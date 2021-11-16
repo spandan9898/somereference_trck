@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon ./src/apps/bluedart/index.js"
   },
   "repository": {
     "type": "git",
@@ -24,5 +25,8 @@
     "lodash": "4.17.21",
     "moment": "2.29.1",
     "mongoose": "6.0.13"
+  },
+  "devDependencies": {
+    "nodemon": "2.0.15"
   }
 }

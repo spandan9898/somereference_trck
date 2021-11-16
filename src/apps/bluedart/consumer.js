@@ -1,0 +1,151 @@
+const _ = require("lodash");
+const moment = require("moment");
+
+const { BLUEDART_CODE_MAPPER_V2 } = require("./constant");
+const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
+
+const repareData = (trackObj) => {
+  const pickrrBluedartDict = {
+    awb: "",
+    scan_type: "",
+    scan_datetime: "",
+    track_info: "",
+    track_location: "",
+    received_by: "",
+    pickup_datetime: "",
+    EDD: "",
+    pickrr_status: "",
+    pickrr_sub_status_code: "",
+    courier_status_code: "",
+  };
+  const { scan_code_id, scan_datetime, track_info, awb, scan_location } =
+    trackObj || {};
+  const scanMappingItem = BLUEDART_CODE_MAPPER_V2[scan_code_id];
+  if (!scanMappingItem) {
+    return { err: "Unknown status code" };
+  }
+
+  pickrrBluedartDict.courier_status_code = scan_code_id;
+  pickrrBluedartDict.pickrr_status =
+    PICKRR_STATUS_CODE_MAPPING[scanMappingItem.scan_type] || "";
+  pickrrBluedartDict.pickrr_sub_status_code =
+    scanMappingItem.pickrr_sub_status_code;
+  pickrrBluedartDict.scan_type =
+    scanMappingItem.scan_type === "UD" ? "NDR" : scanMappingItem.scan_type;
+  pickrrBluedartDict.scan_datetime = scan_datetime;
+  pickrrBluedartDict.track_info = track_info;
+  pickrrBluedartDict.awb = awb;
+  pickrrBluedartDict.track_location = scan_location;
+
+  if (trackObj.EDD) pickrrBluedartDict.EDD = trackObj.EDD;
+  if (trackObj.Receivedby) pickrrBluedartDict.received_by = trackObj.Receivedby;
+  if (trackObj.pickup_datetime)
+    pickrrBluedartDict.pickup_datetime = trackObj.pickup_datetime;
+
+  return pickrrBluedartDict;
+};
+
+const prepareBluedartTrackingList = (trackDta) => {
+  const trackingList = [];
+  try {
+    const statusTracking = trackDta.statustracking;
+    if (!statusTracking) {
+      return {
+        trackingList,
+        err: "Empty Tracking list",
+      };
+    }
+
+    if (statusTracking.constructor !== Array) {
+      trackDta.statustracking = [trackDta.statustracking];
+    }
+    for (const track of statusTracking) {
+      const trackDict = {};
+
+      const shipmentData = _.get(track, "Shipment", {});
+      const trackingId = shipmentData?.WaybillNo;
+      const scanDate = _.get(shipmentData, "Scans.ScanDetail[0].ScanDate");
+      const scanTime = _.get(shipmentData, "Scans.ScanDetail[0].ScanTime");
+      const timestamp = `${scanDate} ${scanTime}`;
+      const scanDetails = _.get(shipmentData, "Scans.ScanDetail[0]", {});
+
+      trackDict.scan_datetime = moment(timestamp, "DD-MM-YYYY hmm");
+      trackDict.scan_type = scanDetails?.ScanType;
+      trackDict.scan_grp_type = scanDetails?.ScanGroupType;
+      trackDict.track_info = scanDetails?.Scan;
+      trackDict.scan_location = scanDetails?.ScannedLocation;
+      trackDict.awb = trackingId;
+      trackDict.scan_code_id = `${scanDetails?.ScanCode}-${scanDetails?.ScanGroupType}`;
+
+      if (shipmentData.PickUpDate) {
+        let pickupDate = `${shipmentData.PickUpDate} ${shipmentData.PickUpTime}`;
+        pickupDate = moment(pickupDate, "DD-MM-YYYY hmm").format(
+          "DD-MM-YYYY HH:mm"
+        );
+        trackDict.pickup_datetime = pickupDate;
+      }
+
+      if (shipmentData.Scans?.DeliveryDetails) {
+        trackDict.Receivedby = _.get(
+          shipmentData,
+          "Scans.DeliveryDetails.ReceivedBy"
+        );
+        const singatureData = _.get(
+          shipmentData,
+          "Scans.DeliveryDetails.ReceivedBy.Signature",
+          []
+        );
+        if (singatureData.length) trackDict.Signature = singatureData;
+      }
+
+      if (shipmentData.ExpectedDeliveryDate) {
+        trackDict.EDD = moment(
+          shipmentData.ExpectedDeliveryDate,
+          "DD-MM-YYYY"
+        ).format("DD-MM-YYYY");
+      }
+      trackingList.push(trackDict);
+    }
+    let sortedTrackingList = _.chain(trackingList)
+      .orderBy(
+        trackingList,
+        [
+          function (item) {
+            return new Date(item.scan_datetime);
+          },
+        ],
+        ["desc"]
+      )
+      .map((item) => ({
+        ...item,
+        scan_datetime: moment(item.scan_datetime).format("DD-MM-YYYY HH:MM"),
+      }))
+      .value();
+
+    return {
+      trackingList: sortedTrackingList,
+    };
+  } catch (error) {
+    return {
+      trackingList,
+      err: error.message,
+    };
+  }
+};
+
+const preparePickrrBluedartDict = (requestedTrackData) => {
+  const result = prepareBluedartTrackingList(requestedTrackData);
+
+  if (result.err) {
+    return result.err;
+  }
+
+  const { trackingList } = result;
+
+  for (const trackData of trackingList) {
+    const preparedData = repareData(trackData);
+    console.log(preparedData);
+  }
+};
+
+module.exports = preparePickrrBluedartDict;
