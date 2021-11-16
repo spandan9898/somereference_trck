@@ -19,6 +19,7 @@
   },
   "homepage": "https://bitbucket.org/laxmanverma/trackingconsumersms#readme",
   "dependencies": {
+    "dotenv": "10.0.0",
     "fastify": "3.24.0",
     "fastify-autoload": "3.9.0",
     "kafkajs": "1.15.0",
