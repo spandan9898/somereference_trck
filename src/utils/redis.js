@@ -68,11 +68,26 @@ function getObject(key){
  */
 function setObject(key,value){
     return new Promise((resolve,reject)=>{
-        if (typeof(key)==='object'){
-            key = JSON.stringify(key);
+        if (typeof(value)==='object'){
+            key = JSON.stringify(value);
         }
 
         redisClient.set(key,value,function(err,value){
+            if (err){
+                reject(err);
+            }
+            resolve(value);
+        })
+    })
+}
+
+/***
+ * @param {string} key
+ * @returns {Number} 1
+ */
+function deleteFromCache(key){
+    return new Promise((resolve,reject)=>{
+        redisClient.del(key,function(err,value){
             if (err){
                 reject(err);
             }
@@ -86,4 +101,5 @@ module.exports = {
     setString,
     getObject,
     setObject,
+    deleteFromCache,
 }
