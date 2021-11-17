@@ -1,16 +1,24 @@
+const _ = require("lodash");
+
 const { BLOCK_NDR_STRINGS } = require("./constants");
 
-const updateTrackDataToPullMongo = (trackData) => {
-  const { scan_type = "", track_info = "", scan_datetime = "" } = trackData;
+const updateTrackDataToPullMongo = (trackObj) => {
+  const trackData = _.cloneDeep(trackObj);
+  const { scanType = "", trackInfo = "" } = trackData;
 
-  if (scan_type === "CC") {
+  if (scanType === "CC") {
     return {
       success: false,
-      err: "scan_type is CC",
+      err: "scanType is CC",
     };
   }
 
-  if (track_info.toLowerCase() in BLOCK_NDR_STRINGS && scan_type === "NDR") {
+  if (trackInfo.toLowerCase() in BLOCK_NDR_STRINGS && scanType === "NDR") {
     trackData.scan_type = "OT";
   }
+  return true;
+};
+
+module.exports = {
+  updateTrackDataToPullMongo,
 };

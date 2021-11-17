@@ -5,8 +5,7 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
     pickrr_sub_status_code: "",
   },
   "FMEOD-101_UD": {
-    courier_remark:
-      "Incomplete shipper pickup address and shipper not contactable",
+    courier_remark: "Incomplete shipper pickup address and shipper not contactable",
     scan_type: "PPF",
     pickrr_sub_status_code: "AI",
   },
@@ -86,8 +85,7 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
     pickrr_sub_status_code: "",
   },
   "X-PPONM_UD": {
-    courier_remark:
-      "Shipment Picked Up from Client Location but Data Not Recieved'",
+    courier_remark: "Shipment Picked Up from Client Location but Data Not Recieved'",
     scan_type: "PP",
     pickrr_sub_status_code: "",
   },
@@ -97,8 +95,7 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
     pickrr_sub_status_code: "",
   },
   "X-PRONM_UD": {
-    courier_remark:
-      "Shipment Picked Up at Origin Center but Data Not Recieved'",
+    courier_remark: "Shipment Picked Up at Origin Center but Data Not Recieved'",
     scan_type: "SHP",
     pickrr_sub_status_code: "",
   },
@@ -183,8 +180,7 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
     pickrr_sub_status_code: "",
   },
   "EOD-143_DL": {
-    courier_remark:
-      "Delivered to others as instructed by consignee - QR Verified",
+    courier_remark: "Delivered to others as instructed by consignee - QR Verified",
     scan_type: "DL",
     pickrr_sub_status_code: "",
   },
@@ -804,8 +800,7 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
     pickrr_sub_status_code: "",
   },
   "RT-106_RT": {
-    courier_remark:
-      "Packaging intact, content mismatch/missing from client at Origin",
+    courier_remark: "Packaging intact, content mismatch/missing from client at Origin",
     scan_type: "RTO-OT",
     pickrr_sub_status_code: "",
   },

@@ -1,30 +1,26 @@
 {
-    "extends": [
-        "airbnb",
-        "prettier"
+  "extends": ["airbnb", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": ["error"],
+    "lines-around-comment": [
+      "error",
+      {
+        "beforeBlockComment": true,
+        "afterBlockComment": true,
+        "beforeLineComment": true,
+        "afterLineComment": true,
+        "allowBlockStart": true,
+        "allowBlockEnd": true,
+        "allowObjectStart": true,
+        "allowObjectEnd": true,
+        "allowArrayStart": true,
+        "allowArrayEnd": true
+      }
     ],
-    "plugins": [
-        "prettier"
-    ],
-    "rules": {
-        "prettier/prettier": [
-            "error"
-        ],
-        "lines-around-comment": [
-            "error",
-            {
-                "beforeBlockComment": true,
-                "afterBlockComment": true,
-                "beforeLineComment": true,
-                "afterLineComment": true,
-                "allowBlockStart": true,
-                "allowBlockEnd": true,
-                "allowObjectStart": true,
-                "allowObjectEnd": true,
-                "allowArrayStart": true,
-                "allowArrayEnd": true
-            }
-        ],
-        "no-unexpected-multiline": "error"
-    }
+    "no-unexpected-multiline": "error"
+  },
+  "parserOptions": {
+    "ecmaVersion": 11
+  }
 }
