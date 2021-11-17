@@ -85,7 +85,7 @@ function setObject(key,value){
  * @param {string} key
  * @returns {Number} 1
  */
-function deleteFromCache(key){
+function deleteKey(key){
     return new Promise((resolve,reject)=>{
         redisClient.del(key,function(err,value){
             if (err){
@@ -101,5 +101,5 @@ module.exports = {
     setString,
     getObject,
     setObject,
-    deleteFromCache,
+    deleteKey,
 }
