@@ -1,5 +1,5 @@
 const prepareDelhiveryData = require("./consumer");
-const kafka = require("../../utils/kafka");
+const kafka = require("../../connector/kafka");
 
 const main = async () => {
   const consumer = kafka.consumer({ groupId: "delhivery-group" });
