@@ -1,3 +1,6 @@
-const { listener } = require("./consumer");
+const { initialize, listener } = require("./consumer");
 
-listener();
+(async () => {
+  const consumer = await initialize();
+  await listener(consumer);
+})();

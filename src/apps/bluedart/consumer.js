@@ -9,9 +9,8 @@ const initialize = async () => {
   return consumer;
 };
 
-exports.listener = async () => {
+const listener = async (consumer) => {
   try {
-    const consumer = await initialize();
     await consumer.run({
       eachMessage: async ({ message }) => {
         const res = preparePickrrBluedartDict(
@@ -24,4 +23,9 @@ exports.listener = async () => {
   } catch (error) {
     console.error(error);
   }
+};
+
+module.exports = {
+  initialize,
+  listener,
 };

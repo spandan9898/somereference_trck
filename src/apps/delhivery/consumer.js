@@ -9,9 +9,8 @@ const initialize = async () => {
   return consumer;
 };
 
-exports.listener = async () => {
+const listener = async (consumer) => {
   try {
-    const consumer = await initialize();
     await consumer.run({
       eachMessage: async ({ message }) => {
         const res = prepareDelhiveryData(Object.values(JSON.parse(message.value.toString()))[0]);
@@ -21,4 +20,9 @@ exports.listener = async () => {
   } catch (error) {
     console.error(error);
   }
+};
+
+module.exports = {
+  initialize,
+  listener,
 };

@@ -136,7 +136,10 @@ Request Payload
   }
 */
 
-const prepareData = (trackObj) => {
+/* 
+  Mapping tracking list's object with our pickrr obj(dict)
+*/
+const preparePickrrObjData = (trackObj) => {
   const pickrrBluedartDict = {
     awb: "",
     scan_type: "",
@@ -179,7 +182,11 @@ const prepareData = (trackObj) => {
   return pickrrBluedartDict;
 };
 
-const prepareBluedartTrackingList = (trackObj) => {
+/* 
+  Fetching only needful data from trackObj's statusTracking list(array)
+  and returning tracking list
+*/
+const getBluedartTrackingList = (trackObj) => {
   const trackingList = [];
   const trackData = _.cloneDeep(trackObj);
   try {
@@ -260,7 +267,7 @@ const prepareBluedartTrackingList = (trackObj) => {
 };
 
 const preparePickrrBluedartDict = (requestedTrackData) => {
-  const result = prepareBluedartTrackingList(requestedTrackData);
+  const result = getBluedartTrackingList(requestedTrackData);
 
   if (result.err) {
     return result.err;
@@ -268,7 +275,7 @@ const preparePickrrBluedartDict = (requestedTrackData) => {
 
   const { trackingList } = result;
 
-  return trackingList.map((trackData) => prepareData(trackData));
+  return trackingList.map((trackData) => preparePickrrObjData(trackData));
 };
 
 module.exports = preparePickrrBluedartDict;
