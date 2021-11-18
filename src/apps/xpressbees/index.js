@@ -1,4 +1,5 @@
-const prepareXbsData = require("./consumer");
+// const prepareXbsData = require("./consumer");
+
 const kafka = require("../../utils/kafka");
 
 const main = async () => {
