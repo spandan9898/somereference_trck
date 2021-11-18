@@ -1,101 +1,35 @@
-const moment = require("moment");
-const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { UDAAN_STATUS_MAPPING } = require("./constant");
-/*
-  udaan_dict: {
-     "awbNumber":"xxxx",
-     "status":"FW_DELIVERY_ATTEMPTED",
-     "statusDescription":"Delivery attempted",
-     "statusUpdateDate":"2021-05-06",
-     "statusUpdateTime":"19:03:59",
-     "comments":"Buyer not reachable over phone",
-     "currentLocation":"Delhi",
-     "deliveryAgentNumber":null,
-     "rtoCode":null
-  }
+const kafka = require("../../connector/kafka");
 
-  return: {
-      "awb":
-      "scan_type":
-      "scan_datetime": datetime.strptime(date, "%d-%m-%Y %H%M")
-      "track_info":
-      "track_location":
-      "EDD":
-  }
-*/
-const udaanDict = {
-     "awbNumber":"acd1234",
-     "status":"FW_DELIVERY_ATTEMPTED",
-     "statusDescription":"Delivery attempted",
-     "statusUpdateDate":"2021-05-06",
-     "statusUpdateTime":"19:03:59",
-     "comments":"Buyer not reachable over phone",
-     "currentLocation":"Delhi",
-     "deliveryAgentNumber":null,
-     "rtoCode":null
-  }
-const prepareUdaanData = (udaanDict) => {
-  const pickrrUdaanDict = {
-    awb: "",
-    scan_type: "",
-    scan_datetime: "",
-    track_info: "",
-    track_location: "",
-    received_by: "",
-    pickup_datetime: "",
-    EDD: "",
-    pickrr_status: "",
-    pickrr_sub_status_code: "",
-    courier_status_code: "",
-  };
+const prepareUdaanData = require("./services");
 
+/**
+ * Initialize consumer and subscribe to topics
+ */
+const initialize = async () => {
+  const consumer = kafka.consumer({ groupId: "udaan-group" });
+  await consumer.connect();
+  await consumer.subscribe({ topic: "udaan", fromBeginning: true });
+  return consumer;
+};
+
+/**
+ *
+ * Listening kafka consumer
+ */
+const listener = async (consumer) => {
   try {
-    const trackData = udaanDict
-    const {status='', comments=''} = trackData
-    const statusScanType = comments.length ? `${status}_${comments}` : status
-    const statusDateTime = `${trackData['statusUpdateDate']} ${trackData['statusUpdateTime']}`
-    const statusDate = statusDateTime
-      ? moment(statusDateTime).format("YYYY-MM-DD HH:MM:SS")
-      : moment(new Date()).format("YYYY-MM-DD HH:MM:SS");
-
-    if ("eta" in trackData && trackData['eta']) {
-      let eddDatetime = trackData["eta"];
-      if (eddDatetime) {
-        eddDatetime = moment(eddDatetime).format("YYYY-MM-DD HH:MM:SS");
-      }
-      pickrrUdaanDict.EDD = eddDatetime;
-    }
-    if ("received_by" in trackData && trackData["received_by"]) {
-      pickrrUdaanDict.received_by = trackData["received_by"];
-    }
-    let reasonDict =
-      UDAAN_STATUS_MAPPING[statusScanType];
-
-    if (!reasonDict) {
-      return {
-        err: "Unknown status code",
-      };
-    }
-    statusType = reasonDict["scan_type"];
-
-    pickrrUdaanDict.scan_type = statusType === "UD" ? "NDR" : statusType;
-    pickrrUdaanDict.scan_datetime = statusDate;
-    pickrrUdaanDict.track_info =
-      trackData["statusDescription"].toString();
-    pickrrUdaanDict.awb = trackData["awbNumber"].toString();
-    pickrrUdaanDict.track_location =
-      trackData["currentLocation"].toString();
-    pickrrUdaanDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
-    pickrrUdaanDict.pickrr_sub_status_code =
-      reasonDict?.pickrr_sub_status_code || "";
-    pickrrUdaanDict.courier_status_code = statusType;
-
-    return pickrrUdaanDict;
+    await consumer.run({
+      eachMessage: async ({ message }) => {
+        const res = prepareUdaanData(Object.values(JSON.parse(message.value.toString()))[0]);
+        console.log(res);
+      },
+    });
   } catch (error) {
-    pickrrUdaanDict["err"] = error.message;
-    return pickrrUdaanDict;
+    console.error(error);
   }
 };
 
-
-module.exports = prepareUdaanData;
+module.exports = {
+  initialize,
+  listener,
+};
