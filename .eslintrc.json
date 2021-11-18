@@ -7,7 +7,7 @@
       "error",
       {
         "beforeBlockComment": true,
-        "afterBlockComment": true,
+        "afterBlockComment": false,
         "beforeLineComment": true,
         "afterLineComment": true,
         "allowBlockStart": true,
@@ -18,7 +18,20 @@
         "allowArrayEnd": true
       }
     ],
-    "no-unexpected-multiline": "error"
+    "no-unexpected-multiline": "error",
+    "func-style": [2, "expression", { "allowArrowFunctions": true }],
+    "arrow-body-style": ["error", "as-needed"],
+    "require-jsdoc": [
+      "error",
+      {
+        "require": {
+          "MethodDefinition": true,
+          "ClassDeclaration": true,
+          "ArrowFunctionExpression": true,
+          "FunctionExpression": true
+        }
+      }
+    ]
   },
   "parserOptions": {
     "ecmaVersion": 11
