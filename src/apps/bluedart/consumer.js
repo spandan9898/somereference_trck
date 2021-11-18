@@ -1,5 +1,5 @@
 const kafka = require("../../connector/kafka");
-const { redisCheckAndUpdateToPull } = require("../../services/pull/services");
+const { redisCheckAndReturnTrackData } = require("../../services/pull/services");
 const { preparePickrrBluedartDict } = require("./services");
 
 /**
@@ -23,7 +23,8 @@ const listener = async (consumer) => {
         const res = preparePickrrBluedartDict(
           Object.values(JSON.parse(message.value.toString()))[0]
         );
-        await redisCheckAndUpdateToPull(res);
+        const trackData = await redisCheckAndReturnTrackData(res);
+        console.log(trackData);
       },
     });
   } catch (error) {
