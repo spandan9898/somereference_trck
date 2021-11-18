@@ -1,10 +1,11 @@
 const kafka = require("../../connector/kafka");
+const { redisCheckAndUpdateToPull } = require("../../services/pull/services");
+const { preparePickrrBluedartDict } = require("./services");
 
-const preparePickrrBluedartDict = require("./services");
-
-/* 
-Initialize consumer and subscribe to topics
-*/
+/**
+ * Initialize consumer and subscribe to topics
+ *
+ * */
 const initialize = async () => {
   const consumer = kafka.consumer({ groupId: "bluedart-group" });
   await consumer.connect();
@@ -12,9 +13,9 @@ const initialize = async () => {
   return consumer;
 };
 
-/* 
-  Listening kafka consumer
-*/
+/**
+ * Listening kafka consumer
+ */
 const listener = async (consumer) => {
   try {
     await consumer.run({
@@ -22,8 +23,7 @@ const listener = async (consumer) => {
         const res = preparePickrrBluedartDict(
           Object.values(JSON.parse(message.value.toString()))[0]
         );
-        console.log("bluedart");
-        console.log(res);
+        await redisCheckAndUpdateToPull(res);
       },
     });
   } catch (error) {

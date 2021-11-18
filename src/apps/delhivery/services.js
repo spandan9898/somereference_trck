@@ -36,9 +36,11 @@ Request payload sample
     }
 */
 
-/* 
-Preparing pickrr dict from delhivery request payload
-*/
+/**
+ *
+ * Preparing pickrr dict from delhivery request payload
+ *
+ */
 const prepareDelhiveryData = (delhiveryDict) => {
   const pickrrDelhiveryDict = {
     awb: "",
