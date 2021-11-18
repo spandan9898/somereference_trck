@@ -136,9 +136,10 @@ Courier Request Payload
   }
 */
 
-/* 
-  Preparing pickrr dict of each tracking lists's item
-*/
+/**
+ *
+ * Preparing pickrr dict of each tracking lists's item
+ */
 const preparePickrrObjData = (trackObj) => {
   const pickrrBluedartDict = {
     awb: "",
@@ -182,10 +183,10 @@ const preparePickrrObjData = (trackObj) => {
   return pickrrBluedartDict;
 };
 
-/* 
-  Fetching only needful data from trackObj's statusTracking list(array)
-  and returning tracking list
-*/
+/**
+ * Fetching only needful data from trackObj's statusTracking list(array)
+ * and returning tracking list
+ */
 const getBluedartTrackingList = (trackObj) => {
   const trackingList = [];
   const trackData = _.cloneDeep(trackObj);
@@ -266,10 +267,11 @@ const getBluedartTrackingList = (trackObj) => {
   }
 };
 
-/* 
-  Getting tracking list information 
-  and preparing each item of the tracking list as our pickrr dict
-*/
+/**
+ * Getting tracking list information
+ * and preparing each item of the tracking list as our pickrr dict
+ *
+ */
 const preparePickrrBluedartDict = (requestedTrackData) => {
   const result = getBluedartTrackingList(requestedTrackData);
 
@@ -282,4 +284,6 @@ const preparePickrrBluedartDict = (requestedTrackData) => {
   return trackingList.map((trackData) => preparePickrrObjData(trackData));
 };
 
-module.exports = preparePickrrBluedartDict;
+module.exports = {
+  preparePickrrBluedartDict,
+};

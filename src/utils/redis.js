@@ -16,9 +16,8 @@ redisClient.on("connect", () => {
  * @param {string} key
  * @returns {string}
  */
-
-function getString(key) {
-  return new Promise((resolve, reject) => {
+const getString = (key) =>
+  new Promise((resolve, reject) => {
     redisClient.get(key, (err, resValue) => {
       if (err) {
         reject(err);
@@ -26,7 +25,6 @@ function getString(key) {
       resolve(resValue);
     });
   });
-}
 
 /** *
  * insert string value to redis-cache
@@ -34,9 +32,8 @@ function getString(key) {
  * @param {string} value
  * @returns {string} "OK"
  */
-
-function setString(key, value) {
-  return new Promise((resolve, reject) => {
+const setString = (key, value) =>
+  new Promise((resolve, reject) => {
     redisClient.set(key, value, (err, resValue) => {
       if (err) {
         reject(err);
@@ -44,16 +41,14 @@ function setString(key, value) {
       resolve(resValue);
     });
   });
-}
 
 /** *
  * retrieve object value from redis-cache
  * @param {string} key
  * @returns {object}
  */
-
-function getObject(key) {
-  return new Promise((resolve, reject) => {
+const getObject = (key) =>
+  new Promise((resolve, reject) => {
     redisClient.get(key, (err, resValue) => {
       if (err) {
         reject(err);
@@ -61,7 +56,6 @@ function getObject(key) {
       resolve(JSON.parse(resValue));
     });
   });
-}
 
 /** *
  * insert object value to redis-cache
@@ -69,30 +63,27 @@ function getObject(key) {
  * @param {object} value
  * @returns {string} "OK"
  */
-
-function setObject(key, value) {
-  return new Promise((resolve, reject) => {
-    let newKey = key;
+const setObject = (key, value) =>
+  new Promise((resolve, reject) => {
+    let newValue = value;
     if (typeof value === "object") {
-      newKey = JSON.stringify(value);
+      newValue = JSON.stringify(value);
     }
 
-    redisClient.set(newKey, value, (err, resValue) => {
+    redisClient.set(key, newValue, (err, resValue) => {
       if (err) {
         reject(err);
       }
       resolve(resValue);
     });
   });
-}
 
 /** *
  * @param {string} key
  * @returns {Number} 1
  */
-
-function deleteKey(key) {
-  return new Promise((resolve, reject) => {
+const deleteKey = (key) =>
+  new Promise((resolve, reject) => {
     redisClient.del(key, (err, resValue) => {
       if (err) {
         reject(err);
@@ -100,7 +91,6 @@ function deleteKey(key) {
       resolve(resValue);
     });
   });
-}
 
 module.exports = {
   getString,
