@@ -2,6 +2,9 @@ const kafka = require("../../connector/kafka");
 
 const prepareDelhiveryData = require("./services");
 
+/* 
+Initialize consumer and subscribe to topics
+*/
 const initialize = async () => {
   const consumer = kafka.consumer({ groupId: "delhivery-group" });
   await consumer.connect();
@@ -9,6 +12,9 @@ const initialize = async () => {
   return consumer;
 };
 
+/* 
+  Listening kafka consumer
+*/
 const listener = async (consumer) => {
   try {
     await consumer.run({

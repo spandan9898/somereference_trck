@@ -5,7 +5,7 @@ const { BLUEDART_CODE_MAPPER_V2 } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 
 /*
-Request Payload
+Courier Request Payload
 {
     statustracking: [
       {
@@ -137,7 +137,7 @@ Request Payload
 */
 
 /* 
-  Mapping tracking list's object with our pickrr obj(dict)
+  Preparing pickrr dict of each tracking lists's item
 */
 const preparePickrrObjData = (trackObj) => {
   const pickrrBluedartDict = {
@@ -266,6 +266,10 @@ const getBluedartTrackingList = (trackObj) => {
   }
 };
 
+/* 
+  Getting tracking list information 
+  and preparing each item of the tracking list as our pickrr dict
+*/
 const preparePickrrBluedartDict = (requestedTrackData) => {
   const result = getBluedartTrackingList(requestedTrackData);
 

@@ -4,6 +4,7 @@ const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER } = require("./constant");
 
 /*
+Request payload sample
     :param delhiveryDict: {
     "Shipment": {
         "Status": {
@@ -35,6 +36,9 @@ const { DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER } = require("./constant");
     }
 */
 
+/* 
+Preparing pickrr dict from delhivery request payload
+*/
 const prepareDelhiveryData = (delhiveryDict) => {
   const pickrrDelhiveryDict = {
     awb: "",
