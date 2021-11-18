@@ -1,4 +1,9 @@
+const _ = require("lodash");
+const moment = require("moment");
+
 const { checkAwbInCache } = require("../../utils/redis");
+const { BLOCK_NDR_STRINGS } = require("./constants");
+const { mapStatusToEvent } = require("./helpers");
 
 /** *
  * @param preparedTrackData -> [
@@ -28,6 +33,58 @@ const redisCheckAndReturnTrackData = async (preparedTrackData) => {
   return trackObj;
 };
 
+/**
+ *
+ * preparing track data
+ */
+const prepareTrackDataToUpdateInPullDb = (trackObj) => {
+  const trackData = _.cloneDeep(trackObj);
+  const {
+    scan_type: scanType = "",
+    track_info: trackInfo = "",
+    scan_datetime: scanDatetime = "",
+    track_location: trackLocation = "",
+    EDD: edd = "",
+  } = trackData;
+
+  if (scanType === "CC") {
+    return {
+      success: false,
+      err: "scanType is CC",
+    };
+  }
+
+  if (trackInfo.toLowerCase() in BLOCK_NDR_STRINGS && scanType === "NDR") {
+    trackData.scan_type = "OT";
+  }
+  let currentStatusTime = moment(scanDatetime, "DD-MM-YYYY HH:MM");
+  currentStatusTime = currentStatusTime.isValid() ? currentStatusTime.format() : null;
+
+  const statusMap = {
+    current_status_time: currentStatusTime,
+    current_status_type: scanType,
+    current_status_body: trackInfo,
+    current_status_location: trackLocation,
+  };
+
+  const eventObj = mapStatusToEvent(statusMap);
+  eventObj.pickrr_sub_status_code = trackData.pickrr_sub_status_code;
+  eventObj.courier_status_code = trackData.courier_status_code;
+  eventObj.update_source = "kafka";
+  eventObj.update_time = moment().utc().format();
+  eventObj.last_update_from = "kafka";
+
+  const eddDate = moment(edd, "DD-MM-YYYY");
+  const eddStamp = eddDate.isValid() ? eddDate.format("DD-MM-YYYY HH:MM") : edd;
+
+  return {
+    eddStamp,
+    eventObj,
+    statusMap,
+  };
+};
+
 module.exports = {
   redisCheckAndReturnTrackData,
+  prepareTrackDataToUpdateInPullDb,
 };

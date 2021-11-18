@@ -75,6 +75,7 @@ const setObject = (key, value) =>
       if (err) {
         reject(err);
       }
+      console.log("resValue");
       resolve(resValue);
     });
   });
