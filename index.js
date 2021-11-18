@@ -1,6 +1,8 @@
-const server = require('./server');
+require("dotenv").config();
 
-const bluedartApp = require('./src/apps/bluedart');
-const delhiveryApp = require('./src/apps/delhivery');
+const server = require("./server");
+
+const bluedartApp = require("./src/apps/bluedart");
+const delhiveryApp = require("./src/apps/delhivery");
 
 server.createServer();
