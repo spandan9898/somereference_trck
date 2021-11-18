@@ -10,7 +10,6 @@ const listener = async () => {
     remarks: "COD Not Ready",
   };
   //amazeDict from producer
-  console.log(amazeDictSample);
   prepareAmazeData(amazeDictSample);
 };
 
