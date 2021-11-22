@@ -1,5 +1,5 @@
 const moment = require("moment");
-
+const _ = require("lodash");
 const { ECOMM_CODE_MAPPER } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 
@@ -44,18 +44,12 @@ const prepareEcommData = (ecommDict) => {
       const pickrrStatusCode = reasonDict.pickrr_status_code;
       const scanType = pickrrStatusCode === "UD" ? "NDR" : pickrrStatusCode;
       const pickrrSubstatusCode = reasonDict.pickrr_sub_status_code;
-      const scanDatetime = moment(ecommDict.datetime).format("YYYY-MM-DD HH-MM-SS");
+      const scanDatetime = moment(ecommDict.datetime).format("YYYY-MM-DD HH:mm:ss");
       let remarks = `${ecommDict.status.trim()} ${ecommDict.reasonCode?.replace("-", "")?.trim()}`;
+      pickrrEcommDict.scan_datetime = scanDatetime || "";
+      pickrrEcommDict.received_by = receivedBy || "";
+      pickrrEcommDict.EDD = EDD ? moment(EDD).format("YYYY-MM-DD HH:mm:ss") : "";
 
-      if (EDD) {
-        const EDDDatetime = moment(EDD).format("YYYY-MM-DD HH-MM-SS");
-        pickrrEcommDict.scan_datetime = EDDDatetime;
-      }
-      if (receivedBy) {
-        pickrrEcommDict.received_by = receivedBy;
-      }
-
-      pickrrEcommDict.scan_datetime = scanDatetime;
       if (scanType === "RTD") {
         remarks = "Order Returned to Consignee";
       }
@@ -64,8 +58,8 @@ const prepareEcommData = (ecommDict) => {
       }
       pickrrEcommDict.scan_type = scanType;
       pickrrEcommDict.track_info = remarks;
-      pickrrEcommDict.awb = ecommDict.awb;
-      pickrrEcommDict.track_location = ecommDict.location;
+      pickrrEcommDict.awb = _.get(ecommDict, "awb", "");
+      pickrrEcommDict.track_location = _.get(ecommDict, "location", "");
       pickrrEcommDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];
       pickrrEcommDict.pickrr_sub_status_code = pickrrSubstatusCode;
       pickrrEcommDict.courier_status_code = reasonCodeNumber;

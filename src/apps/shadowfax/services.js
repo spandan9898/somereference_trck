@@ -1,4 +1,5 @@
 const moment = require("moment");
+const _ = require("lodash");
 
 const { SHADOWFAX_CODE_MAPPER } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
@@ -34,22 +35,17 @@ const prepareShadowfaxData = (shadowfaxDict) => {
   };
 
   try {
-    const { event, received_by: receivedBy } = shadowfaxDict || {};
+    const { event, received_by: receivedBy, EDD } = shadowfaxDict || {};
     if (event in SHADOWFAX_CODE_MAPPER) {
       const scanType = SHADOWFAX_CODE_MAPPER[event];
-      const scanDatetime = moment(shadowfaxDict.event_timestamp).format("YYYY-MM-DD HH-MM-SS");
-      if (shadowfaxDict.EDD) {
-        pickrrShadowfaxDict.EDD = moment(shadowfaxDict.EDD).format("YYYY-MM-DD HH-MM-SS");
-      }
-      if (receivedBy) {
-        pickrrShadowfaxDict.received_by = receivedBy;
-      }
+      const scanDatetime = moment(shadowfaxDict.event_timestamp).format("YYYY-MM-DD HH:mm:ss");
+      pickrrShadowfaxDict.EDD = EDD ? moment(EDD).format("YYYY-MM-DD HH:mm:ss") : "";
+      pickrrShadowfaxDict.received_by = receivedBy || "";
       pickrrShadowfaxDict.scan_type = scanType;
       pickrrShadowfaxDict.scan_datetime = scanDatetime;
-      pickrrShadowfaxDict.track_info = shadowfaxDict.comments;
-      pickrrShadowfaxDict.awb = shadowfaxDict.awb_number;
-      pickrrShadowfaxDict.track_location =
-        "location" in shadowfaxDict ? shadowfaxDict.location : "";
+      pickrrShadowfaxDict.track_info = _.get(shadowfaxDict, "comments", "");
+      pickrrShadowfaxDict.awb = _.get(shadowfaxDict, "awb_number", "");
+      pickrrShadowfaxDict.track_location = _.get(shadowfaxDict, "location", "");
       pickrrShadowfaxDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];
     }
     return pickrrShadowfaxDict;

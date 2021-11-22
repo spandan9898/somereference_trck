@@ -1,4 +1,5 @@
 const moment = require("moment");
+const _ = require("lodash");
 
 const { AMAZE_CODE_MAPPER } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
@@ -39,9 +40,7 @@ const prepareAmazeData = (amazeDict) => {
     const currentStatus = amazeDict.current_status;
 
     let remarks = "";
-    if ("remarks" in amazeDict) {
-      remarks = amazeDict.remarks;
-    }
+    remarks = _.get(amazeDict, "remarks", "");
     let mappingKey = currentStatus;
     if (currentStatus === "Undelivered" && remarks) {
       mappingKey = `${currentStatus}-${remarks}`;
@@ -57,15 +56,14 @@ const prepareAmazeData = (amazeDict) => {
     pickrrAmazeDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING.scanMappingItem?.scan_type || "";
 
     const scanType = scanMappingItem.scan_type;
-    let scanDatetime = amazeDict.updatedAt;
-    scanDatetime = moment(scanDatetime).format("YYYY-MM-DD HH:MM:SS");
+    const scanDatetime = amazeDict.updatedAt
+      ? moment(amazeDict.updatedAt).format("YYYY-MM-DD HH:mm:ss")
+      : "";
 
-    if ("edd" in amazeDict && amazeDict.edd) {
-      pickrrAmazeDict.EDD = moment(amazeDict.edd).format("YYYY-MM-DD HH:MM:SS");
-    }
-    if ("received_by" in amazeDict && amazeDict.received_by) {
-      pickrrAmazeDict.received_by = amazeDict.received_by;
-    }
+    pickrrAmazeDict.EDD = amazeDict.edd ? moment(amazeDict.edd).format("YYYY-MM-DD HH:mm:ss") : "";
+
+    pickrrAmazeDict.received_by = amazeDict.received_by || "";
+
     pickrrAmazeDict.scan_type = scanType;
     pickrrAmazeDict.scan_datetime = scanDatetime;
     pickrrAmazeDict.track_info = amazeDict.current_status;
