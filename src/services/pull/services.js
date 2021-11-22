@@ -72,12 +72,12 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   eventObj.courier_status_code = trackData.courier_status_code;
   eventObj.update_source = "kafka";
   eventObj.update_time = moment().utc().format();
-  eventObj.last_update_from = "kafka";
 
   const eddDate = moment(edd, "DD-MM-YYYY");
   const eddStamp = eddDate.isValid() ? eddDate.format("DD-MM-YYYY HH:MM") : edd;
 
   return {
+    success: true,
     eddStamp,
     eventObj,
     statusMap,

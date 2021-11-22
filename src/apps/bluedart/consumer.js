@@ -1,7 +1,9 @@
 const kafka = require("../../connector/kafka");
 const { updateTrackDataToPullMongo } = require("../../services/pull");
 const { redisCheckAndReturnTrackData } = require("../../services/pull/services");
+
 const { setObject } = require("../../utils/redis");
+
 const { preparePickrrBluedartDict } = require("./services");
 
 /**

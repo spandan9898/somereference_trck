@@ -5,7 +5,8 @@ const redisClient = redis.createClient();
 
 redisClient.on("error", (error) => {
   console.error(error.message);
-  process.exit(1);
+
+  // TODO: notify us
 });
 
 redisClient.on("connect", () => {
