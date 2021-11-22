@@ -16,10 +16,11 @@ const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
     }
 */
 
-/*
-Prepare pickrr_dict from amaze payload
-*/
-
+/**
+ *
+ * @param {*} amazeDict
+ * @returns
+ */
 const prepareAmazeData = (amazeDict) => {
   const pickrrAmazeDict = {
     awb: "",

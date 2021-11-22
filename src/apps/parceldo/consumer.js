@@ -1,24 +1,27 @@
 const kafka = require("../../connector/kafka");
-const { prepareAmazeData } = require("./services");
+const { prepareParceldoData } = require("./services");
 
 /**
- * initialize consumer for amaze payload
+ * initialize consumer for parceldo payload
  */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: "amaze-group" });
+  const consumer = kafka.consumer({ groupId: "parceldo-group" });
   await consumer.connect();
-  await consumer.subscribe({ topic: "amaze", fromBeginning: true });
+  await consumer.subscribe({
+    topic: "parceldo",
+    fromBeginning: true,
+  });
   return consumer;
 };
 
 /**
- * listener for amaze Producer
+ * listener for parceldo producer
  */
 const listener = async (consumer) => {
   try {
     await consumer.run({
       eachMessage: async ({ message }) => {
-        const response = prepareAmazeData(Object.values(JSON.parse(message.values.toString())));
+        const response = prepareParceldoData(Object.values(JSON.parse(message.values.toString())));
         console.log(response);
       },
     });
