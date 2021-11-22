@@ -1,8 +1,12 @@
+/* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
+
 const { updateTrackDataToPullMongo } = require("../../services/pull");
 const { redisCheckAndReturnTrackData } = require("../../services/pull/services");
 
 const { setObject } = require("../../utils/redis");
+
+const { TOTAL_TOPIC_COUNT } = require("./constant");
 
 const { preparePickrrBluedartDict } = require("./services");
 
@@ -12,9 +16,16 @@ const { preparePickrrBluedartDict } = require("./services");
  * */
 const initialize = async () => {
   const consumer = kafka.consumer({ groupId: "bluedart-group" });
+  const totalTopicsCount = new Array(TOTAL_TOPIC_COUNT).fill(1);
   await consumer.connect();
-  await consumer.subscribe({ topic: "bluedart", fromBeginning: true });
-  return consumer;
+  return totalTopicsCount.map(async (_, index) => {
+    try {
+      await consumer.subscribe({ topic: `bluedart-${index}`, fromBeginning: false });
+      return consumer;
+    } catch (error) {
+      console.log("error -->", error.message);
+    }
+  });
 };
 
 /**
@@ -27,7 +38,9 @@ const initialize = async () => {
 const listener = async (consumer) => {
   try {
     await consumer.run({
-      eachMessage: async ({ message }) => {
+      eachMessage: async ({ message, topic, partition }) => {
+        console.log("topic -->", topic);
+        console.log("partition -->", partition);
         const res = preparePickrrBluedartDict(
           Object.values(JSON.parse(message.value.toString()))[0]
         );
