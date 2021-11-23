@@ -2,6 +2,7 @@ const moment = require("moment");
 
 const { prepareTrackDataToUpdateInPullDb } = require("./services");
 const commonTrackingInfoCol = require("./model");
+const { setObject } = require("../../utils/redis");
 
 /**
  *
@@ -33,14 +34,14 @@ const updateTrackDataToPullMongo = async (trackObj) => {
       {
         $set: updatedObj,
         $push: {
-          track_arr: trackArr[0],
+          track_arr: { $each: trackArr, $position: 0 },
         },
       },
       {
         upsert: true,
       }
     );
-
+    setObject(trackObj.awb, trackObj);
     return res;
   } catch (error) {
     throw new Error(error);
