@@ -2,8 +2,6 @@ require("dotenv").config();
 
 const server = require("./server");
 
-// const bluedartApp = require("./src/apps/bluedart");
-
 const db = require("./src/connector/database");
 
 db.initDB((err, _db) => {
@@ -17,6 +15,9 @@ db.initDB((err, _db) => {
   }
 });
 
+// const bluedartApp = require("./src/apps/bluedart");
 // const delhiveryApp = require("./src/apps/delhivery");
+// const delhiveryApp = require("./src/apps/delhivery");
+// const amazeApp = require("./src/apps/amaze");
 
 server.createServer();
