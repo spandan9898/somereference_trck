@@ -1,10 +1,45 @@
+/* eslint-disable consistent-return */
 const { MongoClient } = require("mongodb");
 
-const pullDbMongoClient = new MongoClient(process.env.MONGO_DB_PULL_SERVER_HOST, {
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-});
+// DB
+
+let db;
+
+/**
+ * Init Pull DB
+ */
+const initDB = (callback) => {
+  // If DB already connected and Initialized
+
+  if (db) {
+    console.log("DB has already initialized");
+    return callback(null, db);
+  }
+
+  MongoClient.connect(process.env.MONGO_DB_PULL_SERVER_HOST, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+    .then((client) => {
+      db = client;
+      callback(null, db);
+    })
+    .catch((err) => {
+      callback(err);
+    });
+};
+
+/**
+ * Get DB Instance
+ */
+const getDB = () => {
+  if (!db) {
+    throw Error("DB not initialized");
+  }
+  return db;
+};
 
 module.exports = {
-  pullDbMongoClient,
+  initDB,
+  getDB,
 };
