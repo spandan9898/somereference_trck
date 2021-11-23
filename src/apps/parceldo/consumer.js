@@ -30,7 +30,7 @@ const initialize = async () => {
 const listener = async (consumer) => {
   try {
     await consumer.run({
-      eachMessage: async ({ message, partition, topic }) => {
+      eachMessage: async ({ message, topic, partition }) => {
         console.log(`Topic: ${topic} | Partition ${partition}`);
         const response = prepareParceldoData(
           Object.values(JSON.parse(message.values.toString()))[0]
