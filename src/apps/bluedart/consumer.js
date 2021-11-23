@@ -4,8 +4,6 @@ const kafka = require("../../connector/kafka");
 const { updateTrackDataToPullMongo } = require("../../services/pull");
 const { redisCheckAndReturnTrackData } = require("../../services/pull/services");
 
-const { setObject } = require("../../utils/redis");
-
 const { TOTAL_TOPIC_COUNT } = require("./constant");
 const { preparePickrrBluedartDict } = require("./services");
 
@@ -38,11 +36,12 @@ const listener = async (consumer) => {
   try {
     await consumer.run({
       eachMessage: async ({ message, topic, partition }) => {
-        console.log("topic -->", topic);
-        console.log("partition -->", partition);
+        console.log(`Topic: ${topic} | Partition ${partition}`);
         const res = preparePickrrBluedartDict(
           Object.values(JSON.parse(message.value.toString()))[0]
         );
+        if (!res.awb) return;
+
         const trackData = await redisCheckAndReturnTrackData(res);
         if (!trackData) {
           console.log("Same data already exists");
@@ -50,7 +49,6 @@ const listener = async (consumer) => {
         }
 
         await updateTrackDataToPullMongo(trackData);
-        setObject(trackData.awb, trackData);
       },
     });
   } catch (error) {
