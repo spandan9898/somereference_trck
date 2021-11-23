@@ -7,7 +7,6 @@ const { redisCheckAndReturnTrackData } = require("../../services/pull/services")
 const { setObject } = require("../../utils/redis");
 
 const { TOTAL_TOPIC_COUNT } = require("./constant");
-
 const { preparePickrrBluedartDict } = require("./services");
 
 /**
@@ -20,7 +19,7 @@ const initialize = async () => {
   await consumer.connect();
   return totalTopicsCount.map(async (_, index) => {
     try {
-      await consumer.subscribe({ topic: `bluedart-${index}`, fromBeginning: false });
+      await consumer.subscribe({ topic: `bluedart_${index}`, fromBeginning: false });
       return consumer;
     } catch (error) {
       console.log("error -->", error.message);

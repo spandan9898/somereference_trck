@@ -17,7 +17,6 @@ db.initDB((err, _db) => {
 
 // const bluedartApp = require("./src/apps/bluedart");
 // const delhiveryApp = require("./src/apps/delhivery");
-// const delhiveryApp = require("./src/apps/delhivery");
 // const amazeApp = require("./src/apps/amaze");
 
 server.createServer();
