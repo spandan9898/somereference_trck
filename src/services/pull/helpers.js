@@ -1,12 +1,17 @@
-const mapStatusToEvent = (statusDict) => {
-  const eventDict = {};
+/**
+ *
+ * returning event dict from status obj,
+ * which is coming from prepared data (pickrr object)
+ */
+const mapStatusToEvent = (statusObj) => {
+  const eventObj = {
+    scan_datetime: statusObj.current_status_time || "",
+    scan_type: statusObj.current_status_type || "",
+    scan_status: statusObj.current_status_body || "",
+    scan_location: statusObj.current_status_location || "",
+  };
 
-  eventDict.scan_datetime = statusDict.get("current_status_time", "");
-  eventDict.scan_type = statusDict.get("current_status_type", "");
-  eventDict.scan_status = statusDict.get("current_status_body", "");
-  eventDict.scan_location = statusDict.get("current_status_location", "");
-
-  return eventDict;
+  return eventObj;
 };
 
 module.exports = {

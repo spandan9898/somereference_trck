@@ -3,12 +3,13 @@ const redis = require("redis");
 const redisClient = redis.createClient();
 
 redisClient.on("error", (error) => {
-  console.error(error);
-  throw error;
+  console.error(error.message);
+
+  // TODO: notify us
 });
 
 redisClient.on("connect", () => {
-  console.log("Connected!");
+  console.log("Redis Connected!");
 });
 
 /** *
@@ -74,6 +75,7 @@ const setObject = (key, value) =>
       if (err) {
         reject(err);
       }
+      console.log("resValue");
       resolve(resValue);
     });
   });
@@ -98,4 +100,5 @@ module.exports = {
   getObject,
   setObject,
   deleteKey,
+  redisClient,
 };

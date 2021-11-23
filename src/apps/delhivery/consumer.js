@@ -1,15 +1,24 @@
+/* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
 
 const prepareDelhiveryData = require("./services");
+const { TOTAL_TOPIC_COUNT } = require("./constant");
 
 /**
  * Initialize consumer and subscribe to topics
  */
 const initialize = async () => {
   const consumer = kafka.consumer({ groupId: "delhivery-group" });
-  await consumer.connect();
-  await consumer.subscribe({ topic: "delhivery", fromBeginning: true });
-  return consumer;
+  const totalTopicsCount = new Array(TOTAL_TOPIC_COUNT).fill(1);
+  return totalTopicsCount.map(async (_, index) => {
+    try {
+      await consumer.connect();
+      await consumer.subscribe({ topic: `delhivery_${index}`, fromBeginning: false });
+      return consumer;
+    } catch (error) {
+      console.log("error -->", error.message);
+    }
+  });
 };
 
 /**

@@ -1,22 +1,50 @@
-const _ = require("lodash");
+const moment = require("moment");
 
-const { BLOCK_NDR_STRINGS } = require("./constants");
+const { prepareTrackDataToUpdateInPullDb } = require("./services");
+const commonTrackingInfoCol = require("./model");
 
-const updateTrackDataToPullMongo = (trackObj) => {
-  const trackData = _.cloneDeep(trackObj);
-  const { scanType = "", trackInfo = "" } = trackData;
-
-  if (scanType === "CC") {
-    return {
-      success: false,
-      err: "scanType is CC",
-    };
+/**
+ *
+ * @param {*} trackObj
+ * @desc sending tracking data to pull mongodb
+ * @returns success or error
+ */
+const updateTrackDataToPullMongo = async (trackObj) => {
+  const result = prepareTrackDataToUpdateInPullDb(trackObj);
+  if (!result.success) {
+    throw new Error(result.err);
   }
+  const updatedObj = {
+    status: result.statusMap,
+    track_arr: [result.eventObj],
+    last_update_from: "kafka",
+    edd_stamp: result.eddStamp,
+    updated_at: moment().format(),
+  };
 
-  if (trackInfo.toLowerCase() in BLOCK_NDR_STRINGS && scanType === "NDR") {
-    trackData.scan_type = "OT";
+  try {
+    const pullCollection = await commonTrackingInfoCol();
+
+    const trackArr = updatedObj.track_arr;
+    delete updatedObj.track_arr;
+
+    const res = await pullCollection.updateOne(
+      { tracking_id: trackObj.awb },
+      {
+        $set: updatedObj,
+        $push: {
+          track_arr: trackArr[0],
+        },
+      },
+      {
+        upsert: true,
+      }
+    );
+
+    return res;
+  } catch (error) {
+    throw new Error(error);
   }
-  return true;
 };
 
 module.exports = {
