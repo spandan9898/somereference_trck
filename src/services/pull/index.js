@@ -34,7 +34,7 @@ const updateTrackDataToPullMongo = async (trackObj) => {
       {
         $set: updatedObj,
         $push: {
-          track_arr: trackArr[0],
+          track_arr: { $each: trackArr, $position: 0 },
         },
       },
       {
