@@ -7,7 +7,9 @@ const { initialize, listener } = require("./consumer");
     consumers.forEach((consumer) => {
       consumer
         .then((res) => {
-          listener(res);
+          if (res) {
+            listener(res);
+          }
         })
         .catch((err) => console.log(err));
     });
