@@ -5,7 +5,9 @@ const { initialize, listener } = require("./consumer");
   udaanConsumers.forEach((consumer) => {
     consumer
       .then((res) => {
-        listener(res);
+        if (res) {
+          listener(res);
+        }
       })
       .catch((error) => console.log(error));
   });

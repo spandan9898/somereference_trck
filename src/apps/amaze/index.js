@@ -9,8 +9,10 @@ const { listener, initialize } = require("./consumer");
     const amazeConsumers = await initialize();
     amazeConsumers.forEach((consumer) => {
       consumer
-        .then((res) => {
-          listener(res);
+        .then((response) => {
+          if (response) {
+            listener(response);
+          }
         })
         .catch((error) => console.log(error));
     });

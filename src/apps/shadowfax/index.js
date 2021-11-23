@@ -5,7 +5,9 @@ const { listener, initialize } = require("./consumer");
   shadowfaxConsumers.forEach((consumer) => {
     consumer
       .then((res) => {
-        listener(res);
+        if (res) {
+          listener(res);
+        }
       })
       .catch((err) => console.log(err.message));
   });

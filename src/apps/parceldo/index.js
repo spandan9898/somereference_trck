@@ -5,7 +5,9 @@ const { listener, initialize } = require("./consumer");
   parceldoConsumers.forEach((consumer) => {
     consumer
       .then((response) => {
-        listener(response);
+        if (response) {
+          listener(response);
+        }
       })
       .catch((err) => console.log(err.message));
   });

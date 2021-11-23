@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
 const { prepareShadowfaxData } = require("./services");
 
@@ -19,7 +20,6 @@ const initialize = async () => {
       return consumer;
     } catch (error) {
       console.error(error.message);
-      return error.message;
     }
   });
 };

@@ -4,8 +4,10 @@ const { listener, initialize } = require("./consumer");
   const ecommConsumers = await initialize();
   ecommConsumers.forEach((consumer) => {
     consumer
-      .then((res) => {
-        listener(res);
+      .then((response) => {
+        if (response) {
+          listener(response);
+        }
       })
       .catch((err) => console.log(err));
   });

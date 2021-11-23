@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
 const { updateTrackDataToPullMongo } = require("../../services/pull");
 const { redisCheckAndReturnTrackData } = require("../../services/pull/services");
@@ -18,7 +19,6 @@ const initialize = async () => {
       return consumer;
     } catch (error) {
       console.error(error);
-      return error.message;
     }
   });
 };
