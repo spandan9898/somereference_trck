@@ -1,6 +1,9 @@
 /* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
 
+const { updateTrackDataToPullMongo } = require("../../services/pull");
+const { redisCheckAndReturnTrackData } = require("../../services/pull/services");
+
 const prepareDelhiveryData = require("./services");
 const { TOTAL_TOPIC_COUNT } = require("./constant");
 
@@ -28,9 +31,16 @@ const initialize = async () => {
 const listener = async (consumer) => {
   try {
     await consumer.run({
-      eachMessage: async ({ message }) => {
+      eachMessage: async ({ message, topic, partition }) => {
+        console.log(`Topic: ${topic} | Partition ${partition}`);
         const res = prepareDelhiveryData(Object.values(JSON.parse(message.value.toString()))[0]);
-        console.log(res);
+        if (!res.awb) return;
+        const trackData = await redisCheckAndReturnTrackData(res);
+        if (!trackData) {
+          console.log("data already exists!");
+          return;
+        }
+        await updateTrackDataToPullMongo(trackData);
       },
     });
   } catch (error) {

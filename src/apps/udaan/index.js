@@ -1,6 +1,12 @@
 const { initialize, listener } = require("./consumer");
 
 (async () => {
-  const consumer = await initialize();
-  await listener(consumer);
+  const udaanConsumers = await initialize();
+  udaanConsumers.forEach((consumer) => {
+    consumer
+      .then((res) => {
+        listener(res);
+      })
+      .catch((error) => console.log(error));
+  });
 })();
