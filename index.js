@@ -11,7 +11,7 @@ db.initDB((err, _db) => {
     // TODO: notify error
   } else {
     console.log();
-    console.log(`${_db.s.options.dbName} | DB connected`);
+    console.log(`${_db.s.options.dbName} - DB connected`);
   }
 });
 
