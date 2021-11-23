@@ -16,9 +16,9 @@ const { preparePickrrBluedartDict } = require("./services");
 const initialize = async () => {
   const consumer = kafka.consumer({ groupId: "bluedart-group" });
   const totalTopicsCount = new Array(TOTAL_TOPIC_COUNT).fill(1);
-  await consumer.connect();
   return totalTopicsCount.map(async (_, index) => {
     try {
+      await consumer.connect();
       await consumer.subscribe({ topic: `bluedart_${index}`, fromBeginning: false });
       return consumer;
     } catch (error) {

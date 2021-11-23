@@ -10,9 +10,9 @@ const { TOTAL_TOPIC_COUNT } = require("./constant");
 const initialize = async () => {
   const consumer = kafka.consumer({ groupId: "delhivery-group" });
   const totalTopicsCount = new Array(TOTAL_TOPIC_COUNT).fill(1);
-  await consumer.connect();
   return totalTopicsCount.map(async (_, index) => {
     try {
+      await consumer.connect();
       await consumer.subscribe({ topic: `delhivery_${index}`, fromBeginning: false });
       return consumer;
     } catch (error) {
