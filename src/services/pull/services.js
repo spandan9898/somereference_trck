@@ -1,7 +1,6 @@
 const _ = require("lodash");
 const moment = require("moment");
-
-const { checkAwbInCache } = require("../../utils/redis");
+const { checkAwbInCache } = require("../../utils/helpers");
 const { BLOCK_NDR_STRINGS } = require("./constants");
 const { mapStatusToEvent } = require("./helpers");
 
