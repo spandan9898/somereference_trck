@@ -1,4 +1,11 @@
+/* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
+
+const { updateTrackDataToPullMongo } = require("../../services/pull");
+const { redisCheckAndReturnTrackData } = require("../../services/pull/services");
+
+const { ECOMM_TOPIC_COUNT } = require("./constant");
+
 const { prepareEcommData } = require("./services");
 
 /**
@@ -7,22 +14,35 @@ const { prepareEcommData } = require("./services");
  */
 const initialize = async () => {
   const consumer = kafka.consumer({ groupId: "ecomm-group" });
-  await consumer.connect();
-  await consumer.subscribe({ topic: "ecomm", fromBeginning: true });
-  return consumer;
+  const topicsCount = new Array(ECOMM_TOPIC_COUNT).fill(1);
+  return topicsCount.map(async (_, index) => {
+    try {
+      await consumer.connect();
+      await consumer.subscribe({ topic: `ecomm_${index}`, fromBeginning: false });
+      return consumer;
+    } catch (error) {
+      console.log("error --> ", error.message);
+    }
+  });
 };
 
 /**
  *  consumer for ecomm payload
  */
 const listener = async (consumer) => {
-  // use ecommData
-
   try {
     await consumer.run({
-      eachMessage: async ({ message }) => {
+      eachMessage: async ({ message, topic, partition }) => {
+        console.log(`Topic: ${topic} | Partition ${partition}`);
         const response = prepareEcommData(Object.values(JSON.parse(message.value.toString()))[0]);
-        console.log(response);
+        if (!response.awb) return;
+
+        const trackData = await redisCheckAndReturnTrackData(response);
+        if (!trackData) {
+          console.log("data already exists !");
+          return;
+        }
+        await updateTrackDataToPullMongo(trackData);
       },
     });
   } catch (error) {

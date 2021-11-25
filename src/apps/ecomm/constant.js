@@ -97,6 +97,9 @@ const ECOMM_CODE_MAPPER = {
   R999: { pickrr_status_code: "RTD", pickrr_sub_status_code: "" },
 };
 
+const ECOMM_TOPIC_COUNT = 1;
+
 module.exports = {
   ECOMM_CODE_MAPPER,
+  ECOMM_TOPIC_COUNT,
 };
