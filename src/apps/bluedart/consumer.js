@@ -40,19 +40,22 @@ const listener = async (consumer) => {
         const res = preparePickrrBluedartDict(
           Object.values(JSON.parse(message.value.toString()))[0]
         );
-        if (!res.awb) return;
+        console.log(`AWB: ${res[0].awb}`);
 
-        const trackData = await redisCheckAndReturnTrackData(res);
+        if (!res[0].awb) return;
+        const trackData = await redisCheckAndReturnTrackData(res[0]);
         if (!trackData) {
           console.log("Same data already exists");
           return;
         }
 
         await updateTrackDataToPullMongo(trackData);
+        console.log("done");
+        console.log("--");
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("error -->", error);
   }
 };
 

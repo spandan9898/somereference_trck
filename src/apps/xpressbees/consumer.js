@@ -1,6 +1,5 @@
 /* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
-
 const { updateTrackDataToPullMongo } = require("../../services/pull");
 const { redisCheckAndReturnTrackData } = require("../../services/pull/services");
 
@@ -34,14 +33,16 @@ const listener = async (consumer) => {
       eachMessage: async ({ message, topic, partition }) => {
         console.log(`Topic: ${topic} | Partition ${partition}`);
         const res = prepareXbsData(Object.values(JSON.parse(message.value.toString()))[0]);
+        console.log(`AWB: ${res.awb}`);
         if (!res.awb) return;
-
         const trackData = await redisCheckAndReturnTrackData(res);
         if (!trackData) {
           console.log("data already exists!");
           return;
         }
         await updateTrackDataToPullMongo(trackData);
+        console.log("done");
+        console.log("--");
       },
     });
   } catch (error) {

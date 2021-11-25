@@ -92,7 +92,7 @@ const prepareEkartData = (ekartDict) => {
     pickrrEkartDict.track_location = trackData.location.toString();
     pickrrEkartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrEkartDict.pickrr_sub_status_code = reasonDict?.pickrr_sub_status_code || "";
-    pickrrEkartDict.courier_status_code = statusType;
+    pickrrEkartDict.courier_status_code = statusScanType;
 
     return pickrrEkartDict;
   } catch (error) {

@@ -45,6 +45,7 @@ const prepareEcommData = (ecommDict) => {
       const scanType = pickrrStatusCode === "UD" ? "NDR" : pickrrStatusCode;
       const pickrrSubstatusCode = reasonDict.pickrr_sub_status_code;
       const scanDatetime = moment(ecommDict.datetime).format("YYYY-MM-DD HH:mm:ss");
+      console.log("scanDatetime", scanDatetime);
       let remarks = `${ecommDict.status.trim()} ${ecommDict.reasonCode?.replace("-", "")?.trim()}`;
       pickrrEcommDict.scan_datetime = scanDatetime || "";
       pickrrEcommDict.received_by = receivedBy || "";

@@ -35,6 +35,7 @@ const listener = async (consumer) => {
       eachMessage: async ({ message, topic, partition }) => {
         console.log(`Topic: ${topic} | Partition ${partition}`);
         const response = prepareEcommData(Object.values(JSON.parse(message.value.toString()))[0]);
+        console.log(`AWB: ${response.awb}`);
         if (!response.awb) return;
 
         const trackData = await redisCheckAndReturnTrackData(response);
@@ -43,6 +44,8 @@ const listener = async (consumer) => {
           return;
         }
         await updateTrackDataToPullMongo(trackData);
+        console.log("done");
+        console.log("--");
       },
     });
   } catch (error) {

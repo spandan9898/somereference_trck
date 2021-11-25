@@ -149,7 +149,7 @@ const BLUEDART_CODE_MAPPER_V2 = {
 
 // TODO: change this later
 
-const TOTAL_TOPIC_COUNT = 2;
+const TOTAL_TOPIC_COUNT = 3;
 
 module.exports = {
   BLUEDART_CODE_MAPPER_V2,

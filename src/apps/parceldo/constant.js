@@ -427,7 +427,7 @@ const PARCELDO_CODE_MAPPER = {
   },
 };
 
-const PARCELDO_TOPICS_COUNT = 1;
+const PARCELDO_TOPICS_COUNT = 2;
 
 module.exports = {
   PARCELDO_CODE_MAPPER,

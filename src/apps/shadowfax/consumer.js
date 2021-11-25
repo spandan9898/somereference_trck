@@ -16,7 +16,7 @@ const initialize = async () => {
   return topicsCount.map(async (_, index) => {
     try {
       await consumer.connect();
-      await consumer.subscribe({ topic: `shadowfax_${index}`, fromBeginning: false });
+      await consumer.subscribe({ topic: `shadowfax_${index}`, fromBeginning: true });
       return consumer;
     } catch (error) {
       console.error(error.message);
@@ -35,6 +35,7 @@ const listener = async (consumer) => {
         const response = prepareShadowfaxData(
           Object.values(JSON.parse(message.value.toString()))[0]
         );
+        console.log(`AWB: ${response.awb}`);
         if (!response.awb) return;
 
         const trackData = await redisCheckAndReturnTrackData(response);
@@ -43,6 +44,8 @@ const listener = async (consumer) => {
           return;
         }
         await updateTrackDataToPullMongo(trackData);
+        console.log("done");
+        console.log("--");
       },
     });
   } catch (error) {

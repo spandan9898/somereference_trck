@@ -24,7 +24,7 @@ const { mapStatusToEvent } = require("./helpers");
  * @returns {string}
  */
 const redisCheckAndReturnTrackData = async (preparedTrackData) => {
-  const trackObj = preparedTrackData[0];
+  const trackObj = preparedTrackData;
   const isExists = await checkAwbInCache(trackObj);
   if (isExists) {
     return false;

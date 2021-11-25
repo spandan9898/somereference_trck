@@ -49,7 +49,7 @@ const prepareUdaanData = (udaanDict) => {
     const trackData = udaanDict;
     const { status = "", comments = "" } = trackData;
     const statusScanType = comments.length ? `${status}_${comments}` : status;
-    const statusDateTime = `${trackData.statusUpdateDate} ${trackData.statusUpdateDate}`;
+    const statusDateTime = `${trackData.statusUpdateDate} ${trackData.statusUpdateTime}`;
     const statusDate = statusDateTime
       ? moment(statusDateTime).format("YYYY-MM-DD HH:MM:SS")
       : moment(new Date()).format("YYYY-MM-DD HH:MM:SS");
