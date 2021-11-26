@@ -24,7 +24,7 @@ const checkAwbInCache = async (trackObj) => {
   const oldScanType = getCacheData.scan_type;
   const newScanType = trackObj.scan_type;
 
-  if (newScanDateTime.isBefore(newScanDateTime)) {
+  if (newScanDateTime.isBefore(oldScanDateTime)) {
     return true;
   }
 
