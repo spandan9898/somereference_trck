@@ -38,12 +38,14 @@ const listener = async (consumer) => {
         console.log(`AWB: ${response.awb}`);
 
         if (!response.awb) return;
-        const trackData = redisCheckAndReturnTrackData(response);
+        const trackData = await redisCheckAndReturnTrackData(response);
         if (!trackData) {
           console.log("data already exists!");
           return;
         }
+
         await updateTrackDataToPullMongo(trackData);
+
         console.log("done");
         console.log("--");
       },

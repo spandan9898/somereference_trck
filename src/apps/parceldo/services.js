@@ -56,9 +56,13 @@ const prepareParceldoData = (parceldoDict) => {
         scanType = "RTD";
       }
       const date = _.get(parceldoDict, "response[0].date", "");
-      const scanDatetime = date ? moment(date).format("YYYY-MM-DD HH:mm:ss") : "";
+      const scanDatetime = date
+        ? moment(date, "YYYY/MM/DD HH:mm:ss").format("YYYY-MM-DD HH:mm:ss")
+        : "";
       const EDDDatetime = _.get(parceldoDict, "response[0].EDD", "");
-      pickrrParceldoDict.EDD = EDDDatetime ? moment(EDDDatetime).format("YYYY-MM-DD HH:mm:ss") : "";
+      pickrrParceldoDict.EDD = EDDDatetime
+        ? moment(EDDDatetime, "YYYY/MM/DD HH:mm:ss").format("YYYY-MM-DD HH:mm:ss")
+        : "";
       pickrrParceldoDict.received_by = _.get(parceldoDict, "response[0].receivedBy", "");
       pickrrParceldoDict.scan_type = scanType === "UD" ? "NDR" : scanType;
       pickrrParceldoDict.scan_datetime = scanDatetime;
