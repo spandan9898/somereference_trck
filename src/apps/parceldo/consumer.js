@@ -33,15 +33,21 @@ const listener = async (consumer) => {
       eachMessage: async ({ message, topic, partition }) => {
         console.log(`Topic: ${topic} | Partition ${partition}`);
         const response = prepareParceldoData(
-          Object.values(JSON.parse(message.values.toString()))[0]
+          Object.values(JSON.parse(message.value.toString()))[0]
         );
+        console.log(`AWB: ${response.awb}`);
+
         if (!response.awb) return;
-        const trackData = redisCheckAndReturnTrackData(response);
+        const trackData = await redisCheckAndReturnTrackData(response);
         if (!trackData) {
           console.log("data already exists!");
           return;
         }
+
         await updateTrackDataToPullMongo(trackData);
+
+        console.log("done");
+        console.log("--");
       },
     });
   } catch (error) {

@@ -33,6 +33,7 @@ const listener = async (consumer) => {
       eachMessage: async ({ message, topic, partition }) => {
         console.log(`Topic: ${topic} | Partition ${partition}`);
         const res = prepareEkartData(Object.values(JSON.parse(message.value.toString()))[0]);
+        console.log(`AWB: ${res.awb}`);
         if (!res.awb) return;
 
         const trackData = await redisCheckAndReturnTrackData(res);
@@ -42,6 +43,8 @@ const listener = async (consumer) => {
         }
 
         await updateTrackDataToPullMongo(trackData);
+        console.log("done");
+        console.log("--");
       },
     });
   } catch (error) {

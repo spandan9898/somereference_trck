@@ -15,8 +15,14 @@ db.initDB((err, _db) => {
   }
 });
 
-// const bluedartApp = require("./src/apps/bluedart");
-// const delhiveryApp = require("./src/apps/delhivery");
-// const amazeApp = require("./src/apps/amaze");
+const bluedartApp = require("./src/apps/bluedart");
+const delhiveryApp = require("./src/apps/delhivery");
+const amazeApp = require("./src/apps/amaze");
+const xpressbeesApp = require("./src/apps/xpressbees");
+const ekartApp = require("./src/apps/ekart");
+const udaanApp = require("./src/apps/udaan");
+const ecommApp = require("./src/apps/ecomm");
+const shadowfaxApp = require("./src/apps/shadowfax");
+const parceldoApp = require("./src/apps/parceldo");
 
 server.createServer();

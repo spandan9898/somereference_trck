@@ -75,7 +75,6 @@ const prepareAmazeData = (amazeDict) => {
       const pickupDatetime = scanDatetime;
       pickrrAmazeDict.pickup_datetime = pickupDatetime;
     }
-    console.log(pickrrAmazeDict);
     return pickrrAmazeDict;
   } catch (error) {
     return { err: error };

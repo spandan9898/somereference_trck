@@ -24,7 +24,7 @@ const { mapStatusToEvent } = require("./helpers");
  * @returns {string}
  */
 const redisCheckAndReturnTrackData = async (preparedTrackData) => {
-  const trackObj = preparedTrackData[0];
+  const trackObj = preparedTrackData;
   const isExists = await checkAwbInCache(trackObj);
   if (isExists) {
     return false;
@@ -56,8 +56,9 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   if (trackInfo.toLowerCase() in BLOCK_NDR_STRINGS && scanType === "NDR") {
     trackData.scan_type = "OT";
   }
-  let currentStatusTime = moment(scanDatetime, "DD-MM-YYYY HH:MM");
-  currentStatusTime = currentStatusTime.isValid() ? currentStatusTime.format() : null;
+  const currentStatusTime = scanDatetime;
+
+  // currentStatusTime = currentStatusTime.isValid() ? currentStatusTime.format() : null;
 
   const statusMap = {
     current_status_time: currentStatusTime,
