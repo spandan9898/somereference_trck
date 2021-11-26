@@ -35,7 +35,6 @@ const listener = async (consumer) => {
         const res = prepareUdaanData(Object.values(JSON.parse(message.value.toString()))[0]);
         console.log(`AWB: ${res.awb}`);
         if (!res.awb) return;
-        console.log("res -->", res);
         const trackData = await redisCheckAndReturnTrackData(res);
         if (!trackData) {
           console.log("data already exists!");

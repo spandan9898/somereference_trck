@@ -63,13 +63,13 @@ const prepareEkartData = (ekartDict) => {
     let statusType = statusScanType;
     const statusDateTime = trackData?.event_date;
     const statusDate = statusDateTime
-      ? moment(statusDateTime).format("YYYY-MM-DD HH:MM:SS")
-      : moment(new Date()).format("YYYY-MM-DD HH:MM:SS");
+      ? moment(statusDateTime).format("YYYY-MM-DD HH:mm:ss")
+      : moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
 
     if ("EDD" in trackData) {
       let eddDatetime = trackData.EDD;
       if (eddDatetime) {
-        eddDatetime = moment(eddDatetime).format("YYYY-MM-DD HH:MM:SS");
+        eddDatetime = moment(eddDatetime).format("YYYY-MM-DD HH:mm:ss");
       }
       pickrrEkartDict.EDD = eddDatetime;
     }

@@ -48,7 +48,7 @@ const AMAZE_CODE_MAPPER = {
   "RTO Delivered": { scan_type: "RTD", pickrr_sub_status_code: "" },
 };
 
-const AMAZE_TOPICS_COUNT = 1;
+const AMAZE_TOPICS_COUNT = 2;
 
 module.exports = {
   AMAZE_CODE_MAPPER,

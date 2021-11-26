@@ -34,15 +34,19 @@ const listener = async (consumer) => {
     await consumer.run({
       eachMessage: async ({ message, topic, partition }) => {
         console.log(`Topic: ${topic} | Partition ${partition}`);
-        const response = prepareAmazeData(Object.values(JSON.parse(message.values.toString()))[0]);
+        const response = prepareAmazeData(Object.values(JSON.parse(message.value.toString()))[0]);
+        console.log(`AWB: ${response.awb}`);
+
         if (!response.awb) return;
 
-        const trackData = await redisCheckAndReturnTrackData([response]);
+        const trackData = await redisCheckAndReturnTrackData(response);
         if (!trackData) {
           console.log("data already exists");
           return;
         }
         await updateTrackDataToPullMongo(trackData);
+        console.log("done");
+        console.log("--");
       },
     });
   } catch (error) {
