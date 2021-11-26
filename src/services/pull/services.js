@@ -56,7 +56,7 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   if (trackInfo.toLowerCase() in BLOCK_NDR_STRINGS && scanType === "NDR") {
     trackData.scan_type = "OT";
   }
-  let currentStatusTime = moment(scanDatetime, "DD-MM-YYYY HH:MM");
+  let currentStatusTime = moment(scanDatetime, "YYYY-MM-DD HH:mm:ss");
   currentStatusTime = currentStatusTime.isValid() ? currentStatusTime.format() : null;
 
   const statusMap = {
