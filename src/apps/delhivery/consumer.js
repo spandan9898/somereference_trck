@@ -36,7 +36,7 @@ const listener = async (consumer) => {
         console.log(`AWB: ${res.awb}`);
         if (!res.awb) return;
 
-        const trackData = await redisCheckAndReturnTrackData([res]);
+        const trackData = await redisCheckAndReturnTrackData(res);
         if (!trackData) {
           console.log("Same data already exists");
           return;
