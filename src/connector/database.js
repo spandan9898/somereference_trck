@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-const { MongoClient } = require("mongodb");
+const { MongoClient, ServerApiVersion } = require("mongodb");
 
 // DB
 
@@ -19,6 +19,7 @@ const initDB = (callback) => {
   MongoClient.connect(process.env.MONGO_DB_PULL_SERVER_HOST, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    serverApi: ServerApiVersion.v1,
   })
     .then((client) => {
       db = client;
