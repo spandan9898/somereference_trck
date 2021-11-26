@@ -30,26 +30,27 @@ const initialize = async () => {
 const listener = async (consumer) => {
   try {
     await consumer.run({
-      eachMesage: async ({ message, topic, partition }) => {
+      eachMessage: async ({ message, topic, partition }) => {
         console.log(`Topic: ${topic} | Partition ${partition}`);
         const response = prepareShadowfaxData(
           Object.values(JSON.parse(message.value.toString()))[0]
         );
         console.log(`AWB: ${response.awb}`);
-        if (!response.awb) return;
 
+        if (!response.awb) return;
         const trackData = await redisCheckAndReturnTrackData(response);
         if (!trackData) {
-          console.log("data already exists!");
+          console.log("Same data already exists");
           return;
         }
+
         await updateTrackDataToPullMongo(trackData);
         console.log("done");
         console.log("--");
       },
     });
   } catch (error) {
-    console.error(error);
+    console.error("error -->", error);
   }
 };
 
