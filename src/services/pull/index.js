@@ -19,17 +19,16 @@ const updateTrackDataToPullMongo = async (trackObj) => {
     status: result.statusMap,
     track_arr: [result.eventObj],
     last_update_from: "kafka",
-    edd_stamp: result.eddStamp,
-    updated_at: moment().format(),
+    edd_stamp: result.eddStamp ? new Date(result.eddStamp) : "",
+    updated_at: new Date(moment().utc().format()),
   };
-
   try {
     const pullCollection = await commonTrackingInfoCol();
 
     const trackArr = updatedObj.track_arr;
     delete updatedObj.track_arr;
 
-    const res = await pullCollection.updateOne(
+    await pullCollection.updateOne(
       { tracking_id: trackObj.awb },
       {
         $set: updatedObj,
@@ -42,7 +41,7 @@ const updateTrackDataToPullMongo = async (trackObj) => {
       }
     );
     setObject(trackObj.awb, trackObj);
-    return res;
+    return result;
   } catch (error) {
     throw new Error(error);
   }

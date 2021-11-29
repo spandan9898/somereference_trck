@@ -6,6 +6,7 @@ const { redisCheckAndReturnTrackData } = require("../../services/pull/services")
 
 const { prepareParceldoData } = require("./services");
 const { PARCELDO_TOPICS_COUNT } = require("./constant");
+const sendDataToNdr = require("../../services/ndr");
 
 /**
  * initialize consumer for parceldo payload
@@ -44,8 +45,8 @@ const listener = async (consumer) => {
           return;
         }
 
-        await updateTrackDataToPullMongo(trackData);
-
+        const result = await updateTrackDataToPullMongo(trackData);
+        sendDataToNdr(result);
         console.log("done");
         console.log("--");
       },

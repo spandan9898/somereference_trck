@@ -61,7 +61,7 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   // currentStatusTime = currentStatusTime.isValid() ? currentStatusTime.format() : null;
 
   const statusMap = {
-    current_status_time: currentStatusTime,
+    current_status_time: new Date(currentStatusTime),
     current_status_type: scanType,
     current_status_body: trackInfo,
     current_status_location: trackLocation,
@@ -71,7 +71,8 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   eventObj.pickrr_sub_status_code = trackData.pickrr_sub_status_code;
   eventObj.courier_status_code = trackData.courier_status_code;
   eventObj.update_source = "kafka";
-  eventObj.update_time = moment().utc().format();
+  eventObj.update_time = new Date(moment().utc().format());
+  eventObj.system_updated_at = new Date(moment().utc().format());
 
   const eddDate = moment(edd, "DD-MM-YYYY");
   const eddStamp = eddDate.isValid() ? eddDate.format("DD-MM-YYYY HH:MM") : edd;
@@ -81,6 +82,7 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
     eddStamp,
     eventObj,
     statusMap,
+    awb: trackData.awb,
   };
 };
 
