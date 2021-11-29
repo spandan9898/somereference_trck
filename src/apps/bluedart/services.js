@@ -212,7 +212,7 @@ const getBluedartTrackingList = (trackObj) => {
       const timestamp = `${scanDate} ${scanTime}`;
       const scanDetails = _.get(shipmentData, "Scans.ScanDetail[0]", {});
 
-      trackDict.scan_datetime = moment(timestamp, "DD-MM-YYYY hmm");
+      trackDict.scan_datetime = moment(timestamp, "DD-MM-YYYY hmm").format("YYYY-MM-DD HH:mm:ss");
       trackDict.scan_type = scanDetails?.ScanType;
       trackDict.scan_grp_type = scanDetails?.ScanGroupType;
       trackDict.track_info = scanDetails?.Scan;
@@ -222,7 +222,7 @@ const getBluedartTrackingList = (trackObj) => {
 
       if (shipmentData.PickUpDate) {
         let pickupDate = `${shipmentData.PickUpDate} ${shipmentData.PickUpTime}`;
-        pickupDate = moment(pickupDate, "DD-MM-YYYY hmm").format("DD-MM-YYYY HH:mm");
+        pickupDate = moment(pickupDate, "DD-MM-YYYY hmm").format("YYYY-MM-DD HH:mm:ss");
         trackDict.pickup_datetime = pickupDate;
       }
 
@@ -234,7 +234,7 @@ const getBluedartTrackingList = (trackObj) => {
 
       if (shipmentData.ExpectedDeliveryDate) {
         trackDict.EDD = moment(shipmentData.ExpectedDeliveryDate, "DD-MM-YYYY").format(
-          "DD-MM-YYYY"
+          "YYYY-MM-DD HH:mm:ss"
         );
       }
       trackingList.push(trackDict);
@@ -252,7 +252,7 @@ const getBluedartTrackingList = (trackObj) => {
       )
       .map((item) => ({
         ...item,
-        scan_datetime: moment(item.scan_datetime).format("DD-MM-YYYY HH:MM"),
+        scan_datetime: moment(item.scan_datetime).format("YYYY-MM-DD HH:mm:ss"),
       }))
       .value();
 
@@ -281,7 +281,7 @@ const preparePickrrBluedartDict = (requestedTrackData) => {
 
   const { trackingList } = result;
 
-  return trackingList.map((trackData) => preparePickrrObjData(trackData));
+  return preparePickrrObjData(trackingList[0]);
 };
 
 module.exports = {

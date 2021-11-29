@@ -89,4 +89,4 @@ const prepareUdaanData = (udaanDict) => {
   }
 };
 
-module.exports = prepareUdaanData;
+module.exports = { prepareUdaanData };

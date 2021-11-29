@@ -114,4 +114,4 @@ const prepareDelhiveryData = (delhiveryDict) => {
   }
 };
 
-module.exports = prepareDelhiveryData;
+module.exports = { prepareDelhiveryData };

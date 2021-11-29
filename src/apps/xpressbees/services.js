@@ -90,4 +90,4 @@ const prepareXbsData = (xbsDict) => {
   }
 };
 
-module.exports = prepareXbsData;
+module.exports = { prepareXbsData };
