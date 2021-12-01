@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "nodemon ./test.js",
     "start": "npm run lint && nodemon index.js",
     "lint": "eslint src/*",
     "lint:fix": "eslint --fix src/*"
@@ -21,6 +21,7 @@
   "homepage": "https://bitbucket.org/laxmanverma/trackingconsumersms#readme",
   "dependencies": {
     "aws-sdk": "2.1030.0",
+    "axios": "0.24.0",
     "dotenv": "10.0.0",
     "fastify": "3.24.0",
     "fastify-autoload": "3.9.0",
@@ -28,7 +29,9 @@
     "lodash": "4.17.21",
     "moment": "2.29.1",
     "mongodb": "4.2.0",
-    "redis": "3.1.2"
+    "redis": "3.1.2",
+    "winston": "3.3.3",
+    "winston-transport": "4.4.0"
   },
   "devDependencies": {
     "eslint": "8.2.0",
