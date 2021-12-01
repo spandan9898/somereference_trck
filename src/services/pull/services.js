@@ -1,6 +1,7 @@
 const _ = require("lodash");
 const moment = require("moment");
-const { checkAwbInCache } = require("../../utils/helpers");
+
+const { setObject, getObject, checkAwbInCache } = require("../../utils");
 const { BLOCK_NDR_STRINGS } = require("./constants");
 const { mapStatusToEvent } = require("./helpers");
 
@@ -86,7 +87,26 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   };
 };
 
+/**
+ *
+ * @param {*} result: prepared data
+ * @desc store data in cache with expected format
+ */
+const storeDataInCache = async (result) => {
+  const { eventObj, awb } = result;
+  const { scan_datetime: scanDatetime } = eventObj || {};
+
+  const redisKey = `${eventObj.scan_type}_${moment(scanDatetime).unix()}`;
+  const newRedisPayload = {
+    [redisKey]: eventObj,
+  };
+  const dt = (await getObject(awb)) || {};
+  const oldData = { ...dt, ...newRedisPayload };
+  await setObject(awb, oldData);
+};
+
 module.exports = {
   redisCheckAndReturnTrackData,
   prepareTrackDataToUpdateInPullDb,
+  storeDataInCache,
 };

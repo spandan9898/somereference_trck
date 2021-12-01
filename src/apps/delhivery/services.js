@@ -62,13 +62,13 @@ const prepareDelhiveryData = (delhiveryDict) => {
     let statusType = statusScanType;
     const statusDateTime = trackData?.Status?.StatusDateTime;
     const statusDate = statusDateTime
-      ? moment(statusDateTime).format("YYYY-MM-DD HH:MM:SS")
-      : moment(new Date()).format("YYYY-MM-DD HH:MM:SS");
+      ? moment(statusDateTime).toDate()
+      : moment(new Date()).toDate();
 
     if ("EDD" in trackData) {
       let eddDatetime = trackData.EDD;
       if (eddDatetime) {
-        eddDatetime = moment(eddDatetime).format("YYYY-MM-DD HH:MM:SS");
+        eddDatetime = moment(eddDatetime).toDate();
       }
       pickrrDelhiveryDict.EDD = eddDatetime;
     }
@@ -82,7 +82,7 @@ const prepareDelhiveryData = (delhiveryDict) => {
       let pickupDatetime;
 
       if (pickupDate) {
-        pickupDatetime = moment(pickupDate).format("YYYY-MM-DD HH:MM:SS");
+        pickupDatetime = moment(pickupDate).toDate();
       }
       pickrrDelhiveryDict.pickup_datetime = pickupDatetime || pickupDate;
     }
