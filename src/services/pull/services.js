@@ -6,7 +6,7 @@ const { BLOCK_NDR_STRINGS } = require("./constants");
 const { mapStatusToEvent } = require("./helpers");
 
 /** *
- * @param preparedTrackData -> [
+ * @param preparedTrackData -> 
  * {
     awb: '75456956632',
     scan_type: 'PPF',
@@ -20,7 +20,7 @@ const { mapStatusToEvent } = require("./helpers");
     pickrr_sub_status_code: 'REJ',
     courier_status_code: '016-S'
   }
- * ] 
+ * 
   * @desc check in cache and if exists then return false otherwise return tracking object, which will be move forward
  * @returns {string}
  */
@@ -34,8 +34,8 @@ const redisCheckAndReturnTrackData = async (preparedTrackData) => {
 };
 
 /**
- *
- * preparing track data
+ *@param {*} trackObj : same as above example
+ * preparing track data for pull db update
  */
 const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   const trackData = _.cloneDeep(trackObj);
