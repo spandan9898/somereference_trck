@@ -50,8 +50,9 @@ class KafkaMessageHandler {
         return;
       }
 
-      const result = await updateTrackDataToPullMongo(trackData);
-      sendDataToNdr(result);
+      await updateTrackDataToPullMongo(trackData);
+
+      // sendDataToNdr(result);
 
       console.log("done");
       console.log("--");
