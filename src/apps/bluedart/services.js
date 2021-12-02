@@ -280,7 +280,9 @@ const preparePickrrBluedartDict = (requestedTrackData) => {
   }
 
   const { trackingList } = result;
-
+  if (_.isEmpty(trackingList)) {
+    return {};
+  }
   return preparePickrrObjData(trackingList[0]);
 };
 
