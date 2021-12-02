@@ -1,10 +1,7 @@
 /* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
-const { updateTrackDataToPullMongo } = require("../../services/pull");
-const { redisCheckAndReturnTrackData } = require("../../services/pull/services");
-
 const { EKART_TOPICS_COUNT } = require("./constant");
-const prepareEkartData = require("./services");
+const { KafkaMessageHandler } = require("../../services/common");
 
 /**
  * Initialize consumer and subscribe to topics
@@ -30,21 +27,8 @@ const initialize = async () => {
 const listener = async (consumer) => {
   try {
     await consumer.run({
-      eachMessage: async ({ message, topic, partition }) => {
-        console.log(`Topic: ${topic} | Partition ${partition}`);
-        const res = prepareEkartData(Object.values(JSON.parse(message.value.toString()))[0]);
-        console.log(`AWB: ${res.awb}`);
-        if (!res.awb) return;
-
-        const trackData = await redisCheckAndReturnTrackData(res);
-        if (!trackData) {
-          console.log("Same data already exists");
-          return;
-        }
-
-        await updateTrackDataToPullMongo(trackData);
-        console.log("done");
-        console.log("--");
+      eachMessage: (consumedPayload) => {
+        KafkaMessageHandler.init(consumedPayload, "ekart");
       },
     });
   } catch (error) {

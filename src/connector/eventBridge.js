@@ -9,10 +9,10 @@ const config = {
 /**
  *
  * sending data to event Bridge
- * @desc source - Event Bridge source detail , detailType
+ * @desc -
+ * source - Will get this during bus creation and same as DetailType
  * data - data that to be send to destination api
- * eventBusName - EB name (all should be from .env file)
- *
+ * eventBusName - EB name - ARN of event bus rule
  * @returns
  */
 const sendDataToEventBridge = async ({ source, detailType, data, eventBusName }) => {
@@ -28,10 +28,11 @@ const sendDataToEventBridge = async ({ source, detailType, data, eventBusName })
     const eventBridge = new AWS.EventBridge({
       credentials: config,
       region: "ap-south-1",
+      maxRetries: 2,
     });
     eventBridge.putEvents({ Entries: input }, (err, response) => {
-      if (err) console.log(err, err.stack);
-      else console.log(response);
+      if (err) console.log("err ->", err, err.stack);
+      else console.log("response", response);
     });
   } catch (error) {
     console.error("error", error);

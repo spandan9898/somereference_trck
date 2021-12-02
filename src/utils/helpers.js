@@ -1,5 +1,57 @@
+/* eslint-disable consistent-return */
 const moment = require("moment");
+const { setObject } = require("./redis");
+const { prepareTrackArrCacheData } = require("../services/pull/helpers");
+const commonTrackingInfoCol = require("../services/pull/model");
+
 const { getObject } = require("./redis");
+
+/**
+ *
+ * @param {*} awb
+ * @desc fetch tracking data from pull db, if exists then prepare track data and store in cache
+ * PS: it'll call only if cache data not found
+ */
+const fetchTrackingDataAndStoreInCache = async (awb) => {
+  try {
+    const pullCollection = await commonTrackingInfoCol();
+    const response = await pullCollection.findOne(
+      { tracking_id: awb },
+      { projection: { track_arr: 1 } }
+    );
+    if (!response) {
+      // same -> creation process
+
+      return false;
+    }
+
+    const data = prepareTrackArrCacheData(response.track_arr);
+    await setObject(awb, data);
+    return data;
+  } catch (error) {
+    // TODO: notify us
+
+    console.log("error ->", error);
+    return false;
+  }
+};
+
+/**
+ *
+ * @param {*} newScanTime -> recent scan date time
+ * @param {*} cachedData -> old cache data
+ * @desc compare old scan date time with new scan date time
+ * and return true if exists otherwise return  false
+ * @returns true/false
+ */
+const compareScanUnixTimeAndCheckIfExists = (newScanTime, cachedData) => {
+  const cacheKeys = Object.keys(cachedData);
+  return cacheKeys.some((key) => {
+    const oldScanTime = +key.split("_")[1];
+    const diff = (newScanTime - oldScanTime) / 60;
+    return diff >= -1 && diff <= 1;
+  });
+};
 
 /**
  *
@@ -13,26 +65,21 @@ const { getObject } = require("./redis");
  * @returns true or false
  */
 const checkAwbInCache = async (trackObj) => {
-  const getCacheData = await getObject(trackObj.awb);
+  const cachedData = await getObject(trackObj.awb);
 
-  if (!getCacheData) {
-    return false;
+  const newScanTime = moment(trackObj.scan_datetime).unix();
+
+  if (!cachedData) {
+    const res = await fetchTrackingDataAndStoreInCache(trackObj.awb);
+    if (!res) {
+      return false;
+    }
+    const isExists = await compareScanUnixTimeAndCheckIfExists(newScanTime, res);
+    return isExists;
   }
 
-  const oldScanDateTime = moment(getCacheData.scan_datetime, "DD-MM-YYYY HH:MM");
-  const newScanDateTime = moment(trackObj.scan_datetime, "DD-MM-YYYY HH:MM");
-  const oldScanType = getCacheData.scan_type;
-  const newScanType = trackObj.scan_type;
-
-  if (newScanDateTime.isBefore(newScanDateTime)) {
-    return true;
-  }
-
-  const diff = newScanDateTime.diff(oldScanDateTime, "minute");
-  if (diff < 1 && oldScanType === newScanType) {
-    return true;
-  }
-  return false;
+  const isExists = await compareScanUnixTimeAndCheckIfExists(newScanTime, cachedData);
+  return isExists;
 };
 
 module.exports = {

@@ -101,4 +101,4 @@ const prepareEkartData = (ekartDict) => {
   }
 };
 
-module.exports = prepareEkartData;
+module.exports = { prepareEkartData };

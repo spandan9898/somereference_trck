@@ -1,8 +1,7 @@
 const moment = require("moment");
 
-const { prepareTrackDataToUpdateInPullDb } = require("./services");
+const { prepareTrackDataToUpdateInPullDb, storeDataInCache } = require("./services");
 const commonTrackingInfoCol = require("./model");
-const { setObject } = require("../../utils/redis");
 
 /**
  *
@@ -19,17 +18,16 @@ const updateTrackDataToPullMongo = async (trackObj) => {
     status: result.statusMap,
     track_arr: [result.eventObj],
     last_update_from: "kafka",
-    edd_stamp: result.eddStamp,
-    updated_at: moment().format(),
+    edd_stamp: result.eddStamp ? new Date(result.eddStamp) : "",
+    updated_at: new Date(moment().utc().format()),
   };
-
   try {
     const pullCollection = await commonTrackingInfoCol();
 
     const trackArr = updatedObj.track_arr;
     delete updatedObj.track_arr;
 
-    const res = await pullCollection.updateOne(
+    await pullCollection.updateOne(
       { tracking_id: trackObj.awb },
       {
         $set: updatedObj,
@@ -41,8 +39,8 @@ const updateTrackDataToPullMongo = async (trackObj) => {
         upsert: true,
       }
     );
-    setObject(trackObj.awb, trackObj);
-    return res;
+    await storeDataInCache(result);
+    return result;
   } catch (error) {
     throw new Error(error);
   }

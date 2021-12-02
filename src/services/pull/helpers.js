@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 /**
  *
  * returning event dict from status obj,
@@ -14,6 +16,22 @@ const mapStatusToEvent = (statusObj) => {
   return eventObj;
 };
 
+/**
+ *
+ * @param {*} trackArr
+ * @desc
+ * @returns {*}
+ */
+const prepareTrackArrCacheData = (trackArr) =>
+  trackArr.reduce((obj, item) => {
+    const unixScanTime = moment(item.scan_datetime).unix();
+    return {
+      ...obj,
+      [`${item.scan_type}_${unixScanTime}`]: item,
+    };
+  }, {});
+
 module.exports = {
   mapStatusToEvent,
+  prepareTrackArrCacheData,
 };
