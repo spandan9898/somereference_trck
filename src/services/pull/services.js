@@ -75,9 +75,11 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   eventObj.update_time = new Date(moment().utc().format());
   eventObj.system_updated_at = new Date(moment().utc().format());
 
-  const eddDate = moment(edd, "DD-MM-YYYY");
-  const eddStamp = eddDate.isValid() ? eddDate.format("DD-MM-YYYY HH:MM") : edd;
-
+  let eddStamp;
+  if (edd) {
+    const eddDate = moment(edd);
+    eddStamp = eddDate.isValid() ? eddDate.toDate() : edd;
+  }
   return {
     success: true,
     eddStamp,
