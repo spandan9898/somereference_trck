@@ -10,21 +10,20 @@ const { NDR_EVENT_BRIDGE_SOURCE, NDR_EVENT_BRIDGE_DETAIL_TYPE, NDR_EVENT_BRIDGE_
  * @desc sending track data to ndr event bridge
  */
 const sendDataToNdr = (trackData) => {
-  console.log(trackData);
+  const currentStatusType = trackData?.status?.current_status_type;
+  if (!["NDR", "UD"].includes(currentStatusType)) return false;
   const otherDetails = prepareOtherDetailsFromTrackDataForNDR(trackData);
   const trackingEvent = prepareTrackingEventDictForNDR(trackData);
   const payload = {
     tracking_event: trackingEvent,
     other_details: otherDetails,
   };
-  const currentStatusType = trackData?.status?.current_status_type;
-  if (["NDR", "UD"].includes(currentStatusType)) {
-    sendDataToEventBridge({
-      source: NDR_EVENT_BRIDGE_SOURCE,
-      detailType: NDR_EVENT_BRIDGE_DETAIL_TYPE,
-      data: payload,
-      eventBusName: NDR_EVENT_BRIDGE_BUS_NAME,
-    });
-  }
+  sendDataToEventBridge({
+    source: NDR_EVENT_BRIDGE_SOURCE,
+    detailType: NDR_EVENT_BRIDGE_DETAIL_TYPE,
+    data: payload,
+    eventBusName: NDR_EVENT_BRIDGE_BUS_NAME,
+  });
+  return true;
 };
 module.exports = sendDataToNdr;
