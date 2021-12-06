@@ -26,10 +26,10 @@ const updateTrackDataToPullMongo = async (trackObj) => {
 
     const trackArr = updatedObj.track_arr;
     const auditObj = {
+      source: "kafka_consumer",
       current_status_type: updatedObj.status.current_status_type,
       current_status_time: updatedObj.status.current_status_time,
       pulled_at: new Date(),
-      source: "kafka_consumer",
     };
 
     delete updatedObj.track_arr;
