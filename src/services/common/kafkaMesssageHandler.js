@@ -10,7 +10,8 @@ const { prepareXbsData } = require("../../apps/xpressbees/services");
 
 const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
-const sendDataToNdr = require("../ndr");
+
+// const sendDataToNdr = require("../ndr");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -26,7 +27,7 @@ class KafkaMessageHandler {
       parceldo: prepareParceldoData,
       shadowfax: prepareShadowfaxData,
       udaan: prepareUdaanData,
-      xpressees: prepareXbsData,
+      xpressbees: prepareXbsData,
     };
     return courierPrepareMapFunctions[courierName];
   }
@@ -34,7 +35,7 @@ class KafkaMessageHandler {
   static async init(consumedPayload, courierName) {
     const preapreFunc = KafkaMessageHandler.getPrepareFunction(courierName);
     if (!preapreFunc) {
-      throw new Error(`${courierName} is not a valid coureir`);
+      throw new Error(`${courierName} is not a valid courier`);
     }
     try {
       const { message, topic, partition } = consumedPayload;
