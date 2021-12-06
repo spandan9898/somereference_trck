@@ -27,8 +27,6 @@ const updateTrackDataToPullMongo = async (trackObj) => {
     const trackArr = updatedObj.track_arr;
     delete updatedObj.track_arr;
 
-    // TODO:
-
     const response = await pullCollection.findOneAndUpdate(
       { tracking_id: trackObj.awb },
       {
