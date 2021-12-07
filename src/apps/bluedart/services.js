@@ -233,9 +233,7 @@ const getBluedartTrackingList = (trackObj) => {
       }
 
       if (shipmentData.ExpectedDeliveryDate) {
-        trackDict.EDD = moment(shipmentData.ExpectedDeliveryDate, "DD-MM-YYYY").format(
-          "YYYY-MM-DD HH:mm:ss"
-        );
+        trackDict.EDD = moment(shipmentData.ExpectedDeliveryDate, "DD-MM-YYYY").toDate();
       }
       trackingList.push(trackDict);
     });

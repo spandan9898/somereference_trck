@@ -1,3 +1,4 @@
+/* eslint-disable array-callback-return */
 /* eslint-disable consistent-return */
 const moment = require("moment");
 const { setObject } = require("./redis");
@@ -44,12 +45,15 @@ const fetchTrackingDataAndStoreInCache = async (awb) => {
  * and return true if exists otherwise return  false
  * @returns true/false
  */
-const compareScanUnixTimeAndCheckIfExists = (newScanTime, cachedData) => {
+const compareScanUnixTimeAndCheckIfExists = (newScanTime, newScanType, cachedData) => {
   const cacheKeys = Object.keys(cachedData);
   return cacheKeys.some((key) => {
-    const oldScanTime = +key.split("_")[1];
-    const diff = (newScanTime - oldScanTime) / 60;
-    return diff >= -1 && diff <= 1;
+    const keys = key.split("_");
+    if (keys[0] === newScanType) {
+      const oldScanTime = +keys[1];
+      const diff = (newScanTime - oldScanTime) / 60;
+      return diff >= -1 && diff <= 1;
+    }
   });
 };
 
@@ -66,7 +70,6 @@ const compareScanUnixTimeAndCheckIfExists = (newScanTime, cachedData) => {
  */
 const checkAwbInCache = async (trackObj) => {
   const cachedData = await getObject(trackObj.awb);
-
   const newScanTime = moment(trackObj.scan_datetime).unix();
 
   if (!cachedData) {
@@ -74,11 +77,19 @@ const checkAwbInCache = async (trackObj) => {
     if (!res) {
       return false;
     }
-    const isExists = await compareScanUnixTimeAndCheckIfExists(newScanTime, res);
+    const isExists = await compareScanUnixTimeAndCheckIfExists(
+      newScanTime,
+      trackObj.scan_type,
+      res
+    );
     return isExists;
   }
 
-  const isExists = await compareScanUnixTimeAndCheckIfExists(newScanTime, cachedData);
+  const isExists = await compareScanUnixTimeAndCheckIfExists(
+    newScanTime,
+    trackObj.scan_type,
+    cachedData
+  );
   return isExists;
 };
 
