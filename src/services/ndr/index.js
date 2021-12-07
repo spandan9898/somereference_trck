@@ -1,4 +1,6 @@
 const sendDataToEventBridge = require("../../connector/eventBridge");
+const { prepareTrackingEventDictForNDR } = require("./preparator");
+const { prepareOtherDetailsFromTrackDataForNDR } = require("./preparator");
 
 const { NDR_EVENT_BRIDGE_SOURCE, NDR_EVENT_BRIDGE_DETAIL_TYPE, NDR_EVENT_BRIDGE_BUS_NAME } =
   process.env;
@@ -7,12 +9,21 @@ const { NDR_EVENT_BRIDGE_SOURCE, NDR_EVENT_BRIDGE_DETAIL_TYPE, NDR_EVENT_BRIDGE_
  * @param {*} trackData
  * @desc sending track data to ndr event bridge
  */
-const sendDataToNdr = (trackData) =>
+const sendDataToNdr = (trackData) => {
+  const currentStatusType = trackData?.status?.current_status_type;
+  if (!["NDR", "UD"].includes(currentStatusType)) return false;
+  const otherDetails = prepareOtherDetailsFromTrackDataForNDR(trackData);
+  const trackingEvent = prepareTrackingEventDictForNDR(trackData);
+  const payload = {
+    tracking_event: trackingEvent,
+    other_details: otherDetails,
+  };
   sendDataToEventBridge({
     source: NDR_EVENT_BRIDGE_SOURCE,
     detailType: NDR_EVENT_BRIDGE_DETAIL_TYPE,
-    data: trackData,
+    data: payload,
     eventBusName: NDR_EVENT_BRIDGE_BUS_NAME,
   });
-
+  return true;
+};
 module.exports = sendDataToNdr;
