@@ -42,7 +42,7 @@ const options = {
 
 const loggerTransports = [new transports.Console(options.console)];
 
-if (process.env.NODE_ENV === "production") {
+if (["production", "staging"].includes(process.env.NODE_ENV)) {
   loggerTransports.push(
     new SlackHook({
       webhookUrl: process.env.SLACK_TRACKING_ERROR_WEBHOOK_URL,
