@@ -45,6 +45,9 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
     scan_datetime: scanDatetime = "",
     track_location: trackLocation = "",
     EDD: edd = "",
+    pickrr_sub_status_code: pickrrSubStatusCode = "",
+    courier_status_code: courierStatusCode = "",
+    received_by: receivedBy = "",
   } = trackData;
 
   if (scanType === "CC") {
@@ -66,6 +69,10 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
     current_status_type: scanType,
     current_status_body: trackInfo,
     current_status_location: trackLocation,
+    pickrr_sub_status_code: pickrrSubStatusCode,
+    courier_status_code: courierStatusCode,
+    current_status_val: null,
+    received_by: receivedBy,
   };
 
   const eventObj = mapStatusToEvent(statusMap);
