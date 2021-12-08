@@ -37,7 +37,7 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "593-T": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   "594-T": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   "018-S": { scan_type: "PP", pickrr_sub_status_code: "" },
-  "543-T": { scan_type: "PP", pickrr_sub_status_code: "" },
+  "543-T": { scan_type: "PPF", pickrr_sub_status_code: "HO" },
   "015-S": { scan_type: "PP", pickrr_sub_status_code: "" },
   "538-T": { scan_type: "SHP", pickrr_sub_status_code: "" },
   "001-S": { scan_type: "SHP", pickrr_sub_status_code: "" },

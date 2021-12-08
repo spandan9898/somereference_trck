@@ -22,7 +22,7 @@ const createServer = (options) => {
     return { hello: "world" };
   });
 
-  server.listen(9000, (err) => {
+  server.listen(process.env.PORT || 3000, (err) => {
     if (err) {
       server.log.error(err);
       process.exit(1);
