@@ -81,7 +81,7 @@ const XBS_STATUS_MAPPER = {
   "InTransit-IT": { scan_type: "OT", pickrr_sub_status_code: "" },
 };
 
-const XBS_TOPICS_COUNT = 2;
+const XBS_TOPICS_COUNT = 5;
 
 module.exports = {
   XBS_STATUS_MAPPER,

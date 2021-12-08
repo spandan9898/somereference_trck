@@ -78,7 +78,7 @@ const EKART_STATUS_MAPPER = {
   "shipment_rto_cancelled_shipment is delivered": { scan_type: "DL", pickrr_sub_status_code: "" },
 };
 
-const EKART_TOPICS_COUNT = 2;
+const EKART_TOPICS_COUNT = 3;
 module.exports = {
   EKART_STATUS_MAPPER,
   EKART_TOPICS_COUNT,

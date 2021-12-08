@@ -99,7 +99,7 @@ const UDAAN_STATUS_MAPPING = {
   RT_DELIVERED: { scan_type: "RTD", pickrr_sub_status_code: "" },
 };
 
-const UDAAN_TOPICS_COUNT = 2;
+const UDAAN_TOPICS_COUNT = 1;
 
 module.exports = {
   UDAAN_STATUS_MAPPING,

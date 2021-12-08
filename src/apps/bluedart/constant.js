@@ -147,9 +147,7 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "098-RT": { scan_type: "OC", pickrr_sub_status_code: "" },
 };
 
-// TODO: change this later
-
-const TOTAL_TOPIC_COUNT = 3;
+const TOTAL_TOPIC_COUNT = 5;
 
 module.exports = {
   BLUEDART_CODE_MAPPER_V2,
