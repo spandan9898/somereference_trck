@@ -7,10 +7,10 @@ const moment = require("moment");
  */
 const mapStatusToEvent = (statusObj) => {
   const eventObj = {
-    scan_datetime: statusObj.current_status_time || "",
-    scan_type: statusObj.current_status_type || "",
-    scan_status: statusObj.current_status_body || "",
-    scan_location: statusObj.current_status_location || "",
+    scan_datetime: statusObj["status.current_status_time"] || "",
+    scan_type: statusObj["status.current_status_type"] || "",
+    scan_status: statusObj["status.current_status_body"] || "",
+    scan_location: statusObj["status.current_status_location"] || "",
   };
 
   return eventObj;
