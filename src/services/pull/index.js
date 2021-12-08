@@ -15,7 +15,7 @@ const updateTrackDataToPullMongo = async (trackObj) => {
     throw new Error(result.err);
   }
   const updatedObj = {
-    status: result.statusMap,
+    ...result.statusMap,
     track_arr: [result.eventObj],
     last_update_from: "kafka",
     edd_stamp: result.eddStamp ? new Date(result.eddStamp) : "",
@@ -27,8 +27,8 @@ const updateTrackDataToPullMongo = async (trackObj) => {
     const trackArr = updatedObj.track_arr;
     const auditObj = {
       source: "kafka_consumer",
-      current_status_type: updatedObj.status.current_status_type,
-      current_status_time: updatedObj.status.current_status_time,
+      current_status_type: updatedObj["status.current_status_type"],
+      current_status_time: updatedObj["status.current_status_time"],
       pulled_at: new Date(),
     };
 
@@ -46,6 +46,7 @@ const updateTrackDataToPullMongo = async (trackObj) => {
       {
         upsert: true,
         returnNewDocument: true,
+        returnDocument: "after",
       }
     );
     await storeDataInCache(result);

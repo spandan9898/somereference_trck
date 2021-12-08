@@ -10,8 +10,7 @@ const { prepareXbsData } = require("../../apps/xpressbees/services");
 
 const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
-
-// const sendDataToNdr = require("../ndr");
+const sendDataToNdr = require("../ndr");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -51,10 +50,8 @@ class KafkaMessageHandler {
         return;
       }
 
-      await updateTrackDataToPullMongo(trackData);
-
-      // sendDataToNdr(result);
-
+      const result = await updateTrackDataToPullMongo(trackData);
+      sendDataToNdr(result);
       console.log("done");
       console.log("--");
     } catch (error) {

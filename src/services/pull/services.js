@@ -65,14 +65,14 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   // currentStatusTime = currentStatusTime.isValid() ? currentStatusTime.format() : null;
 
   const statusMap = {
-    current_status_time: new Date(currentStatusTime),
-    current_status_type: scanType,
-    current_status_body: trackInfo,
-    current_status_location: trackLocation,
-    pickrr_sub_status_code: pickrrSubStatusCode,
-    courier_status_code: courierStatusCode,
-    current_status_val: null,
-    received_by: receivedBy,
+    "status.current_status_time": new Date(currentStatusTime),
+    "status.current_status_type": scanType,
+    "status.current_status_body": trackInfo,
+    "status.current_status_location": trackLocation,
+    "status.pickrr_sub_status_code": pickrrSubStatusCode,
+    "status.courier_status_code": courierStatusCode,
+    "status.current_status_val": null,
+    "status.received_by": receivedBy,
   };
 
   const eventObj = mapStatusToEvent(statusMap);
