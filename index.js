@@ -3,6 +3,7 @@ require("dotenv").config();
 const server = require("./server");
 
 const db = require("./src/connector/database");
+const logger = require("./logger");
 
 db.initDB((err, _db) => {
   if (err) {
@@ -25,4 +26,4 @@ const ecommApp = require("./src/apps/ecomm");
 const shadowfaxApp = require("./src/apps/shadowfax");
 const parceldoApp = require("./src/apps/parceldo");
 
-server.createServer();
+server.createServer(logger);

@@ -7,7 +7,11 @@ const { ServerResponse } = require("http");
 
 let serverInstance;
 
-const createServer = (options) => {
+/**
+ *
+ * @param {*} options
+ */
+const createServer = (logger) => {
   // create the server
 
   const server = Fastify({
@@ -21,6 +25,11 @@ const createServer = (options) => {
     reply.type("application/json").code(200);
     return { hello: "world" };
   });
+  server.post("/track/external/push/bluedart", async (request, reply) => {
+    reply.type("application/json").code(200);
+    logger.info("Testing Nginx", request.body);
+    return { hello: "world", body: request.body };
+  });
 
   server.listen(process.env.PORT || 3000, (err) => {
     if (err) {
@@ -32,6 +41,7 @@ const createServer = (options) => {
   });
 };
 
+/** */
 const getServerInstance = () => serverInstance;
 
 module.exports = {
