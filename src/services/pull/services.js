@@ -102,16 +102,8 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
  * @desc store data in cache with expected format
  */
 const storeDataInCache = async (result) => {
-  const { eventObj, awb } = result;
-  const { scan_datetime: scanDatetime } = eventObj || {};
-
-  const redisKey = `${eventObj.scan_type}_${moment(scanDatetime).unix()}`;
-  const newRedisPayload = {
-    [redisKey]: eventObj,
-  };
-  const dt = (await getObject(awb)) || {};
-  const oldData = { ...dt, ...newRedisPayload };
-  await setObject(awb, oldData);
+  const { awb } = result;
+  await setObject(awb, true);
 };
 
 module.exports = {
