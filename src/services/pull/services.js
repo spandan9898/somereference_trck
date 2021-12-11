@@ -21,7 +21,7 @@ const prepareTrackDataForTrackingAndStoreInCache = async (trackArr, awb) => {
     const trackData = cachedAwbData?.track_arr || [];
     let newTrackArr;
 
-    if (!trackData) {
+    if (_.isEmpty(trackData)) {
       newTrackArr = trackArr.reduce((trackArray, trackObj) => {
         const scanType = trackObj.scan_type;
         const newObj = {
