@@ -1,9 +1,55 @@
 const _ = require("lodash");
 const moment = require("moment");
+const logger = require("../../../logger");
 
 const { setObject, getObject, checkAwbInCache } = require("../../utils");
 const { BLOCK_NDR_STRINGS } = require("./constants");
 const { mapStatusToEvent } = require("./helpers");
+
+/**
+ * sorring status array desc -> The last scan time will be in the top
+ */
+const sortStatusArray = (statusArray) =>
+  _.orderBy(statusArray, (obj) => new Date(obj.scan_datetime), ["desc"]);
+
+/**
+ * Preparing track array data for track/tracking
+ */
+const prepareTrackDataForTrackingAndStoreInCache = async (trackArr, awb) => {
+  try {
+    const cachedAwbData = (await getObject(awb)) || {};
+    const trackData = cachedAwbData?.track_arr || [];
+    let newTrackArr;
+
+    if (!trackData) {
+      newTrackArr = trackArr.reduce((trackArray, trackObj) => {
+        const scanType = trackObj.scan_type;
+        const newObj = {
+          status_name: scanType,
+          status_array: sortStatusArray([_.omit(trackObj, "scan_type")]),
+        };
+        return [newObj, ...trackArray];
+      }, []);
+    } else {
+      const latestTrackObj = trackArr[0];
+      const cachedLastTrackObj = trackData[0];
+      if (_.get(latestTrackObj, "scan_type") === _.get(cachedLastTrackObj, "status_name")) {
+        cachedLastTrackObj.status_array.push(_.omit(latestTrackObj, "scan_type"));
+        cachedLastTrackObj.status_array = sortStatusArray(cachedLastTrackObj.status_array);
+      } else {
+        trackData.unshift({
+          status_name: latestTrackObj.scan_type,
+          status_array: sortStatusArray([_.omit(latestTrackObj, "scan_type")]),
+        });
+      }
+      newTrackArr = _.clone(trackData);
+    }
+    cachedAwbData.track_arr = newTrackArr;
+    await setObject(awb, cachedAwbData);
+  } catch (error) {
+    logger.error("prepareTrackDataForTrackingAndStoreInCache", error);
+  }
+};
 
 /** *
  * @param preparedTrackData -> 
@@ -26,7 +72,8 @@ const { mapStatusToEvent } = require("./helpers");
  */
 const redisCheckAndReturnTrackData = async (preparedTrackData) => {
   const trackObj = preparedTrackData;
-  const isExists = await checkAwbInCache(trackObj);
+
+  const isExists = await checkAwbInCache(trackObj, prepareTrackDataForTrackingAndStoreInCache);
   if (isExists) {
     return false;
   }
@@ -107,7 +154,7 @@ const storeDataInCache = async (result) => {
 
   const redisKey = `${eventObj.scan_type}_${moment(scanDatetime).unix()}`;
   const newRedisPayload = {
-    [redisKey]: eventObj,
+    [redisKey]: true,
   };
   const dt = (await getObject(awb)) || {};
   const oldData = { ...dt, ...newRedisPayload };
@@ -118,4 +165,5 @@ module.exports = {
   redisCheckAndReturnTrackData,
   prepareTrackDataToUpdateInPullDb,
   storeDataInCache,
+  prepareTrackDataForTrackingAndStoreInCache,
 };

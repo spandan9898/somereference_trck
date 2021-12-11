@@ -1,3 +1,4 @@
+const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
 
 (async () => {
@@ -11,11 +12,12 @@ const { initialize, listener } = require("./consumer");
             listener(res);
           }
         })
-        .catch((err) => console.log(err));
+        .catch((error) => {
+          logger.error("Shadowfax Consumer Initialize Error", error);
+        });
     });
   } catch (error) {
-    // TODO: notify
-
+    logger.error("Shadowfax Consumer Error", error);
     throw new Error(error);
   }
 })();
