@@ -1,3 +1,4 @@
+const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
 
 (async () => {
@@ -10,11 +11,11 @@ const { initialize, listener } = require("./consumer");
             listener(res);
           }
         })
-        .catch((err) => console.log(err));
+        .catch((error) => {
+          logger.error("Delhivery Consumer Initialize Error ", error);
+        });
     });
   } catch (error) {
-    // TODO: notify
-
-    throw new Error(error);
+    logger.error("Delhivery Consumer Error ", error);
   }
 })();

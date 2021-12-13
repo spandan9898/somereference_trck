@@ -6,6 +6,7 @@ const { prepareTrackArrCacheData } = require("../services/pull/helpers");
 const commonTrackingInfoCol = require("../services/pull/model");
 
 const { getObject } = require("./redis");
+const logger = require("../../logger");
 
 /**
  *
@@ -13,7 +14,10 @@ const { getObject } = require("./redis");
  * @desc fetch tracking data from pull db, if exists then prepare track data and store in cache
  * PS: it'll call only if cache data not found
  */
-const fetchTrackingDataAndStoreInCache = async (awb) => {
+const fetchTrackingDataAndStoreInCache = async (
+  awb,
+  prepareTrackDataForTrackingAndStoreInCache
+) => {
   try {
     const pullCollection = await commonTrackingInfoCol();
     const response = await pullCollection.findOne(
@@ -28,11 +32,10 @@ const fetchTrackingDataAndStoreInCache = async (awb) => {
 
     const data = prepareTrackArrCacheData(response.track_arr);
     await setObject(awb, data);
+    prepareTrackDataForTrackingAndStoreInCache(response.track_arr, awb);
     return data;
   } catch (error) {
-    // TODO: notify us
-
-    console.log("error ->", error);
+    logger.error("fetchTrackingDataAndStoreInCache", error);
     return false;
   }
 };
@@ -60,6 +63,26 @@ const compareScanUnixTimeAndCheckIfExists = (newScanTime, newScanType, cachedDat
 /**
  *
  * @param {*} trackObj
+ * @param {*} cachedData
+ * @returns
+ */
+const checkCurrentStatusAWBInCache = (trackObj, cachedData) => {
+  const cacheKeys = Object.keys(cachedData);
+  const currentStatusType = trackObj?.status?.current_status_type;
+  return cacheKeys.some((key) => {
+    const keys = key.split("_");
+    const statusInitial = keys[0];
+    return (
+      ["dl", "rtd"].includes(statusInitial) ||
+      (statusInitial === "rto" && currentStatusType === "RTO") ||
+      (statusInitial === "rto" && currentStatusType !== "RTD")
+    );
+  });
+};
+
+/**
+ *
+ * @param {*} trackObj
  * @desc Check awb in cache with below conditions
  * Check if awb not in redis then go forward -> return false i.e move forward
  * if exists then check ->
@@ -68,12 +91,15 @@ const compareScanUnixTimeAndCheckIfExists = (newScanTime, newScanType, cachedDat
  * Otherwise -> return false i.e move foward
  * @returns true or false
  */
-const checkAwbInCache = async (trackObj) => {
+const checkAwbInCache = async (trackObj, prepareTrackDataForTrackingAndStoreInCache) => {
   const cachedData = await getObject(trackObj.awb);
   const newScanTime = moment(trackObj.scan_datetime).unix();
 
   if (!cachedData) {
-    const res = await fetchTrackingDataAndStoreInCache(trackObj.awb);
+    const res = await fetchTrackingDataAndStoreInCache(
+      trackObj.awb,
+      prepareTrackDataForTrackingAndStoreInCache
+    );
     if (!res) {
       return false;
     }
@@ -84,6 +110,7 @@ const checkAwbInCache = async (trackObj) => {
     );
     return isExists;
   }
+  if (checkCurrentStatusAWBInCache(trackObj, cachedData)) return true;
 
   const isExists = await compareScanUnixTimeAndCheckIfExists(
     newScanTime,

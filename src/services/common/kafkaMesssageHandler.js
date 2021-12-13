@@ -7,6 +7,7 @@ const { prepareParceldoData } = require("../../apps/parceldo/services");
 const { prepareShadowfaxData } = require("../../apps/shadowfax/services");
 const { prepareUdaanData } = require("../../apps/udaan/services");
 const { prepareXbsData } = require("../../apps/xpressbees/services");
+const logger = require("../../../logger");
 
 const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
@@ -45,17 +46,18 @@ class KafkaMessageHandler {
 
       if (!res.awb) return;
       const trackData = await redisCheckAndReturnTrackData(res);
+
       if (!trackData) {
         console.log("data already exists!");
         return;
       }
 
-      const result = await updateTrackDataToPullMongo(trackData);
+      const result = await updateTrackDataToPullMongo(trackData, logger);
       sendDataToNdr(result);
       console.log("done");
       console.log("--");
     } catch (error) {
-      console.log("error -->", error);
+      logger.error("KafkaMessageHandler", error);
     }
   }
 }

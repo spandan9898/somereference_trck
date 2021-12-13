@@ -7,11 +7,8 @@ const logger = require("./logger");
 
 db.initDB((err, _db) => {
   if (err) {
-    console.log(err);
-
-    // TODO: notify error
+    logger.error("DB Init Error: ", err);
   } else {
-    console.log();
     console.log(`${_db.s.options.dbName} - DB connected`);
   }
 });

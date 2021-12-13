@@ -218,7 +218,7 @@ const getBluedartTrackingList = (trackObj) => {
       trackDict.track_info = scanDetails?.Scan;
       trackDict.scan_location = scanDetails?.ScannedLocation;
       trackDict.awb = trackingId;
-      trackDict.scan_code_id = `${scanDetails?.ScanCode}-${scanDetails?.ScanGroupType}`;
+      trackDict.scan_code_id = `${scanDetails?.ScanCode || ""}-${scanDetails?.ScanGroupType || ""}`;
 
       if (shipmentData.PickUpDate) {
         let pickupDate = `${shipmentData.PickUpDate} ${shipmentData.PickUpTime}`;
