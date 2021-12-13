@@ -4,6 +4,7 @@ const Fastify = require("fastify");
 const path = require("path");
 const AutoLoad = require("fastify-autoload");
 const { ServerResponse } = require("http");
+const trackRoutes = require("./src/apps/tracking");
 
 let serverInstance;
 
@@ -20,6 +21,8 @@ const createServer = (logger) => {
   });
 
   // start the server
+
+  server.register(trackRoutes, { prefix: "/track" });
 
   server.get("/", async (request, reply) => {
     reply.type("application/json").code(200);
