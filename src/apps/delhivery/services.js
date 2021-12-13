@@ -90,7 +90,7 @@ const prepareDelhiveryData = (delhiveryDict) => {
 
     const nslCode = trackData.NSLCode;
     const delhiveryMapperKey = `${nslCode}_${statusScanType}`;
-    const reasonDict = DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER[delhiveryMapperKey];
+    const reasonDict = DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER[delhiveryMapperKey.toLowerCase()];
 
     if (!reasonDict) {
       return {

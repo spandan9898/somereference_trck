@@ -36,8 +36,8 @@ const prepareShadowfaxData = (shadowfaxDict) => {
 
   try {
     const { event, received_by: receivedBy, EDD } = shadowfaxDict || {};
-    if (event in SHADOWFAX_CODE_MAPPER) {
-      const scanType = SHADOWFAX_CODE_MAPPER[event];
+    if (event.toLowerCase() in SHADOWFAX_CODE_MAPPER) {
+      const scanType = SHADOWFAX_CODE_MAPPER[event.toLowerCase()];
       const scanDatetime = moment(shadowfaxDict.event_timestamp).format("YYYY-MM-DD HH:mm:ss");
       pickrrShadowfaxDict.EDD = EDD ? moment(EDD).format("YYYY-MM-DD HH:mm:ss") : "";
       pickrrShadowfaxDict.received_by = receivedBy || "";

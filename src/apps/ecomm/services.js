@@ -40,7 +40,7 @@ const prepareEcommData = (ecommDict) => {
   try {
     const { received_by: receivedBy, reason_code_number: reasonCodeNumber, EDD } = ecommDict || {};
     if (reasonCodeNumber in ECOMM_CODE_MAPPER) {
-      const reasonDict = ECOMM_CODE_MAPPER[reasonCodeNumber];
+      const reasonDict = ECOMM_CODE_MAPPER[reasonCodeNumber.toLowerCase()];
       const pickrrStatusCode = reasonDict.pickrr_status_code;
       const scanType = pickrrStatusCode === "UD" ? "NDR" : pickrrStatusCode;
       const pickrrSubstatusCode = reasonDict.pickrr_sub_status_code;

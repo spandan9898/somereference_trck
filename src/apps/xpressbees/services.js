@@ -67,7 +67,7 @@ const prepareXbsData = (xbsDict) => {
     if ("Receivedby" in trackData && trackData.Receivedby) {
       pickrrXbsDict.received_by = trackData.Receivedby;
     }
-    const reasonDict = XBS_STATUS_MAPPER[statusScanType];
+    const reasonDict = XBS_STATUS_MAPPER[statusScanType.toLowerCase()];
 
     if (!reasonDict) {
       return {

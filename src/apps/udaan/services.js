@@ -64,7 +64,7 @@ const prepareUdaanData = (udaanDict) => {
     if ("received_by" in trackData && trackData.received_by) {
       pickrrUdaanDict.received_by = trackData.received_by;
     }
-    const reasonDict = UDAAN_STATUS_MAPPING[statusScanType];
+    const reasonDict = UDAAN_STATUS_MAPPING[statusScanType.toLowerCase()];
 
     if (!reasonDict) {
       return {
