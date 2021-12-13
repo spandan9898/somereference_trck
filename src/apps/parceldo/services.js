@@ -48,8 +48,8 @@ const prepareParceldoData = (parceldoDict) => {
     statusID = Number(statusID);
     const reasonCode = _.get(parceldoDict, "response[0].reasonCode", "");
     const mapperKey = reasonCode.length ? `${statusID}_${reasonCode}` : statusID;
-    if (mapperKey in PARCELDO_CODE_MAPPER) {
-      const statusMap = PARCELDO_CODE_MAPPER[mapperKey];
+    if (mapperKey.toLowerCase() in PARCELDO_CODE_MAPPER) {
+      const statusMap = PARCELDO_CODE_MAPPER[mapperKey.toLowerCase()];
       let { scanType } = statusMap;
       const isRTO = _.get(parceldoDict, "response[0].isRTO", "");
       if (statusID === 111 && isRTO === "Y") {

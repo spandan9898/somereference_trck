@@ -51,3 +51,5 @@ Thumbs.db
 .env
 package-lock.json
 .vscode/launch.json
+
+mapper/

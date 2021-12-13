@@ -161,7 +161,7 @@ const preparePickrrObjData = (trackObj) => {
     awb,
     scan_location: scanLocation,
   } = trackObj || {};
-  const scanMappingItem = BLUEDART_CODE_MAPPER_V2[scanCodeId];
+  const scanMappingItem = BLUEDART_CODE_MAPPER_V2[scanCodeId.toLowerCase()];
   if (!scanMappingItem) {
     return { err: "Unknown status code" };
   }

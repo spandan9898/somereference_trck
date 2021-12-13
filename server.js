@@ -22,7 +22,7 @@ const createServer = (logger) => {
 
   // start the server
 
-  server.register(trackRoutes, { prefix: "/track" });
+  // server.register(trackRoutes, { prefix: "/track" });
 
   server.get("/", async (request, reply) => {
     reply.type("application/json").code(200);
