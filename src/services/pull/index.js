@@ -24,8 +24,8 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
     ...result.statusMap,
     track_arr: [result.eventObj],
     last_update_from: "kafka",
-    edd_stamp: result.eddStamp ? new Date(result.eddStamp) : "",
-    updated_at: new Date(moment().utc().format()),
+    edd_stamp: result.eddStamp ? result.eddStamp : "",
+    updated_at: moment().toDate(),
   };
   try {
     const pullCollection = await commonTrackingInfoCol();
@@ -34,7 +34,7 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
       from: "kafka_consumer",
       current_status_type: updatedObj["status.current_status_type"],
       current_status_time: updatedObj["status.current_status_time"],
-      pulled_at: new Date(),
+      pulled_at: moment().toDate(),
     };
 
     delete updatedObj.track_arr;
@@ -61,7 +61,6 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
         },
       },
       {
-        upsert: true,
         returnNewDocument: true,
         returnDocument: "after",
       }

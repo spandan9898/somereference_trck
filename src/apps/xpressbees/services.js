@@ -48,18 +48,19 @@ const prepareXbsData = (xbsDict) => {
   };
 
   try {
-    const trackData = xbsDict;
+    const trackData = { ...xbsDict };
     const { StatusCode = "", Remarks = "" } = trackData;
     const statusScanType = `${Remarks}-${StatusCode}`;
     const statusDateTime = `${trackData.StatusDate} ${trackData.StatusTime}`;
+
     const statusDate = statusDateTime
-      ? moment(statusDateTime, "MM-DD-YYYY hhm").format("YYYY-MM-DD HH:mm:ss")
+      ? moment(statusDateTime, "DD-MM-YYYY hhm").format("YYYY-MM-DD HH:mm:ss")
       : moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
 
     if ("EDD" in trackData) {
       let eddDatetime = trackData.EDD;
       if (eddDatetime) {
-        eddDatetime = moment(eddDatetime, "MM-DD-YYYY").format("YYYY-MM-DD");
+        eddDatetime = moment(eddDatetime, "DD-MM-YYYY").format("YYYY-MM-DD");
       }
       pickrrXbsDict.EDD = eddDatetime;
     }

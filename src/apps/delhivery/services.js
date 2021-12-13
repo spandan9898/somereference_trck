@@ -58,7 +58,8 @@ const prepareDelhiveryData = (delhiveryDict) => {
 
   try {
     const trackData = delhiveryDict.Shipment;
-    const statusScanType = trackData.Status.StatusType.toString();
+
+    const statusScanType = trackData.Status.StatusType || "";
     let statusType = statusScanType;
     const statusDateTime = trackData?.Status?.StatusDateTime;
     const statusDate = statusDateTime
@@ -105,7 +106,7 @@ const prepareDelhiveryData = (delhiveryDict) => {
     pickrrDelhiveryDict.track_location = trackData.Status.StatusLocation.toString();
     pickrrDelhiveryDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrDelhiveryDict.pickrr_sub_status_code = reasonDict?.pickrr_sub_status_code || "";
-    pickrrDelhiveryDict.courier_status_code = trackData.NSLCode;
+    pickrrDelhiveryDict.courier_status_code = delhiveryMapperKey;
 
     return pickrrDelhiveryDict;
   } catch (error) {

@@ -46,7 +46,7 @@ const prepareUdaanData = (udaanDict) => {
   };
 
   try {
-    const trackData = udaanDict;
+    const trackData = { ...udaanDict };
     const { status = "", comments = "" } = trackData;
     const statusScanType = comments.length ? `${status}_${comments}` : status;
     const statusDateTime = `${trackData.statusUpdateDate} ${trackData.statusUpdateTime}`;

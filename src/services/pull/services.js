@@ -95,6 +95,7 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
     pickrr_sub_status_code: pickrrSubStatusCode = "",
     courier_status_code: courierStatusCode = "",
     received_by: receivedBy = "",
+    pickup_datetime: pickupDatetime = "",
   } = trackData;
 
   if (scanType === "CC") {
@@ -112,7 +113,7 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   // currentStatusTime = currentStatusTime.isValid() ? currentStatusTime.format() : null;
 
   const statusMap = {
-    "status.current_status_time": new Date(currentStatusTime),
+    "status.current_status_time": moment(currentStatusTime).utc().toDate(),
     "status.current_status_type": scanType,
     "status.current_status_body": trackInfo,
     "status.current_status_location": trackLocation,
@@ -126,13 +127,16 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   eventObj.pickrr_sub_status_code = trackData.pickrr_sub_status_code;
   eventObj.courier_status_code = trackData.courier_status_code;
   eventObj.update_source = "kafka";
-  eventObj.update_time = new Date(moment().utc().format());
-  eventObj.system_updated_at = new Date(moment().utc().format());
+  eventObj.update_time = moment().toDate();
+  eventObj.system_updated_at = moment().toDate();
+  if (pickupDatetime) {
+    eventObj.pickup_datetime = moment(pickupDatetime).utc().toDate();
+  }
 
   let eddStamp;
   if (edd) {
     const eddDate = moment(edd);
-    eddStamp = eddDate.isValid() ? eddDate.toDate() : edd;
+    eddStamp = eddDate.isValid() ? eddDate.utc().toDate() : edd;
   }
   return {
     success: true,
