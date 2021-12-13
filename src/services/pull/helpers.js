@@ -27,7 +27,7 @@ const prepareTrackArrCacheData = (trackArr) =>
     const unixScanTime = moment(item.scan_datetime).unix();
     return {
       ...obj,
-      [`${item.scan_type}_${unixScanTime}`]: item,
+      [`${item.scan_type}_${unixScanTime}`]: true,
     };
   }, {});
 

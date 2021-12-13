@@ -1,3 +1,4 @@
+const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
 
 (async () => {
@@ -11,11 +12,12 @@ const { initialize, listener } = require("./consumer");
             listener(res);
           }
         })
-        .catch((err) => console.log(err));
+        .catch((error) => {
+          logger.error("Consumer Initialize Error In Loop", error);
+        });
     });
   } catch (error) {
-    // TODO: notify
-
+    logger.error("Consumer Initialize Error", error);
     throw new Error(error);
   }
 })();

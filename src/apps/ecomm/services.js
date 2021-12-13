@@ -45,7 +45,7 @@ const prepareEcommData = (ecommDict) => {
       const scanType = pickrrStatusCode === "UD" ? "NDR" : pickrrStatusCode;
       const pickrrSubstatusCode = reasonDict.pickrr_sub_status_code;
       const scanDatetime = moment(ecommDict.datetime).format("YYYY-MM-DD HH:mm:ss");
-      let remarks = `${ecommDict.status.trim()} ${ecommDict.reasonCode?.replace("-", "")?.trim()}`;
+      let remarks = `${ecommDict.status.trim()} ${ecommDict.reason_code?.replace("-", "")?.trim()}`;
       pickrrEcommDict.scan_datetime = scanDatetime || "";
       pickrrEcommDict.received_by = receivedBy || "";
       pickrrEcommDict.EDD = EDD ? moment(EDD).format("YYYY-MM-DD HH:mm:ss") : "";
@@ -64,8 +64,7 @@ const prepareEcommData = (ecommDict) => {
       pickrrEcommDict.pickrr_sub_status_code = pickrrSubstatusCode;
       pickrrEcommDict.courier_status_code = reasonCodeNumber;
       if (scanType === "PP") {
-        const pickupDatetime = scanDatetime;
-        pickrrEcommDict.pickup_datetime = pickupDatetime;
+        pickrrEcommDict.pickup_datetime = scanDatetime;
       }
     }
     return pickrrEcommDict;

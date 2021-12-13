@@ -57,7 +57,7 @@ const prepareEkartData = (ekartDict) => {
   };
 
   try {
-    const trackData = ekartDict;
+    const trackData = { ...ekartDict };
     const { sub_reasons: subReasons = [], event = "" } = trackData;
     const statusScanType = subReasons.length ? `${subReasons[0]}_${event}` : event;
     let statusType = statusScanType;
