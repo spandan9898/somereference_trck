@@ -1,6 +1,6 @@
 const AMAZE_CODE_MAPPER = {
   "Soft Data Upload": { scan_type: "OP", pickrr_sub_status_code: "" },
-  "In Scan – HUB": { scan_type: "PP", pickrr_sub_status_code: "" },
+  "In Scan - HUB": { scan_type: "PP", pickrr_sub_status_code: "" },
   "Bag Created For HUB": { scan_type: "SHP", pickrr_sub_status_code: "" },
   "Bag Created For BRANCH": { scan_type: "SHP", pickrr_sub_status_code: "" },
   "In Transit To HUB": { scan_type: "OT", pickrr_sub_status_code: "" },

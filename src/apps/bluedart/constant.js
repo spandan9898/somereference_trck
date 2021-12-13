@@ -111,7 +111,7 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "123-T": { scan_type: "RTO", pickrr_sub_status_code: "" },
   "074-RT": { scan_type: "RTO", pickrr_sub_status_code: "" },
   "123-RT": { scan_type: "RTO", pickrr_sub_status_code: "" },
-  "503-S": { scan_type: "RTO", pickrr_sub_status_code: "" },
+  "503-S": { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
   "034-T": { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
   "019-S": { scan_type: "RTO-OO", pickrr_sub_status_code: "" },
   "035-RT": { scan_type: "RTO-OO", pickrr_sub_status_code: "" },
