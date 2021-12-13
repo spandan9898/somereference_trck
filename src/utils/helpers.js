@@ -74,7 +74,8 @@ const checkCurrentStatusAWBInCache = (trackObj, cachedData) => {
     const statusInitial = keys[0];
     return (
       ["dl", "rtd"].includes(statusInitial) ||
-      (statusInitial === "rto" && currentStatusType === "RTO")
+      (statusInitial === "rto" && currentStatusType === "RTO") ||
+      (statusInitial === "rto" && currentStatusType !== "RTD")
     );
   });
 };
