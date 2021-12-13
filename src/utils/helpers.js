@@ -60,6 +60,25 @@ const compareScanUnixTimeAndCheckIfExists = (newScanTime, newScanType, cachedDat
 /**
  *
  * @param {*} trackObj
+ * @param {*} cachedData
+ * @returns
+ */
+const checkCurrentStatusAWBInCache = (trackObj, cachedData) => {
+  const cacheKeys = Object.keys(cachedData);
+  const currentStatusType = trackObj?.status?.current_status_type;
+  return cacheKeys.some((key) => {
+    const keys = key.split("_");
+    const statusInitial = keys[0];
+    return (
+      ["dl", "rtd"].includes(statusInitial) ||
+      (statusInitial === "rto" && currentStatusType === "RTO")
+    );
+  });
+};
+
+/**
+ *
+ * @param {*} trackObj
  * @desc Check awb in cache with below conditions
  * Check if awb not in redis then go forward -> return false i.e move forward
  * if exists then check ->
@@ -84,6 +103,7 @@ const checkAwbInCache = async (trackObj) => {
     );
     return isExists;
   }
+  if (checkCurrentStatusAWBInCache(trackObj, cachedData)) return true;
 
   const isExists = await compareScanUnixTimeAndCheckIfExists(
     newScanTime,
