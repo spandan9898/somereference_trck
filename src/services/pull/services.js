@@ -113,7 +113,7 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   // currentStatusTime = currentStatusTime.isValid() ? currentStatusTime.format() : null;
 
   const statusMap = {
-    "status.current_status_time": moment(currentStatusTime).utc().toDate(),
+    "status.current_status_time": moment(currentStatusTime).subtract(330, "m").toDate(),
     "status.current_status_type": scanType,
     "status.current_status_body": trackInfo,
     "status.current_status_location": trackLocation,
@@ -130,13 +130,13 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   eventObj.update_time = moment().toDate();
   eventObj.system_updated_at = moment().toDate();
   if (pickupDatetime) {
-    eventObj.pickup_datetime = moment(pickupDatetime).utc().toDate();
+    eventObj.pickup_datetime = moment(pickupDatetime).subtract(330, "m").toDate();
   }
 
   let eddStamp;
   if (edd) {
     const eddDate = moment(edd);
-    eddStamp = eddDate.isValid() ? eddDate.utc().toDate() : edd;
+    eddStamp = eddDate.isValid() ? eddDate.subtract(330, "m").toDate() : edd;
   }
   return {
     success: true,
