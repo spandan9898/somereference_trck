@@ -25,9 +25,7 @@ const fetchTrackingDataAndStoreInCache = async (
       { projection: { track_arr: 1 } }
     );
     if (!response) {
-      // same -> creation process
-
-      return false;
+      return "NA";
     }
 
     const data = prepareTrackArrCacheData(response.track_arr);
@@ -102,6 +100,9 @@ const checkAwbInCache = async (trackObj, prepareTrackDataForTrackingAndStoreInCa
     );
     if (!res) {
       return false;
+    }
+    if (res === "NA") {
+      return true;
     }
     const isExists = await compareScanUnixTimeAndCheckIfExists(
       newScanTime,
