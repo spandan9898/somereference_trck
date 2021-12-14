@@ -16,12 +16,12 @@ const prepareTrackingEventDictForNDR = (trackData) => {
     pickrr_sub_status_code:
       trackData?.pickrr_sub_status_code ||
       _.get(trackData, "track_arr[0].pickrr_sub_status_code", ""),
-    pickup_datetime: findPickupDate(trackData?.track_arr),
+    pickup_datetime: findPickupDate(trackData?.track_arr || []),
     received_by: trackData?.status?.received_by,
     scan_datetime: trackData?.status?.current_status_time,
     scan_type: trackData?.status?.current_status_type,
     track_info: trackData?.status?.current_status_body,
-    track_location: trackData?.status?.current_status_body,
+    track_location: trackData?.status?.current_status_location,
     ofd_count: ofdCount(trackData?.track_arr),
     courier_name: trackData?.courier_parent_name,
   };
