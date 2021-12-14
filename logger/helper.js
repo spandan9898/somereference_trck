@@ -1,4 +1,6 @@
 const { format, transports } = require("winston");
+const { logLevel } = require("kafkajs");
+const isEmpty = require("lodash/isEmpty");
 
 const { printf } = format;
 
@@ -53,13 +55,32 @@ if (["production", "staging"].includes(process.env.NODE_ENV)) {
 
 const customFormat = printf(({ level, message, timestamp: loggerTimestamp, ...metadata }) => {
   let msg = `${loggerTimestamp} [${level}] : ${message} `;
-  if (metadata) {
+  if (!isEmpty(metadata)) {
     msg += JSON.stringify(metadata);
   }
   return msg;
 });
 
+/**
+ *
+ * @param {*} level
+ * @returns
+ */
+const toWinstonLogLevel = (level) => {
+  switch (level) {
+    case logLevel.WARN:
+      return "warn";
+    case logLevel.INFO:
+      return "info";
+    case logLevel.DEBUG:
+      return "debug";
+    default:
+      return "error";
+  }
+};
+
 module.exports = {
   customFormat,
   loggerTransports,
+  toWinstonLogLevel,
 };
