@@ -12,6 +12,7 @@ const logger = require("../../../logger");
 const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
 const sendDataToNdr = require("../ndr");
+const sendTrackDataToV1 = require("../v1");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -54,6 +55,7 @@ class KafkaMessageHandler {
 
       const result = await updateTrackDataToPullMongo(trackData, logger);
       sendDataToNdr(result);
+      sendTrackDataToV1(result);
       console.log("done");
       console.log("--");
     } catch (error) {
