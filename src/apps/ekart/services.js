@@ -76,7 +76,7 @@ const prepareEkartData = (ekartDict) => {
     if ("Receivedby" in trackData && trackData.Receivedby) {
       pickrrEkartDict.received_by = trackData.Receivedby;
     }
-    const reasonDict = EKART_STATUS_MAPPER[statusType];
+    const reasonDict = EKART_STATUS_MAPPER[statusType.toLowerCase()];
 
     if (!reasonDict) {
       return {

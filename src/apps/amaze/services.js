@@ -46,7 +46,7 @@ const prepareAmazeData = (amazeDict) => {
       mappingKey = `${currentStatus}-${remarks}`;
     }
 
-    const scanMappingItem = AMAZE_CODE_MAPPER[mappingKey];
+    const scanMappingItem = AMAZE_CODE_MAPPER[mappingKey.toLowerCase()];
     if (!scanMappingItem) {
       return {
         err: `Unknown status code ${mappingKey}`,

@@ -6,6 +6,7 @@
   "scripts": {
     "test": "nodemon ./test.js",
     "start": "npm run lint && nodemon index.js",
+    "dev:script": "node script.js",
     "lint": "eslint src/*",
     "lint:fix": "eslint --fix src/*"
   },
