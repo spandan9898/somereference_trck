@@ -2,6 +2,7 @@
 const kafka = require("../../connector/kafka");
 const { AMAZE_TOPICS_COUNT } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
+const logger = require("../../../logger");
 
 /**
  * initialize consumer for amaze payload
@@ -15,7 +16,7 @@ const initialize = async () => {
       await consumer.subscribe({ topic: `amaze_${index}`, fromBeginning: false });
       return consumer;
     } catch (error) {
-      console.log("error --> ", error.message);
+      logger.error("Amaze Consumer Initialize Error --> ", error);
     }
   });
 };
@@ -34,7 +35,7 @@ const listener = async (consumer) => {
       },
     });
   } catch (error) {
-    console.log(error.message);
+    logger.error("Amaze Listener Error ", error);
   }
 };
 

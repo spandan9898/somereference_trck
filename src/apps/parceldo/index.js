@@ -1,3 +1,4 @@
+const logger = require("../../../logger");
 const { listener, initialize } = require("./consumer");
 
 (async () => {
@@ -9,6 +10,6 @@ const { listener, initialize } = require("./consumer");
           listener(response);
         }
       })
-      .catch((err) => console.log(err.message));
+      .catch((err) => logger.error("Parceldo Consumer Error ", err));
   });
 })();

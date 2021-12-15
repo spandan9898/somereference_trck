@@ -2,6 +2,7 @@
 const kafka = require("../../connector/kafka");
 const { ECOMM_TOPIC_COUNT } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
+const logger = require("../../../logger");
 
 /**
  *initialize consumer for ecomm
@@ -16,7 +17,7 @@ const initialize = async () => {
       await consumer.subscribe({ topic: `ecomm_${index}`, fromBeginning: false });
       return consumer;
     } catch (error) {
-      console.log("error --> ", error.message);
+      logger.error("Ecomm listener error --> ", error);
     }
   });
 };
@@ -32,7 +33,7 @@ const listener = async (consumer) => {
       },
     });
   } catch (error) {
-    console.log(error);
+    logger.error("Ecomm listener Error", error);
   }
 };
 

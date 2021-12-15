@@ -2,7 +2,7 @@ const { format, transports } = require("winston");
 const { logLevel } = require("kafkajs");
 const isEmpty = require("lodash/isEmpty");
 
-const { printf } = format;
+const { printf, combine } = format;
 
 const SlackHook = require("./slackHook");
 
@@ -33,16 +33,23 @@ const customSlackFormatter = ({ message, timestamp: loggerTimestamp, ...metadata
   };
 };
 
-const options = {
-  console: {
-    level: "debug",
-    handleExceptions: true,
-    json: false,
-    colorize: true,
-  },
-};
-
-const loggerTransports = [new transports.Console(options.console)];
+const alignColorsAndTime = format.combine(
+  format.colorize({
+    all: true,
+  }),
+  format.label({
+    label: "[LOGGER]",
+  }),
+  format.timestamp({
+    format: "YY-MM-DD HH:MM:SS",
+  }),
+  format.printf((info) => ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`)
+);
+const loggerTransports = [
+  new transports.Console({
+    format: combine(format.colorize(), alignColorsAndTime),
+  }),
+];
 
 if (["production", "staging"].includes(process.env.NODE_ENV)) {
   loggerTransports.push(

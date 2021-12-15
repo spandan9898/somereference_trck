@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+const logger = require("../../../logger");
 const { listener, initialize } = require("./consumer");
 
 /**
@@ -14,7 +15,7 @@ const { listener, initialize } = require("./consumer");
             listener(response);
           }
         })
-        .catch((error) => console.log(error));
+        .catch((error) => logger.error("Amaze consumer", error));
     });
   } catch (error) {
     throw new Error(error);

@@ -9,7 +9,7 @@ db.initDB((err, _db) => {
   if (err) {
     logger.error("DB Init Error: ", err);
   } else {
-    console.log(`${_db.s.options.dbName} - DB connected`);
+    logger.info(`${_db.s.options.dbName} - DB connected`);
   }
 });
 

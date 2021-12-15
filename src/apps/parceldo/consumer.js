@@ -2,6 +2,7 @@
 const kafka = require("../../connector/kafka");
 const { PARCELDO_TOPICS_COUNT } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
+const logger = require("../../../logger");
 
 /**
  * initialize consumer for parceldo payload
@@ -15,7 +16,7 @@ const initialize = async () => {
       await consumer.subscribe({ topic: `parceldo_${index}`, fromBeginning: false });
       return consumer;
     } catch (error) {
-      console.log("error -->", error.message);
+      logger.error("Parceldo Initialize error -->", error);
     }
   });
 };
@@ -31,7 +32,7 @@ const listener = async (consumer) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    logger.error("Parceldo Listener Error", error);
   }
 };
 

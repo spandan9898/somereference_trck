@@ -1,3 +1,4 @@
+const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
 
 (async () => {
@@ -10,6 +11,6 @@ const { initialize, listener } = require("./consumer");
           listener(res);
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => logger.error("Ekart Consumer Error ", err));
   });
 })();

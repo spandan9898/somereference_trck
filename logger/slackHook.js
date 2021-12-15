@@ -43,15 +43,17 @@ module.exports = class SlackHook extends Transport {
       payload.text = `${info.level}: ${info.message}`;
     }
 
-    this.axiosInstance
-      .post(this.webhookUrl, payload)
-      .then((response) => {
-        this.emit("logged", info);
-        callback();
-      })
-      .catch((err) => {
-        this.emit("error", err);
-        callback();
-      });
+    if (info.level === "error") {
+      this.axiosInstance
+        .post(this.webhookUrl, payload)
+        .then((response) => {
+          this.emit("logged", info);
+          callback();
+        })
+        .catch((err) => {
+          this.emit("error", err);
+          callback();
+        });
+    }
   }
 };

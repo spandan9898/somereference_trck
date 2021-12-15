@@ -2,6 +2,7 @@
 const kafka = require("../../connector/kafka");
 const { XBS_TOPICS_COUNT } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
+const logger = require("../../../logger");
 
 /**
  * Initialize consumer and subscribe to topics
@@ -15,7 +16,7 @@ const initialize = async () => {
       await consumer.subscribe({ topic: `xbs_${index}`, fromBeginning: false });
       return consumer;
     } catch (error) {
-      console.error("error --> ", error.message);
+      logger.error("XBS Initialize error --> ", error.message);
     }
   });
 };
@@ -32,7 +33,7 @@ const listener = async (consumer) => {
       },
     });
   } catch (error) {
-    console.error(error);
+    logger.error("XBS Listening Error", error);
   }
 };
 

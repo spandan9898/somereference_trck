@@ -1,5 +1,6 @@
 /* eslint-disable consistent-return */
 const { MongoClient, ServerApiVersion } = require("mongodb");
+const logger = require("../../logger");
 
 // DB
 
@@ -12,7 +13,7 @@ const initDB = (callback) => {
   // If DB already connected and Initialized
 
   if (db) {
-    console.log("DB has already initialized");
+    logger.info("DB has already initialized");
     return callback(null, db);
   }
 

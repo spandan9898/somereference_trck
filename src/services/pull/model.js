@@ -1,3 +1,4 @@
+const logger = require("../../../logger");
 const db = require("../../connector/database");
 
 /**
@@ -8,7 +9,7 @@ const commonTrackingInfoCol = async () => {
     const res = db.getDB().db().collection(process.env.MONGO_DB_PULL_SERVER_COLLECTION_NAME);
     return res;
   } catch (error) {
-    console.error(`Error encountered ${error}`);
+    logger.error("commonTrackingInfoCol Error ", error);
     throw new Error(error);
   }
 };
