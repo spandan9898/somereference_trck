@@ -127,7 +127,7 @@ const checkAwbInCache = async (trackObj, prepareTrackDataForTrackingAndStoreInCa
  * @returns
  */
 const convertDatetimeFormat = (date) =>
-  date ? moment(date, "YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm:ss") : "";
+  date ? moment(date, "YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm") : "";
 
 module.exports = {
   checkAwbInCache,
