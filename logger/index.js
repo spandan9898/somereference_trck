@@ -1,7 +1,15 @@
-const { createLogger, format } = require("winston");
+const { createLogger, format, addColors } = require("winston");
 
 const { combine, splat, timestamp } = format;
 const { customFormat, loggerTransports } = require("./helper");
+
+addColors({
+  error: "bold underline red",
+  warn: "yellow",
+  info: "green",
+  verbose: "cyan",
+  debug: "green",
+});
 
 const logger = createLogger({
   level: "debug",

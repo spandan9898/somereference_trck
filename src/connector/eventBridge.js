@@ -1,4 +1,5 @@
 const AWS = require("aws-sdk");
+const logger = require("../../logger");
 
 const { ACCESS_KEY, SECRET_KEY } = process.env;
 const config = {
@@ -30,12 +31,11 @@ const sendDataToEventBridge = async ({ source, detailType, data, eventBusName })
       region: "ap-south-1",
       maxRetries: 2,
     });
-    eventBridge.putEvents({ Entries: input }, (err, response) => {
-      if (err) console.log("err ->", err, err.stack);
-      else console.log("response", response);
+    eventBridge.putEvents({ Entries: input }, (err) => {
+      if (err) logger.error("sendDataToEventBridge Put Events err ->", err, err.stack);
     });
   } catch (error) {
-    console.error("error", error);
+    logger.error("sendDataToEventBridge err", error);
     throw new Error(error);
   }
 };

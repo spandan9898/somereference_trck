@@ -12,7 +12,8 @@ const logger = require("../../../logger");
 const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
 const sendDataToNdr = require("../ndr");
-const sendTrackDataToV1 = require("../v1");
+
+// const sendTrackDataToV1 = require("../v1");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -39,25 +40,22 @@ class KafkaMessageHandler {
       throw new Error(`${courierName} is not a valid courier`);
     }
     try {
-      const { message, topic, partition } = consumedPayload;
-      console.log(`Topic: ${topic} | Partition ${partition}`);
+      const { message } = consumedPayload;
 
       const res = preapreFunc(Object.values(JSON.parse(message.value.toString()))[0]);
-      console.log(`AWB: ${res.awb}`);
 
       if (!res.awb) return;
       const trackData = await redisCheckAndReturnTrackData(res);
 
       if (!trackData) {
-        console.log("data already exists!");
+        logger.info("data already exists!");
         return;
       }
 
       const result = await updateTrackDataToPullMongo(trackData, logger);
       sendDataToNdr(result);
-      sendTrackDataToV1(result);
-      console.log("done");
-      console.log("--");
+
+      // sendTrackDataToV1(result);
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }

@@ -23,10 +23,8 @@ const WinstonLogCreator = (logLevelVaue) => {
     const { message, ...extra } = log;
     if (level === 1) {
       logger.error(`${label} [${namespace}] ${message}`, extra);
-    } else if (process.env.NODE_ENV !== "production") {
-      console.log("----");
-      console.log(`${label} [${namespace}] ${message} ${JSON.stringify(extra)}`);
-      console.log("----");
+    } else if (process.env.NODE_ENV !== "production" && level === 4) {
+      logger.verbose(`${label} [${namespace}] ${message} ${JSON.stringify(extra)}`);
     }
   };
 };

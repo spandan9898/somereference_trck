@@ -1,3 +1,4 @@
+const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
 
 (async () => {
@@ -9,6 +10,6 @@ const { initialize, listener } = require("./consumer");
           listener(res);
         }
       })
-      .catch((err) => console.log(err.message));
+      .catch((err) => logger.error("XBS Consumer Error", err));
   });
 })();

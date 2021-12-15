@@ -2,6 +2,7 @@
 const kafka = require("../../connector/kafka");
 const { SHADOWFAX_TOPICS_COUNT } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
+const logger = require("../../../logger");
 
 /**
  * initialize consumer for shadowfax payload
@@ -15,7 +16,7 @@ const initialize = async () => {
       await consumer.subscribe({ topic: `shadowfax_${index}`, fromBeginning: true });
       return consumer;
     } catch (error) {
-      console.error(error.message);
+      logger.error("Shadowfax Initialize Error", error);
     }
   });
 };
@@ -31,7 +32,7 @@ const listener = async (consumer) => {
       },
     });
   } catch (error) {
-    console.error("error -->", error);
+    logger.error("Shadowfax Listener error -->", error);
   }
 };
 

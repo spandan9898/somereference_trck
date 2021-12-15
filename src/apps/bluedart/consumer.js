@@ -2,6 +2,7 @@
 const kafka = require("../../connector/kafka");
 const { TOTAL_TOPIC_COUNT } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
+const logger = require("../../../logger");
 
 /**
  * Initialize consumer and subscribe to topics
@@ -16,7 +17,7 @@ const initialize = async () => {
       await consumer.subscribe({ topic: `bluedart_${index}`, fromBeginning: false });
       return consumer;
     } catch (error) {
-      console.log("error -->", error.message);
+      logger.error("Bluedart Initialize error -->", error);
     }
   });
 };
@@ -36,7 +37,7 @@ const listener = async (consumer) => {
       },
     });
   } catch (error) {
-    console.error("error -->", error);
+    logger.error("Bluedart Listener error -->", error);
   }
 };
 
