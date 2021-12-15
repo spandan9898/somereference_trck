@@ -120,6 +120,15 @@ const checkAwbInCache = async (trackObj, prepareTrackDataForTrackingAndStoreInCa
   return isExists;
 };
 
+/**
+ *
+ * @param {*} date
+ * @returns
+ */
+const convertDatetimeFormat = (date) =>
+  date ? moment(date, "YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm:ss") : "";
+
 module.exports = {
   checkAwbInCache,
+  convertDatetimeFormat,
 };
