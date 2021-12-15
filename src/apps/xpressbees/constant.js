@@ -80,7 +80,7 @@ const XBS_STATUS_MAPPER = {
   "89-ud": { scan_type: "UD", pickrr_sub_status_code: "OTH" },
   "intransit-it": { scan_type: "OT", pickrr_sub_status_code: "" },
 };
-const XBS_TOPICS_COUNT = 5;
+const XBS_TOPICS_COUNT = 8;
 
 module.exports = {
   XBS_STATUS_MAPPER,

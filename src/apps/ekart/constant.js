@@ -103,6 +103,7 @@ const EKART_STATUS_MAPPER = {
 };
 
 const EKART_TOPICS_COUNT = 3;
+
 module.exports = {
   EKART_STATUS_MAPPER,
   EKART_TOPICS_COUNT,

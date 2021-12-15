@@ -18,7 +18,7 @@ const SHADOWFAX_CODE_MAPPER = {
   on_hold: "OT",
 };
 
-const SHADOWFAX_TOPICS_COUNT = 2;
+const SHADOWFAX_TOPICS_COUNT = 1;
 
 module.exports = {
   SHADOWFAX_CODE_MAPPER,

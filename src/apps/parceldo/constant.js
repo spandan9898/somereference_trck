@@ -426,7 +426,7 @@ const PARCELDO_CODE_MAPPER = {
     pickrr_sub_status_code: "CNA",
   },
 };
-const PARCELDO_TOPICS_COUNT = 2;
+const PARCELDO_TOPICS_COUNT = 1;
 
 module.exports = {
   PARCELDO_CODE_MAPPER,

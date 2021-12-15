@@ -1470,7 +1470,7 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
     pickrr_sub_status_code: "",
   },
 };
-const TOTAL_TOPIC_COUNT = 5;
+const TOTAL_TOPIC_COUNT = 8;
 
 module.exports = {
   DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER,
