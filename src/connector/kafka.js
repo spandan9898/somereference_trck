@@ -3,7 +3,7 @@ const logger = require("../../logger");
 const { toWinstonLogLevel } = require("../../logger/helper");
 
 const {
-  KAFKA_USERNAME: username,
+  KAFKA_USER_NAME: username,
   KAFKA_PASSWORD: password,
   KAFKA_BROKER_URL: brokerUrl,
   KAFKA_CLIENT_ID: clientId,
