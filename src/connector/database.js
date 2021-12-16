@@ -17,7 +17,7 @@ const initDB = (callback) => {
     return callback(null, db);
   }
 
-  MongoClient.connect(process.env.MONGO_DB_PULL_SERVER_HOST, {
+  MongoClient.connect(process.env.MONGO_DB_PROD_SERVER_HOST, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     serverApi: ServerApiVersion.v1,
