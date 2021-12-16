@@ -54,6 +54,8 @@ module.exports = class SlackHook extends Transport {
           this.emit("error", err);
           callback();
         });
+    } else {
+      callback();
     }
   }
 };
