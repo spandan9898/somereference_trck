@@ -6,7 +6,7 @@ const {
   KAFKA_USERNAME: username,
   KAFKA_PASSWORD: password,
   KAFKA_BROKER_URL: brokerUrl,
-  KAFKA_CLIENT_ID: clientId
+  KAFKA_CLIENT_ID: clientId,
 } = process.env;
 const sasl = username && password ? { username, password, mechanism: "plain" } : null;
 const ssl = !!sasl;
