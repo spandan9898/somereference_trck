@@ -137,6 +137,15 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   if (edd) {
     const eddDate = moment(edd);
     eddStamp = eddDate.isValid() ? eddDate.subtract(330, "m").toDate() : edd;
+    try {
+      const isBefore = moment(eddStamp).isBefore(moment(), "year");
+      if (isBefore) {
+        eddStamp = "";
+      }
+    } catch (error) {
+      logger.error("Edd Date Issue", error);
+      eddStamp = "";
+    }
   }
   return {
     success: true,
