@@ -1,6 +1,5 @@
 const _ = require("lodash");
-const { findPickupDate } = require("./helpers");
-const { ofdCount } = require("./helpers");
+const { ofdCount, convertDatetimeFormat, findPickupDate } = require("./helpers");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("./constants");
 
 /**
@@ -10,16 +9,17 @@ const { NEW_STATUS_TO_OLD_MAPPING } = require("./constants");
  */
 const prepareTrackDictForV1 = (trackData) => {
   const scanType = trackData?.status?.current_status_type;
+
   const trackDict = {
-    awb: trackData?.tracking_id,
-    scan_type: NEW_STATUS_TO_OLD_MAPPING[scanType],
-    scan_datetime: trackData?.status?.current_status_time,
-    track_info: trackData?.status?.current_status_body,
-    track_location: trackData?.status?.current_status_location,
-    received_by: trackData?.status?.received_by,
-    pickup_datetime: findPickupDate(trackData?.track_arr || []),
-    EDD: trackData?.edd_stamp,
-    pickrr_status: NEW_STATUS_TO_OLD_MAPPING[scanType],
+    awb: trackData?.tracking_id || "",
+    scan_type: NEW_STATUS_TO_OLD_MAPPING[scanType] || "",
+    scan_datetime: convertDatetimeFormat(trackData?.status?.current_status_time),
+    track_info: trackData?.status?.current_status_body || "",
+    track_location: trackData?.status?.current_status_location || "",
+    received_by: trackData?.status?.received_by || "",
+    pickup_time: convertDatetimeFormat(findPickupDate(trackData?.track_arr)),
+    EDD: convertDatetimeFormat(trackData?.edd_stamp),
+    pickrr_status: NEW_STATUS_TO_OLD_MAPPING[scanType] || "",
     pickrr_sub_status_code:
       trackData?.pickrr_sub_status_code ||
       _.get(trackData, "track_arr[0].pickrr_sub_status_code", ""),
