@@ -26,7 +26,7 @@ const prepareTrackingEventDictForNDR = (trackData) => {
     track_info: trackData?.status?.current_status_body || "",
     track_location: trackData?.status?.current_status_location || "",
     ofd_count: ofdCount(trackData?.track_arr) || "",
-    courier_name: trackData?.courier_parent_name || "",
+    courier_name: trackData?.courier_used || "",
   };
   return trackingEventDict;
 };
