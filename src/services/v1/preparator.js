@@ -29,7 +29,7 @@ const prepareTrackDictForV1 = (trackData) => {
       trackData?.pickrr_sub_status_code ||
       _.get(trackData, "track_arr[0].pickrr_sub_status_code", ""),
     courier_status_code: _.get(trackData, "track_arr[0].courier_status_code", ""),
-    ofd_count: ofdCount(trackData?.track_arr),
+    ofd_count: trackData?.track_arr ? ofdCount(trackData?.track_arr) : 0,
   };
   return trackDict;
 };
