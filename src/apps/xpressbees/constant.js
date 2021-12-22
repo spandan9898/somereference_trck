@@ -82,7 +82,23 @@ const XBS_STATUS_MAPPER = {
 };
 const XBS_TOPICS_COUNT = 8;
 
+const XBS_NDR_MAPPER = {
+  CR: "Customer Refused Shipment",
+  CNA: "Customer Not Available/Office/Residence Closed/Consignee phone not reachable",
+  AI: "Address Issue",
+  CD: "Customer Delay/Future Delivery",
+  REST: "Entry Restricted Area",
+  "CR-OTP": "Customer Refused Shipment- OTP Verified",
+  ODA: "Out of Delivery area",
+  CNR: "Cash Not Ready",
+  OPDEL: "Conignee wants open delivery",
+  OTH: "Other",
+  CI: "Customer Issue",
+  SD: "Shipper Delay",
+};
+
 module.exports = {
   XBS_STATUS_MAPPER,
   XBS_TOPICS_COUNT,
+  XBS_NDR_MAPPER,
 };
