@@ -59,7 +59,7 @@ const prepareOtherDetailsFromTrackDataForNDR = (trackData) => {
     product_sku: trackData?.sku || "",
     order_type: "", // bug in existing system
     service_type: trackData?.dispatch_mode || "",
-    cod_amount: trackData?.cod_amount || "",
+    cod_amount: trackData?.info?.cod_amount || "",
     invoice_value: trackData?.info?.invoice_value || "",
     zone: trackData?.billing_zone || "",
     edd_stamp: convertDatetimeFormat(eddStamp),
