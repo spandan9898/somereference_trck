@@ -29,10 +29,12 @@ const sendDataToEventBridge = async ({ source, detailType, data, eventBusName })
     const eventBridge = new AWS.EventBridge({
       credentials: config,
       region: "ap-south-1",
-      maxRetries: 2,
+      maxRetries: 3,
     });
-    eventBridge.putEvents({ Entries: input }, (err) => {
+
+    eventBridge.putEvents({ Entries: input }, (err, responseData) => {
       if (err) logger.error("sendDataToEventBridge Put Events err ->", err, err.stack);
+      logger.info("responseData eventBridge", responseData);
     });
   } catch (error) {
     logger.error("sendDataToEventBridge err", error);

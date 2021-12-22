@@ -1,7 +1,7 @@
 const sendDataToEventBridge = require("../../connector/eventBridge");
 const { prepareTrackDictForV1 } = require("./preparator");
 
-const { V1_EVENT_BRIDGE_SOURCE, V1_EVENT_BRIDGE_DETAIL_TYPE, V1_EVENT_BRIDGE_BUS_NAME } =
+const { TO_V1_EB_EVENT_BUS_SOURCE, TO_V1_EB_EVENT_BUS_DETAIL_TYPE, TO_V1_EB_EVENT_BUS_NAME } =
   process.env;
 
 /**
@@ -10,14 +10,12 @@ const { V1_EVENT_BRIDGE_SOURCE, V1_EVENT_BRIDGE_DETAIL_TYPE, V1_EVENT_BRIDGE_BUS
  */
 const sendTrackDataToV1 = (trackData) => {
   const trackDict = prepareTrackDictForV1(trackData);
-  const payload = {
-    trackDict,
-  };
+
   sendDataToEventBridge({
-    source: V1_EVENT_BRIDGE_SOURCE,
-    detailType: V1_EVENT_BRIDGE_DETAIL_TYPE,
-    data: payload,
-    eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
+    source: TO_V1_EB_EVENT_BUS_SOURCE,
+    detailType: TO_V1_EB_EVENT_BUS_DETAIL_TYPE,
+    data: trackDict,
+    eventBusName: TO_V1_EB_EVENT_BUS_NAME,
   });
   return true;
 };
