@@ -1,25 +1,22 @@
-// const { BLOCKED_IPS, ALLOWED_IPS } = require("./constant");
-
 const { fetchTrackingService } = require("./services");
 
-module.exports.track = async (req) => {
+const BLOCKED_IPS = [];
+
+module.exports.track = async (req, reply) => {
   //   const ip = null;
   //   const verifyByHost = false;
 
   let trackingIds = null;
   let clientOrderIds = null;
+  const IP = null;
 
-  console.log("handlers");
+  // IP = req.Meta.get("REMOTE_ADDR");
 
-  //   try {
-  //     ip = req.Meta.get("REMOTE_ADDR");
-  //     if (ip in BLOCKED_IPS) {
-  //       const response = { status: "" };
-  //       return response;
-  //     }
-  //   } catch (error) {
-  //     console.log("No REMOTE _ADDR key");
-  //   }
+  // if (BLOCKED_IPS.include(IP)) {
+  //   return { err: "IP Blocked" };
+  // }
+
+  console.log("No REMOTE _ADDR key");
 
   //   try {
   //     const hostName = req.Meta.HTTP_POST;
@@ -33,7 +30,21 @@ module.exports.track = async (req) => {
   //   }
 
   const { query } = req;
-  console.log(query);
+
+  // console.log(query);
+
+  let authToken = null;
+  if (query.auth_token) {
+    authToken = query.auth_token;
+  }
+
+  // let valid = true;
+  // if (!authToken) {
+  //   valid = false;
+  // }
+
+  // find IP from
+
   if (query.tracking_id) {
     trackingIds = query.tracking_id
       .replace("\n", "")
@@ -73,7 +84,7 @@ module.exports.track = async (req) => {
   //   const tracking = await fetchTrackingService(trackingIds, clientOrderIds, authToken, ip);
 
   // eslint-disable-next-line prefer-const
-  let tracking = await fetchTrackingService(trackingIds, clientOrderIds);
+  let tracking = await fetchTrackingService(trackingIds, clientOrderIds, authToken, IP);
 
   // if (
   //   (tracking.err && !tracking && tracking.err != null) ||
@@ -82,5 +93,5 @@ module.exports.track = async (req) => {
   //   tracking = filterTrackingParams(tracking);
   // }
 
-  return tracking;
+  return reply.code(200).send({ tracking });
 };

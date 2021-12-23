@@ -16,12 +16,18 @@ const initDB = (callback) => {
     logger.info("DB has already initialized");
     return callback(null, db);
   }
+  console.log("-------");
+  console.log("the name is ", process.env.MONGO_DB_PROD_SERVER_HOST);
+  console.log("-------");
 
-  MongoClient.connect(process.env.MONGO_DB_PROD_SERVER_HOST, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    serverApi: ServerApiVersion.v1,
-  })
+  MongoClient.connect(
+    "mongodb+srv://dev:DGcIhTUYJIeVNvm3@cluster0.z3kfm.mongodb.net/kafka_test?retryWrites=true&w=majority",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      serverApi: ServerApiVersion.v1,
+    }
+  )
     .then((client) => {
       db = client;
       callback(null, db);
