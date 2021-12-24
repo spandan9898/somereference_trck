@@ -48,7 +48,6 @@ const prepareTrackDataForTrackingAndStoreInCache = async (trackArr, awb) => {
     await setObject(awb, cachedAwbData);
   } catch (error) {
     logger.error("prepareTrackDataForTrackingAndStoreInCache", error);
-    return error;
   }
 };
 
