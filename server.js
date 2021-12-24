@@ -31,8 +31,6 @@ const createServer = (logger) => {
     return { hello: "world" };
   });
 
-  server.get("/track/tracking", trackingHandler);
-
   server.post("/track/external/push/bluedart", async (request, reply) => {
     reply.type("application/json").code(200);
     logger.info("Testing Nginx", request.body);
