@@ -16,8 +16,9 @@ const findOneDocumentFromMongo = async (filters, collection) => {
  */
 const findandProject = async (findFilters, projectfilters, collection) => {
   let response;
+
   try {
-    response = await collection.findOne(findFilters, { projection: { projectfilters } });
+    response = await collection.findOne(findFilters, { projection: projectfilters });
     return response;
   } catch (error) {
     console.log("some error at findandProject");
