@@ -12,8 +12,7 @@ const logger = require("../../../logger");
 const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
 const sendDataToNdr = require("../ndr");
-
-// const sendTrackDataToV1 = require("../v1");
+const sendTrackDataToV1 = require("../v1");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -43,19 +42,17 @@ class KafkaMessageHandler {
       const { message } = consumedPayload;
 
       const res = preapreFunc(Object.values(JSON.parse(message.value.toString()))[0]);
-
       if (!res.awb) return;
       const trackData = await redisCheckAndReturnTrackData(res);
 
       if (!trackData) {
-        logger.info("data already exists!");
+        logger.info(`data already exists! ${res.awb}`);
         return;
       }
 
       const result = await updateTrackDataToPullMongo(trackData, logger);
       sendDataToNdr(result);
-
-      // sendTrackDataToV1(result);
+      sendTrackDataToV1(result);
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }

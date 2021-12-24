@@ -28,6 +28,7 @@ const initialize = async () => {
 const listener = async (consumer) => {
   try {
     await consumer.run({
+      autoCommitInterval: 60000,
       eachMessage: (consumedPayload) => {
         KafkaMessageHandler.init(consumedPayload, "ekart");
       },
