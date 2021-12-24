@@ -1,5 +1,3 @@
-/* eslint-disable no-await-in-loop */
-const _ = require("lodash");
 const { PrepareTrackModelFilters } = require("./preparator");
 const commonTrackingInfoCol = require("../../services/pull/model");
 const { getObject, setObject } = require("../../utils/redis");
