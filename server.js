@@ -6,8 +6,6 @@ const AutoLoad = require("fastify-autoload");
 const { ServerResponse } = require("http");
 const trackRoutes = require("./src/apps/tracking");
 
-const { track: trackingHandler } = require("./src/apps/tracking/handlers");
-
 let serverInstance;
 
 /**
