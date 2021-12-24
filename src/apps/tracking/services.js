@@ -1,3 +1,4 @@
+const { isEmpty } = require("lodash");
 const { PrepareTrackModelFilters } = require("./preparator");
 const commonTrackingInfoCol = require("../../services/pull/model");
 const { getObject, setObject } = require("../../utils/redis");
@@ -9,15 +10,16 @@ const { prepareTrackDataForTrackingAndStoreInCache } = require("../../services/p
  * @param {gets called by fetchTrackingModel and returns a document} trackingAwb
  */
 const getDocumentfromMongo = async (trackingAwb) => {
+  console.log("tracking awb", trackingAwb);
   let trackModelDocument;
   try {
     const { query, projection } = await PrepareTrackModelFilters(trackingAwb);
+    console.log("query is -->", query, projection);
     const pullcollection = await commonTrackingInfoCol();
+    console.log("pull collection is", pullcollection);
     trackModelDocument = await findandProject(query, projection, pullcollection);
-    // eslint-disable-next-line no-underscore-dangle
-    delete trackModelDocument._id;
   } catch (error) {
-    console.log("some error at getDocumentfromMongo");
+    throw new Error("failed to fetch document", error);
   }
   return trackModelDocument;
 };
@@ -29,29 +31,32 @@ const getDocumentfromMongo = async (trackingAwb) => {
 const fetchTrackingModel = async (trackingAwb) => {
   let trackingobj;
   try {
-    trackingobj = getObject(trackingAwb) || [];
-    if (!trackingobj?.track_model || trackingobj === []) {
+    trackingobj = (await getObject(trackingAwb)) || {};
+    console.log("tracking obj -->", trackingobj);
+    if (isEmpty(trackingobj) || !trackingobj?.track_model) {
+      console.log("tracking object", trackingobj);
       const getDocument = await getDocumentfromMongo(trackingAwb);
-      // eslint-disable-next-line no-underscore-dangle
-      delete getDocument._id;
+      if (isEmpty(getDocument)) {
+        throw new Error("failed to fetch document");
+      }
       const trackArr = getDocument?.track_arr || [];
       const modifiedTrackArr = await prepareTrackDataForTrackingAndStoreInCache(
         trackArr,
         trackingAwb
       );
-      getDocument.track_arr = modifiedTrackArr?.track_arr;
-      const trackModel = {
-        track_model: getDocument,
-      };
-      setObject(trackingAwb, trackModel);
-      trackingobj = await getObject(trackingAwb);
-    } else {
+      if (isEmpty(modifiedTrackArr)) {
+        throw new Error("track array is empty");
+      }
+      getDocument.track_arr = modifiedTrackArr;
+      trackingobj.track_model = getDocument;
+      await setObject(trackingAwb, trackingobj);
+      console.log("new track model", trackingobj);
       return trackingobj;
     }
+    return trackingobj;
   } catch (error) {
-    console.log("some error at prepareTrackingModel", error);
+    throw new Error(error);
   }
-  return trackingobj;
 };
 
 module.exports = {

@@ -19,6 +19,7 @@ const findandProject = async (findFilters, projectfilters, collection) => {
 
   try {
     response = await collection.findOne(findFilters, { projection: projectfilters });
+    console.log("response is", response);
     return response;
   } catch (error) {
     console.log("some error at findandProject");
