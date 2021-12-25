@@ -6,8 +6,6 @@ const AutoLoad = require("fastify-autoload");
 const { ServerResponse } = require("http");
 const trackRoutes = require("./src/apps/tracking");
 
-const { track: trackingHandler } = require("./src/apps/tracking/handlers");
-
 let serverInstance;
 
 /**
@@ -30,8 +28,6 @@ const createServer = (logger) => {
     reply.type("application/json").code(200);
     return { hello: "world" };
   });
-
-  server.get("/track/tracking", trackingHandler);
 
   server.post("/track/external/push/bluedart", async (request, reply) => {
     reply.type("application/json").code(200);
