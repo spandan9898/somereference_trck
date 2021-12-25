@@ -145,8 +145,8 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
         eddStamp = "";
       }
     } catch (error) {
-      logger.error("Edd Date Issue", error);
       eddStamp = "";
+      logger.error("Edd Date Issue", error);
     }
   }
   return {

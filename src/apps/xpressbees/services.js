@@ -1,7 +1,7 @@
 const moment = require("moment");
 
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { XBS_STATUS_MAPPER } = require("./constant");
+const { XBS_STATUS_MAPPER, XBS_NDR_MAPPER } = require("./constant");
 
 /*
   :param xbs_dict: {
@@ -77,7 +77,8 @@ const prepareXbsData = (xbsDict) => {
     const statusType = reasonDict.scan_type;
     pickrrXbsDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrXbsDict.scan_datetime = statusDate;
-    pickrrXbsDict.track_info = trackData.Remarks;
+    pickrrXbsDict.track_info =
+      statusType === "UD" ? XBS_NDR_MAPPER[reasonDict?.pickrr_sub_status_code] : trackData.Remarks;
     pickrrXbsDict.awb = trackData.AWBNO;
     pickrrXbsDict.track_location = trackData.CurrentLocation;
     pickrrXbsDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
@@ -90,5 +91,4 @@ const prepareXbsData = (xbsDict) => {
     return pickrrXbsDict;
   }
 };
-
 module.exports = { prepareXbsData };
