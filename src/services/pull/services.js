@@ -13,6 +13,50 @@ const sortStatusArray = (statusArray) =>
   _.orderBy(statusArray, (obj) => new Date(obj.scan_datetime), ["desc"]);
 
 /**
+ *
+ * @param {*} trackArr
+ * @desc prepare the track array, like the below format
+ * [
+    {
+      status_name: "",
+      status_array: [],
+    },
+  ]
+ */
+const prepareTrackDataForTracking = async (trackArr) => {
+  if (_.isEmpty(trackArr)) {
+    return [];
+  }
+  try {
+    let lastScanType = "";
+    const newTrackArrayObj = trackArr.reduce((accum, trackItem) => {
+      const newTrackObj = { ...accum };
+      const scanType = trackItem.scan_type;
+      const filteredTrackItem = _.omit(trackItem, "scan_type");
+
+      if (scanType === lastScanType) {
+        newTrackObj[scanType].status_array.push(filteredTrackItem);
+      } else {
+        newTrackObj[scanType] = {
+          status_name: scanType,
+          status_array: [filteredTrackItem],
+        };
+      }
+      lastScanType = scanType;
+      return newTrackObj;
+    }, {});
+    let newTrackArray = Object.values(newTrackArrayObj);
+    newTrackArray = newTrackArray.map((trackItem) => ({
+      ...trackItem,
+      status_array: sortStatusArray(trackItem.status_array),
+    }));
+    return newTrackArray;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+/**
  * Preparing track array data for track/tracking
  */
 const prepareTrackDataForTrackingAndStoreInCache = async (trackArr, awb) => {
