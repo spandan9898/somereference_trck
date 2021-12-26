@@ -14,23 +14,32 @@ const logger = require("../../logger");
  * @desc fetch tracking data from pull db, if exists then prepare track data and store in cache
  * PS: it'll call only if cache data not found
  */
-const fetchTrackingDataAndStoreInCache = async (
-  awb,
-  prepareTrackDataForTrackingAndStoreInCache
-) => {
+const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray) => {
   try {
+    const { awb } = trackObj;
+
     const pullCollection = await commonTrackingInfoCol();
     const response = await pullCollection.findOne(
       { tracking_id: awb },
       { projection: { track_arr: 1 } }
     );
+
     if (!response) {
       return "NA";
     }
 
+    const cacheData = (await getObject(awb)) || {};
     const data = prepareTrackArrCacheData(response.track_arr);
-    await setObject(awb, data);
-    prepareTrackDataForTrackingAndStoreInCache(response.track_arr, awb);
+
+    const updatedCacheData = { ...data };
+    updatedCacheData.track_model = cacheData.track_model || {};
+    await setObject(awb, updatedCacheData);
+
+    updateCacheTrackArray({
+      trackArray: response.track_arr,
+      currentTrackObj: trackObj,
+      awb,
+    });
     return data;
   } catch (error) {
     logger.error("fetchTrackingDataAndStoreInCache", error);
@@ -89,15 +98,12 @@ const checkCurrentStatusAWBInCache = (trackObj, cachedData) => {
  * Otherwise -> return false i.e move foward
  * @returns true or false
  */
-const checkAwbInCache = async (trackObj, prepareTrackDataForTrackingAndStoreInCache) => {
+const checkAwbInCache = async (trackObj, updateCacheTrackArray) => {
   const cachedData = await getObject(trackObj.awb);
   const newScanTime = moment(trackObj.scan_datetime).unix();
 
   if (!cachedData) {
-    const res = await fetchTrackingDataAndStoreInCache(
-      trackObj.awb,
-      prepareTrackDataForTrackingAndStoreInCache
-    );
+    const res = await fetchTrackingDataAndStoreInCache(trackObj, updateCacheTrackArray);
     if (!res) {
       return false;
     }

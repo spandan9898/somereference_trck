@@ -9,15 +9,16 @@ let db;
 /**
  * Init Pull DB
  */
-const initDB = (callback) => {
+const initDB = (dbServerHost, callback) => {
   // If DB already connected and Initialized
 
+  const DB_SERVER_HOST = dbServerHost || process.env.MONGO_DB_PROD_SERVER_HOST;
   if (db) {
     logger.info("DB has already initialized");
     return callback(null, db);
   }
 
-  MongoClient.connect(process.env.MONGO_DB_PROD_SERVER_HOST, {
+  MongoClient.connect(DB_SERVER_HOST, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     serverApi: ServerApiVersion.v1,
