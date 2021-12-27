@@ -1,13 +1,12 @@
 const logger = require("../../../logger");
-const db = require("../../connector/database");
+const { getDbCollectionInstance } = require("../../utils/mongo_utils");
 
 /**
  * @desc Get commonTrackingInfo collection instance
  */
 const commonTrackingInfoCol = async () => {
   try {
-    const res = db.getDB().db().collection(process.env.MONGO_DB_PROD_SERVER_COLLECTION_NAME);
-    return res;
+    return await getDbCollectionInstance();
   } catch (error) {
     logger.error("commonTrackingInfoCol Error ", error);
     throw new Error(error);

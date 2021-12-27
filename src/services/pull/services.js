@@ -1,53 +1,72 @@
+/* eslint-disable no-param-reassign */
 const _ = require("lodash");
 const moment = require("moment");
+
 const logger = require("../../../logger");
-
 const { setObject, getObject, checkAwbInCache } = require("../../utils");
-const { BLOCK_NDR_STRINGS } = require("./constants");
-const { mapStatusToEvent } = require("./helpers");
+const { sortStatusArray } = require("../common/helpers");
+const {
+  prepareTrackDataForTracking,
+  fetchTrackingModelAndUpdateCache,
+} = require("../common/trackServices");
 
 /**
- * sorring status array desc -> The last scan time will be in the top
+ *
+ * @param {*} currentTrackObj -> recent pushed prepared track obj
+ * @param {*} trackArray -> whole trak array (same as DB)
+ * @desc -> if track_arr not found in cache then use trackArray otherwise use currentTrackObj
+ * and update cache's track_arr
+ * @returns bool
  */
-const sortStatusArray = (statusArray) =>
-  _.orderBy(statusArray, (obj) => new Date(obj.scan_datetime), ["desc"]);
-
-/**
- * Preparing track array data for track/tracking
- */
-const prepareTrackDataForTrackingAndStoreInCache = async (trackArr, awb) => {
+const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
   try {
-    const cachedAwbData = (await getObject(awb)) || {};
-    const trackData = cachedAwbData?.track_arr || [];
-    let newTrackArr;
+    const cacheData = await getObject(awb);
 
-    if (_.isEmpty(trackData)) {
-      newTrackArr = trackArr.reduce((trackArray, trackObj) => {
-        const scanType = trackObj.scan_type;
-        const newObj = {
-          status_name: scanType,
-          status_array: sortStatusArray([_.omit(trackObj, "scan_type")]),
-        };
-        return [newObj, ...trackArray];
-      }, []);
+    if (_.isEmpty(cacheData)) {
+      await fetchTrackingModelAndUpdateCache(awb);
+      return true;
+    }
+    const trackModel = cacheData.track_model;
+
+    if (_.isEmpty(trackModel)) {
+      await fetchTrackingModelAndUpdateCache(awb);
+      return true;
+    }
+
+    const cachedTrackArray = trackModel.track_arr;
+    if (_.isEmpty(cachedTrackArray)) {
+      // i.e first time,
+
+      const preparedTrackArray = prepareTrackDataForTracking(trackArray);
+      cacheData.trackModel.track_arr = preparedTrackArray;
     } else {
-      const latestTrackObj = trackArr[0];
-      const cachedLastTrackObj = trackData[0];
-      if (_.get(latestTrackObj, "scan_type") === _.get(cachedLastTrackObj, "status_name")) {
-        cachedLastTrackObj.status_array.push(_.omit(latestTrackObj, "scan_type"));
-        cachedLastTrackObj.status_array = sortStatusArray(cachedLastTrackObj.status_array);
+      // i.e track_arr data exists in cache
+      // Check the recent status_name, if it is same as current status_name
+      // then append currentTrackObj to status_array, and do sorting(scan_datetime)
+      // If it's not same then simply prepare new track object and append to top of cached track array.
+
+      currentTrackObj.status_time = moment(currentTrackObj.scan_datetime).format(
+        "DD MMM YYYY, HH:mm"
+      );
+      currentTrackObj.status_body = currentTrackObj.scan_status;
+      const cachedTopTrackObj = cachedTrackArray[0];
+      if (_.get(currentTrackObj, "scan_type") === _.get(cachedTopTrackObj, "status_name")) {
+        cachedTopTrackObj.status_array.push(_.omit(currentTrackObj, "scan_type"));
+        cachedTopTrackObj.status_array = sortStatusArray(cachedTopTrackObj.status_array);
       } else {
-        trackData.unshift({
-          status_name: latestTrackObj.scan_type,
-          status_array: sortStatusArray([_.omit(latestTrackObj, "scan_type")]),
+        cachedTrackArray.unshift({
+          status_name: currentTrackObj.scan_type,
+          status_array: sortStatusArray([_.omit(currentTrackObj, "scan_type")]),
         });
       }
-      newTrackArr = _.clone(trackData);
+      cacheData.track_model.track_arr = cachedTrackArray;
     }
-    cachedAwbData.track_arr = newTrackArr;
-    await setObject(awb, cachedAwbData);
+
+    await setObject(awb, cacheData);
+    return true;
   } catch (error) {
-    logger.error("prepareTrackDataForTrackingAndStoreInCache", error);
+    logger.error("updateCacheTrackArray", error);
+    return false;
   }
 };
 
@@ -71,89 +90,13 @@ const prepareTrackDataForTrackingAndStoreInCache = async (trackArr, awb) => {
  * @returns {string}
  */
 const redisCheckAndReturnTrackData = async (preparedTrackData) => {
-  const trackObj = preparedTrackData;
+  const trackObj = { ...preparedTrackData };
 
-  const isExists = await checkAwbInCache(trackObj, prepareTrackDataForTrackingAndStoreInCache);
+  const isExists = await checkAwbInCache(trackObj, updateCacheTrackArray);
   if (isExists) {
     return false;
   }
   return trackObj;
-};
-
-/**
- *@param {*} trackObj : same as above example
- * preparing track data for pull db update
- */
-const prepareTrackDataToUpdateInPullDb = (trackObj) => {
-  const trackData = _.cloneDeep(trackObj);
-  const {
-    scan_type: scanType = "",
-    track_info: trackInfo = "",
-    scan_datetime: scanDatetime = "",
-    track_location: trackLocation = "",
-    EDD: edd = "",
-    pickrr_sub_status_code: pickrrSubStatusCode = "",
-    courier_status_code: courierStatusCode = "",
-    received_by: receivedBy = "",
-    pickup_datetime: pickupDatetime = "",
-  } = trackData;
-
-  if (scanType === "CC") {
-    return {
-      success: false,
-      err: "scanType is CC",
-    };
-  }
-
-  if (trackInfo.toLowerCase() in BLOCK_NDR_STRINGS && scanType === "NDR") {
-    trackData.scan_type = "OT";
-  }
-  const currentStatusTime = scanDatetime;
-
-  // currentStatusTime = currentStatusTime.isValid() ? currentStatusTime.format() : null;
-
-  const statusMap = {
-    "status.current_status_time": moment(currentStatusTime).subtract(330, "m").toDate(),
-    "status.current_status_type": scanType,
-    "status.current_status_body": trackInfo,
-    "status.current_status_location": trackLocation,
-    "status.pickrr_sub_status_code": pickrrSubStatusCode,
-    "status.courier_status_code": courierStatusCode,
-    "status.current_status_val": null,
-    "status.received_by": receivedBy,
-  };
-
-  const eventObj = mapStatusToEvent(statusMap);
-  eventObj.pickrr_sub_status_code = trackData.pickrr_sub_status_code;
-  eventObj.courier_status_code = trackData.courier_status_code;
-  eventObj.update_source = "kafka";
-  eventObj.update_time = moment().toDate();
-  eventObj.system_updated_at = moment().toDate();
-  if (pickupDatetime) {
-    eventObj.pickup_datetime = moment(pickupDatetime).subtract(330, "m").toDate();
-  }
-
-  let eddStamp;
-  if (edd) {
-    const eddDate = moment(edd);
-    eddStamp = eddDate.isValid() ? eddDate.subtract(330, "m").toDate() : edd;
-    try {
-      const isBefore = moment(eddStamp).isBefore(moment(), "year");
-      if (isBefore) {
-        eddStamp = "";
-      }
-    } catch (error) {
-      eddStamp = "";
-      logger.error("Edd Date Issue", error);
-    }
-  }
-  return {
-    success: true,
-    eddStamp,
-    eventObj,
-    statusMap,
-    awb: trackData.awb,
-  };
 };
 
 /**
@@ -164,7 +107,6 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
 const storeDataInCache = async (result) => {
   const { eventObj, awb } = result;
   const { scan_datetime: scanDatetime } = eventObj || {};
-
   const redisKey = `${eventObj.scan_type}_${moment(scanDatetime).unix()}`;
   const newRedisPayload = {
     [redisKey]: true,
@@ -176,7 +118,6 @@ const storeDataInCache = async (result) => {
 
 module.exports = {
   redisCheckAndReturnTrackData,
-  prepareTrackDataToUpdateInPullDb,
   storeDataInCache,
-  prepareTrackDataForTrackingAndStoreInCache,
+  updateCacheTrackArray,
 };
