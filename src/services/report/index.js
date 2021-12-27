@@ -8,7 +8,7 @@ const { reportMongoCol } = require("./model");
  * @param {*} trackObj
  * @param {*} logger
  */
-const updateStatusonReport = async (trackObj, logger) => {
+const updateStatusOnReport = async (trackObj, logger) => {
   const latestScanType = _.get(trackObj, "track_arr[0].scan_type", null);
   if (!latestScanType) {
     logger.info("no scan type found", latestScanType);
@@ -45,4 +45,4 @@ const updateStatusonReport = async (trackObj, logger) => {
   }
 };
 
-module.exports = updateStatusonReport;
+module.exports = updateStatusOnReport;

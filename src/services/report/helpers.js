@@ -130,7 +130,7 @@ const prepareTrackingStatus = (trackDict) => {
   trackingStatus.status_location = location;
   trackingStatus.status_code = REPORT_STATUS_CODE_MAPPING[latestScanType];
   trackingStatus.status_type = REPORT_STATUS_TYPE_MAPPING[latestScanType];
-  trackingStatus.status_datetime = findLatestStatusDatetime(trackDict?.track_arr || {});
+  trackingStatus.status_datetime = findLatestStatusDatetime(trackDict);
   if (latestScanType === "RTD") {
     trackingStatus.status = " Returned to Source Customer";
   } else {
