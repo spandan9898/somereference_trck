@@ -1,21 +1,22 @@
 const logger = require("../../../logger");
-const db = require("../../connector/database");
+const { initReportDB } = require("../../connector/reportdatabase");
 
 /**
- *
- * @returns
+ * @desc Get reportMongo collection instance (kafka_staging)
  */
 const reportMongoCol = async () => {
+  const reportClient = await initReportDB();
   try {
-    const res = db
-      .getDB()
-      .db(process.env.MONGO_DB_REPORT_SERVER_HOST)
-      .collection(process.env.MONGO_DB_SERVER_COLLECTION_NAME);
-    return res;
+    const reportDb = reportClient.db(process.env.MONGO_DB_REPORT_DB_NAME);
+    const opsReportColInstance = await reportDb.collection("opsreport_col");
+    return {
+      reportClient,
+      opsReportColInstance,
+    };
   } catch (error) {
-    logger.error("reportMongoCol connection error", error);
+    logger.error("reportMongoConnection Error ", error);
     throw new Error(error);
   }
 };
 
-module.exports = reportMongoCol;
+module.exports = { reportMongoCol };

@@ -1,4 +1,3 @@
-const moment = require("moment");
 const _ = require("lodash");
 const { REPORT_STATUS_CODE_MAPPING, REPORT_STATUS_TYPE_MAPPING } = require("./constants");
 
@@ -40,8 +39,7 @@ const findLatestStatusDatetime = (trackDict) => {
   if (!latestDatetime) {
     return "NA";
   }
-  const convertedDatetime = moment(latestDatetime).add(330, "minute").format("DD MMM YYYY HH:mm");
-  return convertedDatetime;
+  return latestDatetime;
 };
 
 /**
