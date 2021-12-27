@@ -63,8 +63,6 @@ const PrepareTrackModelFilters = async (trackingAwb) => {
     ops_profile: 0,
     user_pk: 0,
     updated_at: 0,
-    label_logo: 0,
-    last_update_logo: 0,
     ewaybill_number: 0,
     is_mps: 0,
     rto_waybill: 0,
