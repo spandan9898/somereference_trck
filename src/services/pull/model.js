@@ -1,5 +1,5 @@
 const logger = require("../../../logger");
-const { getDbCollectionInstance } = require("../../utils");
+const { getDbCollectionInstance } = require("../../utils/mongo_utils");
 
 /**
  * @desc Get commonTrackingInfo collection instance

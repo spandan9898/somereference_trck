@@ -53,7 +53,7 @@ const prepareTrackDataForTracking = (trackArr) => {
  */
 const PrepareTrackModelFilters = async (trackingAwb) => {
   const query = {
-    courier_tracking_id: trackingAwb,
+    tracking_id: trackingAwb,
   };
 
   const projection = {
@@ -63,7 +63,6 @@ const PrepareTrackModelFilters = async (trackingAwb) => {
     ops_profile: 0,
     user_pk: 0,
     updated_at: 0,
-    auth_token: 0,
     label_logo: 0,
     last_update_logo: 0,
     ewaybill_number: 0,
@@ -104,7 +103,7 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb) => {
   try {
     const trackingObj = (await getObject(trackingAwb)) || {};
 
-    if (isEmpty(trackingObj) || !trackingObj?.track_model) {
+    if (isEmpty(trackingObj) || isEmpty(trackingObj?.track_model)) {
       const trackDocument = await getTrackDocumentfromMongo(trackingAwb);
 
       if (isEmpty(trackDocument)) {

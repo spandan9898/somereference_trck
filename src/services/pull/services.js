@@ -3,8 +3,11 @@ const moment = require("moment");
 
 const logger = require("../../../logger");
 const { setObject, getObject, checkAwbInCache } = require("../../utils");
-const { sortStatusArray, fetchTrackingModelAndUpdateCache } = require("../common");
-const { prepareTrackDataForTracking } = require("../common");
+const { sortStatusArray } = require("../common/helpers");
+const {
+  prepareTrackDataForTracking,
+  fetchTrackingModelAndUpdateCache,
+} = require("../common/trackServices");
 
 /**
  *
@@ -30,7 +33,6 @@ const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
     }
 
     const cachedTrackArray = trackModel.track_arr;
-
     if (_.isEmpty(cachedTrackArray)) {
       // i.e first time,
 
@@ -43,8 +45,7 @@ const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
       // If it's not same then simply prepare new track object and append to top of cached track array.
 
       const cachedTopTrackObj = cachedTrackArray[0];
-
-      if (_.get(currentTrackObj, "scan_type") === _.get(cachedTopTrackObj, "scan_type")) {
+      if (_.get(currentTrackObj, "scan_type") === _.get(cachedTopTrackObj, "status_name")) {
         cachedTopTrackObj.status_array.push(_.omit(currentTrackObj, "scan_type"));
         cachedTopTrackObj.status_array = sortStatusArray(cachedTopTrackObj.status_array);
       } else {
@@ -101,7 +102,6 @@ const redisCheckAndReturnTrackData = async (preparedTrackData) => {
 const storeDataInCache = async (result) => {
   const { eventObj, awb } = result;
   const { scan_datetime: scanDatetime } = eventObj || {};
-
   const redisKey = `${eventObj.scan_type}_${moment(scanDatetime).unix()}`;
   const newRedisPayload = {
     [redisKey]: true,

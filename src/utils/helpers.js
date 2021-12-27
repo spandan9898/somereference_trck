@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable array-callback-return */
 /* eslint-disable consistent-return */
 const moment = require("moment");
@@ -34,7 +35,6 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
     const updatedCacheData = { ...data };
     updatedCacheData.track_model = cacheData.track_model || {};
     await setObject(awb, updatedCacheData);
-
     updateCacheTrackArray({
       trackArray: response.track_arr,
       currentTrackObj: trackObj,
@@ -60,7 +60,8 @@ const compareScanUnixTimeAndCheckIfExists = (newScanTime, newScanType, cachedDat
   return cacheKeys.some((key) => {
     const keys = key.split("_");
     if (keys[0] === newScanType) {
-      const oldScanTime = +keys[1];
+      let oldScanTime = +keys[1];
+      oldScanTime += 330 * 60;
       const diff = (newScanTime - oldScanTime) / 60;
       return diff >= -1 && diff <= 1;
     }
@@ -78,7 +79,8 @@ const checkCurrentStatusAWBInCache = (trackObj, cachedData) => {
   const currentStatusType = trackObj?.status?.current_status_type;
   return cacheKeys.some((key) => {
     const keys = key.split("_");
-    const statusInitial = keys[0];
+    let statusInitial = keys[0];
+    statusInitial = statusInitial.toLowerCase();
     return (
       ["dl", "rtd"].includes(statusInitial) ||
       (statusInitial === "rto" && currentStatusType === "RTO") ||
@@ -110,6 +112,7 @@ const checkAwbInCache = async (trackObj, updateCacheTrackArray) => {
     if (res === "NA") {
       return true;
     }
+    if (checkCurrentStatusAWBInCache(trackObj, res)) return true;
     const isExists = await compareScanUnixTimeAndCheckIfExists(
       newScanTime,
       trackObj.scan_type,
