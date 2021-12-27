@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 const _ = require("lodash");
 const moment = require("moment");
 
@@ -44,6 +45,10 @@ const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
       // then append currentTrackObj to status_array, and do sorting(scan_datetime)
       // If it's not same then simply prepare new track object and append to top of cached track array.
 
+      currentTrackObj.status_time = moment(currentTrackObj.scan_datetime).format(
+        "DD MMM YYYY, HH:mm"
+      );
+      currentTrackObj.status_body = currentTrackObj.scan_status;
       const cachedTopTrackObj = cachedTrackArray[0];
       if (_.get(currentTrackObj, "scan_type") === _.get(cachedTopTrackObj, "status_name")) {
         cachedTopTrackObj.status_array.push(_.omit(currentTrackObj, "scan_type"));

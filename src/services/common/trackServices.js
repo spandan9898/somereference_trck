@@ -1,4 +1,5 @@
 const { isEmpty, omit } = require("lodash");
+const moment = require("moment");
 
 const { findOneDocumentFromMongo, getObject, setObject } = require("../../utils");
 const { sortStatusArray } = require("./helpers");
@@ -24,7 +25,10 @@ const prepareTrackDataForTracking = (trackArr) => {
       const newTrackObj = { ...accum };
       const scanType = trackItem.scan_type;
       const filteredTrackItem = omit(trackItem, "scan_type");
-
+      filteredTrackItem.status_time = moment(filteredTrackItem.scan_datetime).format(
+        "DD MMM YYYY, HH:mm"
+      );
+      filteredTrackItem.status_body = filteredTrackItem.scan_status;
       if (scanType === lastScanType) {
         newTrackObj[scanType].status_array.push(filteredTrackItem);
       } else {
