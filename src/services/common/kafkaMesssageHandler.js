@@ -46,7 +46,7 @@ class KafkaMessageHandler {
       const trackData = await redisCheckAndReturnTrackData(res);
 
       if (!trackData) {
-        logger.info(`data already exists! ${res.awb}`);
+        logger.info(`data already exists or not found in DB! ${res.awb}`);
         return;
       }
 

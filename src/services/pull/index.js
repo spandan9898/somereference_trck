@@ -1,11 +1,8 @@
 const moment = require("moment");
 const _ = require("lodash");
 
-const {
-  prepareTrackDataToUpdateInPullDb,
-  storeDataInCache,
-  prepareTrackDataForTrackingAndStoreInCache,
-} = require("./services");
+const { storeDataInCache, updateCacheTrackArray } = require("./services");
+const { prepareTrackDataToUpdateInPullDb } = require("./preparator");
 const commonTrackingInfoCol = require("./model");
 
 /**
@@ -67,7 +64,11 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
       }
     );
     await storeDataInCache(result);
-    prepareTrackDataForTrackingAndStoreInCache(trackArr, result.awb);
+    updateCacheTrackArray({
+      currentTrackObj: trackArr[0],
+      trackArray: trackArr,
+      awb: result.awb,
+    });
     return response.value;
   } catch (error) {
     logger.error("updateTrackDataToPullMongo Error", error);
