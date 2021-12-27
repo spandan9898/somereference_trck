@@ -5,7 +5,7 @@ const server = require("./server");
 const db = require("./src/connector/database");
 const logger = require("./logger");
 
-db.initDB(undefined, (err, _db) => {
+db.initDB("", (err, _db) => {
   if (err) {
     logger.error("DB Init Error: ", err);
   } else {
