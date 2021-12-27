@@ -14,11 +14,7 @@ const initReportDB = async () => {
       serverApi: ServerApiVersion.v1,
     });
 
-    // reportDb = client.db(process.env.MONGO_DB_REPORT_DB_NAME);
-
     logger.info("Report DB connection established");
-
-    // return reportDb;
 
     return client;
   } catch (error) {
