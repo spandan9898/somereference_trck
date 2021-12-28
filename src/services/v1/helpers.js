@@ -18,12 +18,11 @@ const ofdCount = (trackArr) => {
  * @param {*} track_arr
  */
 const findPickupDate = (trackArr) => {
-  // eslint-disable-next-line consistent-return
-  trackArr.forEach((trackArrObj) => {
-    if (trackArrObj?.scan_type === "PP") {
-      return trackArrObj.scan_datetime;
+  for (let i = 0; i < trackArr.length; i += 1) {
+    if (trackArr[i].scan_type === "PP") {
+      return trackArr[i]?.scan_datetime;
     }
-  });
+  }
   return "";
 };
 module.exports = {

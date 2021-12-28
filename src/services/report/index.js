@@ -1,4 +1,6 @@
 const _ = require("lodash");
+const moment = require("moment");
+const { prepareDataForReportMongo } = require("./preparator");
 
 const { prepareDataForReportMongo } = require("./preparator");
 const { reportMongoCol } = require("./model");
@@ -24,10 +26,11 @@ const updateStatusOnReport = async (trackObj, logger, elkClient) => {
   }
   const result = prepareDataForReportMongo(trackObj);
   sendReportsDataToELK(result, elkClient);
+  result.last_updated_date = moment().toDate();
   const { reportClient, opsReportColInstance } = await reportMongoCol();
   try {
     const response = await opsReportColInstance.findOneAndUpdate(
-      { tracking_id: trackObj.tracking_id },
+      { pickrr_tracking_id: trackObj.tracking_id },
       {
         $set: result,
       },

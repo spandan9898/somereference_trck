@@ -35,7 +35,9 @@ const prepareDataForReportMongo = (trackData) => {
 
     // rto_waybill isn't handled on PULL
 
-    status_pk: trackData?.pk,
+    // confim status pk key on Pull Mongo
+
+    status_pk: trackData?.status_pk,
     delivery_date: findDeliveryDate(trackData?.track_arr || {}),
     rto_date: findRTODate(trackData?.track_arr || {}),
     tracking_id: trackData.tracking_id,
