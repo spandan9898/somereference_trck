@@ -6,6 +6,7 @@ const {
   hasCurrentStatusWebhookEnabled,
 } = require("./services");
 const { SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS, SMART_SHIP_AUTH_TOKENS } = require("./constants");
+const { callLambdaFunction } = require("../../connector/lambda");
 
 /**
  * webhook trigger
@@ -43,10 +44,11 @@ const triggerWebhook = async (trackingObj) => {
       }
       lambdaPayload.data.shopify_access_token = shopcluesToken;
     }
-
-    // TODO: call lambda function
+    await callLambdaFunction(lambdaPayload);
+    return true;
   } catch (error) {
     logger.error("triggerWebhook", error);
+    return false;
   }
 };
 
