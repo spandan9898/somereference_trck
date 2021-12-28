@@ -147,7 +147,7 @@ const prepareTrackingStatus = (trackDict) => {
  */
 const sendReportsDataToELK = async (data, elkClient) => {
   try {
-    const awb = data.pickrr_tracking_id || "123";
+    const awb = data.pickrr_tracking_id || "NA";
     const body = {
       awb: awb.toString(),
       payload: JSON.stringify(data),
