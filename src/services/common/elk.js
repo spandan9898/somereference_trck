@@ -2,7 +2,7 @@ const logger = require("../../../logger");
 
 /**
  *
- * send trackinginfo data to elk
+ * send data to elk
  */
 const sendDataToElk = async ({ body, elkClient, indexName = "track-reports" }) => {
   try {
