@@ -12,15 +12,10 @@ redisClient.on("error", (error) => {
  * @param {string} key
  * @returns {string}
  */
-const getString = (key) =>
-  new Promise((resolve, reject) => {
-    redisClient.get(key, (err, resValue) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(resValue);
-    });
-  });
+const getString = async (key) => {
+  const res = await redisClient.get(key);
+  return res;
+};
 
 /** *
  * insert string value to redis-cache
@@ -28,30 +23,19 @@ const getString = (key) =>
  * @param {string} value
  * @returns {string} "OK"
  */
-const setString = (key, value) =>
-  new Promise((resolve, reject) => {
-    redisClient.set(key, value, (err, resValue) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(resValue);
-    });
-  });
+const setString = async (key, value) => {
+  await redisClient.set(key, value);
+};
 
 /** *
  * retrieve object value from redis-cache
  * @param {string} key
  * @returns {object}
  */
-const getObject = (key) =>
-  new Promise((resolve, reject) => {
-    redisClient.get(key, (err, resValue) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(JSON.parse(resValue));
-    });
-  });
+const getObject = async (key) => {
+  const res = await redisClient.get(key);
+  return JSON.parse(res);
+};
 
 /** *
  * insert object value to redis-cache
@@ -59,34 +43,18 @@ const getObject = (key) =>
  * @param {object} value
  * @returns {string} "OK"
  */
-const setObject = (key, value) =>
-  new Promise((resolve, reject) => {
-    let newValue = value;
-    if (typeof value === "object") {
-      newValue = JSON.stringify(value);
-    }
-
-    redisClient.set(key, newValue, (err, resValue) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(resValue);
-    });
-  });
+const setObject = async (key, value) => {
+  const payloadValue = JSON.stringify(value);
+  await redisClient.set(key, payloadValue);
+};
 
 /** *
  * @param {string} key
  * @returns {Number} 1
  */
-const deleteKey = (key) =>
-  new Promise((resolve, reject) => {
-    redisClient.del(key, (err, resValue) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(resValue);
-    });
-  });
+const deleteKey = async (key) => {
+  await redisClient.del(key);
+};
 
 /**
  * ES6 redis cache store with expired keys
