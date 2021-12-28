@@ -70,7 +70,7 @@ const findLatestNDRDetails = (trackArr) => {
     }
   }
   return {
-    latest_ndr_remark: "",
+    latest_ndr_remark: null,
     latest_ndr_date: null,
   };
 };
