@@ -1,17 +1,16 @@
+const logger = require("../../../logger");
+
 /**
  *
  * send trackinginfo data to elk
  */
-const sendDataToElk = async ({ awb, data, elkClient, logger, indexName = "track-reports" }) => {
+const sendDataToElk = async ({ body, elkClient, indexName = "track-reports" }) => {
   try {
-    await elkClient.index({
+    const res = await elkClient.index({
       index: indexName,
-      body: {
-        awb: awb.toString(),
-        payload: JSON.stringify(data),
-        time: new Date(),
-      },
+      body,
     });
+    return res;
   } catch (error) {
     logger.error("ELK Error", error);
   }

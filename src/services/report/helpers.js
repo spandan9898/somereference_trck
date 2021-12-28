@@ -1,4 +1,7 @@
 const _ = require("lodash");
+
+const logger = require("../../../logger");
+const { sendDataToElk } = require("../common/elk");
 const { REPORT_STATUS_CODE_MAPPING, REPORT_STATUS_TYPE_MAPPING } = require("./constants");
 
 /**
@@ -139,6 +142,26 @@ const prepareTrackingStatus = (trackDict) => {
   return trackingStatus;
 };
 
+/**
+ * @desc send report data to elk for future reference
+ */
+const sendReportsDataToELK = async (data, elkClient) => {
+  try {
+    const awb = data.tracking_id || "123";
+    const body = {
+      awb: awb.toString(),
+      payload: JSON.stringify(data),
+      time: new Date(),
+    };
+    await sendDataToElk({
+      body,
+      elkClient,
+    });
+  } catch (error) {
+    logger.error("sendReportsDataToELK", { data });
+  }
+};
+
 module.exports = {
   prepareTrackingStatus,
   findLatestTrackingInfo,
@@ -147,4 +170,5 @@ module.exports = {
   findLatestNDRDetails,
   findDeliveryDate,
   findRTODate,
+  sendReportsDataToELK,
 };
