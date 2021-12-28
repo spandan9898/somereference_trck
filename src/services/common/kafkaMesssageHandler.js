@@ -14,6 +14,7 @@ const { redisCheckAndReturnTrackData } = require("../pull/services");
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const updateStatusOnReport = require("../report");
+const elkClient = require("../../connector/elk");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -54,7 +55,7 @@ class KafkaMessageHandler {
       const result = await updateTrackDataToPullMongo(trackData, logger);
       sendDataToNdr(result);
       sendTrackDataToV1(result);
-      updateStatusOnReport(result, logger);
+      updateStatusOnReport(result, logger, elkClient);
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }
