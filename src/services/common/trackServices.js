@@ -92,7 +92,7 @@ const getTrackDocumentfromMongo = async (trackingAwb) => {
       collectionName: process.env.MONGO_DB_PROD_SERVER_COLLECTION_NAME,
     });
   } catch (error) {
-    throw new Error("failed to fetch document", error);
+    throw new Error(`failed to fetch document | AWB: ${trackingAwb} | message: ${error.message}`);
   }
   return trackModelDocument;
 };
@@ -109,7 +109,7 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb) => {
       const trackDocument = await getTrackDocumentfromMongo(trackingAwb);
 
       if (isEmpty(trackDocument)) {
-        throw new Error("failed to fetch document");
+        throw new Error(`failed to fetch document - ${trackingAwb}`);
       }
 
       const trackArr = trackDocument?.track_arr || [];
