@@ -25,8 +25,8 @@ const updateStatusOnReport = async (trackObj, logger, elkClient) => {
     return false;
   }
   const result = prepareDataForReportMongo(trackObj);
-  sendReportsDataToELK(result, elkClient);
   result.last_updated_date = moment().toDate();
+  sendReportsDataToELK(result, elkClient);
   const { reportClient, opsReportColInstance } = await reportMongoCol();
   try {
     const response = await opsReportColInstance.findOneAndUpdate(
