@@ -2,7 +2,6 @@ const _ = require("lodash");
 const moment = require("moment");
 const { prepareDataForReportMongo } = require("./preparator");
 
-const { prepareDataForReportMongo } = require("./preparator");
 const { reportMongoCol } = require("./model");
 const { sendReportsDataToELK } = require("./helpers");
 
