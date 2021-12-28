@@ -13,6 +13,7 @@ const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
+const triggerWebhook = require("../webhook");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -53,6 +54,7 @@ class KafkaMessageHandler {
       const result = await updateTrackDataToPullMongo(trackData, logger);
       sendDataToNdr(result);
       sendTrackDataToV1(result);
+      triggerWebhook(result);
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }
