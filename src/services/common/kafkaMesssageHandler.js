@@ -14,6 +14,8 @@ const { redisCheckAndReturnTrackData } = require("../pull/services");
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
+const updateStatusOnReport = require("../report");
+const elkClient = require("../../connector/elk");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -47,7 +49,7 @@ class KafkaMessageHandler {
       const trackData = await redisCheckAndReturnTrackData(res);
 
       if (!trackData) {
-        logger.info(`data already exists! ${res.awb}`);
+        logger.info(`data already exists or not found in DB! ${res.awb}`);
         return;
       }
 
@@ -55,6 +57,7 @@ class KafkaMessageHandler {
       sendDataToNdr(result);
       sendTrackDataToV1(result);
       triggerWebhook(result);
+      updateStatusOnReport(result, logger, elkClient);
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }
