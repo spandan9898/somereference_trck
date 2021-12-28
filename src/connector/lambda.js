@@ -25,15 +25,8 @@ const callLambdaFunction = async (data, functionName) => {
       Payload: JSON.stringify(data),
     };
     const lambdaRequestObj = lambda.invoke(params);
-
-    lambdaRequestObj.on("success", (response) => {
-      console.log("success", response.data);
-    });
     lambdaRequestObj.on("error", (response) => {
       logger.error("lambda trigger error", response.error.message);
-    });
-    lambdaRequestObj.on("complete", () => {
-      console.log("Complete");
     });
     lambdaRequestObj.send();
   } catch (error) {
