@@ -18,7 +18,7 @@ const prepareDataForReportMongo = (trackData) => {
   const NDRObject = findLatestNDRDetails(trackData?.track_arr || {});
   const data = {
     pickup_date: findPickupDate(trackData?.track_arr || {}),
-    received_by: trackData?.status?.received_by,
+    received_by: trackData?.status?.received_by || null,
     current_status: trackingStatus.status_type || "FAILED",
     current_status_update: trackingStatus.status,
     current_status_datetime: trackingStatus.status_datetime,
@@ -35,12 +35,10 @@ const prepareDataForReportMongo = (trackData) => {
 
     // rto_waybill isn't handled on PULL
 
-    // confim status pk key on Pull Mongo
-
     status_pk: trackData?.status_pk,
     delivery_date: findDeliveryDate(trackData?.track_arr || {}),
     rto_date: findRTODate(trackData?.track_arr || {}),
-    tracking_id: trackData.tracking_id,
+    pickrr_tracking_id: trackData.tracking_id,
   };
   return data;
 };
