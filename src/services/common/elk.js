@@ -13,6 +13,7 @@ const sendDataToElk = async ({ body, elkClient, indexName = "track-reports" }) =
     return res;
   } catch (error) {
     logger.error("ELK Error", error);
+    return "";
   }
 };
 
