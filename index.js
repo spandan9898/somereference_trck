@@ -4,6 +4,16 @@ const server = require("./server");
 
 const db = require("./src/connector/database");
 const logger = require("./logger");
+const { redisClient } = require("./src/utils");
+
+(async () => {
+  try {
+    await redisClient.connect();
+    logger.info("Redis Connected");
+  } catch (error) {
+    logger.error("Redis connect error", error);
+  }
+})();
 
 db.initDB("", (err, _db) => {
   if (err) {

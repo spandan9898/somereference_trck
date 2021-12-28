@@ -1,14 +1,10 @@
-const redis = require("redis");
+const { createClient } = require("redis");
 const logger = require("../../logger");
 
-const redisClient = redis.createClient();
+const redisClient = createClient();
 
 redisClient.on("error", (error) => {
   logger.error("Redis Connection Error", error);
-});
-
-redisClient.on("connect", () => {
-  logger.info("Redis Connected!");
 });
 
 /** *
@@ -92,6 +88,23 @@ const deleteKey = (key) =>
     });
   });
 
+/**
+ * ES6 redis cache store with expired keys
+ * expiryTime in seconds
+ */
+const storeInCache = async (key, value, expiryTime) => {
+  try {
+    const redisKey = typeof key === "string" ? key : JSON.stringify(key);
+    const redisValue = typeof value === "string" ? value : JSON.stringify(value);
+    const redisExpiryTime = expiryTime || 7 * 24 * 60 * 60;
+    await redisClient.set(redisKey, redisValue, {
+      EX: redisExpiryTime,
+    });
+  } catch (error) {
+    logger.error("storeInCache", error);
+  }
+};
+
 module.exports = {
   getString,
   setString,
@@ -99,4 +112,5 @@ module.exports = {
   setObject,
   deleteKey,
   redisClient,
+  storeInCache,
 };
