@@ -1,4 +1,4 @@
-const { isEmpty, omit } = require("lodash");
+const { isEmpty, omit, get, last } = require("lodash");
 const moment = require("moment");
 
 const { findOneDocumentFromMongo, getObject, setObject } = require("../../utils");
@@ -19,33 +19,42 @@ const prepareTrackDataForTracking = (trackArr) => {
   if (isEmpty(trackArr)) {
     return [];
   }
+
   try {
-    let lastScanType = "";
-    const newTrackArrayObj = trackArr.reduce((accum, trackItem) => {
-      const newTrackObj = { ...accum };
+    let updatedTrackArray = [];
+
+    trackArr.forEach((trackItem) => {
       const scanType = trackItem.scan_type;
+      const lastItem = last(updatedTrackArray);
       const filteredTrackItem = omit(trackItem, "scan_type");
       filteredTrackItem.status_time = moment(filteredTrackItem.scan_datetime).format(
         "DD MMM YYYY, HH:mm"
       );
       filteredTrackItem.status_body = filteredTrackItem.scan_status;
-      if (scanType === lastScanType) {
-        newTrackObj[scanType].status_array.push(filteredTrackItem);
-      } else {
-        newTrackObj[scanType] = {
+
+      if (!lastItem) {
+        updatedTrackArray.push({
           status_name: scanType,
           status_array: [filteredTrackItem],
-        };
+        });
+      } else {
+        const lastItemScanType = get(lastItem, "status_name");
+        if (scanType !== lastItemScanType) {
+          updatedTrackArray.push({
+            status_name: scanType,
+            status_array: [filteredTrackItem],
+          });
+        } else {
+          lastItem.status_array.push(filteredTrackItem);
+        }
       }
-      lastScanType = scanType;
-      return newTrackObj;
-    }, {});
-    let newTrackArray = Object.values(newTrackArrayObj);
-    newTrackArray = newTrackArray.map((trackItem) => ({
+    });
+    updatedTrackArray = updatedTrackArray.map((trackItem) => ({
       ...trackItem,
       status_array: sortStatusArray(trackItem.status_array),
     }));
-    return newTrackArray;
+
+    return updatedTrackArray;
   } catch (error) {
     throw new Error(error);
   }
@@ -115,6 +124,7 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb) => {
       const trackArr = trackDocument?.track_arr || [];
 
       const modifiedTrackArr = prepareTrackDataForTracking(trackArr);
+
       if (isEmpty(modifiedTrackArr)) {
         throw new Error("track array is empty");
       }
