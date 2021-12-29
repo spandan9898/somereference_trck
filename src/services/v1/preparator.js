@@ -12,7 +12,7 @@ const { NEW_STATUS_TO_OLD_MAPPING } = require("./constants");
  */
 const prepareTrackDictForV1 = (trackData) => {
   const scanType = trackData?.status?.current_status_type;
-
+  const pickupTime = findPickupDate(trackData?.track_arr || []);
   const trackDict = {
     awb: trackData?.tracking_id,
     scan_type: NEW_STATUS_TO_OLD_MAPPING[scanType] || scanType,
@@ -22,7 +22,7 @@ const prepareTrackDictForV1 = (trackData) => {
     track_info: trackData?.status?.current_status_body,
     track_location: trackData?.status?.current_status_location,
     received_by: trackData?.status?.received_by,
-    pickup_datetime: findPickupDate(trackData?.track_arr || []),
+    pickup_time: pickupTime ? moment(pickupTime).format("DD-MM-YYYY HH:mm") : "",
     EDD: trackData?.edd_stamp ? moment(trackData?.edd_stamp).format("DD-MM-YYYY HH:mm") : "",
     pickrr_status: NEW_STATUS_TO_OLD_MAPPING[scanType],
     pickrr_sub_status_code:
