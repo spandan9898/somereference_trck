@@ -23,7 +23,7 @@ const prepareTrackDictForV1 = (trackData) => {
     track_location: trackData?.status?.current_status_location,
     received_by: trackData?.status?.received_by,
     pickup_datetime: findPickupDate(trackData?.track_arr || []),
-    EDD: trackData?.edd_stamp,
+    EDD: trackData?.edd_stamp ? moment(trackData?.edd_stamp).format("DD-MM-YYYY HH:mm") : "",
     pickrr_status: NEW_STATUS_TO_OLD_MAPPING[scanType],
     pickrr_sub_status_code:
       trackData?.pickrr_sub_status_code ||
