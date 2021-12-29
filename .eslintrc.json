@@ -1,0 +1,39 @@
+{
+  "extends": ["airbnb", "prettier"],
+  "plugins": ["prettier"],
+  "rules": {
+    "prettier/prettier": ["error"],
+    "lines-around-comment": [
+      "error",
+      {
+        "beforeBlockComment": true,
+        "afterBlockComment": false,
+        "beforeLineComment": true,
+        "afterLineComment": true,
+        "allowBlockStart": true,
+        "allowBlockEnd": true,
+        "allowObjectStart": true,
+        "allowObjectEnd": true,
+        "allowArrayStart": true,
+        "allowArrayEnd": true
+      }
+    ],
+    "no-unexpected-multiline": "error",
+    "func-style": [2, "expression", { "allowArrowFunctions": true }],
+    "arrow-body-style": ["error", "as-needed"],
+    "require-jsdoc": [
+      "error",
+      {
+        "require": {
+          "MethodDefinition": false,
+          "ClassDeclaration": true,
+          "ArrowFunctionExpression": true,
+          "FunctionExpression": true
+        }
+      }
+    ]
+  },
+  "parserOptions": {
+    "ecmaVersion": 11
+  }
+}

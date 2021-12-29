@@ -48,3 +48,8 @@ Thumbs.db
 *.mov
 *.wmv
 
+.env
+package-lock.json
+.vscode/launch.json
+
+mapper/
