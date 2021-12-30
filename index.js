@@ -26,7 +26,6 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
     await initDB.connectDb(HOST_NAMES.PULL_DB, MONGO_DB_PROD_SERVER_HOST);
     await initDB.connectDb(HOST_NAMES.REPORT_DB, MONGO_DB_REPORT_SERVER_HOST);
 
-    require("./src/apps/delhivery");
     require("./src/apps/bluedart");
     require("./src/apps/delhivery");
     require("./src/apps/amaze");
