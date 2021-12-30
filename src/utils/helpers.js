@@ -76,17 +76,21 @@ const compareScanUnixTimeAndCheckIfExists = (newScanTime, newScanType, cachedDat
  */
 const checkCurrentStatusAWBInCache = (trackObj, cachedData) => {
   const cacheKeys = Object.keys(cachedData);
-  const currentStatusType = trackObj?.status?.current_status_type;
-  return cacheKeys.some((key) => {
-    const keys = key.split("_");
+  const currentStatusType = trackObj?.status?.current_status_type || trackObj?.scan_type;
+
+  for (let i = 0; i < cacheKeys.length; i += 1) {
+    const keys = cacheKeys[i].split("_");
     let statusInitial = keys[0];
     statusInitial = statusInitial.toLowerCase();
-    return (
+    if (
       ["dl", "rtd"].includes(statusInitial) ||
       (statusInitial === "rto" && currentStatusType === "RTO") ||
       (statusInitial === "rto" && currentStatusType !== "RTD")
-    );
-  });
+    ) {
+      return true;
+    }
+  }
+  return false;
 };
 
 /**
