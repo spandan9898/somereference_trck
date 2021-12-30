@@ -56,7 +56,7 @@ class KafkaMessageHandler {
       const result = await updateTrackDataToPullMongo(trackData, logger);
       sendDataToNdr(result);
       sendTrackDataToV1(result);
-      triggerWebhook(result);
+      triggerWebhook(result, elkClient);
       updateStatusOnReport(result, logger, elkClient);
     } catch (error) {
       logger.error("KafkaMessageHandler", error);

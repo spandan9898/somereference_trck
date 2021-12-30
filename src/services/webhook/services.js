@@ -3,6 +3,7 @@ const axios = require("axios");
 const logger = require("../../../logger");
 const { getObject, getString, setString, storeInCache } = require("../../utils");
 const commonWebhookUserInfoCol = require("./model");
+const { sendDataToElk } = require("../common/elk");
 
 const {
   SHOPCLUES_TOKEN_URL,
@@ -108,8 +109,33 @@ const getShopCluesAccessToken = async () => {
   }
 };
 
+/**
+ *
+ * @param {*} data -> lambda payload
+ * @param {*} elkClient -> elk instance
+ * @desc sending lambda payload data to elk instance
+ */
+const sendWebhookDataToELK = async (data, elkClient) => {
+  try {
+    const awb = data.tracking_info_doc?.tracking_id || "NA";
+    const body = {
+      awb: awb.toString(),
+      payload: JSON.stringify(data),
+      time: new Date(),
+    };
+    await sendDataToElk({
+      indexName: "track_webhook",
+      body,
+      elkClient,
+    });
+  } catch (error) {
+    logger.error("sendWebhookDataToELK", error);
+  }
+};
+
 module.exports = {
   hasCurrentStatusWebhookEnabled,
   getShopCluesAccessToken,
   webhookUserHandlingGetAndStoreInCache,
+  sendWebhookDataToELK,
 };
