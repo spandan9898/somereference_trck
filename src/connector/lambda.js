@@ -1,10 +1,10 @@
 const AWS = require("aws-sdk");
 const logger = require("../../logger");
 
-const { ACCESS_KEY, SECRET_KEY } = process.env;
+const { ACCESS_KEY_2, SECRET_KEY_2 } = process.env;
 const config = {
-  accessKeyId: ACCESS_KEY,
-  secretAccessKey: SECRET_KEY,
+  accessKeyId: ACCESS_KEY_2,
+  secretAccessKey: SECRET_KEY_2,
 };
 
 const lambda = new AWS.Lambda({
