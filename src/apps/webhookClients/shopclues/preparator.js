@@ -36,16 +36,17 @@ const createShopcluesTrackingJson = (trackResponse) => {
     let statusUpdateDate = "";
     let statusUpdateTime = "";
 
-    const currentStatusDatetime = currentStatusDict.current_status_time || "";
+    let currentStatusDatetime = currentStatusDict.current_status_time || "";
     if (moment(currentStatusDatetime).isValid()) {
-      statusUpdateDate = moment(currentStatusDatetime).format("YYYY-MM-DD");
-      statusUpdateTime = moment(currentStatusDatetime).format("hh:mm:ss");
+      currentStatusDatetime = moment(currentStatusDatetime).subtract(330, "m");
+      statusUpdateDate = currentStatusDatetime.format("YYYY-MM-DD");
+      statusUpdateTime = currentStatusDatetime.format("HH:mm:ss");
     }
 
     let statusType = currentStatusDict.current_status_type || "";
     let currentStatus = currentStatusDict.current_status_body || "";
     let comments = currentStatusDict.current_status_body || "";
-    let statusDescription = SHOPCLUES_STATUS_DESCRIPTION_MAPPING[statusType];
+    let statusDescription = SHOPCLUES_STATUS_DESCRIPTION_MAPPING[statusType] || currentStatus;
 
     let reasonCode = "";
     let pickrrSubStatusCode = "";
@@ -98,7 +99,8 @@ const createShopcluesTrackingJson = (trackResponse) => {
     shopcluesTrackingJson.statusUpdateDate = statusUpdateDate;
     shopcluesTrackingJson.statusUpdateTime = statusUpdateTime;
     shopcluesTrackingJson.current_location = currentStatusDict.current_status_location;
-    shopcluesTrackingJson.from_location = infoDict?.to_city || "";
+    shopcluesTrackingJson.from_location = infoDict?.from_city || "";
+    shopcluesTrackingJson.to_location = infoDict?.to_city || "";
     shopcluesTrackingJson.comments = comments;
     shopcluesTrackingJson.reasonCode = "";
     shopcluesTrackingJson.rto_awbno = trackResponse.courier_tracking_id || "";

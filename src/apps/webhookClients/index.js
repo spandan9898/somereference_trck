@@ -8,17 +8,21 @@ const {
   SMART_SHIP_AUTH_TOKENS,
   NAAPTOL_AUTH_TOKEN,
 } = require("./constants");
+const logger = require("../../../logger");
 
 /**
  * Return prepared data based on auth token
  */
 class WebhookClient {
-  constructor(authToken, trackingObj) {
-    this.authToken = authToken;
+  constructor(trackingObj) {
+    this.authToken = trackingObj.auth_token;
     this.trackingObj = trackingObj;
   }
 
-  getPreparedData() {
+  async getPreparedData() {
+    if (!this.authToken) {
+      logger.error("getPreparedData - auth token not found");
+    }
     if (SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS.includes(this.authToken)) {
       return ShopcluesServices.init(this.trackingObj);
     }

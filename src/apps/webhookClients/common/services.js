@@ -4,7 +4,7 @@ const prepareCommonTrackingInfo = require("./preparator");
  *
  */
 class CommonServices {
-  static init(trackingInfoDoc) {
+  static async init(trackingInfoDoc) {
     return prepareCommonTrackingInfo(trackingInfoDoc);
   }
 }
