@@ -57,7 +57,7 @@ const prepareEddStamp = (eddDatetime, addDay) => {
     if (addDay) {
       eddDate = eddDate.add(addDay, "day");
     }
-    return eddDate.format("YYYY-MM-DD HH:mm:ss");
+    return eddDate.format("DD-MM-YYYY HH:mm:ss");
   }
   return eddDatetime;
 };

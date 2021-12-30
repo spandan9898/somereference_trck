@@ -104,6 +104,8 @@ const REMOVE_ELMENTS_KEY = [
   "rtd_sent",
   "mandatory_status_map",
   "label_logo",
+  "user_email",
+  "billing_zone",
 ];
 module.exports = {
   GET_TRACK_PARENT_KEYS,

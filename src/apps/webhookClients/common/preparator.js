@@ -54,11 +54,12 @@ const filterTrackingParamsForTracker = async (trackDict) => {
 const prepareCommonTrackingInfo = async (trackingResponse) => {
   try {
     const trackingInfoDoc = validateTrackingJson(trackingResponse);
-    if (trackingInfoDoc.edd_stamp) {
-      trackingInfoDoc.edd_stamp = prepareEddStamp(trackingInfoDoc.edd_stamp);
-      trackingInfoDoc.edd_stamp_one_more_day = prepareEddStamp(trackingInfoDoc.edd_stamp, 1);
+    const eddStamp = trackingInfoDoc.edd_stamp;
+    if (eddStamp) {
+      trackingInfoDoc.edd_stamp = prepareEddStamp(eddStamp);
+      trackingInfoDoc.edd_stamp_one_more_day = prepareEddStamp(eddStamp, 1);
     }
-    const updatedTrackingInfoDoc = await filterTrackingParamsForTracker();
+    const updatedTrackingInfoDoc = await filterTrackingParamsForTracker(trackingInfoDoc);
 
     _.set(
       updatedTrackingInfoDoc,
@@ -67,7 +68,7 @@ const prepareCommonTrackingInfo = async (trackingResponse) => {
     );
 
     const currentStatusType = _.get(updatedTrackingInfoDoc, "status.current_status_type", "");
-    if (NEW_STATUS_TO_OLD_MAPPING.includes(currentStatusType)) {
+    if (NEW_STATUS_TO_OLD_MAPPING[currentStatusType]) {
       updatedTrackingInfoDoc.status.current_status_type =
         NEW_STATUS_TO_OLD_MAPPING[currentStatusType];
     } else if (currentStatusType === "UD") {
