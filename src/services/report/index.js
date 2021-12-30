@@ -36,7 +36,7 @@ const updateStatusOnReport = async (trackObj, logger, elkClient) => {
       {
         returnNewDocument: true,
         returnDocument: "after",
-        upsert: true,
+        upsert: false,
       }
     );
     return response.value;
