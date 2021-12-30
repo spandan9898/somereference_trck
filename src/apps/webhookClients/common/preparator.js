@@ -1,7 +1,7 @@
 const _ = require("lodash");
 
 const logger = require("../../../../logger");
-const { NEW_STATUS_TO_OLD_MAPPING, REMOVE_ELMENTS_KEY } = require("./constants");
+const { NEW_STATUS_TO_OLD_MAPPING, REMOVE_ELEMENT_KEYS } = require("./constants");
 const {
   validateTrackingJson,
   prepareEddStamp,
@@ -89,7 +89,7 @@ const prepareCommonTrackingInfo = async (trackingResponse) => {
     }
     updatedTrackingInfoDoc.fetched_from = "kafka_lambda";
 
-    return _.omit(updatedTrackingInfoDoc, REMOVE_ELMENTS_KEY);
+    return _.omit(updatedTrackingInfoDoc, REMOVE_ELEMENT_KEYS);
   } catch (error) {
     logger.error("prepareCommonTrackingInfo", error);
     return {};

@@ -4,7 +4,7 @@ const axios = require("axios");
 
 const logger = require("../../../../logger");
 const {
-  GET_TRACK_PARENT_KEYS,
+  TRACKING_INFO_PARENT_KEYS,
   GET_TRACK_INFO_KEYS,
   PICKRR_STATUS_CODE_MAPPING,
 } = require("./constants");
@@ -17,7 +17,7 @@ const {
 const validateTrackingJson = (trackObj) => {
   const trackingObj = _.cloneDeep(trackObj);
   try {
-    GET_TRACK_PARENT_KEYS.forEach((key) => {
+    TRACKING_INFO_PARENT_KEYS.forEach((key) => {
       if (!trackingObj[key]) {
         if (key === "info") {
           trackingObj[key] = {};

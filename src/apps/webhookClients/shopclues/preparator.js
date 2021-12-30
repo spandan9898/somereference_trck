@@ -58,7 +58,7 @@ const createShopcluesTrackingJson = (trackResponse) => {
       let currentlyNdr = false;
 
       trackArrReverse.forEach((trackItem) => {
-        if (["NDR", "UD"].includes(trackItem.scan_type)) {
+        if (["ndr", "ud"].includes((trackItem.scan_type || "").toLowerCase())) {
           currentlyNdr = true;
           reasonCode = trackItem.scan_status;
           pickrrSubStatusCode = trackItem.pickrr_sub_status_code || "";
@@ -67,14 +67,14 @@ const createShopcluesTrackingJson = (trackResponse) => {
         }
       });
 
-      if (!["DL", "RTO", "RTD"].includes(statusType) && currentlyNdr) {
+      if (!["dl", "rto", "rtd"].includes((statusType || "").toLowerCase()) && currentlyNdr) {
         statusType = "NDR";
         currentStatus = "Failed Attempt at Delivery";
         comments = reasonCode;
         statusDescription = reasonCode;
       }
     }
-    if (["NDR", "UD"].includes(statusType)) {
+    if (["ndr", "ud"].includes((statusType || "").toLowerCase())) {
       const subStatus = pickrrSubStatusCode;
       if (!subStatus) {
         currentStatus = "Undelivered";
@@ -91,7 +91,7 @@ const createShopcluesTrackingJson = (trackResponse) => {
     }
 
     const infoDict = trackResponse.info || {};
-    const receivedByName = statusType === "RTD" ? "from_name" : "to_name";
+    const receivedByName = statusType.toLowerCase() === "rtd" ? "from_name" : "to_name";
     shopcluesTrackingJson.awbno = trackResponse.courier_tracking_id || trackResponse.tracking_id;
     shopcluesTrackingJson.status = currentStatus;
     shopcluesTrackingJson.status_code = statusType;

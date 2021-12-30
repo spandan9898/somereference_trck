@@ -62,8 +62,10 @@ const createNaaptolTrackingJson = (trackResponse) => {
       let currentlyNdr = false;
 
       trackArrReverse.forEach((trackItem) => {
-        const { scan_type: scanType } = trackItem;
-        if (["NDR", "UD"].includes(scanType)) {
+        let { scan_type: scanType } = trackItem;
+        scanType = (scanType || "").toLowerCase();
+
+        if (["ndr", "ud"].includes(scanType)) {
           currentlyNdr = true;
           reasonCode = trackItem.scan_status;
           pickrrSubStatusCode = trackItem.pickrr_sub_status_code || "";
@@ -71,22 +73,23 @@ const createNaaptolTrackingJson = (trackResponse) => {
           reasonCode = "";
         }
 
-        if (scanType === "OO") {
+        if (scanType === "oo") {
           attemptCount += 1;
         }
-        if (["RTO", "RTO-OO", "RTO-OT"].includes(scanType)) {
+        if (["rto", "rto-oo", "rto-ot"].includes(scanType)) {
           isRto = true;
           rtoComment = trackItem.scan_status;
         }
       });
-      if (!["DL", "RTO", "RTD"].includes(statusType) && currentlyNdr) {
+
+      if (!["dl", "rto", "rtd"].includes((statusType || "").toLowerCase()) && currentlyNdr) {
         statusType = "NDR";
         currentStatus = "Failed Attempt at Delivery";
         statusDescription = reasonCode;
       }
     }
 
-    if (["NDR", "UD"].includes(statusType)) {
+    if (["ndr", "ud"].includes((statusType || "").toLowerCase())) {
       const subStatus = pickrrSubStatusCode;
       if (!subStatus) {
         currentStatus = "Undelivered";

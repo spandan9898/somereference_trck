@@ -1,4 +1,4 @@
-const GET_TRACK_PARENT_KEYS = [
+const TRACKING_INFO_PARENT_KEYS = [
   "order_type",
   "client_order_id",
   "courier_tracking_id",
@@ -91,7 +91,7 @@ const PICKRR_STATUS_CODE_MAPPING = {
   UD: "Undelivered",
 };
 
-const REMOVE_ELMENTS_KEY = [
+const REMOVE_ELEMENT_KEYS = [
   "_id",
   "auth_token",
   "created_at",
@@ -108,9 +108,9 @@ const REMOVE_ELMENTS_KEY = [
   "billing_zone",
 ];
 module.exports = {
-  GET_TRACK_PARENT_KEYS,
+  TRACKING_INFO_PARENT_KEYS,
   GET_TRACK_INFO_KEYS,
   NEW_STATUS_TO_OLD_MAPPING,
   PICKRR_STATUS_CODE_MAPPING,
-  REMOVE_ELMENTS_KEY,
+  REMOVE_ELEMENT_KEYS,
 };
