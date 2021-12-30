@@ -41,7 +41,7 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "015-s": { scan_type: "PP", pickrr_sub_status_code: "" },
   "538-t": { scan_type: "SHP", pickrr_sub_status_code: "" },
   "001-s": { scan_type: "SHP", pickrr_sub_status_code: "" },
-  "002-s": { scan_type: "OT", pickrr_sub_status_code: "" },
+  "002-s": { scan_type: "OO", pickrr_sub_status_code: "" },
   "007-t": { scan_type: "OT", pickrr_sub_status_code: "" },
   "021-s": { scan_type: "OT", pickrr_sub_status_code: "" },
   "032-t": { scan_type: "OT", pickrr_sub_status_code: "" },
