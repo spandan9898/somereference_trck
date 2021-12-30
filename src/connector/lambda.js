@@ -28,6 +28,9 @@ const callLambdaFunction = async (data, functionName) => {
     lambdaRequestObj.on("error", (response) => {
       logger.error("lambda trigger error", response.error.message);
     });
+    lambdaRequestObj.on("complete", () => {
+      logger.verbose("Complete");
+    });
     lambdaRequestObj.send();
   } catch (error) {
     logger.error("callLambdaFunction", error);

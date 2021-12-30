@@ -29,6 +29,32 @@ const createServer = (logger) => {
     return { hello: "world" };
   });
 
+  server.post("/webhook-test/shopclues", async (request, reply) => {
+    reply.type("application/json").code(200);
+    return {
+      success: true,
+      data: { message: { description: "Record Successfully Submitted" }, body: request.body },
+    };
+  });
+
+  server.post("/webhook-test/naaptol", async (request, reply) => {
+    reply.type("application/json").code(200);
+    return {
+      success: true,
+      HasError: "False",
+      data: { message: { description: "Record Successfully Submitted" }, body: request.body },
+    };
+  });
+
+  server.post("/webhook-test/common", async (request, reply) => {
+    reply.type("application/json").code(200);
+    return {
+      success: true,
+      HasError: "False",
+      data: { message: { description: "Record Successfully Submitted" }, body: request.body },
+    };
+  });
+
   server.post("/track/external/push/bluedart", async (request, reply) => {
     reply.type("application/json").code(200);
     logger.info("Testing Nginx", request.body);
