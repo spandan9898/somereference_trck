@@ -57,7 +57,7 @@ const deleteKey = async (key) => {
 };
 
 /**
- * ES6 redis cache store with expired keys
+ * redis cache store with expired keys
  * expiryTime in seconds
  */
 const storeInCache = async (key, value, expiryTime) => {

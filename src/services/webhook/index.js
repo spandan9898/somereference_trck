@@ -1,5 +1,6 @@
-const logger = require("../../../logger");
+const _ = require("lodash");
 
+const logger = require("../../../logger");
 const {
   webhookUserHandlingGetAndStoreInCache,
   getShopCluesAccessToken,
@@ -11,13 +12,18 @@ const { callLambdaFunction } = require("../../connector/lambda");
 /**
  * webhook trigger
  */
-const triggerWebhook = async (trackingObj) => {
+const triggerWebhook = async (trackingData) => {
   try {
+    // Testing phase
+    // order_created_at >= 4th Jan
+    // auth_token check [5 client - shopclues, bs, cred, nt, snitch]
+
+    const trackingObj = _.cloneDeep(trackingData);
     const lambdaPayload = {
       data: {
-        tracking_info_doc: trackingObj,
+        tracking_info_doc: _.omit(trackingObj, ["audit", "_id"]),
         url: "",
-        shopify_access_token: "",
+        shopclues_access_token: "random_token",
       },
     };
     const result = await webhookUserHandlingGetAndStoreInCache(trackingObj);
@@ -53,4 +59,3 @@ const triggerWebhook = async (trackingObj) => {
 };
 
 module.exports = triggerWebhook;
-module.exports = getShopCluesAccessToken;

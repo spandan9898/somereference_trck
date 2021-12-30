@@ -1,7 +1,7 @@
 const { isEmpty } = require("lodash");
 const axios = require("axios");
 const logger = require("../../../logger");
-const { setObject, getObject, getString, setString } = require("../../utils");
+const { getObject, getString, setString, storeInCache } = require("../../utils");
 const commonWebhookUserInfoCol = require("./model");
 
 const {
@@ -35,7 +35,12 @@ const hasCurrentStatusWebhookEnabled = (cacheObj, currentStatus) => {
 const webhookUserHandlingGetAndStoreInCache = async (trackObj) => {
   try {
     const authToken = trackObj?.auth_token;
+
+    if (!authToken) {
+      return false;
+    }
     const cachedAuthTokenData = await getObject(authToken);
+
     if (!cachedAuthTokenData) {
       const webhookInstance = await commonWebhookUserInfoCol();
       const res = await webhookInstance.findOne({ user_auth_token: authToken });
@@ -43,15 +48,13 @@ const webhookUserHandlingGetAndStoreInCache = async (trackObj) => {
         const cachePayload = {
           user_auth_token: res.user_auth_token,
           track_url: res.track_url,
-          token: res?.track_url,
+          token: res?.token,
           has_webhook_enabled: res.has_webhook_enabled,
           shop_platform: res?.shop_platform,
-          events_enabled: res?.events_enabled || [],
+          events_enabled: res?.events_enabled || {},
         };
 
-        // TODO: use custom expiry
-
-        await setObject(authToken, cachePayload);
+        await storeInCache(authToken, cachePayload, 60 * 59);
         return {
           success: true,
           cachUserData: cachePayload,
