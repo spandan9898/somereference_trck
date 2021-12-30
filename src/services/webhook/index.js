@@ -18,7 +18,6 @@ const { checkIfCompulsoryEventAlreadySent } = require("./helpers");
 const triggerWebhook = async (trackingData, elkClient) => {
   try {
     // Testing phase
-    // order_created_at >= 4th Jan
     // auth_token check [5 client - shopclues, bs, cred, nt, snitch]
 
     const trackingObj = _.cloneDeep(trackingData);
