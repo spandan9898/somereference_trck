@@ -1,9 +1,12 @@
-const { isEmpty } = require("lodash");
+const { isEmpty, get } = require("lodash");
 const axios = require("axios");
+
 const logger = require("../../../logger");
 const { getObject, getString, setString, storeInCache } = require("../../utils");
-const commonWebhookUserInfoCol = require("./model");
+const { commonWebhookUserInfoCol } = require("./model");
 const { sendDataToElk } = require("../common/elk");
+const { fetchWebhookHistoryMapData } = require("./model");
+const { prepareCurrentStatusWebhookKeyMap } = require("./preparator");
 
 const {
   SHOPCLUES_TOKEN_URL,
@@ -133,9 +136,45 @@ const sendWebhookDataToELK = async (data, elkClient) => {
   }
 };
 
+/**
+ *
+ * @param {*} trackingObj
+ */
+const statusCheckInHistoryMap = async (trackingObj) => {
+  try {
+    const currentStatusType = trackingObj?.status?.current_status_type;
+    const currentStatusTime = trackingObj?.status?.current_status_time;
+
+    const trackingId = trackingObj?.tracking_id;
+    if (!currentStatusType || !trackingId) {
+      return false;
+    }
+    const res = await fetchWebhookHistoryMapData(trackingId);
+    if (!res) {
+      return false;
+    }
+    const { history_map: historyMap } = res || {};
+    if (isEmpty(historyMap)) {
+      return false;
+    }
+    const currentStatusWebhookMapKey = prepareCurrentStatusWebhookKeyMap(
+      currentStatusType,
+      currentStatusTime
+    );
+    if (get(historyMap, currentStatusWebhookMapKey)) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    logger.error("statusCheckInHistoryMap", error);
+    return false;
+  }
+};
+
 module.exports = {
   hasCurrentStatusWebhookEnabled,
   getShopCluesAccessToken,
   webhookUserHandlingGetAndStoreInCache,
   sendWebhookDataToELK,
+  statusCheckInHistoryMap,
 };
