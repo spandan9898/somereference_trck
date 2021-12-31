@@ -3,6 +3,7 @@ const moment = require("moment");
 
 const { findOneDocumentFromMongo, getObject, setObject } = require("../../utils");
 const { sortStatusArray } = require("./helpers");
+const { IS_FETCH_FROM_DB } = require("../../utils/constants");
 
 /**
  *
@@ -114,11 +115,11 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb) => {
   try {
     const trackingObj = (await getObject(trackingAwb)) || {};
 
-    if (isEmpty(trackingObj) || isEmpty(trackingObj?.track_model)) {
+    if (IS_FETCH_FROM_DB || isEmpty(trackingObj) || isEmpty(trackingObj?.track_model)) {
       const trackDocument = await getTrackDocumentfromMongo(trackingAwb);
 
       if (isEmpty(trackDocument)) {
-        throw new Error(`failed to fetch document - ${trackingAwb}`);
+        throw new Error("failed to fetch document");
       }
 
       const trackArr = trackDocument?.track_arr || [];
