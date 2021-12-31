@@ -1,3 +1,5 @@
+const _ = require("lodash");
+
 const { prepareAmazeData } = require("../../apps/amaze/services");
 const { preparePickrrBluedartDict } = require("../../apps/bluedart/services");
 const { prepareDelhiveryData } = require("../../apps/delhivery/services");
@@ -16,6 +18,7 @@ const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
 const updateStatusOnReport = require("../report");
 const elkClient = require("../../connector/elk");
+const { updatePrepareDict } = require("./helpers");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -45,6 +48,7 @@ class KafkaMessageHandler {
       const { message } = consumedPayload;
 
       const res = preapreFunc(Object.values(JSON.parse(message.value.toString()))[0]);
+
       if (!res.awb) return;
       const trackData = await redisCheckAndReturnTrackData(res);
 
@@ -53,7 +57,13 @@ class KafkaMessageHandler {
         return;
       }
 
-      const result = await updateTrackDataToPullMongo(trackData, logger);
+      const updatedTrackData = await updatePrepareDict(trackData);
+      if (_.isEmpty(updatedTrackData)) {
+        logger.error("Xpresbees reverse map not found", trackData);
+        return;
+      }
+
+      const result = await updateTrackDataToPullMongo(updatedTrackData, logger);
       sendDataToNdr(result);
       sendTrackDataToV1(result);
       triggerWebhook(result, elkClient);
