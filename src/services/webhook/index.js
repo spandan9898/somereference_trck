@@ -6,6 +6,7 @@ const {
   getShopCluesAccessToken,
   hasCurrentStatusWebhookEnabled,
   sendWebhookDataToELK,
+  statusCheckInHistoryMap,
 } = require("./services");
 const { SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS, SMART_SHIP_AUTH_TOKENS } = require("./constants");
 const { callLambdaFunction } = require("../../connector/lambda");
@@ -21,6 +22,11 @@ const triggerWebhook = async (trackingData, elkClient) => {
     // auth_token check [5 client - shopclues, bs, cred, nt, snitch]
 
     if (!["33d8f654722f8959c5f68271730f28de175485"].includes(trackingData?.auth_token)) {
+      return false;
+    }
+
+    const isStatusAlreadyPresentInHistoryMap = await statusCheckInHistoryMap(trackingData);
+    if (isStatusAlreadyPresentInHistoryMap) {
       return false;
     }
 
