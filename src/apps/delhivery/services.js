@@ -1,7 +1,10 @@
 const moment = require("moment");
 
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER } = require("./constant");
+const {
+  DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER,
+  DELHIVERY_REVERSE_MAPPER,
+} = require("./constant");
 
 /*
 Request payload sample
@@ -90,7 +93,11 @@ const prepareDelhiveryData = (delhiveryDict) => {
 
     const nslCode = trackData.NSLCode;
     const delhiveryMapperKey = `${nslCode}_${statusScanType}`;
-    const reasonDict = DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER[delhiveryMapperKey.toLowerCase()];
+    const delhiveryMapper = {
+      ...DELHIVERY_REVERSE_MAPPER,
+      ...DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER,
+    };
+    const reasonDict = delhiveryMapper[delhiveryMapperKey.toLowerCase()];
 
     if (!reasonDict) {
       return {
