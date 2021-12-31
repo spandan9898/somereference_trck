@@ -136,7 +136,7 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
     return responseDict;
   } catch (error) {
     logger.error(error.message);
-    if (error.message === "failed to fetch document") responseDict.err = error;
+    if (error.message.includes("failed to fetch document")) responseDict.err = error;
     return responseDict;
   }
 };

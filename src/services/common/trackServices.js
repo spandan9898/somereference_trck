@@ -119,7 +119,7 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb) => {
       const trackDocument = await getTrackDocumentfromMongo(trackingAwb);
 
       if (isEmpty(trackDocument)) {
-        throw new Error("failed to fetch document");
+        throw new Error(`failed to fetch document - ${trackingAwb}`);
       }
 
       const trackArr = trackDocument?.track_arr || [];
