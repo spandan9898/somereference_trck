@@ -52,7 +52,7 @@ const updatePrepareDict = async (preparedDict) => {
   try {
     const clonedPreparedDict = cloneDeep(preparedDict);
 
-    const { isRversed, courierUsed } = await isRervseCheck(clonedPreparedDict);
+    const { isRversed, courierUsed = "" } = await isRervseCheck(clonedPreparedDict);
     if (!isRversed) {
       return clonedPreparedDict;
     }
