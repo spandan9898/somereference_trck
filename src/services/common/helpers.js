@@ -65,7 +65,7 @@ const updatePrepareDict = async (preparedDict) => {
 
     const reversedMappedData = reverseMappings[courierStatusCode];
 
-    if (isEmpty(reversedMappedData) && courierUsed === "xpressbees") {
+    if (isEmpty(reversedMappedData) && courierUsed.includes("xpressbees")) {
       return {};
     }
 
