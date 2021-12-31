@@ -1,26 +1,43 @@
+/* eslint-disable global-require */
 require("dotenv").config();
 
 const server = require("./server");
 
-const db = require("./src/connector/database");
 const logger = require("./logger");
+const { redisClient } = require("./src/utils");
+const initDB = require("./src/connector/db");
 
-db.initDB("", (err, _db) => {
-  if (err) {
-    logger.error("DB Init Error: ", err);
-  } else {
-    logger.info(`${_db.s.options.dbName} - DB connected`);
+const { HOST_NAMES } = require("./src/utils/constants");
+
+const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
+
+(async () => {
+  try {
+    await redisClient.connect();
+    logger.info("Redis Connected");
+  } catch (error) {
+    logger.error("Redis connect error", error);
+    process.exit(1);
   }
-});
+})();
 
-const bluedartApp = require("./src/apps/bluedart");
-const delhiveryApp = require("./src/apps/delhivery");
-const amazeApp = require("./src/apps/amaze");
-const xpressbeesApp = require("./src/apps/xpressbees");
-const ekartApp = require("./src/apps/ekart");
-const udaanApp = require("./src/apps/udaan");
-const ecommApp = require("./src/apps/ecomm");
-const shadowfaxApp = require("./src/apps/shadowfax");
-const parceldoApp = require("./src/apps/parceldo");
+(async () => {
+  try {
+    await initDB.connectDb(HOST_NAMES.PULL_DB, MONGO_DB_PROD_SERVER_HOST);
+    await initDB.connectDb(HOST_NAMES.REPORT_DB, MONGO_DB_REPORT_SERVER_HOST);
+
+    require("./src/apps/bluedart");
+    require("./src/apps/delhivery");
+    require("./src/apps/amaze");
+    require("./src/apps/xpressbees");
+    require("./src/apps/ekart");
+    require("./src/apps/udaan");
+    require("./src/apps/ecomm");
+    require("./src/apps/shadowfax");
+    require("./src/apps/parceldo");
+  } catch (error) {
+    logger.error("DB Connection Error", error);
+  }
+})();
 
 server.createServer(logger);
