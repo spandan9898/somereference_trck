@@ -1,7 +1,9 @@
 const { isEmpty } = require("lodash");
 
 const logger = require("../../logger");
-const db = require("../connector/database");
+const initDb = require("../connector/db");
+
+const { HOST_NAMES } = require("./constants");
 
 const { MONGO_DB_PROD_SERVER_DATABASE_NAME, MONGO_DB_PROD_SERVER_COLLECTION_NAME } = process.env;
 
@@ -13,9 +15,11 @@ const { MONGO_DB_PROD_SERVER_DATABASE_NAME, MONGO_DB_PROD_SERVER_COLLECTION_NAME
 const getDbCollectionInstance = async ({
   dbName = MONGO_DB_PROD_SERVER_DATABASE_NAME,
   collectionName = MONGO_DB_PROD_SERVER_COLLECTION_NAME,
+  hostName = HOST_NAMES.PULL_DB,
 } = {}) => {
   try {
-    const res = db.getDB().db(dbName).collection(collectionName);
+    const dbInstance = initDb.getDbInstance(hostName);
+    const res = dbInstance.db(dbName).collection(collectionName);
     return res;
   } catch (error) {
     logger.error("getDbCollectionInstance Error ", error);

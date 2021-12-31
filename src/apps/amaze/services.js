@@ -53,7 +53,7 @@ const prepareAmazeData = (amazeDict) => {
       };
     }
 
-    pickrrAmazeDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING.scanMappingItem?.scan_type || "";
+    pickrrAmazeDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanMappingItem?.scan_type] || "";
 
     const scanType = scanMappingItem.scan_type;
     const scanDatetime = amazeDict.updatedAt

@@ -26,7 +26,7 @@ const updateStatusOnReport = async (trackObj, logger, elkClient) => {
   const result = prepareDataForReportMongo(trackObj);
   result.last_updated_date = moment().toDate();
   sendReportsDataToELK(result, elkClient);
-  const { reportClient, opsReportColInstance } = await reportMongoCol();
+  const opsReportColInstance = await reportMongoCol();
   try {
     const response = await opsReportColInstance.findOneAndUpdate(
       { pickrr_tracking_id: trackObj.tracking_id },
@@ -36,7 +36,7 @@ const updateStatusOnReport = async (trackObj, logger, elkClient) => {
       {
         returnNewDocument: true,
         returnDocument: "after",
-        upsert: true,
+        upsert: false,
       }
     );
     return response.value;
@@ -44,8 +44,6 @@ const updateStatusOnReport = async (trackObj, logger, elkClient) => {
     logger.error("updateStatusonReport Error", error);
 
     return false;
-  } finally {
-    reportClient.close();
   }
 };
 
