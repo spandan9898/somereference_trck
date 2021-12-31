@@ -1472,7 +1472,612 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
 };
 const TOTAL_TOPIC_COUNT = 8;
 
+const DELHIVERY_REVERSE_MAPPER = {
+  "x-uco_pp": {
+    courier_remark: "Received soft data for consignment",
+    scan_type: "OP",
+    pickrr_sub_status_code: "",
+  },
+  "x-asp_pp": { courier_remark: "Auto scheduled", scan_type: "OM", pickrr_sub_status_code: "" },
+  "cl-101_pp": {
+    courier_remark: "As per client's instructions",
+    scan_type: "OM",
+    pickrr_sub_status_code: "",
+  },
+  "x-ddd3fp_pp": { courier_remark: "Out for pickup", scan_type: "OFP", pickrr_sub_status_code: "" },
+  "x-ddd1fp_pp": { courier_remark: "Out for pickup", scan_type: "OFP", pickrr_sub_status_code: "" },
+  "x-ddd2fp_pp": { courier_remark: "Out for pickup", scan_type: "OFP", pickrr_sub_status_code: "" },
+  "x-ddd4fp_pp": { courier_remark: "Out for pickup", scan_type: "OFP", pickrr_sub_status_code: "" },
+  "x-ddd4fr_pp": {
+    courier_remark: "Out for Delivery and Pickup",
+    scan_type: "OFP",
+    pickrr_sub_status_code: "",
+  },
+  "x-ddd2fr_pp": {
+    courier_remark: "Out for Delivery and Pickup",
+    scan_type: "OFP",
+    pickrr_sub_status_code: "",
+  },
+  "x-ddd1fr_pp": {
+    courier_remark: "Out for Delivery and Pickup",
+    scan_type: "OFP",
+    pickrr_sub_status_code: "",
+  },
+  "x-ddd3fr_pp": {
+    courier_remark: "Out for Delivery and Pickup",
+    scan_type: "OFP",
+    pickrr_sub_status_code: "",
+  },
+  "x-lm1p_pp": { courier_remark: "Out for Pickup", scan_type: "OFP", pickrr_sub_status_code: "" },
+  "eod-21_cn": {
+    courier_remark: "Cancelled the pickup request",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
+  },
+  "eod-84_cn": {
+    courier_remark: "Product description mismatch",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  "eod-131_cn": {
+    courier_remark: "Brand Mismatch",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  "eod-132_cn": {
+    courier_remark: "Colour Mismatch",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  "eod-95_cn": {
+    courier_remark: "Damaged/Used product",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "DAM",
+  },
+  "eod-106_cn": {
+    courier_remark: "Reached Maximum attempt count",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SNR",
+  },
+  "eod-108_cn": {
+    courier_remark: "Product count mismatch",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  "eod-73_pp": {
+    courier_remark: "Bad/Incomplete address",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "AI",
+  },
+  "eod-65_pp": { courier_remark: "Not attempted", scan_type: "PPF", pickrr_sub_status_code: "NA" },
+  "eod-121_pp": {
+    courier_remark: "Entry restricted area",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NSL",
+  },
+  "eod-68_pp": {
+    courier_remark: "Request for delayed pickup",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SNR",
+  },
+  "eod-26_pp": {
+    courier_remark: "Consignee unavailable",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SU",
+  },
+  "eod-77_pu": {
+    courier_remark: "DTO/REPL: Pick Up Completed",
+    scan_type: "PP",
+    pickrr_sub_status_code: "",
+  },
+  "st-109_cn": {
+    courier_remark: "Out of service area",
+    scan_type: "OC",
+    pickrr_sub_status_code: "",
+  },
+  "st-112_cn": {
+    courier_remark: "Return Center is NSZ",
+    scan_type: "OC",
+    pickrr_sub_status_code: "",
+  },
+  "x-prc_pu": { courier_remark: "Package Recieved", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-dld1r_pu": { courier_remark: "Added to IST", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-dll2r_pu": { courier_remark: "Added to IST", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-dll0r_pu": { courier_remark: "Added to IST", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-dld0r_pu": { courier_remark: "Added to IST", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-dlo0r_pu": { courier_remark: "Added to IST", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-dll1r_pu": { courier_remark: "Added to IST", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-dld2r_pu": { courier_remark: "Added to IST", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-dlo2r_pu": { courier_remark: "Added to IST", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-ild2r_pu": { courier_remark: "IST received", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-ild1r_pu": { courier_remark: "IST received", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-ild0r_pu": { courier_remark: "IST received", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-ilo1r_pu": { courier_remark: "IST received", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-ilo0r_pu": { courier_remark: "IST received", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-ill2r_pu": { courier_remark: "IST received", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-ill0r_pu": { courier_remark: "IST received", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-ill1r_pu": { courier_remark: "IST received", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-ilo2r_pu": { courier_remark: "IST received", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-ibd4r_pu": {
+    courier_remark: "Bag incoming at return city RPC",
+    scan_type: "RAD",
+    pickrr_sub_status_code: "",
+  },
+  "x-ibd3r_pu": {
+    courier_remark: "Bag incoming at return city DC",
+    scan_type: "RAD",
+    pickrr_sub_status_code: "",
+  },
+  "x-ibd1r_pu": {
+    courier_remark: "Bag incoming at return city PC",
+    scan_type: "RAD",
+    pickrr_sub_status_code: "",
+  },
+  "x-dro2r_pu": {
+    courier_remark: "Dispatched for DTO",
+    scan_type: "OO",
+    pickrr_sub_status_code: "",
+  },
+  "x-drd2r_pu": {
+    courier_remark: "Dispatched for DTO",
+    scan_type: "OO",
+    pickrr_sub_status_code: "",
+  },
+  "x-drd1r_pu": {
+    courier_remark: "Dispatched for DTO",
+    scan_type: "OO",
+    pickrr_sub_status_code: "",
+  },
+  "x-drd4r_pu": {
+    courier_remark: "Dispatched for DTO",
+    scan_type: "OO",
+    pickrr_sub_status_code: "",
+  },
+  "x-dro1r_pu": {
+    courier_remark: "Dispatched for DTO",
+    scan_type: "OO",
+    pickrr_sub_status_code: "",
+  },
+  "x-dro4r_pu": {
+    courier_remark: "Dispatched for DTO",
+    scan_type: "OO",
+    pickrr_sub_status_code: "",
+  },
+  "x-drd3r_pu": {
+    courier_remark: "Dispatched for DTO",
+    scan_type: "OO",
+    pickrr_sub_status_code: "",
+  },
+  "x-dro3r_pu": {
+    courier_remark: "Dispatched for DTO",
+    scan_type: "OO",
+    pickrr_sub_status_code: "",
+  },
+  "rd-pd4_pu": {
+    courier_remark: "Client Wants Open Delivery",
+    scan_type: "UD",
+    pickrr_sub_status_code: "OPDEL",
+  },
+  "rd-pd12_pu": {
+    courier_remark: "Damaged content",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CR",
+  },
+  "rd-pd7_pu": { courier_remark: "Short Shipment", scan_type: "UD", pickrr_sub_status_code: "CR" },
+  "rd-pd8_pu": {
+    courier_remark: "Soft data not available with client",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CI",
+  },
+  "rd-pd10_pu": {
+    courier_remark: "Content mismatch",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CR",
+  },
+  "rd-pd11_pu": {
+    courier_remark: "Content missing",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CR",
+  },
+  "rd-pd17_pu": { courier_remark: "Not attempted", scan_type: "UD", pickrr_sub_status_code: "SD" },
+  "rd-pd18_pu": {
+    courier_remark: "Incorrect seller information",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  "rd-pd15_pu": {
+    courier_remark: "Client capacity constraint",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CI",
+  },
+  "rd-pd3_pu": {
+    courier_remark: "Client/ Seller closed",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  "rd-pd20_pu": {
+    courier_remark: "Missing invoice",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CI",
+  },
+  "rd-pd21_pu": {
+    courier_remark: "Damaged packing",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CR",
+  },
+  "cl-105_pu": {
+    courier_remark: "Reversal of Return closure",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "rt-111_dl": {
+    courier_remark: "DTO due to poor packaging",
+    scan_type: "OC",
+    pickrr_sub_status_code: "",
+  },
+  "cl-102_pp": {
+    courier_remark: "As per client's instructions",
+    scan_type: "OC",
+    pickrr_sub_status_code: "",
+  },
+  "cl-103_pp": {
+    courier_remark: "As per client's instructions",
+    scan_type: "OC",
+    pickrr_sub_status_code: "",
+  },
+  "rd-ac_dl": { courier_remark: "RETURN Accepted", scan_type: "DL", pickrr_sub_status_code: "" },
+  "dlyrg-125_pu": {
+    courier_remark: "Delay due to Disturbance/Strike",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlylh-109_pu": {
+    courier_remark: "Vehicle Breakdown",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyrg-124_pu": {
+    courier_remark: "Consignment being inspected for duty",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlylh-106_pu": {
+    courier_remark: "Flight delayed/cancelled",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlymr-118_pu": { courier_remark: "Misrouted", scan_type: "OT", pickrr_sub_status_code: "" },
+  "dlyrg-130_pu": {
+    courier_remark: "Region Specific Off",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlylh-104_pu": {
+    courier_remark: "Flight cancelled",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyrpc-416_pu": {
+    courier_remark: "Hold as per client instrutions",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyrg-127_pu": {
+    courier_remark: "Documentation from shipper is insufficient",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlylh-133_pu": {
+    courier_remark: "Air Offload - Capacity constraint",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlylh-115_pu": {
+    courier_remark: "Air Offload - Security constraint",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyrg-120_pu": {
+    courier_remark: "Under inspection by regulatory authorities",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyrpc-419_pu": {
+    courier_remark: "Not dispatched due to client schedule",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyrpc-417_pu": {
+    courier_remark: "Physical address doesn't match the soft data",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlydc-102_pp": {
+    courier_remark: "Natural Disaster",
+    scan_type: "OM",
+    pickrr_sub_status_code: "",
+  },
+  "dlydc-107_pp": {
+    courier_remark: "Office/Institute closed",
+    scan_type: "OM",
+    pickrr_sub_status_code: "",
+  },
+  "dlydc-101_pp": {
+    courier_remark: "Heavy Rain/ Fog",
+    scan_type: "OM",
+    pickrr_sub_status_code: "",
+  },
+  "doff-128_pu": {
+    courier_remark: "Surface Transit Delay",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlylh-139_pu": {
+    courier_remark: "Checkpost/ Clearance Delay",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlylh-142_pu": {
+    courier_remark: "Delay due to runway closure",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "eod-140_pu": {
+    courier_remark: "Shipments Count Mismatch",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-pronm_pu": {
+    courier_remark: "Shipment Picked Up at Origin Center but Data Not Recieved",
+    scan_type: "PP",
+    pickrr_sub_status_code: "",
+  },
+  "x-awd_pu": { courier_remark: "Added to Dispatch", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-pponm_pu": {
+    courier_remark: "Shipment Picked Up from Client Location but Data Not Recieved",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dtup-207_pu": { courier_remark: "Re-routed", scan_type: "OT", pickrr_sub_status_code: "" },
+  "dlylh-151_pu": {
+    courier_remark: "Vehicle Accident",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlylh-101_pu": {
+    courier_remark: "Vehicle Breakdown",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlydc-416_pu": {
+    courier_remark: "Hold as per client instrutions",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyrg-145_pu": {
+    courier_remark: "Held for Incorrect/Incomplete Manifest",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyb2b-108_pu": {
+    courier_remark: "Consignee not reachable/Contact details unavailable",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SU",
+  },
+  "dtup-205_pu": {
+    courier_remark: "Package details changed by Delhivery",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "rd-pd22_pu": {
+    courier_remark: "Client Reject",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
+  },
+  "dlyrg-148_pu": {
+    courier_remark: "Handed for Customs Clearance",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-dbl1f_pu": { courier_remark: "Added to Bag", scan_type: "OT", pickrr_sub_status_code: "" },
+  "dlydc-109_pu": { courier_remark: "Doubtful Order", scan_type: "OT", pickrr_sub_status_code: "" },
+  "x-ppom_pu": {
+    courier_remark: "Shipment picked up",
+    scan_type: "PP",
+    pickrr_sub_status_code: "",
+  },
+  "eod-83_pp": {
+    courier_remark: "Damaged/Used Product",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "DAM",
+  },
+  "x-dll2f_pu": {
+    courier_remark: "Connected to destination",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlydc-110_pu": { courier_remark: "Reset NTD", scan_type: "UD", pickrr_sub_status_code: "SD" },
+  "dlysor-101_pu": {
+    courier_remark: "Shipment sorter downtime",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-ill1f_pu": {
+    courier_remark: "Bag Received at Facility",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "eod-900_pp": {
+    courier_remark: "Customer Request to Cancel at Pickup",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
+  },
+  "eod-148_pu": {
+    courier_remark: "Consignee unavailable. Establishment closed",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SC",
+  },
+  "dtup-213_pu": {
+    courier_remark: "Scan Bulk Update",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyrg-151_pu": {
+    courier_remark: "Customs Cleared in Destination Country",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-ddd3fd_pp": {
+    courier_remark: "Out for delivery",
+    scan_type: "OO",
+    pickrr_sub_status_code: "",
+  },
+  "dtup-209_pu": {
+    courier_remark: "Return Center Changed",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyb2b-101_pu": {
+    courier_remark: "Delivery rescheduled based on input from consignee",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CD",
+  },
+  "dlyb2b-103_pu": {
+    courier_remark: "On Hold- Space issues at Consignee's End",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CD",
+  },
+  "dlylh-126_pu": {
+    courier_remark: "On hold. Destination unable to receive",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyrg-150_pu": {
+    courier_remark: "Held by Customs",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "eod-11_pp": {
+    courier_remark: "Consignee Unavailable",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  "dlydfd-100_pu": {
+    courier_remark: "Deferred Date has been set",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyrg-149_pu": {
+    courier_remark: "Customs Cleared in Origin Country",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "cl-107_pp": {
+    courier_remark: "Closed Reverse Pickup",
+    scan_type: "",
+    pickrr_sub_status_code: "CANC",
+  },
+  "eod-902_pp": {
+    courier_remark: "Weight mismatch at pickup",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  "x-oll2f_pu": {
+    courier_remark: "Offloaded from vehicle",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "eod-3_pp": {
+    courier_remark: "Delivery date rescheduled",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CD",
+  },
+  "x-piom_pu": {
+    courier_remark: "Shipment Recieved at Origin Center",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlylh-145_pu": {
+    courier_remark: "Held for invoices/ Missing or Incomplete Documents",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dtup-232_pu": {
+    courier_remark: "Pincode updated by addfix for secondary address",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-ill2f_pu": { courier_remark: "Vehicle Arrived", scan_type: "OT", pickrr_sub_status_code: "" },
+  "dlysec-100_pu": {
+    courier_remark: "Under security investigation",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "eod-74_pp": {
+    courier_remark: "Address quality issue",
+    scan_type: "UD",
+    pickrr_sub_status_code: "AI",
+  },
+  "dlylh-152_pu": {
+    courier_remark: "Delayed. No Entry",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlylh-136_pu": {
+    courier_remark: "Airport retrieval delay",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-rwd_pu": {
+    courier_remark: "Removed From Dispatch",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlyrg-128_pu": {
+    courier_remark: "Detained by GST officials for Penalty Payment",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlydc-105_pu": {
+    courier_remark: "Arrived post Cut Off at Dispatch Center",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-ibd3f_pu": {
+    courier_remark: "Shipment Received at Facility",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "dlymr-119_pu": {
+    courier_remark: "Misroute- No Trip",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "eod-104_pp": {
+    courier_remark: "Entry restricted area",
+    scan_type: "UD",
+    pickrr_sub_status_code: "",
+  },
+  "x-prom_pu": {
+    courier_remark: "Shipment Picked Up at Origin Center",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "eod-86_pp": { courier_remark: "Not attempted", scan_type: "UD", pickrr_sub_status_code: "" },
+  "x-premb_pu": {
+    courier_remark: "Shipment removed from bag",
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "cl-110_dto": {
+    courier_remark: "DTO due to Seller Dependency",
+    scan_type: "DL",
+    pickrr_sub_status_code: "",
+  },
+};
+
 module.exports = {
   DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER,
   TOTAL_TOPIC_COUNT,
+  DELHIVERY_REVERSE_MAPPER,
 };

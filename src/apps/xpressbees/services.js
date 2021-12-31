@@ -1,7 +1,7 @@
 const moment = require("moment");
 
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { XBS_STATUS_MAPPER, XBS_NDR_MAPPER } = require("./constant");
+const { XBS_STATUS_MAPPER, XBS_NDR_MAPPER, XBS_REVERSE_MAPPER } = require("./constant");
 
 /*
   :param xbs_dict: {
@@ -67,18 +67,20 @@ const prepareXbsData = (xbsDict) => {
     if ("Receivedby" in trackData && trackData.Receivedby) {
       pickrrXbsDict.received_by = trackData.Receivedby;
     }
-    const reasonDict = XBS_STATUS_MAPPER[statusScanType.toLowerCase()];
+    const xbsMapper = { ...XBS_STATUS_MAPPER, ...XBS_REVERSE_MAPPER };
+    const reasonDict = xbsMapper[statusScanType.toLowerCase()];
 
     if (!reasonDict) {
       return {
         err: "Unknown status code",
       };
     }
+    const xbsNdrMapper = { ...XBS_REVERSE_MAPPER, ...XBS_NDR_MAPPER };
     const statusType = reasonDict.scan_type;
     pickrrXbsDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrXbsDict.scan_datetime = statusDate;
     pickrrXbsDict.track_info =
-      statusType === "UD" ? XBS_NDR_MAPPER[reasonDict?.pickrr_sub_status_code] : trackData.Remarks;
+      statusType === "UD" ? xbsNdrMapper[reasonDict?.pickrr_sub_status_code] : trackData.Remarks;
     pickrrXbsDict.awb = trackData.AWBNO;
     pickrrXbsDict.track_location = trackData.CurrentLocation;
     pickrrXbsDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
