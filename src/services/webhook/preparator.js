@@ -12,9 +12,7 @@ const prepareCurrentStatusWebhookKeyMap = (currentStatusType, currentStatusTime)
     if (!formattedCurrentStatusTime.isValid()) {
       return `${currentStatusType}_${currentStatusTime}`;
     }
-    formattedCurrentStatusTime = formattedCurrentStatusTime
-      .subtract(330, "m")
-      .format("YYYY-MM-DD HH:mm:ss");
+    formattedCurrentStatusTime = formattedCurrentStatusTime.format("YYYY-MM-DD HH:mm:ss");
     return `${currentStatusType}_${formattedCurrentStatusTime}`;
   } catch (error) {
     logger.error("prepareCurrentStatusWebhookKeyMap", error);
