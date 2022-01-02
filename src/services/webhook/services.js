@@ -144,7 +144,6 @@ const statusCheckInHistoryMap = async (trackingObj) => {
   try {
     const currentStatusType = trackingObj?.status?.current_status_type;
     const currentStatusTime = trackingObj?.status?.current_status_time;
-
     const trackingId = trackingObj?.tracking_id;
     if (!currentStatusType || !trackingId) {
       return false;

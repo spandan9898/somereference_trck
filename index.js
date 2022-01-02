@@ -8,6 +8,8 @@ const { redisClient } = require("./src/utils");
 const initDB = require("./src/connector/db");
 
 const { HOST_NAMES } = require("./src/utils/constants");
+const { statusCheckInHistoryMap } = require("./src/services/webhook/services");
+const { trackingObj } = require("./mockData");
 
 const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
 
@@ -26,15 +28,17 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
     await initDB.connectDb(HOST_NAMES.PULL_DB, MONGO_DB_PROD_SERVER_HOST);
     await initDB.connectDb(HOST_NAMES.REPORT_DB, MONGO_DB_REPORT_SERVER_HOST);
 
-    require("./src/apps/bluedart");
-    require("./src/apps/delhivery");
-    require("./src/apps/amaze");
-    require("./src/apps/xpressbees");
-    require("./src/apps/ekart");
-    require("./src/apps/udaan");
-    require("./src/apps/ecomm");
-    require("./src/apps/shadowfax");
-    require("./src/apps/parceldo");
+    statusCheckInHistoryMap(trackingObj);
+
+    // require("./src/apps/bluedart");
+    // require("./src/apps/delhivery");
+    // require("./src/apps/amaze");
+    // require("./src/apps/xpressbees");
+    // require("./src/apps/ekart");
+    // require("./src/apps/udaan");
+    // require("./src/apps/ecomm");
+    // require("./src/apps/shadowfax");
+    // require("./src/apps/parceldo");
   } catch (error) {
     logger.error("DB Connection Error", error);
   }
