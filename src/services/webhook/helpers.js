@@ -12,6 +12,9 @@ const logger = require("../../../logger");
 const checkIfCompulsoryEventAlreadySent = (trackingObj) => {
   try {
     const currentEvent = _.get(trackingObj, "status.current_status_type", "");
+    if (!["PP", "RTO", "RTD", "DL"].includes(currentEvent)) {
+      return false;
+    }
     const mandatoryStatusMap = _.get(trackingObj, `mandatory_status_map[${currentEvent}]`);
     return mandatoryStatusMap?.is_sent && mandatoryStatusMap?.is_received_success;
   } catch (error) {
