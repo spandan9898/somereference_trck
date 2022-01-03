@@ -35,7 +35,7 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
     const updatedCacheData = { ...data };
     updatedCacheData.track_model = cacheData.track_model || {};
     await setObject(awb, updatedCacheData);
-    updateCacheTrackArray({
+    await updateCacheTrackArray({
       trackArray: response.track_arr,
       currentTrackObj: trackObj,
       awb,

@@ -32,6 +32,7 @@ const prepareTrackDataForTracking = (trackArr) => {
         "DD MMM YYYY, HH:mm"
       );
       filteredTrackItem.status_body = filteredTrackItem.scan_status;
+      filteredTrackItem.status_location = filteredTrackItem.scan_location;
 
       if (!lastItem) {
         updatedTrackArray.push({
