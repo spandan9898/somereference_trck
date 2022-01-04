@@ -92,7 +92,7 @@ const checkShowDetailsClient = async (authToken) => {
  */
 const getCurrentStatusTime = (currentStatusTime) => {
   if (moment(currentStatusTime).isValid()) {
-    return moment(currentStatusTime).format("DD-MM-YYYY HH:mm");
+    return moment(currentStatusTime).add(330, "minutes").format("DD-MM-YYYY HH:mm");
   }
   return currentStatusTime;
 };

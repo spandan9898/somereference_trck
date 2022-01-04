@@ -9,6 +9,7 @@ const {
   prepareTrackDataForTracking,
   fetchTrackingModelAndUpdateCache,
 } = require("../common/trackServices");
+const { updateIsNDRinCache } = require("../ndr/helpers");
 
 /**
  *
@@ -49,6 +50,7 @@ const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
         "DD MMM YYYY, HH:mm"
       );
       currentTrackObj.status_body = currentTrackObj.scan_status;
+      currentTrackObj.status_location = currentTrackObj.scan_location;
       const cachedTopTrackObj = cachedTrackArray[0];
       if (_.get(currentTrackObj, "scan_type") === _.get(cachedTopTrackObj, "status_name")) {
         cachedTopTrackObj.status_array.push(_.omit(currentTrackObj, "scan_type"));
@@ -111,6 +113,9 @@ const storeDataInCache = async (result) => {
   const newRedisPayload = {
     [redisKey]: true,
   };
+  if (["NDR", "UD"].includes(eventObj.scan_type)) {
+    await updateIsNDRinCache(awb);
+  }
   const dt = (await getObject(awb)) || {};
   const oldData = { ...dt, ...newRedisPayload };
   await setObject(awb, oldData);
