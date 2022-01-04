@@ -11,7 +11,7 @@ const {
 const { SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS, SMART_SHIP_AUTH_TOKENS } = require("./constants");
 const { callLambdaFunction } = require("../../connector/lambda");
 const WebhookClient = require("../../apps/webhookClients");
-const { checkIfCompulsoryEventAlreadySent } = require("./helpers");
+const { checkIfCompulsoryEventAlreadySent } = require("./services");
 
 /**
  * webhook trigger

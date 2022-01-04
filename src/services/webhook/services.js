@@ -1,4 +1,6 @@
-const { isEmpty, get } = require("lodash");
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable class-methods-use-this */
+const { isEmpty, get, last } = require("lodash");
 const axios = require("axios");
 
 const logger = require("../../../logger");
@@ -7,6 +9,12 @@ const { commonWebhookUserInfoCol } = require("./model");
 const { sendDataToElk } = require("../common/elk");
 const { fetchWebhookHistoryMapData } = require("./model");
 const { prepareCurrentStatusWebhookKeyMap } = require("./preparator");
+const {
+  COMPULSORY_EVENTS,
+  COMPULSORY_EVENTS_PRECEDENCE,
+  STATUS_PROXY_LIST,
+} = require("./constants");
+const { WebhookHelper, getTrackObjFromTrackArray } = require("./helpers");
 
 const {
   SHOPCLUES_TOKEN_URL,
@@ -170,10 +178,112 @@ const statusCheckInHistoryMap = async (trackingObj) => {
   }
 };
 
+/**
+ *
+ * @param {*} trackingObj
+ * @desc check if current status(event) is in mandatory_status_map and already
+ * sent trigger
+ * @returns true/false
+ */
+const checkIfCompulsoryEventAlreadySent = (trackingObj) => {
+  try {
+    const currentEvent = get(trackingObj, "status.current_status_type", "");
+    if (!["PP", "RTO", "RTD", "DL"].includes(currentEvent)) {
+      return false;
+    }
+    const mandatoryStatusMap = get(trackingObj, `mandatory_status_map[${currentEvent}]`);
+    return mandatoryStatusMap?.is_sent && mandatoryStatusMap?.is_received_success;
+  } catch (error) {
+    logger.error("checkIfCompulsoryEventAlreadySent", error);
+    return false;
+  }
+};
+
+/**
+ *
+ */
+class WebhookServices extends WebhookHelper {
+  constructor(trackingObj) {
+    super();
+    this.trackingObj = trackingObj;
+  }
+
+  getProxyEventStatus(trackArray, event) {
+    try {
+      const trackObj = getTrackObjFromTrackArray(trackArray);
+      const eventStatusProxyList = STATUS_PROXY_LIST[event];
+      for (const proxyEvent of eventStatusProxyList) {
+        if (trackObj[proxyEvent]) {
+          const proxyStatus = this.mapEventTotStatus(last(trackObj[proxyEvent]) || []);
+          proxyStatus.current_status_type = proxyEvent;
+          return proxyStatus;
+        }
+      }
+      return {};
+    } catch (error) {
+      logger.error("getProxyEventStatus", error);
+      return {};
+    }
+  }
+
+  handleSingleCompulsoryEvent(event) {
+    const trackArray = this.trackingObj.track_arr || [];
+
+    const specialStatus = this.getProxyEventStatus(trackArray, event);
+
+    if (isEmpty(specialStatus)) {
+      return {};
+    }
+
+    return specialStatus;
+  }
+
+  compulsoryEventsHandler() {
+    try {
+      const { status } = this.trackingObj;
+      if (!status) {
+        return false;
+      }
+      const currentStatusType = status.current_status_type;
+      const flagCheckReqObj = this.prepareInitialFlagCheckReqObj();
+
+      for (const compulsoryEvent in COMPULSORY_EVENTS) {
+        if (!COMPULSORY_EVENTS[compulsoryEvent].includes(currentStatusType)) {
+          flagCheckReqObj[compulsoryEvent] = true;
+        }
+      }
+
+      let breakPrecedenceLoop = false;
+      for (let precedence = 0; precedence < COMPULSORY_EVENTS_PRECEDENCE.length; precedence += 1) {
+        if (breakPrecedenceLoop) {
+          break;
+        }
+        let foundAnEventForCurrentPrecedence = false;
+
+        COMPULSORY_EVENTS_PRECEDENCE[precedence].forEach((event) => {
+          if (flagCheckReqObj[event]) {
+            foundAnEventForCurrentPrecedence = true;
+            this.handleSingleCompulsoryEvent(event);
+          }
+        });
+        if (!foundAnEventForCurrentPrecedence) {
+          breakPrecedenceLoop = true;
+        }
+      }
+      return true;
+    } catch (error) {
+      console.log("error", error);
+      return false;
+    }
+  }
+}
+
 module.exports = {
   hasCurrentStatusWebhookEnabled,
   getShopCluesAccessToken,
   webhookUserHandlingGetAndStoreInCache,
   sendWebhookDataToELK,
   statusCheckInHistoryMap,
+  WebhookServices,
+  checkIfCompulsoryEventAlreadySent,
 };
