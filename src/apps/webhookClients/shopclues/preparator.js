@@ -38,7 +38,7 @@ const createShopcluesTrackingJson = (trackResponse) => {
 
     let currentStatusDatetime = currentStatusDict.current_status_time || "";
     if (moment(currentStatusDatetime).isValid()) {
-      currentStatusDatetime = moment(currentStatusDatetime).subtract(330, "m");
+      currentStatusDatetime = moment(currentStatusDatetime).add(330, "m");
       statusUpdateDate = currentStatusDatetime.format("YYYY-MM-DD");
       statusUpdateTime = currentStatusDatetime.format("HH:mm:ss");
     }
