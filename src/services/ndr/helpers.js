@@ -36,6 +36,9 @@ const ofdCount = (trackArr) => {
  */
 const checkIfTriggerNDREb = async (currentStatusType, awb) => {
   try {
+    if (!awb) {
+      return false;
+    }
     const { isNDR = false } = (await getObject(awb)) || {};
 
     if (["NDR", "UD"].includes(currentStatusType) || isNDR) {
