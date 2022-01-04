@@ -1,7 +1,56 @@
 const moment = require("moment");
 const _ = require("lodash");
-const { ECOMM_CODE_MAPPER } = require("./constant");
+const { ECOMM_CODE_MAPPER, ECOMM_CHILD_CODE_MAPPER } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
+const logger = require("../../../logger");
+
+/*
+sample ecomm payload: {
+            "awb": "AWB_NUMBER",
+            "datetime": "YYYY-MM-DD HH:MM:SS",
+            "status": "remark",
+            "reason_code": "777 - RTS - Return To Shipper",
+            "reason_code_number": "777",
+            "location": "JRD",
+            "Employee": "Name of Employee",
+            "status_update_number": "44591782",
+            "order_number": "ORDER_NUMBER",
+            "city": "Vadodara",
+            "ref_awb": ""
+            }
+*/
+
+/**
+ *
+ * @param {*} ecomDict
+ */
+const checkReasonCodeAndReturnCodeMapper = (ecomDict) => {
+  try {
+    const {
+      reason_code_number: reasonCodeNumber,
+      child_reason_code_number: childReasonCodeNumber,
+    } = ecomDict || {};
+    if (
+      childReasonCodeNumber &&
+      ECOMM_CHILD_CODE_MAPPER[childReasonCodeNumber.toString().toLowerCase()]
+    ) {
+      return {
+        codeNumber: childReasonCodeNumber,
+        codeMapper: ECOMM_CHILD_CODE_MAPPER[childReasonCodeNumber.toString().toLowerCase()],
+      };
+    }
+    if (reasonCodeNumber && ECOMM_CODE_MAPPER[reasonCodeNumber.toString().toLowerCase()]) {
+      return {
+        codeNumber: reasonCodeNumber,
+        codeMapper: ECOMM_CODE_MAPPER[reasonCodeNumber.toString().toLowerCase()],
+      };
+    }
+    return {};
+  } catch (error) {
+    logger.error("checkReasonCodeAndReturnCodeMapper", error);
+    return {};
+  }
+};
 
 /*
 sample ecomm payload: {
@@ -38,9 +87,10 @@ const prepareEcommData = (ecommDict) => {
     courier_status_code: "",
   };
   try {
-    const { received_by: receivedBy, reason_code_number: reasonCodeNumber, EDD } = ecommDict || {};
-    if (reasonCodeNumber in ECOMM_CODE_MAPPER) {
-      const reasonDict = ECOMM_CODE_MAPPER[reasonCodeNumber.toLowerCase()];
+    const { received_by: receivedBy, EDD } = ecommDict || {};
+    const reasonCodeReturnCode = checkReasonCodeAndReturnCodeMapper(ecommDict);
+    if (!_.isEmpty(reasonCodeReturnCode)) {
+      const reasonDict = reasonCodeReturnCode.codeMapper;
       const pickrrStatusCode = reasonDict.pickrr_status_code;
       const scanType = pickrrStatusCode === "UD" ? "NDR" : pickrrStatusCode;
       const pickrrSubstatusCode = reasonDict.pickrr_sub_status_code;
@@ -62,7 +112,7 @@ const prepareEcommData = (ecommDict) => {
       pickrrEcommDict.track_location = _.get(ecommDict, "location", "");
       pickrrEcommDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];
       pickrrEcommDict.pickrr_sub_status_code = pickrrSubstatusCode;
-      pickrrEcommDict.courier_status_code = reasonCodeNumber;
+      pickrrEcommDict.courier_status_code = reasonCodeReturnCode.codeNumber;
       if (scanType === "PP") {
         pickrrEcommDict.pickup_datetime = scanDatetime;
       }
