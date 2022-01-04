@@ -1,9 +1,5 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable class-methods-use-this */
-const _ = require("lodash");
-
-const logger = require("../../../logger");
-
 const { COMPULSORY_EVENTS } = require("./constants");
 
 /**

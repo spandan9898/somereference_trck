@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable class-methods-use-this */
-const { isEmpty, get, last } = require("lodash");
+const _ = require("lodash");
+const { isEmpty, get, last, cloneDeep } = require("lodash");
 const axios = require("axios");
 
 const logger = require("../../../logger");
@@ -13,8 +14,12 @@ const {
   COMPULSORY_EVENTS,
   COMPULSORY_EVENTS_PRECEDENCE,
   STATUS_PROXY_LIST,
+  SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
+  SMART_SHIP_AUTH_TOKENS,
 } = require("./constants");
 const { WebhookHelper, getTrackObjFromTrackArray } = require("./helpers");
+const WebhookClient = require("../../apps/webhookClients");
+const { callLambdaFunction } = require("../../connector/lambda");
 
 const {
   SHOPCLUES_TOKEN_URL,
@@ -201,11 +206,71 @@ const checkIfCompulsoryEventAlreadySent = (trackingObj) => {
 
 /**
  *
+ * @desc prepare tracking info document and call webhook lambda
+ */
+const prepareDataAndCallLambda = async (trackingObj, elkClient) => {
+  try {
+    const webhookClient = new WebhookClient(trackingObj);
+    const preparedData = await webhookClient.getPreparedData();
+
+    if (_.isEmpty(preparedData)) {
+      return false;
+    }
+
+    const lambdaPayload = {
+      data: {
+        tracking_info_doc: _.omit(trackingObj, ["audit", "_id"]),
+        prepared_data: preparedData,
+        url: "",
+        shopclues_access_token: "random_token",
+      },
+    };
+    const result = await webhookUserHandlingGetAndStoreInCache(trackingObj);
+    if (!result.success) {
+      return false;
+    }
+
+    lambdaPayload.data.url = result.cachUserData.track_url;
+    const currentStatus = trackingObj?.status?.current_status_type;
+
+    const statusWebhookEnabled = hasCurrentStatusWebhookEnabled(
+      result.cachUserData.has_webhook_enabled,
+      currentStatus
+    );
+
+    if (!statusWebhookEnabled) {
+      return false;
+    }
+
+    if (
+      [...SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS, ...SMART_SHIP_AUTH_TOKENS].includes(
+        trackingObj.auth_token
+      )
+    ) {
+      const shopcluesToken = await getShopCluesAccessToken();
+      if (!shopcluesToken) {
+        return false;
+      }
+      lambdaPayload.data.shopclues_access_token = shopcluesToken;
+    }
+    sendWebhookDataToELK(lambdaPayload.data, elkClient);
+
+    await callLambdaFunction(lambdaPayload);
+    return true;
+  } catch (error) {
+    logger.error("prepareDataAndCallLambda", error);
+    return false;
+  }
+};
+
+/**
+ *
  */
 class WebhookServices extends WebhookHelper {
-  constructor(trackingObj) {
+  constructor(trackingObj, elkClient) {
     super();
     this.trackingObj = trackingObj;
+    this.elkClient = elkClient;
   }
 
   getProxyEventStatus(trackArray, event) {
@@ -227,15 +292,17 @@ class WebhookServices extends WebhookHelper {
   }
 
   handleSingleCompulsoryEvent(event) {
-    const trackArray = this.trackingObj.track_arr || [];
+    const trackingObj = cloneDeep(this.trackingObj);
+    const trackArray = trackingObj.track_arr || [];
 
     const specialStatus = this.getProxyEventStatus(trackArray, event);
 
     if (isEmpty(specialStatus)) {
       return {};
     }
-
-    return specialStatus;
+    _.set(trackingObj, "status", specialStatus);
+    prepareDataAndCallLambda(trackingObj, this.elkClient);
+    return {};
   }
 
   compulsoryEventsHandler() {
@@ -272,7 +339,7 @@ class WebhookServices extends WebhookHelper {
       }
       return true;
     } catch (error) {
-      console.log("error", error);
+      logger.errpr("compulsoryEventsHandler", error);
       return false;
     }
   }
@@ -286,4 +353,5 @@ module.exports = {
   statusCheckInHistoryMap,
   WebhookServices,
   checkIfCompulsoryEventAlreadySent,
+  prepareDataAndCallLambda,
 };
