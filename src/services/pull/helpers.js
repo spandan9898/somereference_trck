@@ -1,4 +1,5 @@
 const moment = require("moment");
+const { updateIsNDRinCache } = require("../ndr/helpers");
 
 /**
  *
@@ -22,14 +23,21 @@ const mapStatusToEvent = (statusObj) => {
  * @desc
  * @returns {*}
  */
-const prepareTrackArrCacheData = (trackArr) =>
-  trackArr.reduce((obj, item) => {
+const prepareTrackArrCacheData = (trackArr) => {
+  let isNDR = false;
+  const trackMap = trackArr.reduce((obj, item) => {
     const unixScanTime = moment(item.scan_datetime).unix();
+    const scanType = item.scan_type;
+    if (["NDR", "UD"].includes(scanType)) {
+      isNDR = true;
+    }
     return {
       ...obj,
-      [`${item.scan_type}_${unixScanTime}`]: true,
+      [`${scanType}_${unixScanTime}`]: true,
     };
   }, {});
+  return { trackMap, isNDR };
+};
 
 module.exports = {
   mapStatusToEvent,
