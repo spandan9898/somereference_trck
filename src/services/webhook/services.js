@@ -61,7 +61,7 @@ const webhookUserHandlingGetAndStoreInCache = async (trackObj) => {
     if (!cachedAuthTokenData) {
       const webhookInstance = await commonWebhookUserInfoCol();
       const res = await webhookInstance.findOne({
-        user_auth_token: "33d8f654722f8959c5f68271730f28de175485",
+        user_auth_token: authToken,
       });
       if (res && res.track_url && res.has_webhook_enabled && res.is_active && res.user_auth_token) {
         const cachePayload = {
@@ -136,17 +136,18 @@ const getShopCluesAccessToken = async () => {
 const sendWebhookDataToELK = async (data, elkClient) => {
   try {
     const awb = data.tracking_info_doc?.tracking_id || "NA";
+    const authToken = data.tracking_info_doc?.auth_token || "naa";
     const body = {
       awb: awb.toString(),
+      auth_token: authToken,
       payload: JSON.stringify(data),
       time: new Date(),
     };
-    const res = await sendDataToElk({
+    await sendDataToElk({
       indexName: "track_webhook",
       body,
       elkClient,
     });
-    console.log("res", res);
   } catch (error) {
     logger.error("sendWebhookDataToELK", error);
   }
@@ -268,11 +269,10 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient) => {
       }
       lambdaPayload.data.shopclues_access_token = shopcluesToken;
     }
-    console.log("lambdaPayload.data", lambdaPayload.data);
+
     sendWebhookDataToELK(lambdaPayload.data, elkClient);
 
     if (["33d8f654722f8959c5f68271730f28de175485"].includes(trackingObj?.auth_token)) {
-      console.log("should be called now");
       await callLambdaFunction(lambdaPayload);
       return false;
     }
