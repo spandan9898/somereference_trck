@@ -6,7 +6,7 @@ const { isEmpty, get, last, cloneDeep } = require("lodash");
 const axios = require("axios");
 
 const logger = require("../../../logger");
-const { getObject, getString, setString, storeInCache } = require("../../utils");
+const { getObject, getString, storeInCache } = require("../../utils");
 const { commonWebhookUserInfoCol } = require("./model");
 const { sendDataToElk } = require("../common/elk");
 const { fetchWebhookHistoryMapData } = require("./model");
