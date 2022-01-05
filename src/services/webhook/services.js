@@ -223,6 +223,7 @@ const prepareDataAndCallLambda = async (trackingObj, elkClient) => {
         prepared_data: preparedData,
         url: "",
         shopclues_access_token: "random_token",
+        update_from: "kafka-consumer",
       },
     };
     const result = await webhookUserHandlingGetAndStoreInCache(trackingObj);
