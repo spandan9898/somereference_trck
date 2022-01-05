@@ -12,10 +12,6 @@ const triggerWebhook = async (trackingData, elkClient) => {
     // Testing phase
     // auth_token check [5 client - shopclues, bs, cred, nt, snitch]
 
-    if (!["33d8f654722f8959c5f68271730f28de175485"].includes(trackingData?.auth_token)) {
-      return false;
-    }
-
     const trackingObj = _.cloneDeep(trackingData);
 
     const webhookServices = new WebhookServices(trackingObj, elkClient);

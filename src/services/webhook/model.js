@@ -9,7 +9,7 @@ const { MONGO_DB_PROD_WEBHOOK_HISTORY_COL_NAME } = process.env;
 const commonWebhookUserInfoCol = async () => {
   try {
     const res = await getDbCollectionInstance({
-      collectionName: process.env.MONGO_DB_PROD_WEBHOOK_COLLECTION_NAME,
+      collectionName: process.env.MONGO_DB_PROD_WEBHOOK_COLLECTION_NAME || "common_webhook_user",
     });
     return res;
   } catch (error) {
