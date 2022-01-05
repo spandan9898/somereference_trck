@@ -208,8 +208,19 @@ const checkIfCompulsoryEventAlreadySent = (trackingObj) => {
  *
  * @desc prepare tracking info document and call webhook lambda
  */
-const prepareDataAndCallLambda = async (trackingObj, elkClient) => {
+const prepareDataAndCallLambda = async (trackingDocument, elkClient) => {
   try {
+    const trackingObj = _.cloneDeep(trackingDocument);
+
+    const isStatusAlreadyPresentInHistoryMap = await statusCheckInHistoryMap(trackingObj);
+    if (isStatusAlreadyPresentInHistoryMap) {
+      return false;
+    }
+
+    if (checkIfCompulsoryEventAlreadySent(trackingObj)) {
+      return false;
+    }
+
     const webhookClient = new WebhookClient(trackingObj);
     const preparedData = await webhookClient.getPreparedData();
 

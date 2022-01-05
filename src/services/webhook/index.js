@@ -1,12 +1,7 @@
 const _ = require("lodash");
 
 const logger = require("../../../logger");
-const {
-  statusCheckInHistoryMap,
-  prepareDataAndCallLambda,
-  checkIfCompulsoryEventAlreadySent,
-  WebhookServices,
-} = require("./services");
+const { prepareDataAndCallLambda, WebhookServices } = require("./services");
 const { COMPULSORY_EVENTS } = require("./constants");
 
 /**
@@ -21,16 +16,7 @@ const triggerWebhook = async (trackingData, elkClient) => {
       return false;
     }
 
-    const isStatusAlreadyPresentInHistoryMap = await statusCheckInHistoryMap(trackingData);
-    if (isStatusAlreadyPresentInHistoryMap) {
-      return false;
-    }
-
     const trackingObj = _.cloneDeep(trackingData);
-
-    if (checkIfCompulsoryEventAlreadySent(trackingObj)) {
-      return false;
-    }
 
     const webhookServices = new WebhookServices(trackingObj, elkClient);
     await webhookServices.compulsoryEventsHandler();
