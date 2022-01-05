@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable class-methods-use-this */
 const _ = require("lodash");
@@ -5,7 +6,7 @@ const { isEmpty, get, last, cloneDeep } = require("lodash");
 const axios = require("axios");
 
 const logger = require("../../../logger");
-const { getObject, getString, setString, storeInCache } = require("../../utils");
+const { getObject, getString, storeInCache } = require("../../utils");
 const { commonWebhookUserInfoCol } = require("./model");
 const { sendDataToElk } = require("../common/elk");
 const { fetchWebhookHistoryMapData } = require("./model");
@@ -327,7 +328,7 @@ class WebhookServices extends WebhookHelper {
     return {};
   }
 
-  compulsoryEventsHandler() {
+  async compulsoryEventsHandler() {
     try {
       const { status } = this.trackingObj;
       if (!status) {
@@ -349,12 +350,12 @@ class WebhookServices extends WebhookHelper {
         }
         let foundAnEventForCurrentPrecedence = false;
 
-        COMPULSORY_EVENTS_PRECEDENCE[precedence].forEach((event) => {
+        for (const event of COMPULSORY_EVENTS_PRECEDENCE[precedence]) {
           if (flagCheckReqObj[event]) {
             foundAnEventForCurrentPrecedence = true;
-            this.handleSingleCompulsoryEvent(event);
+            await this.handleSingleCompulsoryEvent(event);
           }
-        });
+        }
         if (!foundAnEventForCurrentPrecedence) {
           breakPrecedenceLoop = true;
         }
