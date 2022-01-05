@@ -36,7 +36,7 @@ const triggerWebhook = async (trackingData, elkClient) => {
     await webhookServices.compulsoryEventsHandler();
 
     const currentStatus = _.get(trackingObj, "status.current_status_type", "");
-    if (currentStatus.includes(COMPULSORY_EVENTS)) {
+    if (COMPULSORY_EVENTS[currentStatus]) {
       return false;
     }
 
