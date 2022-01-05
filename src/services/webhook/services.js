@@ -256,6 +256,7 @@ const prepareDataAndCallLambda = async (trackingObj, elkClient) => {
     sendWebhookDataToELK(lambdaPayload.data, elkClient);
 
     await callLambdaFunction(lambdaPayload);
+
     return true;
   } catch (error) {
     logger.error("prepareDataAndCallLambda", error);
@@ -280,7 +281,7 @@ class WebhookServices extends WebhookHelper {
       for (const proxyEvent of eventStatusProxyList) {
         if (trackObj[proxyEvent]) {
           const proxyStatus = this.mapEventTotStatus(last(trackObj[proxyEvent]) || []);
-          proxyStatus.current_status_type = proxyEvent;
+          proxyStatus.current_status_type = event;
           return proxyStatus;
         }
       }
@@ -291,7 +292,7 @@ class WebhookServices extends WebhookHelper {
     }
   }
 
-  handleSingleCompulsoryEvent(event) {
+  async handleSingleCompulsoryEvent(event) {
     const trackingObj = cloneDeep(this.trackingObj);
     const trackArray = trackingObj.track_arr || [];
 
@@ -300,8 +301,9 @@ class WebhookServices extends WebhookHelper {
     if (isEmpty(specialStatus)) {
       return {};
     }
+
     _.set(trackingObj, "status", specialStatus);
-    prepareDataAndCallLambda(trackingObj, this.elkClient);
+    await prepareDataAndCallLambda(trackingObj, this.elkClient);
     return {};
   }
 

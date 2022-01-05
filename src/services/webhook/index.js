@@ -31,17 +31,17 @@ const triggerWebhook = async (trackingData, elkClient) => {
     if (checkIfCompulsoryEventAlreadySent(trackingObj)) {
       return false;
     }
-    const webhookServices = new WebhookServices(trackingObj, elkClient);
 
-    webhookServices.compulsoryEventsHandler();
+    const webhookServices = new WebhookServices(trackingObj, elkClient);
+    await webhookServices.compulsoryEventsHandler();
 
     const currentStatus = _.get(trackingObj, "status.current_status_type", "");
-
     if (currentStatus.includes(COMPULSORY_EVENTS)) {
       return false;
     }
 
     await prepareDataAndCallLambda(trackingObj, elkClient);
+
     return true;
   } catch (error) {
     logger.error("triggerWebhook", error);
