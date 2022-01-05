@@ -73,7 +73,7 @@ const webhookUserHandlingGetAndStoreInCache = async (trackObj) => {
           events_enabled: res?.events_enabled || {},
         };
 
-        await storeInCache(authToken, cachePayload, 60 * 59);
+        await storeInCache(authToken, cachePayload);
         return {
           success: true,
           cachUserData: cachePayload,
@@ -114,7 +114,7 @@ const getShopCluesAccessToken = async () => {
       const res = await axios.post(SHOPCLUES_TOKEN_URL, ShopCluesPayload);
       const resData = res.data;
       if ("access_token" in resData) {
-        await setString("shopcluesToken", resData.access_token);
+        await storeInCache("shopcluesToken", resData.access_token, 60 * 59);
         return resData.access_token;
       }
 
