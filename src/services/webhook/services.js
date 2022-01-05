@@ -1,3 +1,4 @@
+/* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable class-methods-use-this */
 const _ = require("lodash");
@@ -327,7 +328,7 @@ class WebhookServices extends WebhookHelper {
     return {};
   }
 
-  compulsoryEventsHandler() {
+  async compulsoryEventsHandler() {
     try {
       const { status } = this.trackingObj;
       if (!status) {
@@ -349,12 +350,12 @@ class WebhookServices extends WebhookHelper {
         }
         let foundAnEventForCurrentPrecedence = false;
 
-        COMPULSORY_EVENTS_PRECEDENCE[precedence].forEach((event) => {
+        for (const event of COMPULSORY_EVENTS_PRECEDENCE[precedence]) {
           if (flagCheckReqObj[event]) {
             foundAnEventForCurrentPrecedence = true;
-            this.handleSingleCompulsoryEvent(event);
+            await this.handleSingleCompulsoryEvent(event);
           }
-        });
+        }
         if (!foundAnEventForCurrentPrecedence) {
           breakPrecedenceLoop = true;
         }
