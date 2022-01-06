@@ -274,7 +274,9 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient) => {
     sendWebhookDataToELK(lambdaPayload.data, elkClient);
 
     if (["33d8f654722f8959c5f68271730f28de175485"].includes(trackingObj?.auth_token)) {
-      await callLambdaFunction(lambdaPayload);
+      setTimeout(() => {
+        callLambdaFunction(lambdaPayload);
+      }, 500);
       return false;
     }
 
