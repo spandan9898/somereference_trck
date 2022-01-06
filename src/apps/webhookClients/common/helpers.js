@@ -53,7 +53,7 @@ const validateTrackingJson = (trackObj) => {
  */
 const prepareEddStamp = (eddDatetime, addDay) => {
   if (moment(eddDatetime).isValid()) {
-    let eddDate = moment(eddDatetime).subtract(330, "minutes");
+    let eddDate = moment(eddDatetime);
     if (addDay) {
       eddDate = eddDate.add(addDay, "day");
     }
@@ -92,7 +92,7 @@ const checkShowDetailsClient = async (authToken) => {
  */
 const getCurrentStatusTime = (currentStatusTime) => {
   if (moment(currentStatusTime).isValid()) {
-    return moment(currentStatusTime).format("DD-MM-YYYY HH:mm");
+    return moment(currentStatusTime).add(330, "minutes").format("DD-MM-YYYY HH:mm");
   }
   return currentStatusTime;
 };

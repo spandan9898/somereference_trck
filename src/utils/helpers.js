@@ -8,6 +8,7 @@ const commonTrackingInfoCol = require("../services/pull/model");
 
 const { getObject } = require("./redis");
 const logger = require("../../logger");
+const { updateIsNDRinCache } = require("../services/ndr/helpers");
 
 /**
  *
@@ -30,9 +31,9 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
     }
 
     const cacheData = (await getObject(awb)) || {};
-    const data = prepareTrackArrCacheData(response.track_arr);
+    const { trackMap, isNDR } = prepareTrackArrCacheData(response.track_arr);
 
-    const updatedCacheData = { ...data };
+    const updatedCacheData = { ...trackMap };
     updatedCacheData.track_model = cacheData.track_model || {};
     await setObject(awb, updatedCacheData);
     await updateCacheTrackArray({
@@ -40,7 +41,10 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
       currentTrackObj: trackObj,
       awb,
     });
-    return data;
+    if (isNDR) {
+      await updateIsNDRinCache(awb);
+    }
+    return trackMap;
   } catch (error) {
     logger.error("fetchTrackingDataAndStoreInCache", error);
     return false;
