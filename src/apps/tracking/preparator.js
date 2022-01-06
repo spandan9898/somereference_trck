@@ -3,7 +3,6 @@
 const moment = require("moment");
 const isEmpty = require("lodash/isEmpty");
 const logger = require("../../../logger");
-const { convertDatetimeFormat2 } = require("../../utils");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("../../utils/statusMapping");
 const { GetTrackingJsonParentKeys, GetTrackJsonInfokeys } = require("./constant");
 const { checkShowClientDetails } = require("./helpers");
@@ -73,6 +72,8 @@ const validateTrackingJson = async (trackingObj) => {
             current_status_location: "",
             current_status_val: "",
           };
+        } else {
+          json[key] = "";
         }
       }
     }
@@ -82,11 +83,36 @@ const validateTrackingJson = async (trackingObj) => {
         json.info[key] = "";
       }
     }
+    if ("label_logo" in json) {
+      json.logo = json.label_logo;
+    }
+    if ("billing_zone" in json) {
+      json.billing_zone = "";
+    }
     return json;
   } catch (error) {
     logger.error("validateTrackingJson error -->", error);
     throw new Error(error);
   }
+};
+
+/**
+ *
+ * @param {*} trackingObj
+ * @returns
+ */
+const reverseStatusArray = (trackingObj) => {
+  const trackObj = { ...trackingObj };
+  if ("track_arr" in trackObj) {
+    const trackArr = trackObj.track_arr;
+
+    for (let i = 0; i < trackArr.length; i += 1) {
+      if ("status_array" in trackArr[i]) {
+        trackArr[i].status_array.reverse();
+      }
+    }
+  }
+  return trackObj;
 };
 
 /**
@@ -117,6 +143,7 @@ const prepareTrackingRes = async (trackingObj) => {
   try {
     if ("response_list" in tracking) {
       const responseList = tracking.response_list;
+      responseList.reverse();
       for (let i = 0; i < responseList.length; i += 1) {
         if ("err" in responseList[i] && responseList[i].err) {
           // eslint-disable-next-line no-continue
@@ -135,7 +162,9 @@ const prepareTrackingRes = async (trackingObj) => {
           }
           responseList[i].web_address = "";
           try {
-            responseList[i].edd_stamp = await convertDatetimeFormat2(responseList[i].edd_stamp);
+            responseList[i].edd_stamp = moment
+              .utc(responseList[i].edd_stamp)
+              .subtract(330, "minutes");
           } catch (error) {
             // pass
           }
@@ -179,21 +208,33 @@ const prepareTrackingRes = async (trackingObj) => {
               },
             ];
           } else responseList[i].track_arr.reverse();
-          responseList[i] = fixStatusMapping(responseList[i]);
+          if (!isEmpty(responseList[i])) {
+            responseList[i] = fixStatusMapping(responseList[i]);
+          }
+          responseList[i] = reverseStatusArray(responseList[i]);
         }
       }
     } else {
       tracking = await validateTrackingJson(tracking);
-      const authToken = tracking.auth_token;
+      const authToken = tracking?.auth_token;
+
+      if (!isEmpty(tracking)) {
+        tracking.auth_token = "";
+        tracking.show_details = true;
+        if (authToken && !(await checkShowClientDetails(authToken))) {
+          tracking.company_name = "";
+          tracking.show_details = false;
+        }
+        tracking.web_address = "";
+      }
       try {
-        tracking.status.current_status_time = await convertDatetimeFormat2(
-          tracking.status.current_status_time
-        );
-        tracking.edd_stamp = await convertDatetimeFormat2(tracking.edd_stamp);
-        if (["6c96b95bb99c767660312f5fd97c558732735"].includes(authToken)) {
-          tracking.edd_stamp = moment(tracking.edd_stamp, "DD MMM YYYY, HH:mm")
+        if (["6c96b95bb99c767660312f5fd97c558732735"].includes(authToken) && tracking.edd_stamp) {
+          tracking.edd_stamp = moment
+            .utc(tracking.edd_stamp)
             .add(1, "day")
-            .format("DD MMM YYYY HH:mm");
+            .subtract(330, "minutes");
+        } else {
+          tracking.edd_stamp = moment.utc(tracking.edd_stamp).subtract(330, "minutes");
         }
       } catch {
         // pass
@@ -243,6 +284,7 @@ const prepareTrackingRes = async (trackingObj) => {
       if (!isEmpty(tracking)) {
         tracking = fixStatusMapping(tracking);
       }
+      tracking = reverseStatusArray(tracking);
     }
     return tracking;
   } catch (error) {

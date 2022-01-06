@@ -1,7 +1,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable no-await-in-loop */
 const _ = require("lodash");
-const { getString, setObject } = require("../../utils/redis");
+const { getString, setString } = require("../../utils/redis");
 const logger = require("../../../logger");
 const { VALIDATE_VIA_AUTH_TOKEN, ALLOWED_IPS } = require("../../utils/constants");
 const { filterTrackingObj } = require("./preparator");
@@ -50,7 +50,7 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
             const resExists = !_.isEmpty(res);
             if (resExists) {
               const awb = res?.tracking_id || "";
-              await setObject(clientOrderIdPattern, awb);
+              await setString(clientOrderIdPattern, awb);
               trackingIdsList.push(awb);
             } else {
               trackingIdsList.push("err");
@@ -135,8 +135,10 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
     }
     return responseDict;
   } catch (error) {
+    if (error.message.includes("failed")) {
+      responseDict.err = "Tracking ID not found";
+    }
     logger.error(error.message);
-    if (error.message.includes("failed to fetch document")) responseDict.err = error;
     return responseDict;
   }
 };
