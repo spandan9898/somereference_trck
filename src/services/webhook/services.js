@@ -364,7 +364,7 @@ class WebhookServices extends WebhookHelper {
       }
       return true;
     } catch (error) {
-      logger.errpr("compulsoryEventsHandler", error);
+      logger.error("compulsoryEventsHandler", error);
       return false;
     }
   }
