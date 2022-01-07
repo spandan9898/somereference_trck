@@ -50,4 +50,7 @@ const findOneDocumentFromMongo = async ({ queryObj, projectionObj, collectionNam
   return response;
 };
 
-module.exports = { findOneDocumentFromMongo, getDbCollectionInstance };
+module.exports = {
+  findOneDocumentFromMongo,
+  getDbCollectionInstance,
+};

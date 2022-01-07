@@ -7,7 +7,7 @@ const { isEmpty, get, last, cloneDeep, omit } = require("lodash");
 const axios = require("axios");
 
 const logger = require("../../../logger");
-const { getObject, getString, storeInCache } = require("../../utils");
+const { getObject, getString, storeInCache, getDbCollectionInstance } = require("../../utils");
 const { fetchAllEnabledWebhookUserData } = require("./model");
 const { sendDataToElk } = require("../common/elk");
 const { fetchWebhookHistoryMapData } = require("./model");
@@ -19,7 +19,11 @@ const {
   SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
   SMART_SHIP_AUTH_TOKENS,
 } = require("./constants");
-const { WebhookHelper, getTrackObjFromTrackArray } = require("./helpers");
+const {
+  WebhookHelper,
+  getTrackObjFromTrackArray,
+  isWebhookUserDataUpdateable,
+} = require("./helpers");
 const WebhookClient = require("../../apps/webhookClients");
 const { callLambdaFunction } = require("../../connector/lambda");
 const { WEBHOOK_USER_CACHE_KEY_NAME } = require("../../utils/constants");
@@ -31,6 +35,7 @@ const {
   SHOPCLUES_CLIENTID,
   SHOPCLUES_CLIENT_SECRET,
   SHOPCLUES_GRANT_TYPE,
+  MONGO_DB_PROD_WEBHOOK_COLLECTION_NAME,
 } = process.env;
 
 /**
@@ -67,7 +72,7 @@ const getWebhookUserDataFromCache = async (authToken) => {
     if (!authToken) {
       return {};
     }
-    const res = await getObject(WEBHOOK_USER_CACHE_KEY_NAME);
+    const res = (await getObject(WEBHOOK_USER_CACHE_KEY_NAME)) || {};
 
     if (!res[authToken]) {
       return {};
@@ -363,6 +368,57 @@ class WebhookServices extends WebhookHelper {
   }
 }
 
+/**
+ *
+ * @param {*} updatedDocument -> common webhook user document
+ * @desc first check if all required fields are present in updatedDocument
+ * if present then we have to update webhookUser cacheData, otherwise some required fields are either false or missing, in this case we have to remove it from webhookUser
+ */
+const updateWebhookUserCacheData = async (updatedDocument) => {
+  try {
+    const webhookUserCacheData = (await getObject(WEBHOOK_USER_CACHE_KEY_NAME)) || {};
+    const isUpdateAble = isWebhookUserDataUpdateable(updatedDocument);
+
+    if (isUpdateAble) {
+      // Update webhook user data with updated one
+
+      webhookUserCacheData[updatedDocument.user_auth_token] = {
+        track_url: updatedDocument.track_url,
+        token: updatedDocument.token,
+        has_webhook_enabled: updatedDocument.has_webhook_enabled,
+        shop_platform: updatedDocument.shop_platform,
+        events_enabled: updatedDocument.events_enabled || {},
+      };
+    } else {
+      delete webhookUserCacheData[updatedDocument.user_auth_token];
+    }
+
+    await storeInCache(WEBHOOK_USER_CACHE_KEY_NAME, webhookUserCacheData);
+
+    logger.info("Webhook user cache update by mongo stream");
+  } catch (error) {
+    logger.error("updateWebhookUserCacheData from stream", error);
+  }
+};
+
+/**
+ * @desc list all changes on common_webhook_user collection;
+ */
+const monitorWebhookUserColChanges = async () => {
+  try {
+    const collection = await getDbCollectionInstance({
+      collectionName: MONGO_DB_PROD_WEBHOOK_COLLECTION_NAME,
+    });
+    const changeStream = collection.watch([], { fullDocument: "updateLookup" });
+
+    changeStream.on("change", (next) => {
+      updateWebhookUserCacheData(next.fullDocument);
+    });
+  } catch (error) {
+    logger.error("monitorWebhookUserColChanges error -->", error);
+  }
+};
+
 module.exports = {
   hasCurrentStatusWebhookEnabled,
   getShopCluesAccessToken,
@@ -373,4 +429,5 @@ module.exports = {
   prepareDataAndCallLambda,
   updateAllEnabledWebhookUserDataInCache,
   getWebhookUserDataFromCache,
+  monitorWebhookUserColChanges,
 };
