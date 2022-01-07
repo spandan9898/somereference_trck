@@ -19,6 +19,39 @@ const commonWebhookUserInfoCol = async () => {
 };
 
 /**
+ * @desc fetch all webhook user data from common webhook user collection
+ * @returns all webhook user
+ */
+const fetchAllEnabledWebhookUserData = async () => {
+  try {
+    const webhookUserColInstance = await commonWebhookUserInfoCol();
+    const filters = {
+      is_active: true,
+      has_webhook_enabled: true,
+      track_url: {
+        $ne: "",
+      },
+    };
+    const options = {
+      projection: {
+        _id: 0,
+        user_auth_token: 1,
+        track_url: 1,
+        token: 1,
+        has_webhook_enabled: 1,
+        shop_platform: 1,
+        events_enabled: 1,
+      },
+    };
+    const res = webhookUserColInstance.find(filters, options);
+    return res.toArray();
+  } catch (error) {
+    logger.error("fetchAllEnabledWebhookUserData", error);
+    return [];
+  }
+};
+
+/**
  * @desc find history map data by tracking id
  */
 const fetchWebhookHistoryMapData = async (trackingId) => {
@@ -43,4 +76,8 @@ const fetchWebhookHistoryMapData = async (trackingId) => {
   }
 };
 
-module.exports = { commonWebhookUserInfoCol, fetchWebhookHistoryMapData };
+module.exports = {
+  commonWebhookUserInfoCol,
+  fetchWebhookHistoryMapData,
+  fetchAllEnabledWebhookUserData,
+};

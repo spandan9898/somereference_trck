@@ -1,10 +1,7 @@
 // import dependencies from npm
 
 const Fastify = require("fastify");
-const path = require("path");
-const AutoLoad = require("fastify-autoload");
-const { ServerResponse } = require("http");
-const trackRoutes = require("./src/apps/tracking");
+const routes = require("./src/routes");
 
 let serverInstance;
 
@@ -12,7 +9,7 @@ let serverInstance;
  *
  * @param {*} options
  */
-const createServer = (logger) => {
+const createServer = async () => {
   // create the server
 
   const server = Fastify({
@@ -20,46 +17,8 @@ const createServer = (logger) => {
     logger: true,
   });
 
-  // start the server
-
-  // server.register(trackRoutes, { prefix: "/track" });
-
-  server.get("/", async (request, reply) => {
-    reply.type("application/json").code(200);
-    return { hello: "world" };
-  });
-
-  server.post("/webhook-test/shopclues", async (request, reply) => {
-    reply.type("application/json").code(200);
-    return {
-      success: true,
-      data: { message: { description: "Record Successfully Submitted" }, body: request.body },
-    };
-  });
-
-  server.post("/webhook-test/naaptol", async (request, reply) => {
-    reply.type("application/json").code(200);
-    return {
-      success: true,
-      HasError: "False",
-      data: { message: { description: "Record Successfully Submitted" }, body: request.body },
-    };
-  });
-
-  server.post("/webhook-test/common", async (request, reply) => {
-    reply.type("application/json").code(200);
-    return {
-      success: true,
-      HasError: "False",
-      data: { message: { description: "Record Successfully Submitted" }, body: request.body },
-    };
-  });
-
-  server.post("/track/external/push/bluedart", async (request, reply) => {
-    reply.type("application/json").code(200);
-    logger.info("Testing Nginx", request.body);
-    return { hello: "world", body: request.body };
-  });
+  server.register(routes);
+  await server.ready();
 
   server.listen(process.env.PORT || 3000, (err) => {
     if (err) {
