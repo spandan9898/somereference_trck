@@ -20,7 +20,7 @@ const lambda = new AWS.Lambda({
 const callLambdaFunction = async (data, functionName) => {
   try {
     const params = {
-      FunctionName: functionName || "kafkaWebhookTrigger",
+      FunctionName: functionName || "kafkaWebhookTriggerV2",
       InvocationType: "Event",
       Payload: JSON.stringify(data),
     };
