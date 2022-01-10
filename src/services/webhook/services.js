@@ -1,13 +1,14 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable class-methods-use-this */
 const _ = require("lodash");
-const { isEmpty, get, last, cloneDeep } = require("lodash");
+const { isEmpty, get, last, cloneDeep, omit } = require("lodash");
 const axios = require("axios");
 
 const logger = require("../../../logger");
-const { getObject, getString, storeInCache } = require("../../utils");
-const { commonWebhookUserInfoCol } = require("./model");
+const { getObject, getString, storeInCache, getDbCollectionInstance } = require("../../utils");
+const { fetchAllEnabledWebhookUserData } = require("./model");
 const { sendDataToElk } = require("../common/elk");
 const { fetchWebhookHistoryMapData } = require("./model");
 const { prepareCurrentStatusWebhookKeyMap } = require("./preparator");
@@ -18,9 +19,14 @@ const {
   SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
   SMART_SHIP_AUTH_TOKENS,
 } = require("./constants");
-const { WebhookHelper, getTrackObjFromTrackArray } = require("./helpers");
+const {
+  WebhookHelper,
+  getTrackObjFromTrackArray,
+  isWebhookUserDataUpdateable,
+} = require("./helpers");
 const WebhookClient = require("../../apps/webhookClients");
 const { callLambdaFunction } = require("../../connector/lambda");
+const { WEBHOOK_USER_CACHE_KEY_NAME } = require("../../utils/constants");
 
 const {
   SHOPCLUES_TOKEN_URL,
@@ -29,72 +35,71 @@ const {
   SHOPCLUES_CLIENTID,
   SHOPCLUES_CLIENT_SECRET,
   SHOPCLUES_GRANT_TYPE,
+  MONGO_DB_PROD_WEBHOOK_COLLECTION_NAME,
 } = process.env;
 
 /**
- *
- * @desc  check webhook enebaled for particular status
+ * @desc fetch all common webhook user from DB and store in cache
  */
-const hasCurrentStatusWebhookEnabled = (cacheObj, currentStatus) => {
-  if (!isEmpty(cacheObj.has_webhook_enabled)) {
-    if (cacheObj.has_webhook_enabled.includes(currentStatus)) {
-      return true;
+const updateAllEnabledWebhookUserDataInCache = async () => {
+  try {
+    const res = await fetchAllEnabledWebhookUserData();
+    if (isEmpty(res)) {
+      logger.error("No Webhook user data found");
+      return false;
     }
-    return false;
+    const webhookUserCachePayload = res.reduce((obj, webhookUser) => {
+      webhookUser.events_enabled = webhookUser.events_enabled || {};
+      obj[webhookUser.user_auth_token] = omit(webhookUser, "user_auth_token");
+      return obj;
+    }, {});
+    await storeInCache(WEBHOOK_USER_CACHE_KEY_NAME, webhookUserCachePayload);
+  } catch (error) {
+    logger.error("updateAllEnabledWebhookUserDataInCache", error);
   }
   return true;
 };
 
 /**
  *
- * @param trackArr
- * @desc store and fetch data from cache if exists else fetch from db and cache update
+ * @param {*} authToken
+ * @desc fetch webhook user data from cache by auth token,
+ *  if not exists then return empty object i.e break the flow.
+ * @returns {}
  */
-const webhookUserHandlingGetAndStoreInCache = async (trackObj) => {
+const getWebhookUserDataFromCache = async (authToken) => {
   try {
-    const authToken = trackObj?.auth_token;
-
     if (!authToken) {
-      return false;
+      return {};
     }
-    const cachedAuthTokenData = await getObject(authToken);
+    const res = (await getObject(WEBHOOK_USER_CACHE_KEY_NAME)) || {};
 
-    if (!cachedAuthTokenData) {
-      const webhookInstance = await commonWebhookUserInfoCol();
-      const res = await webhookInstance.findOne({
-        user_auth_token: authToken,
-      });
-      if (res && res.track_url && res.has_webhook_enabled && res.is_active && res.user_auth_token) {
-        const cachePayload = {
-          user_auth_token: res.user_auth_token,
-          track_url: res.track_url,
-          token: res?.token,
-          has_webhook_enabled: res.has_webhook_enabled,
-          shop_platform: res?.shop_platform,
-          events_enabled: res?.events_enabled || {},
-        };
-
-        await storeInCache(authToken, cachePayload);
-        return {
-          success: true,
-          cachUserData: cachePayload,
-        };
-      }
-    } else {
-      return {
-        success: true,
-        cachUserData: cachedAuthTokenData,
-      };
+    if (!res[authToken]) {
+      return {};
     }
+
     return {
-      success: false,
+      ...res[authToken],
+      user_auth_token: authToken,
     };
   } catch (error) {
-    logger.error("webhookUserHandlingGetAndStoreInCache", error);
-    return {
-      success: false,
-    };
+    logger.error("getWebhookUserDataFromCache", error);
+    return {};
   }
+};
+
+/**
+ *
+ * @desc  check webhook enebaled for particular status
+ */
+const hasCurrentStatusWebhookEnabled = (webhookUserData, currentStatus) => {
+  if (!isEmpty(webhookUserData.events_enabled)) {
+    if (webhookUserData.events_enabled.includes(currentStatus)) {
+      return true;
+    }
+    return false;
+  }
+  return true;
 };
 
 /**
@@ -155,7 +160,6 @@ const sendWebhookDataToELK = async (data, elkClient) => {
 };
 
 /**
- *
  * @param {*} trackingObj
  */
 const statusCheckInHistoryMap = async (trackingObj) => {
@@ -213,7 +217,7 @@ const checkIfCompulsoryEventAlreadySent = (trackingObj) => {
  *
  * @desc prepare tracking info document and call webhook lambda
  */
-const prepareDataAndCallLambda = async (trackingDocument, elkClient) => {
+const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUserData) => {
   try {
     const trackingObj = _.cloneDeep(trackingDocument);
 
@@ -242,18 +246,11 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient) => {
         update_from: "kafka-consumer",
       },
     };
-    const result = await webhookUserHandlingGetAndStoreInCache(trackingObj);
-    if (!result.success) {
-      return false;
-    }
 
-    lambdaPayload.data.url = result.cachUserData.track_url;
+    lambdaPayload.data.url = webhookUserData.track_url || "";
     const currentStatus = trackingObj?.status?.current_status_type;
 
-    const statusWebhookEnabled = hasCurrentStatusWebhookEnabled(
-      result.cachUserData.has_webhook_enabled,
-      currentStatus
-    );
+    const statusWebhookEnabled = hasCurrentStatusWebhookEnabled(webhookUserData, currentStatus);
 
     if (!statusWebhookEnabled) {
       return false;
@@ -273,7 +270,15 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient) => {
 
     sendWebhookDataToELK(lambdaPayload.data, elkClient);
 
-    if (["33d8f654722f8959c5f68271730f28de175485"].includes(trackingObj?.auth_token)) {
+    if (
+      [
+        "33d8f654722f8959c5f68271730f28de175485",
+        "07047784ea22c2fa1477e32cf9b52856164831",
+        "a2338904dcfb964c22436a0f51c0e9b4153769",
+        "01d0d081e1a3fa186d7cd97ce4daa2e5125402",
+        "1410b101d4e4080da48800c9bc2ee8b5135779",
+      ].includes(trackingObj?.auth_token)
+    ) {
       setTimeout(() => {
         callLambdaFunction(lambdaPayload);
       }, 500);
@@ -288,13 +293,14 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient) => {
 };
 
 /**
- *
+ * @desc webhook service for compulsory event check
  */
 class WebhookServices extends WebhookHelper {
-  constructor(trackingObj, elkClient) {
+  constructor(trackingObj, elkClient, webhookUserData) {
     super();
     this.trackingObj = trackingObj;
     this.elkClient = elkClient;
+    this.webhookUserData = webhookUserData;
   }
 
   getProxyEventStatus(trackArray, event) {
@@ -326,7 +332,7 @@ class WebhookServices extends WebhookHelper {
     }
 
     _.set(trackingObj, "status", specialStatus);
-    await prepareDataAndCallLambda(trackingObj, this.elkClient);
+    await prepareDataAndCallLambda(trackingObj, this.elkClient, this.webhookUserData);
     return {};
   }
 
@@ -355,7 +361,9 @@ class WebhookServices extends WebhookHelper {
         for (const event of COMPULSORY_EVENTS_PRECEDENCE[precedence]) {
           if (flagCheckReqObj[event]) {
             foundAnEventForCurrentPrecedence = true;
-            await this.handleSingleCompulsoryEvent(event);
+            setTimeout(() => {
+              this.handleSingleCompulsoryEvent(event);
+            }, 2000);
           }
         }
         if (!foundAnEventForCurrentPrecedence) {
@@ -370,13 +378,66 @@ class WebhookServices extends WebhookHelper {
   }
 }
 
+/**
+ *
+ * @param {*} updatedDocument -> common webhook user document
+ * @desc first check if all required fields are present in updatedDocument
+ * if present then we have to update webhookUser cacheData, otherwise some required fields are either false or missing, in this case we have to remove it from webhookUser
+ */
+const updateWebhookUserCacheData = async (updatedDocument) => {
+  try {
+    const webhookUserCacheData = (await getObject(WEBHOOK_USER_CACHE_KEY_NAME)) || {};
+    const isUpdateAble = isWebhookUserDataUpdateable(updatedDocument);
+
+    if (isUpdateAble) {
+      // Update webhook user data with updated one
+
+      webhookUserCacheData[updatedDocument.user_auth_token] = {
+        track_url: updatedDocument.track_url,
+        token: updatedDocument.token,
+        has_webhook_enabled: updatedDocument.has_webhook_enabled,
+        shop_platform: updatedDocument.shop_platform,
+        events_enabled: updatedDocument.events_enabled || {},
+      };
+    } else {
+      delete webhookUserCacheData[updatedDocument.user_auth_token];
+    }
+
+    await storeInCache(WEBHOOK_USER_CACHE_KEY_NAME, webhookUserCacheData);
+
+    logger.info("Webhook user cache update by mongo stream");
+  } catch (error) {
+    logger.error("updateWebhookUserCacheData from stream", error);
+  }
+};
+
+/**
+ * @desc list all changes on common_webhook_user collection;
+ */
+const monitorWebhookUserColChanges = async () => {
+  try {
+    const collection = await getDbCollectionInstance({
+      collectionName: MONGO_DB_PROD_WEBHOOK_COLLECTION_NAME,
+    });
+    const changeStream = collection.watch([], { fullDocument: "updateLookup" });
+
+    changeStream.on("change", (next) => {
+      updateWebhookUserCacheData(next.fullDocument);
+    });
+  } catch (error) {
+    logger.error("monitorWebhookUserColChanges error -->", error);
+  }
+};
+
 module.exports = {
   hasCurrentStatusWebhookEnabled,
   getShopCluesAccessToken,
-  webhookUserHandlingGetAndStoreInCache,
   sendWebhookDataToELK,
   statusCheckInHistoryMap,
   WebhookServices,
   checkIfCompulsoryEventAlreadySent,
   prepareDataAndCallLambda,
+  updateAllEnabledWebhookUserDataInCache,
+  getWebhookUserDataFromCache,
+  monitorWebhookUserColChanges,
 };
