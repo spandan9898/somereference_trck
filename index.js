@@ -9,8 +9,6 @@ const initDB = require("./src/connector/db");
 
 const { HOST_NAMES } = require("./src/utils/constants");
 
-const { monitorWebhookUserColChanges } = require("./src/services/webhook/services");
-
 const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
 
 (async () => {
@@ -27,8 +25,6 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
   try {
     await initDB.connectDb(HOST_NAMES.PULL_DB, MONGO_DB_PROD_SERVER_HOST);
     await initDB.connectDb(HOST_NAMES.REPORT_DB, MONGO_DB_REPORT_SERVER_HOST);
-
-    monitorWebhookUserColChanges();
 
     require("./src/apps/bluedart");
     require("./src/apps/delhivery");
