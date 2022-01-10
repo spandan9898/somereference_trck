@@ -2,6 +2,8 @@
 
 const moment = require("moment");
 const isEmpty = require("lodash/isEmpty");
+const crypto = require("crypto");
+const _ = require("lodash");
 const logger = require("../../../logger");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("../../utils/statusMapping");
 const { GetTrackingJsonParentKeys, GetTrackJsonInfokeys } = require("./constant");
@@ -37,6 +39,9 @@ const filterTrackingObj = async (trackModelObj) => {
     }
     if ("audit" in trackModel) {
       delete trackModel.audit;
+    }
+    if ("info" in trackModel && "user_id" in trackModel.info) {
+      delete trackModel.info.user_id;
     }
     return trackModel;
   } catch (error) {
@@ -85,10 +90,15 @@ const validateTrackingJson = async (trackingObj) => {
     }
     if ("label_logo" in json) {
       json.logo = json.label_logo;
+      if (!json.logo) {
+        json.logo = "";
+      }
     }
     if ("billing_zone" in json) {
       json.billing_zone = "";
     }
+    json.xkt = crypto.createHash("sha512").update(json?.auth_token).digest().toString("hex");
+
     return json;
   } catch (error) {
     logger.error("validateTrackingJson error -->", error);
@@ -166,7 +176,7 @@ const prepareTrackingRes = async (trackingObj) => {
               .utc(responseList[i].edd_stamp)
               .subtract(330, "minutes");
           } catch (error) {
-            // pass
+            responseList[i].edd_stamp = "";
           }
           try {
             responseList[i].info.to_phone_number = "";
@@ -208,9 +218,6 @@ const prepareTrackingRes = async (trackingObj) => {
               },
             ];
           } else responseList[i].track_arr.reverse();
-          if (!isEmpty(responseList[i])) {
-            responseList[i] = fixStatusMapping(responseList[i]);
-          }
           responseList[i] = reverseStatusArray(responseList[i]);
         }
       }
@@ -233,11 +240,11 @@ const prepareTrackingRes = async (trackingObj) => {
             .utc(tracking.edd_stamp)
             .add(1, "day")
             .subtract(330, "minutes");
-        } else {
+        } else if (tracking.edd_stamp) {
           tracking.edd_stamp = moment.utc(tracking.edd_stamp).subtract(330, "minutes");
         }
       } catch {
-        // pass
+        tracking.edd_stamp = "";
       }
       try {
         tracking.info.to_phone_number = "";
@@ -281,9 +288,7 @@ const prepareTrackingRes = async (trackingObj) => {
       } else {
         tracking.track_arr.reverse();
       }
-      if (!isEmpty(tracking)) {
-        tracking = fixStatusMapping(tracking);
-      }
+
       tracking = reverseStatusArray(tracking);
     }
     return tracking;
@@ -291,4 +296,85 @@ const prepareTrackingRes = async (trackingObj) => {
     throw new Error(error);
   }
 };
-module.exports = { filterTrackingObj, prepareTrackingRes };
+
+/**
+ * edits response from prepareClientTracking in responseList and single response
+ * @param {*} trackingObj
+ * @returns
+ */
+const prepareTrackObjForClientTracking = async (trackingObj) => {
+  let tracking = { ...trackingObj };
+  tracking = _.omit(tracking, ["xkt"]);
+  if ("edd_stamp" in tracking && tracking.edd_stamp !== "") {
+    tracking.edd_stamp = moment(tracking.edd_stamp).add(330, "minute").format("DD MMM YYYY, HH:mm");
+  }
+  if ("status" in tracking && "current_status_time" in tracking.status) {
+    tracking.status.current_status_time = moment(
+      tracking.status.current_status_time,
+      "YYYY-MM-DD HH:mm:ss"
+    ).format("DD MMM YYYY, HH:mm");
+  }
+
+  if ("courier_parent_name" in tracking) {
+    tracking.courier_used = tracking.courier_parent_name;
+  }
+  return tracking;
+};
+
+/**
+ * edits tracking response generated from prepareTrackingRes
+ * according to track/tracking response (clientTracking)
+ * @param {*} trackingObj
+ * @returns
+ */
+const prepareClientTracking = async (trackingObj) => {
+  try {
+    let tracking = { ...trackingObj };
+    if ("response_list" in tracking) {
+      const responseList = tracking.response_list;
+      responseList.reverse();
+      for (let i = 0; i < responseList.length; i += 1) {
+        responseList[i] = await prepareTrackObjForClientTracking(responseList[i]);
+      }
+    } else {
+      tracking = await prepareTrackObjForClientTracking(tracking);
+    }
+    return tracking;
+  } catch (error) {
+    logger.error("prepareClientTracking error --->", error);
+    throw new Error(error);
+  }
+};
+
+/**
+ * edits tracking response generated from prepareTrackingRes
+ * according to tracking response (public tracking)
+ * @param {*} trackingObj
+ * @returns
+ */
+const preparePublicTracking = async (trackingObj) => {
+  try {
+    let tracking = { ...trackingObj };
+    if ("response_list" in tracking) {
+      const responseList = tracking.response_list;
+      for (let i = 0; i < responseList.length; i += 1) {
+        if (!isEmpty(responseList[i])) {
+          responseList[i] = fixStatusMapping(responseList[i]);
+        }
+      }
+    } else if (!isEmpty(tracking)) {
+      tracking = fixStatusMapping(tracking);
+    }
+    return tracking;
+  } catch (error) {
+    logger.error("preparePublicTracking error --->", error);
+    throw new Error(error);
+  }
+};
+
+module.exports = {
+  filterTrackingObj,
+  prepareTrackingRes,
+  prepareClientTracking,
+  preparePublicTracking,
+};

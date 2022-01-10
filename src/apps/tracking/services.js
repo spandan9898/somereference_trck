@@ -1,9 +1,11 @@
+/* eslint-disable import/no-unresolved */
 /* eslint-disable no-continue */
 /* eslint-disable no-await-in-loop */
 const _ = require("lodash");
+const RequestIp = require("@supercharge/request-IP");
 const { getString, setString } = require("../../utils/redis");
 const logger = require("../../../logger");
-const { VALIDATE_VIA_AUTH_TOKEN, ALLOWED_IPS } = require("../../utils/constants");
+const { VALIDATE_VIA_AUTH_TOKEN, ALLOWED_IPS, BLOCKED_IPS } = require("../../utils/constants");
 const { filterTrackingObj } = require("./preparator");
 const { fetchTrackingModelAndUpdateCache } = require("../../services/common/trackServices");
 const { fetchTrackingIdFromClientOrderId } = require("./models");
@@ -90,7 +92,7 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
         responseDict = trackingObj?.track_model || {};
         return responseDict;
       } catch (error) {
-        responseDict.err = " Tracking id Not found";
+        responseDict.err = " Tracking ID not found";
       }
       if ((IP && ALLOWED_IPS.includes(IP)) || allowFetchFromDB) {
         const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0]);
@@ -98,7 +100,7 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
         responseDict = trackModel;
         return responseDict;
       }
-      responseDict.err = "Tracking id Not Found";
+      responseDict.err = "Tracking ID not found";
       return responseDict;
     }
     let singleResponseDict = {};
@@ -107,7 +109,7 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
       if (trackingId === "err") {
         // client order id not found
 
-        responseList.push({ err: "order id not found" });
+        responseList.push({ err: "Order ID not found" });
         continue;
       }
       if (!trackingId) {
@@ -128,7 +130,8 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
         responseList.push(singleResponseDict);
       } catch (error) {
         singleResponseDict = {};
-        singleResponseDict.err = "Tracking Id Not Found";
+        singleResponseDict.err = "Tracking ID Not Found";
+        singleResponseDict.tracking_id = trackingId;
         responseList.push(singleResponseDict);
       }
       responseDict.response_list = responseList;
@@ -143,4 +146,57 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
   }
 };
 
-module.exports = { fetchTrackingService };
+/**
+ * Authentication for client and public tracking API
+ * @param {*} req
+ * @returns
+ */
+const TrackingAuthenticationService = async (req) => {
+  let trackingIds = null;
+  let clientOrderIds = null;
+  const authToken = req.query?.auth_token || null;
+  let IP = RequestIp.getClientIp(req);
+  const hostName = req?.hostname || null;
+  let verifiedByHost = false;
+  let valid = true;
+  if (BLOCKED_IPS.includes(IP)) {
+    return { status: "" };
+  }
+  if (hostName.toLowerCase().includes("pickrr.com")) {
+    verifiedByHost = true;
+  }
+  const { query } = req;
+  if (query.tracking_id) {
+    trackingIds = query.tracking_id
+      .replace("\n", "")
+      .replace("\t", "")
+      .replace("\r", "")
+      .replace(" ", "");
+  } else if (query.client_order_id) {
+    clientOrderIds = query.client_order_id
+      .replaceAll(" ", "")
+      .replace("\n", "")
+      .replace("\t", "")
+      .replace("\r", "")
+      .replace(" ", "");
+  } else {
+    return { err: "invalid request" };
+  }
+  if (!authToken) {
+    valid = false;
+  }
+  if (IP && ALLOWED_IPS.includes(IP)) {
+    valid = true;
+  }
+  if (verifiedByHost) {
+    valid = true;
+    [IP] = ALLOWED_IPS;
+  }
+  if (!valid) {
+    return { err: "Invalid Request/ Unauthorized" };
+  }
+
+  return { trackingIds, clientOrderIds, authToken, IP };
+};
+
+module.exports = { fetchTrackingService, TrackingAuthenticationService };

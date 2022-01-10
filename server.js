@@ -6,7 +6,7 @@ const AutoLoad = require("fastify-autoload");
 const { ServerResponse } = require("http");
 const cors = require("fastify-cors");
 const trackRoutes = require("./src/apps/tracking");
-const { track: trackingHandler } = require("./src/apps/tracking/handlers");
+const { clientTracking, publicTracking } = require("./src/apps/tracking/handlers");
 
 let serverInstance;
 
@@ -31,8 +31,8 @@ const createServer = (logger) => {
     reply.type("application/json").code(200);
     return { hello: "world" };
   });
-  server.get("/track/tracking", trackingHandler);
-
+  server.get("/track/tracking", clientTracking);
+  server.get("/tracking", publicTracking);
   server.post("/webhook-test/shopclues", async (request, reply) => {
     reply.type("application/json").code(200);
     return {
