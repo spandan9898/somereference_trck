@@ -28,7 +28,7 @@ const updateStatusOnReport = async (trackObj, logger, elkClient) => {
     (val) => val !== null && val !== undefined && val !== ""
   );
   result.last_updated_date = moment().toDate();
-  result.last_update_from = `last_update_from_kafka:${result.last_updated_date}`;
+  result.last_update_from_kafka = `${moment(result.last_updated_date).format()}`;
   sendReportsDataToELK(result, elkClient);
   const opsReportColInstance = await reportMongoCol();
   try {
