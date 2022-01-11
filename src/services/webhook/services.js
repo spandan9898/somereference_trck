@@ -279,9 +279,7 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
         "1410b101d4e4080da48800c9bc2ee8b5135779",
       ].includes(trackingObj?.auth_token)
     ) {
-      setTimeout(() => {
-        callLambdaFunction(lambdaPayload);
-      }, 500);
+      callLambdaFunction(lambdaPayload);
       return false;
     }
 
@@ -357,13 +355,10 @@ class WebhookServices extends WebhookHelper {
           break;
         }
         let foundAnEventForCurrentPrecedence = false;
-
         for (const event of COMPULSORY_EVENTS_PRECEDENCE[precedence]) {
           if (flagCheckReqObj[event]) {
             foundAnEventForCurrentPrecedence = true;
-            setTimeout(() => {
-              this.handleSingleCompulsoryEvent(event);
-            }, 2000);
+            await this.handleSingleCompulsoryEvent(event);
           }
         }
         if (!foundAnEventForCurrentPrecedence) {
