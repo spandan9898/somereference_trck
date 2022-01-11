@@ -2,6 +2,7 @@ const { isEmpty, omit, get, last } = require("lodash");
 const moment = require("moment");
 
 const { findOneDocumentFromMongo, getObject, setObject } = require("../../utils");
+const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { sortStatusArray } = require("./helpers");
 
 /**
@@ -32,6 +33,7 @@ const prepareTrackDataForTracking = (trackArr) => {
       );
       filteredTrackItem.status_body = filteredTrackItem.scan_status;
       filteredTrackItem.status_location = filteredTrackItem.scan_location;
+      filteredTrackItem.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];
 
       if (!lastItem) {
         updatedTrackArray.push({
