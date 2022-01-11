@@ -4,6 +4,7 @@ const moment = require("moment");
 
 const logger = require("../../../logger");
 const { setObject, getObject, checkAwbInCache } = require("../../utils");
+const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { sortStatusArray } = require("../common/helpers");
 const {
   prepareTrackDataForTracking,
@@ -51,6 +52,9 @@ const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
       );
       currentTrackObj.status_body = currentTrackObj.scan_status;
       currentTrackObj.status_location = currentTrackObj.scan_location;
+      currentTrackObj.pickrr_status =
+        PICKRR_STATUS_CODE_MAPPING[_.get(currentTrackObj, "scan_type")];
+      console.log("currentTrackObj", currentTrackObj);
       const cachedTopTrackObj = cachedTrackArray[0];
       if (_.get(currentTrackObj, "scan_type") === _.get(cachedTopTrackObj, "status_name")) {
         cachedTopTrackObj.status_array.push(_.omit(currentTrackObj, "scan_type"));
