@@ -1,3 +1,4 @@
+/* eslint-disable no-promise-executor-return */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
 /* eslint-disable no-restricted-syntax */
@@ -359,6 +360,7 @@ class WebhookServices extends WebhookHelper {
           if (flagCheckReqObj[event]) {
             foundAnEventForCurrentPrecedence = true;
             await this.handleSingleCompulsoryEvent(event);
+            await new Promise((done) => setTimeout(() => done(), 1000));
           }
         }
         if (!foundAnEventForCurrentPrecedence) {
