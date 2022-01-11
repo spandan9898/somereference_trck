@@ -1,3 +1,4 @@
+/* eslint-disable no-promise-executor-return */
 const _ = require("lodash");
 
 const logger = require("../../../logger");
@@ -30,6 +31,8 @@ const triggerWebhook = async (trackingData, elkClient) => {
     if (COMPULSORY_EVENTS[currentStatus]) {
       return false;
     }
+
+    await new Promise((done) => setTimeout(() => done(), 2000));
 
     await prepareDataAndCallLambda(trackingObj, elkClient, webhookUserData);
 
