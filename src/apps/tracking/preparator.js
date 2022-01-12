@@ -320,21 +320,25 @@ const prepareTrackObjForClientTracking = async (trackingObj) => {
   if ("last_update_from" in tracking) {
     tracking = _.omit(tracking, ["last_update_from"]);
   }
-  const trackArr = tracking?.track_arr || [];
-  for (let i = 0; i < trackArr.length; i += 1) {
-    const statusArr = trackArr[i].status_array;
-    for (let obj = 0; obj < statusArr.length; obj += 1) {
-      statusArr[obj] = _.omit(statusArr[obj], [
+  let trackArr = tracking?.track_arr || [];
+  trackArr = trackArr.map((trackItem) => {
+    const statusArray = trackItem.status_array.map((item) =>
+      _.omit(item, [
         "scan_datetime",
         "scan_location",
         "scan_status",
         "system_updated_at",
         "update_source",
         "update_time",
-      ]);
-    }
-  }
+      ])
+    );
+    return {
+      ...trackItem,
+      status_array: statusArray,
+    };
+  });
 
+  tracking.track_arr = trackArr;
   if ("courier_parent_name" in tracking) {
     tracking.courier_used = tracking.courier_parent_name;
   }
