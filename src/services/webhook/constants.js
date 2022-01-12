@@ -23,7 +23,7 @@ const COMPULSORY_EVENTS = {
   RTD: ["OP", "OM", "OFP", "PPF", "OT", "OO", "UD", "NDR", "RTO", "RTO-OT", "RTO-OO", "RTO-UD"],
 };
 
-const COMPULSORY_EVENTS_PRECEDENCE = [["PP"], ["DL", "RTD", "RTO"]];
+const COMPULSORY_EVENTS_PRECEDENCE = [["PP"], ["DL", "RTO", "RTD"]];
 
 const STATUS_PROXY_LIST = {
   PP: [
