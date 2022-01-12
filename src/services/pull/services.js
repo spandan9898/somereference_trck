@@ -54,7 +54,6 @@ const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
       currentTrackObj.status_location = currentTrackObj.scan_location;
       currentTrackObj.pickrr_status =
         PICKRR_STATUS_CODE_MAPPING[_.get(currentTrackObj, "scan_type")];
-      console.log("currentTrackObj", currentTrackObj);
       const cachedTopTrackObj = cachedTrackArray[0];
       if (_.get(currentTrackObj, "scan_type") === _.get(cachedTopTrackObj, "status_name")) {
         cachedTopTrackObj.status_array.push(_.omit(currentTrackObj, "scan_type"));
