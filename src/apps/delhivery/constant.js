@@ -1469,8 +1469,47 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
     scan_type: "OC",
     pickrr_sub_status_code: "",
   },
+  "x-dbl1f_rt": {
+    courier_remark: "Added to Bag",
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-ibd3f_rt": {
+    courier_remark: "Received at destination city",
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-ill1f_rt": {
+    courier_remark: "IST Received",
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-ill2f_rt": {
+    courier_remark: "IST Received",
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-dll2f_rt": {
+    courier_remark: "Added to IST",
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-1ll1f_rt": {
+    courier_remark: "Added to IST",
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-piom_rt": {
+    courier_remark: "Shipment Recieved at Origin Center",
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  "x-ppom_rt": {
+    courier_remark: "Shipment picked up",
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
 };
-const TOTAL_TOPIC_COUNT = 8;
 
 const DELHIVERY_REVERSE_MAPPER = {
   "x-uco_pp": {
@@ -2075,6 +2114,8 @@ const DELHIVERY_REVERSE_MAPPER = {
     pickrr_sub_status_code: "",
   },
 };
+
+const TOTAL_TOPIC_COUNT = 8;
 
 module.exports = {
   DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER,
