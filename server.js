@@ -1,6 +1,8 @@
 // import dependencies from npm
 
 const Fastify = require("fastify");
+const cors = require("fastify-cors");
+const { clientTracking, publicTracking } = require("./src/apps/tracking/handlers");
 const routes = require("./src/routes");
 
 let serverInstance;
@@ -16,6 +18,15 @@ const createServer = async () => {
     ignoreTrailingSlash: true,
     logger: true,
   });
+
+  // start the server
+
+  // server.register(trackRoutes, { prefix: "/track" });
+
+  server.register(cors);
+
+  server.get("/track/tracking", clientTracking);
+  server.get("/tracking", publicTracking);
 
   server.register(routes);
   await server.ready();
