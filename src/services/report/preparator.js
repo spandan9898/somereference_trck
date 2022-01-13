@@ -19,7 +19,7 @@ const prepareDataForReportMongo = (trackData) => {
   const data = {
     pickup_date: findPickupDate(trackData?.track_arr || {}),
     received_by: trackData?.status?.received_by || null,
-    current_status: trackingStatus.status_type || "FAILED",
+    current_status: trackingStatus.status_type || "NA",
     current_status_update: trackingStatus.status,
     current_status_datetime: trackingStatus.status_datetime,
     out_for_delivery_count: ofdCount(trackData?.track_arr || {}),
