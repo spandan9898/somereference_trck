@@ -1,3 +1,5 @@
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable no-promise-executor-return */
 const _ = require("lodash");
 
@@ -25,16 +27,19 @@ const triggerWebhook = async (trackingData, elkClient) => {
     const trackingObj = _.cloneDeep(trackingData);
 
     const webhookServices = new WebhookServices(trackingObj, elkClient, webhookUserData);
-    await webhookServices.compulsoryEventsHandler();
+
+    const allTrackingData = (await webhookServices.compulsoryEventsHandler()) || [];
 
     const currentStatus = _.get(trackingObj, "status.current_status_type", "");
-    if (COMPULSORY_EVENTS[currentStatus]) {
-      return false;
+
+    if (!COMPULSORY_EVENTS[currentStatus]) {
+      allTrackingData.push(trackingObj);
     }
 
-    await new Promise((done) => setTimeout(() => done(), 2000));
-
-    await prepareDataAndCallLambda(trackingObj, elkClient, webhookUserData);
+    for (const trackObj of allTrackingData) {
+      await prepareDataAndCallLambda(trackObj, elkClient, webhookUserData);
+      await new Promise((done) => setTimeout(() => done(), 3000));
+    }
 
     return true;
   } catch (error) {
