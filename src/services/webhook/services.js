@@ -323,6 +323,7 @@ class WebhookServices extends WebhookHelper {
   async handleSingleCompulsoryEvent(event) {
     const trackingObj = cloneDeep(this.trackingObj);
     const trackArray = trackingObj.track_arr || [];
+    const mandatoryStatusMap = get(trackingObj, "mandatory_status_map") || {};
 
     const specialStatus = this.getProxyEventStatus(trackArray, event);
 
@@ -330,16 +331,21 @@ class WebhookServices extends WebhookHelper {
       return {};
     }
 
+    const matchedMandatoryStatusMap = mandatoryStatusMap[specialStatus.current_status_type] || {};
+    if (matchedMandatoryStatusMap?.is_sent && matchedMandatoryStatusMap?.is_received_success) {
+      return {};
+    }
+
     _.set(trackingObj, "status", specialStatus);
-    await prepareDataAndCallLambda(trackingObj, this.elkClient, this.webhookUserData);
-    return {};
+
+    return trackingObj;
   }
 
   async compulsoryEventsHandler() {
     try {
       const { status } = this.trackingObj;
       if (!status) {
-        return false;
+        return [];
       }
       const currentStatusType = status.current_status_type;
       const flagCheckReqObj = this.prepareInitialFlagCheckReqObj();
@@ -350,27 +356,32 @@ class WebhookServices extends WebhookHelper {
         }
       }
 
+      const proxyEventsData = [];
+
       let breakPrecedenceLoop = false;
       for (let precedence = 0; precedence < COMPULSORY_EVENTS_PRECEDENCE.length; precedence += 1) {
         if (breakPrecedenceLoop) {
           break;
         }
         let foundAnEventForCurrentPrecedence = false;
+
         for (const event of COMPULSORY_EVENTS_PRECEDENCE[precedence]) {
           if (flagCheckReqObj[event]) {
             foundAnEventForCurrentPrecedence = true;
-            await this.handleSingleCompulsoryEvent(event);
-            await new Promise((done) => setTimeout(() => done(), 1000));
+            const res = await this.handleSingleCompulsoryEvent(event);
+            if (!isEmpty(res)) {
+              proxyEventsData.push(res);
+            }
           }
         }
         if (!foundAnEventForCurrentPrecedence) {
           breakPrecedenceLoop = true;
         }
       }
-      return true;
+      return proxyEventsData;
     } catch (error) {
       logger.error("compulsoryEventsHandler", error);
-      return false;
+      return [];
     }
   }
 }
