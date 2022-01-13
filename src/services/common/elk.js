@@ -1,3 +1,5 @@
+const { nanoid } = require("nanoid");
+
 const logger = require("../../../logger");
 
 /**
@@ -17,4 +19,32 @@ const sendDataToElk = async ({ body, elkClient, indexName = "track-reports" }) =
   }
 };
 
-module.exports = { sendDataToElk };
+/**
+ *
+ * @desc update data in ELK
+ * @returns
+ */
+const elkDataUpdate = async ({
+  doc,
+  elkClient,
+  indexName = "status_index_3",
+  id = nanoid(5),
+  upsert = false,
+}) => {
+  try {
+    const response = await elkClient.update({
+      index: indexName,
+      id,
+      body: {
+        doc,
+        doc_as_upsert: upsert,
+      },
+    });
+    return response;
+  } catch (error) {
+    logger.error("elkDataUpdate", error);
+    return "";
+  }
+};
+
+module.exports = { sendDataToElk, elkDataUpdate };
