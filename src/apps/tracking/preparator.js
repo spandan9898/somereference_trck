@@ -314,7 +314,31 @@ const prepareTrackObjForClientTracking = async (trackingObj) => {
       "YYYY-MM-DD HH:mm:ss"
     ).format("DD MMM YYYY, HH:mm");
   }
+  if ("logo" in tracking) {
+    tracking.logo = "";
+  }
+  if ("last_update_from" in tracking) {
+    tracking = _.omit(tracking, ["last_update_from"]);
+  }
+  let trackArr = tracking?.track_arr || [];
+  trackArr = trackArr.map((trackItem) => {
+    const statusArray = trackItem.status_array.map((item) =>
+      _.omit(item, [
+        "scan_datetime",
+        "scan_location",
+        "scan_status",
+        "system_updated_at",
+        "update_source",
+        "update_time",
+      ])
+    );
+    return {
+      ...trackItem,
+      status_array: statusArray,
+    };
+  });
 
+  tracking.track_arr = trackArr;
   if ("courier_parent_name" in tracking) {
     tracking.courier_used = tracking.courier_parent_name;
   }
