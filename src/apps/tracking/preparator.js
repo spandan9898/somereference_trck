@@ -175,6 +175,9 @@ const prepareTrackingRes = async (trackingObj) => {
             responseList[i].edd_stamp = moment
               .utc(responseList[i].edd_stamp)
               .subtract(330, "minutes");
+            if (!responseList[i].edd_stamp.isValid()) {
+              responseList[i].edd_stamp = "";
+            }
           } catch (error) {
             responseList[i].edd_stamp = "";
           }
@@ -338,7 +341,7 @@ const prepareTrackObjForClientTracking = async (trackingObj) => {
     };
   });
 
-  tracking.track_arr = trackArr;
+  if (!isEmpty(trackArr)) tracking.track_arr = trackArr;
   if ("courier_parent_name" in tracking) {
     tracking.courier_used = tracking.courier_parent_name;
   }

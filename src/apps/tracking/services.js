@@ -122,8 +122,8 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
           if (IP && ALLOWED_IPS.includes(IP)) {
             // pass
           } else {
-            responseDict.err = "Unauthorized";
-            return responseDict;
+            responseList.push({ err: "Unauthorized" });
+            continue;
           }
         }
         singleResponseDict = trackingObj?.track_model;
