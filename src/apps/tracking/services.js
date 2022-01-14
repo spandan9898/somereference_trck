@@ -41,6 +41,10 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
         const clientOrderIdPattern = clientOrderIdsList[i];
         const clientOrderId = clientOrderIdPattern.split("-PICK-")[0];
         const userPK = Number(clientOrderIdPattern.split("-PICK-")[1]);
+        if (!clientOrderIdPattern.includes("-PICK-")) {
+          trackingIdsList.push("err");
+          continue;
+        }
         const cachedAwb = (await getString(clientOrderIdPattern)) || {};
         const clientOrderIdPatternExistInCache = !_.isEmpty(cachedAwb);
 
@@ -134,8 +138,8 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
         singleResponseDict.tracking_id = trackingId;
         responseList.push(singleResponseDict);
       }
-      responseDict.response_list = responseList;
     }
+    responseDict.response_list = responseList;
     return responseDict;
   } catch (error) {
     if (error.message.includes("failed")) {
