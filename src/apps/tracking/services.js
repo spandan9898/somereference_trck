@@ -2,7 +2,7 @@
 /* eslint-disable no-continue */
 /* eslint-disable no-await-in-loop */
 const _ = require("lodash");
-const RequestIp = require("@supercharge/request-IP");
+const RequestIp = require("@supercharge/request-ip");
 const { getString, setString } = require("../../utils/redis");
 const logger = require("../../../logger");
 const { VALIDATE_VIA_AUTH_TOKEN, ALLOWED_IPS, BLOCKED_IPS } = require("../../utils/constants");
