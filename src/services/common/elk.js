@@ -39,7 +39,7 @@ const elkDataUpdate = async ({
         doc,
         doc_as_upsert: upsert,
       },
-      retry_on_conflict: 5,
+      retry_on_conflict: 3,
     });
     return response;
   } catch (error) {
