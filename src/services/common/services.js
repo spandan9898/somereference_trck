@@ -16,7 +16,6 @@ const updateStatusELK = async (trackingDoc, elkClient) => {
     const currentStatusType = get(trackingDoc, "status.current_status_type") || "NA";
 
     await elkDataUpdate({
-      upsert: true,
       elkClient,
       id: trackingId,
       doc: {
@@ -25,7 +24,7 @@ const updateStatusELK = async (trackingDoc, elkClient) => {
       },
     });
   } catch (error) {
-    logger.error("updateStatusELK", error);
+    logger.error(error.message);
   }
 };
 
