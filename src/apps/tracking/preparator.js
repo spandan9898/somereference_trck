@@ -172,11 +172,11 @@ const prepareTrackingRes = async (trackingObj) => {
           }
           responseList[i].web_address = "";
           try {
-            responseList[i].edd_stamp = moment
+            const convertedEddStamp = moment
               .utc(responseList[i].edd_stamp)
               .subtract(330, "minutes");
-            if (!responseList[i].edd_stamp.isValid()) {
-              responseList[i].edd_stamp = "";
+            if (convertedEddStamp.isValid()) {
+              responseList[i].edd_stamp = convertedEddStamp;
             }
           } catch (error) {
             responseList[i].edd_stamp = "";
