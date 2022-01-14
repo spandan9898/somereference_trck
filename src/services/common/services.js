@@ -2,6 +2,7 @@ const get = require("lodash/get");
 const moment = require("moment");
 
 const logger = require("../../../logger");
+const { NEW_STATUS_TO_OLD_MAPPING } = require("../../apps/webhookClients/common/constants");
 const { elkDataUpdate } = require("./elk");
 
 /**
@@ -20,8 +21,7 @@ const updateStatusELK = async (trackingDoc, elkClient) => {
       id: trackingId,
       doc: {
         current_status_time: moment(currentStatusTime).subtract(330, "minutes").toDate(),
-        current_status_type: currentStatusType,
-        timestamp: new Date(),
+        current_status_type: NEW_STATUS_TO_OLD_MAPPING[currentStatusType] || currentStatusType,
       },
     });
   } catch (error) {
