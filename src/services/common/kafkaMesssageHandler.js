@@ -85,7 +85,7 @@ class KafkaMessageHandler {
         return;
       }
 
-      const { prodElkClient, stagingElkClient } = KafkaMessageHandler.getElkClients();
+      const { prodElkClient } = KafkaMessageHandler.getElkClients();
 
       const result = await updateTrackDataToPullMongo(updatedTrackData, logger);
 
@@ -93,7 +93,7 @@ class KafkaMessageHandler {
       sendTrackDataToV1(result);
       triggerWebhook(result, prodElkClient);
       updateStatusOnReport(result, logger, prodElkClient);
-      updateStatusELK(result, stagingElkClient);
+      updateStatusELK(result, prodElkClient);
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }
