@@ -172,9 +172,12 @@ const prepareTrackingRes = async (trackingObj) => {
           }
           responseList[i].web_address = "";
           try {
-            responseList[i].edd_stamp = moment
+            const convertedEddStamp = moment
               .utc(responseList[i].edd_stamp)
               .subtract(330, "minutes");
+            if (convertedEddStamp.isValid()) {
+              responseList[i].edd_stamp = convertedEddStamp;
+            }
           } catch (error) {
             responseList[i].edd_stamp = "";
           }
@@ -338,7 +341,7 @@ const prepareTrackObjForClientTracking = async (trackingObj) => {
     };
   });
 
-  tracking.track_arr = trackArr;
+  if (!isEmpty(trackArr)) tracking.track_arr = trackArr;
   if ("courier_parent_name" in tracking) {
     tracking.courier_used = tracking.courier_parent_name;
   }
