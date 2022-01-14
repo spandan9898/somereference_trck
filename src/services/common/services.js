@@ -7,7 +7,7 @@ const { getOrderType } = require("./helpers");
 
 /**
  * @param trackingDoc -> tracking document(same as DB document)
- * @desc preapre status and status time and order type and then update ELK
+ * @desc preapre current status, current status time and order type and then update ELK
  */
 const updateStatusELK = async (trackingDoc, elkClient) => {
   try {
