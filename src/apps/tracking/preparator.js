@@ -6,7 +6,11 @@ const crypto = require("crypto");
 const _ = require("lodash");
 const logger = require("../../../logger");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("../../utils/statusMapping");
-const { GetTrackingJsonParentKeys, GetTrackJsonInfokeys } = require("./constant");
+const {
+  GetTrackingJsonParentKeys,
+  GetTrackJsonInfokeys,
+  TRACK_ARRAY_OMIT_FIELDS_CLIENT_TRACKING,
+} = require("./constant");
 const { checkShowClientDetails } = require("./helpers");
 
 /**
@@ -326,14 +330,7 @@ const prepareTrackObjForClientTracking = async (trackingObj) => {
   let trackArr = tracking?.track_arr || [];
   trackArr = trackArr.map((trackItem) => {
     const statusArray = trackItem.status_array.map((item) =>
-      _.omit(item, [
-        "scan_datetime",
-        "scan_location",
-        "scan_status",
-        "system_updated_at",
-        "update_source",
-        "update_time",
-      ])
+      _.omit(item, TRACK_ARRAY_OMIT_FIELDS_CLIENT_TRACKING)
     );
     return {
       ...trackItem,

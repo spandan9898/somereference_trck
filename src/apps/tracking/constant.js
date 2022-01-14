@@ -52,4 +52,18 @@ const GetTrackJsonInfokeys = async () => [
   "from_phone_number",
 ];
 
-module.exports = { GetTrackingJsonParentKeys, GetTrackJsonInfokeys };
+const TRACK_ARRAY_OMIT_FIELDS_CLIENT_TRACKING = [
+  "scan_datetime",
+  "scan_location",
+  "scan_status",
+  "system_updated_at",
+  "update_source",
+  "update_time",
+  "pickup_datetime",
+];
+
+module.exports = {
+  GetTrackingJsonParentKeys,
+  GetTrackJsonInfokeys,
+  TRACK_ARRAY_OMIT_FIELDS_CLIENT_TRACKING,
+};
