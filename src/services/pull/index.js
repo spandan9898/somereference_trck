@@ -49,6 +49,15 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
     }
     updatedObj.track_arr = sortedTrackArray;
 
+    const firstTrackObjOfTrackArr = sortedTrackArray[0];
+
+    updatedObj["status.current_status_type"] = firstTrackObjOfTrackArr.scan_type;
+    updatedObj["status.courier_status_code"] = firstTrackObjOfTrackArr.courier_status_code;
+    updatedObj["status.current_status_body"] = firstTrackObjOfTrackArr.scan_status;
+    updatedObj["status.current_status_location"] = firstTrackObjOfTrackArr.scan_location;
+    updatedObj["status.current_status_time"] = firstTrackObjOfTrackArr.scan_datetime;
+    updatedObj["status.pickrr_sub_status_code"] = firstTrackObjOfTrackArr.pickrr_sub_status_code;
+
     const response = await pullCollection.findOneAndUpdate(
       { tracking_id: trackObj.awb },
       {
