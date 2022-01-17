@@ -64,11 +64,10 @@ const checkCancelStatusInTrackArr = (trackArr) => {
 const updateTrackModel = (cacheTrakModel, trackingDocument) => {
   try {
     return Object.keys(cacheTrakModel).reduce((obj, key) => {
-      const newKey = trackingDocument.hasOwnProperty(key) ? key : key;
-      if (newKey === "track_arr") {
-        obj[newKey] = cacheTrakModel[key];
+      if (key === "track_arr") {
+        obj[key] = cacheTrakModel[key];
       } else {
-        obj[newKey] = trackingDocument[key];
+        obj[key] = trackingDocument[key];
       }
       return obj;
     }, {});
