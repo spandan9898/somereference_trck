@@ -1,7 +1,7 @@
 const moment = require("moment");
 const _ = require("lodash");
 
-const { storeDataInCache, updateCacheTrackArray } = require("./services");
+const { storeDataInCache, updateCacheTrackArray, softCancellationCheck } = require("./services");
 const { prepareTrackDataToUpdateInPullDb } = require("./preparator");
 const commonTrackingInfoCol = require("./model");
 
@@ -48,6 +48,10 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
       sortedTrackArray = updatedTrackArray;
     }
     updatedObj.track_arr = sortedTrackArray;
+
+    if (softCancellationCheck(sortedTrackArray, trackObj)) {
+      return false;
+    }
 
     const firstTrackObjOfTrackArr = sortedTrackArray[0];
 
