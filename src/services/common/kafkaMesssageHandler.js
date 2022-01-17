@@ -88,6 +88,9 @@ class KafkaMessageHandler {
       const { prodElkClient } = KafkaMessageHandler.getElkClients();
 
       const result = await updateTrackDataToPullMongo(updatedTrackData, logger);
+      if (!result) {
+        return;
+      }
 
       sendDataToNdr(result);
       sendTrackDataToV1(result);
