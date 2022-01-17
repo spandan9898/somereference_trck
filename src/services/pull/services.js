@@ -11,6 +11,7 @@ const {
   fetchTrackingModelAndUpdateCache,
 } = require("../common/trackServices");
 const { updateIsNDRinCache } = require("../ndr/helpers");
+const { checkCancelStatusInTrackArr } = require("./helpers");
 
 /**
  *
@@ -124,8 +125,36 @@ const storeDataInCache = async (result) => {
   await setObject(awb, oldData);
 };
 
+/**
+ *
+ * @param {*} trackArr -> updated track_arr (after fetching from DB)
+ * @param {*} preparedTrackData
+ * @desc check OC status in track_arr. If present and current pushed status
+ * is in ["OFP", "OM", "OP", "PPF", "OC"] then break the process otherwise continue
+ * @returns true/false
+ */
+const softCancellationCheck = (trackArr, preparedTrackData) => {
+  try {
+    const isPresent = checkCancelStatusInTrackArr(trackArr);
+    if (!isPresent) {
+      return false;
+    }
+    const currentStatus = preparedTrackData.scan_type;
+
+    if (["OFP", "OM", "OP", "PPF", "OC"].includes(currentStatus)) {
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    logger.error("softCancellationCheck", error);
+    return false;
+  }
+};
+
 module.exports = {
   redisCheckAndReturnTrackData,
   storeDataInCache,
   updateCacheTrackArray,
+  softCancellationCheck,
 };
