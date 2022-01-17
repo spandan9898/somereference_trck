@@ -21,7 +21,7 @@ const { checkCancelStatusInTrackArr } = require("./helpers");
  * and update cache's track_arr
  * @returns bool
  */
-const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
+const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb, currentStatusObj }) => {
   try {
     const cacheData = await getObject(awb);
 
@@ -48,9 +48,9 @@ const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
       // then append currentTrackObj to status_array, and do sorting(scan_datetime)
       // If it's not same then simply prepare new track object and append to top of cached track array.
 
-      currentTrackObj.status_time = moment(currentTrackObj.scan_datetime).format(
-        "DD MMM YYYY, HH:mm"
-      );
+      currentTrackObj.status_time = moment(currentTrackObj.scan_datetime)
+        .add(330, "m")
+        .format("DD MMM YYYY, HH:mm");
       currentTrackObj.status_body = currentTrackObj.scan_status;
       currentTrackObj.status_location = currentTrackObj.scan_location;
       currentTrackObj.pickrr_status =
@@ -67,7 +67,13 @@ const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
       }
       cacheData.track_model.track_arr = cachedTrackArray;
     }
-
+    if (currentStatusObj) {
+      const currentStatus = { ...currentStatusObj };
+      currentStatus.current_status_time = moment(currentStatus.current_status_time)
+        .add(330, "m")
+        .format("DD MMM YYYY, HH:mm");
+      cacheData.track_model.status = currentStatus;
+    }
     await setObject(awb, cacheData);
     return true;
   } catch (error) {
