@@ -59,7 +59,7 @@ const checkCancelStatusInTrackArr = (trackArr) => {
 };
 
 /**
- * @desc update cahce track_model, if key exists
+ * @desc update cache track_model, if key exists
  */
 const updateTrackModel = (cacheTrakModel, trackingDocument) => {
   try {
