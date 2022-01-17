@@ -81,7 +81,7 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
       currentTrackObj: trackArr[0],
       trackArray: trackArr,
       awb: result.awb,
-      currentStatusObj: response.value.status,
+      trackingDocument: response.value,
     });
     return response.value;
   } catch (error) {

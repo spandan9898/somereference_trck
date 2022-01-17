@@ -11,7 +11,7 @@ const {
   fetchTrackingModelAndUpdateCache,
 } = require("../common/trackServices");
 const { updateIsNDRinCache } = require("../ndr/helpers");
-const { checkCancelStatusInTrackArr } = require("./helpers");
+const { checkCancelStatusInTrackArr, updateTrackModel } = require("./helpers");
 
 /**
  *
@@ -21,7 +21,7 @@ const { checkCancelStatusInTrackArr } = require("./helpers");
  * and update cache's track_arr
  * @returns bool
  */
-const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb, currentStatusObj }) => {
+const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb, trackingDocument }) => {
   try {
     const cacheData = await getObject(awb);
 
@@ -67,12 +67,9 @@ const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb, current
       }
       cacheData.track_model.track_arr = cachedTrackArray;
     }
-    if (currentStatusObj) {
-      const currentStatus = { ...currentStatusObj };
-      currentStatus.current_status_time = moment(currentStatus.current_status_time)
-        .add(330, "m")
-        .format("DD MMM YYYY, HH:mm");
-      cacheData.track_model.status = currentStatus;
+    if (trackingDocument) {
+      const updatedTrackModel = updateTrackModel(cacheData.track_model, trackingDocument);
+      cacheData.track_model = updatedTrackModel;
     }
     await setObject(awb, cacheData);
     return true;
