@@ -79,7 +79,7 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
     await storeDataInCache(result);
     updateCacheTrackArray({
       currentTrackObj: trackArr[0],
-      trackArray: trackArr,
+      trackArray: response.value.track_arr,
       awb: result.awb,
       trackingDocument: response.value,
     });
