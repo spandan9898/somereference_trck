@@ -324,9 +324,10 @@ const prepareTrackObjForClientTracking = async (trackingObj) => {
   }
   let trackArr = tracking?.track_arr || [];
   trackArr = trackArr.map((trackItem) => {
-    const statusArray = trackItem.status_array.map((item) =>
-      _.omit(item, TRACK_ARRAY_OMIT_FIELDS_CLIENT_TRACKING)
-    );
+    const statusArray = trackItem.status_array.map((item) => {
+      const obj = _.omit(item, TRACK_ARRAY_OMIT_FIELDS_CLIENT_TRACKING);
+      return { courier_status_code: null, pickrr_sub_status_code: null, ...obj };
+    });
     return {
       ...trackItem,
       status_array: statusArray,
