@@ -11,7 +11,7 @@ const {
   fetchTrackingModelAndUpdateCache,
 } = require("../common/trackServices");
 const { updateIsNDRinCache } = require("../ndr/helpers");
-const { checkCancelStatusInTrackArr } = require("./helpers");
+const { checkCancelStatusInTrackArr, updateTrackModel } = require("./helpers");
 
 /**
  *
@@ -21,7 +21,7 @@ const { checkCancelStatusInTrackArr } = require("./helpers");
  * and update cache's track_arr
  * @returns bool
  */
-const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
+const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb, trackingDocument }) => {
   try {
     const cacheData = await getObject(awb);
 
@@ -48,9 +48,9 @@ const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
       // then append currentTrackObj to status_array, and do sorting(scan_datetime)
       // If it's not same then simply prepare new track object and append to top of cached track array.
 
-      currentTrackObj.status_time = moment(currentTrackObj.scan_datetime).format(
-        "DD MMM YYYY, HH:mm"
-      );
+      currentTrackObj.status_time = moment(currentTrackObj.scan_datetime)
+        .add(330, "m")
+        .format("DD MMM YYYY, HH:mm");
       currentTrackObj.status_body = currentTrackObj.scan_status;
       currentTrackObj.status_location = currentTrackObj.scan_location;
       currentTrackObj.pickrr_status =
@@ -67,7 +67,10 @@ const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
       }
       cacheData.track_model.track_arr = cachedTrackArray;
     }
-
+    if (trackingDocument) {
+      const updatedTrackModel = updateTrackModel(cacheData.track_model, trackingDocument);
+      cacheData.track_model = updatedTrackModel;
+    }
     await setObject(awb, cacheData);
     return true;
   } catch (error) {

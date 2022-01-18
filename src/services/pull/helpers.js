@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-prototype-builtins */
 const moment = require("moment");
 const logger = require("../../../logger");
 
@@ -56,8 +58,28 @@ const checkCancelStatusInTrackArr = (trackArr) => {
   }
 };
 
+/**
+ * @desc update cache track_model, if key exists
+ */
+const updateTrackModel = (cacheTrakModel, trackingDocument) => {
+  try {
+    return Object.keys(cacheTrakModel).reduce((obj, key) => {
+      if (key === "track_arr") {
+        obj[key] = cacheTrakModel[key];
+      } else {
+        obj[key] = trackingDocument[key];
+      }
+      return obj;
+    }, {});
+  } catch (error) {
+    logger.error("updateTrackModel", error);
+    return cacheTrakModel;
+  }
+};
+
 module.exports = {
   mapStatusToEvent,
   prepareTrackArrCacheData,
   checkCancelStatusInTrackArr,
+  updateTrackModel,
 };

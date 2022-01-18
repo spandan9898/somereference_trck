@@ -29,9 +29,9 @@ const prepareTrackDataForTracking = (trackArr) => {
       const scanType = trackItem.scan_type;
       const lastItem = last(updatedTrackArray);
       const filteredTrackItem = omit(trackItem, "scan_type");
-      filteredTrackItem.status_time = moment(filteredTrackItem.scan_datetime).format(
-        "DD MMM YYYY, HH:mm"
-      );
+      filteredTrackItem.status_time = moment(filteredTrackItem.scan_datetime)
+        .add(330, "m")
+        .format("DD MMM YYYY, HH:mm");
       filteredTrackItem.status_body = filteredTrackItem.scan_status;
       filteredTrackItem.status_location = filteredTrackItem.scan_location;
       filteredTrackItem.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];

@@ -71,6 +71,8 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
       eddStamp = "";
       logger.error("Edd Date Issue", error);
     }
+  } else {
+    eddStamp = edd;
   }
   return {
     success: true,
