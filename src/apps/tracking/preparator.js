@@ -176,16 +176,6 @@ const prepareTrackingRes = async (trackingObj) => {
           }
           responseList[i].web_address = "";
           try {
-            const convertedEddStamp = moment
-              .utc(responseList[i].edd_stamp)
-              .subtract(330, "minutes");
-            if (convertedEddStamp.isValid()) {
-              responseList[i].edd_stamp = convertedEddStamp;
-            }
-          } catch (error) {
-            responseList[i].edd_stamp = "";
-          }
-          try {
             responseList[i].info.to_phone_number = "";
             responseList[i].info.to_address = "";
             responseList[i].info.invoice_value = "";
@@ -243,12 +233,10 @@ const prepareTrackingRes = async (trackingObj) => {
       }
       try {
         if (["6c96b95bb99c767660312f5fd97c558732735"].includes(authToken) && tracking.edd_stamp) {
-          tracking.edd_stamp = moment
-            .utc(tracking.edd_stamp)
-            .add(1, "day")
-            .subtract(330, "minutes");
-        } else if (tracking.edd_stamp) {
-          tracking.edd_stamp = moment.utc(tracking.edd_stamp).subtract(330, "minutes");
+          const convertedEddStamp = moment.utc(tracking.edd_stamp).add(1, "day");
+          if (convertedEddStamp.isValid()) {
+            tracking.edd_stamp = convertedEddStamp;
+          }
         }
       } catch {
         tracking.edd_stamp = "";
@@ -312,14 +300,21 @@ const prepareTrackingRes = async (trackingObj) => {
 const prepareTrackObjForClientTracking = async (trackingObj) => {
   let tracking = { ...trackingObj };
   tracking = _.omit(tracking, ["xkt"]);
+  tracking = _.omit(tracking, ["order_created_at"]);
+  tracking = _.omit(tracking, ["created_at"]);
+  tracking = _.omit(tracking, ["sync_count"]);
+
   if ("edd_stamp" in tracking && tracking.edd_stamp !== "") {
-    tracking.edd_stamp = moment(tracking.edd_stamp).add(330, "minute").format("DD MMM YYYY, HH:mm");
+    const convertedEddStamp = moment.utc(tracking.edd_stamp).add(330, "minute");
+    if (convertedEddStamp.isValid()) {
+      tracking.edd_stamp = convertedEddStamp.format("DD MMM YYYY, HH:mm");
+    }
   }
   if ("status" in tracking && "current_status_time" in tracking.status) {
-    tracking.status.current_status_time = moment(
-      tracking.status.current_status_time,
-      "YYYY-MM-DD HH:mm:ss"
-    ).format("DD MMM YYYY, HH:mm");
+    tracking.status.current_status_time = moment
+      .utc(tracking.status.current_status_time, "YYYY-MM-DD HH:mm:ss")
+      .add(330, "minute")
+      .format("DD MMM YYYY, HH:mm");
   }
   if ("logo" in tracking) {
     tracking.logo = "";
