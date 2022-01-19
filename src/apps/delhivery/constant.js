@@ -846,8 +846,8 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
   },
   "eod-21_cn": {
     courier_remarks: "Cancelled the pickup request",
-    scan_type: "PPF",
-    pickrr_sub_status_code: "CANC",
+    scan_type: "OC",
+    pickrr_sub_status_code: "",
   },
   "eod-68_pp": {
     courier_remarks: "Request for delayed pickup",
@@ -1086,8 +1086,8 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
   },
   "eod-84_cn": {
     courier_remarks: "Product description mismatch",
-    scan_type: "PPF",
-    pickrr_sub_status_code: "OTH",
+    scan_type: "OC",
+    pickrr_sub_status_code: "",
   },
   "eod-131_cn": {
     courier_remarks: "Brand Mismatch",
@@ -1111,8 +1111,8 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
   },
   "eod-108_cn": {
     courier_remarks: "Product count mismatch",
-    scan_type: "PPF",
-    pickrr_sub_status_code: "OTH",
+    scan_type: "OC",
+    pickrr_sub_status_code: "",
   },
   "eod-65_pp": {
     courier_remarks: "Not attempted",
