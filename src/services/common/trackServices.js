@@ -2,7 +2,9 @@ const { isEmpty, omit, get, last } = require("lodash");
 const moment = require("moment");
 
 const { findOneDocumentFromMongo, getObject, setObject } = require("../../utils");
+const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { sortStatusArray } = require("./helpers");
+const { IS_FETCH_FROM_DB } = require("../../utils/constants");
 
 /**
  *
@@ -27,11 +29,12 @@ const prepareTrackDataForTracking = (trackArr) => {
       const scanType = trackItem.scan_type;
       const lastItem = last(updatedTrackArray);
       const filteredTrackItem = omit(trackItem, "scan_type");
-      filteredTrackItem.status_time = moment(filteredTrackItem.scan_datetime).format(
-        "DD MMM YYYY, HH:mm"
-      );
+      filteredTrackItem.status_time = moment(filteredTrackItem.scan_datetime)
+        .add(330, "m")
+        .format("DD MMM YYYY, HH:mm");
       filteredTrackItem.status_body = filteredTrackItem.scan_status;
       filteredTrackItem.status_location = filteredTrackItem.scan_location;
+      filteredTrackItem.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];
 
       if (!lastItem) {
         updatedTrackArray.push({
@@ -77,12 +80,8 @@ const PrepareTrackModelFilters = async (trackingAwb) => {
     ops_profile: 0,
     user_pk: 0,
     updated_at: 0,
-    ewaybill_number: 0,
-    is_mps: 0,
-    rto_waybill: 0,
-    waybill_type: 0,
-    pdd_date: 0,
     pickup_address_pk: 0,
+    mandatory_status_map: 0,
   };
 
   return { query, projection };
@@ -115,7 +114,7 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb) => {
   try {
     const trackingObj = (await getObject(trackingAwb)) || {};
 
-    if (isEmpty(trackingObj) || isEmpty(trackingObj?.track_model)) {
+    if (IS_FETCH_FROM_DB || isEmpty(trackingObj) || isEmpty(trackingObj?.track_model)) {
       const trackDocument = await getTrackDocumentfromMongo(trackingAwb);
 
       if (isEmpty(trackDocument)) {

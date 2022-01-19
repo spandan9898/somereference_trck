@@ -1,0 +1,33 @@
+const get = require("lodash/get");
+const moment = require("moment");
+
+const logger = require("../../../logger");
+const { NEW_STATUS_TO_OLD_MAPPING } = require("../../apps/webhookClients/common/constants");
+const { elkDataUpdate } = require("./elk");
+
+/**
+ * @param trackingDoc -> tracking document(same as DB document)
+ * @desc preapre current status, current status time and order type and then update ELK
+ */
+const updateStatusELK = async (trackingDoc, elkClient) => {
+  try {
+    const trackingId = trackingDoc.tracking_id;
+    const currentStatusTime = get(trackingDoc, "status.current_status_time") || "NA";
+    const currentStatusType = get(trackingDoc, "status.current_status_type") || "NA";
+
+    await elkDataUpdate({
+      elkClient,
+      id: trackingId,
+      doc: {
+        current_status_time: moment(currentStatusTime).subtract(330, "minutes").toDate(),
+        current_status_type: NEW_STATUS_TO_OLD_MAPPING[currentStatusType] || currentStatusType,
+      },
+    });
+  } catch (error) {
+    logger.error(error.message);
+  }
+};
+
+module.exports = {
+  updateStatusELK,
+};

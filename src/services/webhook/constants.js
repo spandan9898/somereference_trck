@@ -15,7 +15,42 @@ const SMART_SHIP_AUTH_TOKENS = [
   "c82f7d4d83ab952711a8422413298e5d166524",
   "4f315f7a24b24977ae0804b9f2a4bf06166522",
 ];
+
+const COMPULSORY_EVENTS = {
+  PP: ["OP", "OM", "OFP", "PPF"],
+  DL: ["OP", "OM", "OFP", "PPF", "PP", "SHP", "OT", "OO", "RTD"],
+  RTO: ["OP", "OM", "OFP", "PPF", "PP", "SHP", "OT", "OO"],
+  RTD: ["OP", "OM", "OFP", "PPF", "OT", "OO", "UD", "NDR", "RTO", "RTO-OT", "RTO-OO", "RTO-UD"],
+};
+
+const COMPULSORY_EVENTS_PRECEDENCE = [["PP"], ["DL", "RTO", "RTD"]];
+
+const STATUS_PROXY_LIST = {
+  PP: [
+    "PP",
+    "SHP",
+    "OT",
+    "RAD",
+    "OO",
+    "NDR",
+    "DL",
+    "RTO",
+    "RTO-OT",
+    "RTO-OO",
+    "RTO-UD",
+    "RTD",
+    "LT",
+    "DM",
+  ],
+  RTO: ["RTO", "RTO-OT", "RTO-OO", "RTO-UD", "RTD"],
+  RTD: ["RTD"],
+  DL: ["DL"],
+};
+
 module.exports = {
   SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
   SMART_SHIP_AUTH_TOKENS,
+  COMPULSORY_EVENTS,
+  COMPULSORY_EVENTS_PRECEDENCE,
+  STATUS_PROXY_LIST,
 };

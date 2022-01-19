@@ -85,7 +85,35 @@ const updatePrepareDict = async (preparedDict) => {
   }
 };
 
+/**
+ *
+ * @param {*} trackingObj -> tracking document
+ * @desc check the order type based on three parameters
+ * @returns -> order type
+ */
+const getOrderType = (trackingObj) => {
+  try {
+    const {
+      is_reverse: isReverse,
+      is_cod: isCod,
+      info: { cod_amount: codAmount } = {},
+    } = trackingObj || {};
+    switch (true) {
+      case isReverse:
+        return "reverse";
+      case isCod || codAmount:
+        return "cod";
+      default:
+        return "prepaid";
+    }
+  } catch (error) {
+    logger.error("getOrderType", error);
+    return "NA";
+  }
+};
+
 module.exports = {
   sortStatusArray,
   updatePrepareDict,
+  getOrderType,
 };

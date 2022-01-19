@@ -20,16 +20,16 @@ const lambda = new AWS.Lambda({
 const callLambdaFunction = async (data, functionName) => {
   try {
     const params = {
-      FunctionName: functionName || "kafkaWebhookTrigger",
+      FunctionName: functionName || "kafkaWebhookTriggerV2",
       InvocationType: "Event",
       Payload: JSON.stringify(data),
     };
     const lambdaRequestObj = lambda.invoke(params);
     lambdaRequestObj.on("error", (response) => {
-      logger.error("lambda trigger error", response.error.message);
+      logger.error("lambda trigger error", response);
     });
-    lambdaRequestObj.on("complete", () => {
-      logger.verbose("Complete");
+    lambdaRequestObj.on("success", () => {
+      logger.verbose("Webhook Lambda Success");
     });
     lambdaRequestObj.send();
   } catch (error) {

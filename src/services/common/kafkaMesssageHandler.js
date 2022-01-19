@@ -10,6 +10,7 @@ const { prepareShadowfaxData } = require("../../apps/shadowfax/services");
 const { prepareUdaanData } = require("../../apps/udaan/services");
 const { prepareXbsData } = require("../../apps/xpressbees/services");
 const logger = require("../../../logger");
+const initELK = require("../../connector/elkConnection");
 
 const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
@@ -17,8 +18,9 @@ const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
 const updateStatusOnReport = require("../report");
-const elkClient = require("../../connector/elk");
 const { updatePrepareDict } = require("./helpers");
+const { ELK_INSTANCE_NAMES } = require("../../utils/constants");
+const { updateStatusELK } = require("./services");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -37,6 +39,26 @@ class KafkaMessageHandler {
       xpressbees: prepareXbsData,
     };
     return courierPrepareMapFunctions[courierName];
+  }
+
+  static getElkClients() {
+    let prodElkClient = "";
+    let stagingElkClient = "";
+    try {
+      prodElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.PROD.name);
+      stagingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.STAGING.name);
+
+      return {
+        prodElkClient,
+        stagingElkClient,
+      };
+    } catch (error) {
+      logger.error("getElkClients", error);
+      return {
+        prodElkClient,
+        stagingElkClient,
+      };
+    }
   }
 
   static async init(consumedPayload, courierName) {
@@ -63,11 +85,18 @@ class KafkaMessageHandler {
         return;
       }
 
+      const { prodElkClient } = KafkaMessageHandler.getElkClients();
+
       const result = await updateTrackDataToPullMongo(updatedTrackData, logger);
+      if (!result) {
+        return;
+      }
+
       sendDataToNdr(result);
       sendTrackDataToV1(result);
-      triggerWebhook(result, elkClient);
-      updateStatusOnReport(result, logger, elkClient);
+      triggerWebhook(result, prodElkClient);
+      updateStatusOnReport(result, logger, prodElkClient);
+      updateStatusELK(result, prodElkClient);
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }

@@ -58,7 +58,7 @@ const checkIfTriggerNDREb = async (currentStatusType, awb) => {
  */
 const updateIsNDRinCache = async (awb) => {
   try {
-    const cacheData = await getObject(awb);
+    const cacheData = (await getObject(awb)) || {};
     cacheData.isNDR = true;
     await setObject(awb, cacheData);
   } catch (error) {
