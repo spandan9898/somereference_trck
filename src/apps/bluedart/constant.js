@@ -145,6 +145,8 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "188-rt": { scan_type: "RTD", pickrr_sub_status_code: "" },
   "105-rt": { scan_type: "RTD", pickrr_sub_status_code: "" },
   "098-rt": { scan_type: "OC", pickrr_sub_status_code: "" },
+  "020-s": { scan_type: "OT", pickrr_sub_status_code: "" },
+  "003-s": { scan_type: "OT", pickrr_sub_status_code: "" },
 };
 
 const TOTAL_TOPIC_COUNT = 5;
