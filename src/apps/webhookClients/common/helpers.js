@@ -53,7 +53,7 @@ const validateTrackingJson = (trackObj) => {
  */
 const prepareEddStamp = (eddDatetime, addDay) => {
   if (moment(eddDatetime).isValid()) {
-    let eddDate = moment(eddDatetime);
+    let eddDate = moment(eddDatetime).add(330, "minutes");
     if (addDay) {
       eddDate = eddDate.add(addDay, "day");
     }
