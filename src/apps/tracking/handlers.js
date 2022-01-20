@@ -1,6 +1,8 @@
 /* eslint-disable import/no-unresolved */
 
+const RequestIp = require("@supercharge/request-ip");
 const { isEmpty } = require("lodash");
+const logger = require("../../../logger");
 const {
   prepareTrackingRes,
   prepareClientTracking,
@@ -75,6 +77,17 @@ module.exports.clientTracking = async (req, reply) => {
     tracking = await prepareClientTracking(tracking);
     return reply.code(200).send(tracking);
   } catch (error) {
+    logger.error("client tracking handler error", error);
     return reply.code(200).send(error.message);
   }
+};
+
+module.exports.returnHeaders = async (req, reply) => {
+  const IP = RequestIp.getClientIp(req);
+  const replydict = {
+    IP,
+    headers: req.headers,
+    IPS: req.ips,
+  };
+  return reply.code(200).send(replydict);
 };
