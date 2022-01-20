@@ -17,13 +17,19 @@ const prepareTrackDictForV1 = (trackData) => {
     awb: trackData?.tracking_id,
     scan_type: NEW_STATUS_TO_OLD_MAPPING[scanType] || scanType,
     scan_datetime: trackData?.status?.current_status_time
-      ? moment(trackData?.status?.current_status_time).format("DD-MM-YYYY HH:mm")
+      ? moment(trackData?.status?.current_status_time)
+          .add(330, "minutes")
+          .format("DD-MM-YYYY HH:mm")
       : "",
     track_info: trackData?.status?.current_status_body,
     track_location: trackData?.status?.current_status_location,
     received_by: trackData?.status?.received_by,
-    pickup_time: pickupTime ? moment(pickupTime).format("DD-MM-YYYY HH:mm") : "",
-    EDD: trackData?.edd_stamp ? moment(trackData?.edd_stamp).format("DD-MM-YYYY HH:mm") : "",
+    pickup_time: pickupTime
+      ? moment(pickupTime).add(330, "minutes").format("DD-MM-YYYY HH:mm")
+      : "",
+    EDD: trackData?.edd_stamp
+      ? moment(trackData?.edd_stamp).add(330, "minutes").format("DD-MM-YYYY HH:mm")
+      : "",
     pickrr_status: NEW_STATUS_TO_OLD_MAPPING[scanType],
     pickrr_sub_status_code:
       trackData?.pickrr_sub_status_code ||
