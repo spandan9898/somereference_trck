@@ -87,7 +87,6 @@ module.exports.returnHeaders = async (req, reply) => {
   const replydict = {
     IP,
     headers: req.headers,
-    IPS: req.ips,
   };
   return reply.code(200).send(replydict);
 };
