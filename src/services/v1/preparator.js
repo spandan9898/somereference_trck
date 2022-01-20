@@ -36,6 +36,7 @@ const prepareTrackDictForV1 = (trackData) => {
       _.get(trackData, "track_arr[0].pickrr_sub_status_code", ""),
     courier_status_code: _.get(trackData, "track_arr[0].courier_status_code", ""),
     ofd_count: trackData?.track_arr ? ofdCount(trackData?.track_arr) : 0,
+    source: "node-kafka",
   };
   return trackDict;
 };
