@@ -25,7 +25,7 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "532-t": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   "533-t": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   "534-t": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
-  "535-t": { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
+  "535-t": { scan_type: "OC", pickrr_sub_status_code: "" },
   "536-t": { scan_type: "PPF", pickrr_sub_status_code: "SC" },
   "537-t": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   "540-t": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
@@ -111,7 +111,7 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "123-t": { scan_type: "RTO", pickrr_sub_status_code: "" },
   "074-rt": { scan_type: "RTO", pickrr_sub_status_code: "" },
   "123-rt": { scan_type: "RTO", pickrr_sub_status_code: "" },
-  "503-s": { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
+  "503-s": { scan_type: "OC", pickrr_sub_status_code: "" },
   "034-t": { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
   "019-s": { scan_type: "RTO-OO", pickrr_sub_status_code: "" },
   "035-rt": { scan_type: "RTO-OO", pickrr_sub_status_code: "" },
@@ -145,6 +145,8 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "188-rt": { scan_type: "RTD", pickrr_sub_status_code: "" },
   "105-rt": { scan_type: "RTD", pickrr_sub_status_code: "" },
   "098-rt": { scan_type: "OC", pickrr_sub_status_code: "" },
+  "020-s": { scan_type: "OT", pickrr_sub_status_code: "" },
+  "003-s": { scan_type: "OT", pickrr_sub_status_code: "" },
 };
 
 const TOTAL_TOPIC_COUNT = 5;
