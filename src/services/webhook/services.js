@@ -28,7 +28,8 @@ const {
 const WebhookClient = require("../../apps/webhookClients");
 const { callLambdaFunction } = require("../../connector/lambda");
 const { WEBHOOK_USER_CACHE_KEY_NAME } = require("../../utils/constants");
-const { NAAPTOL_AUTH_TOKEN } = require("../../apps/webhookClients/constants");
+
+// const { NAAPTOL_AUTH_TOKEN } = require("../../apps/webhookClients/constants");
 
 const {
   SHOPCLUES_TOKEN_URL,
