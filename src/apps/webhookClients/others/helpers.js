@@ -1,6 +1,6 @@
 
 
-const get_current_track_status = (trackingObj) => {
+const getCurrentTrackStatus = (trackingObj) => {
     current_status = None
     if (trackingObj.return_delivered_date)
         current_status = 'RTD';
@@ -25,5 +25,5 @@ const get_current_track_status = (trackingObj) => {
 };
 
 module.exports = {
-    get_current_track_status
+    getCurrentTrackStatus
 }
