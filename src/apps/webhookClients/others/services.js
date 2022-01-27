@@ -12,7 +12,7 @@ class UpdateClients {
                 "order_id": trackingObj.clientExtraVar,
                 "tracking_number": trackingObj.trackingId,
                 "carrier": courierMap[trackingObj.courierUsed],
-                "tracking_url": "https://pickrr.com/tracking/#/?tracking_id={trackingObj.trackingId}"
+                "tracking_url": `https://pickrr.com/tracking/#/?tracking_id=${trackingObj.trackingId}`
             }
             url = "https://cfapi.pickrr.com/plugins/instamojo/api/v1/update-order-tracking/"
             let update = new MakeApiCall(url, instamojoDict)
@@ -79,7 +79,7 @@ class UpdateClients {
                 'shop_name': clientExtraVar.get("shop_name"),
                 'delivery_date': deliveryDate,
                 'tracking_number': trackingObj.trackingId,
-                'tracking_url': "https://pickrr.com/tracking/#/?tracking_id=${trackingObj.tracking_id}",
+                'tracking_url': `https://pickrr.com/tracking/#/?tracking_id=${trackingObj.tracking_id}`,
                 'shipment_date': trackingObj.pickupTime.moment(date, "YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm"),
                 'carrier': trackingObj.courierUsed
             }
@@ -95,10 +95,10 @@ class UpdateClients {
     }
     getWoocomBase(storeName) {
         if (storeName.startswith() == "http") {
-            return "${store_name}/wp/json/wc/3"
+            return `${store_name}/wp/json/wc/3`
         }
         else {
-            return "https://${store_name}/wp-json/wc/v3"
+            return `https://${store_name}/wp-json/wc/v3`
         }
     }
     updateOrderStatusOnWoocom(woocomUser, status, clientOrderId) {
@@ -115,12 +115,12 @@ class UpdateClients {
                 "status": status
             }
             const str1 = this.getWoocomBase(storeName)
-            url = str1.concat('/orders/${order_id}')
+            url = str1.concat(`/orders/${order_id}`)
             headers = {
                 'Content-Type': 'application/json',
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
             }
-            url += "?consumer_key=${Username}&consumer_secret=${Password}"
+            url += `?consumer_key=${Username}&consumer_secret=${Password}`
             try {
                 let response = new MakeApiCall(url, data, headers, timeout = REQUESTTIMEOUT)
                 orderResponse = response.put()
