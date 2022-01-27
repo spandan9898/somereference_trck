@@ -1,25 +1,36 @@
 const getCurrentTrackStatus = (trackingObj) => {
     currentStatus = None
-    if (trackingObj.returnDeliveredDate)
-        currentStatus = 'RTD';
-    else if (trackingObj.rtoDate)
-        currentStatus = 'RTO';
-    else if (trackingObj.deliveryDate)
-        currentStatus = 'DL';
-    else if (trackingObj.outDeliveryTime)
-        currentStatus = 'OO';
-    else if (trackingObj.inTransitTime)
-        currentStatus = 'OT';
-    else if (trackingObj.pickupTime)
-        currentStatus = 'PP';
-    else if (trackingObj.order.isCancelled)
-        currentStatus = 'OC';
-    else if (trackingObj.manifestTime || trackingObj.order.placedAt)
-        currentStatus = 'OP';
-    else {
-        pass;
+    switch (true) {
+        case (trackingObj.returnDeliveredDate !== null):
+            currentStatus = 'RTD';
+            break;
+        case (trackingObj.rtoDate !== null):
+            currentStatus = 'RTO';
+            break;
+        case (trackingObj.deliveryDate !== null):
+            currentStatus = 'DL';
+            break;
+        case (trackingObj.outDeliveryTime !== null):
+            currentStatus = 'OO';
+            break;
+        case (trackingObj.inTransitTime !== null):
+            currentStatus = 'OT';
+            break;
+        case (trackingObj.pickupTime !== null):
+            currentStatus = 'PP';
+            break;
+        case (trackingObj.isCancelled !== null):
+            currentStatus = 'OC';
+            break;
+        case (trackingObj.manifestTime !== null || trackingObj.order.placedAt !== null):
+            currentStatus = 'OP';
+            break;
+        default: {
+            break;
+        }
     }
-    return currentStatus
+    return currentStatus;
+
 };
 
 module.exports = {

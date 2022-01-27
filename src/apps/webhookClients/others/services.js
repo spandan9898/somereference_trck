@@ -4,8 +4,8 @@ import CV from './constants'
 const moment = require("moment");
 
 class UpdateClients {
-    updateInstamojoTracking(trackingObj, client) {
-        courierMap = CV
+    updateInstamojoTracking = (trackingObj, client) => {
+        const courierMap = CV
         try {
             instamojoDict = {
                 "auth_token": client.auth_token,
@@ -23,7 +23,7 @@ class UpdateClients {
             throw new Error(error);
         }
     }
-    updateInstamojoOrder(trackingObj, client, currentStatus) {
+    updateInstamojoOrder = (trackingObj, client, currentStatus) => {
         try {
             url = 'https://cfapi.pickrr.com/plugins/instamojo/api/v1/update-order-status/'
             orderUpdateBody = {
@@ -39,7 +39,7 @@ class UpdateClients {
             throw new Error(error);
         }
     }
-    updateZohoInventoryOrder(trackingObj, client, currentStatus) {
+    updateZohoInventoryOrder = (trackingObj, client, currentStatus) => {
         try {
             url = 'https://cfapi.pickrr.com/plugins/zoho-inventory/api/v1/update-order-status/'
             clientExtraVar = json.parse(trackingObj.clientExtraVar)
@@ -61,13 +61,13 @@ class UpdateClients {
             throw new Error(error);
         }
     }
-    updateZohoOrder(trackingObj, client, currentStatus) {
+    updateZohoOrder = (trackingObj, client, currentStatus) => {
         try {
             url = 'https://cfapi.pickrr.com//plugins/zoho/update-order-status/'
             clientExtraVar = json.parse(trackingObj.clientExtraVar)
             platformOrderId = clientExtraVar.get('platform_order_id')
             if (trackingObj.deliveryDate) {
-                deliveryDate = trackingObj.deliveryDate.moment(date, "YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm");
+                deliveryDate = trackingObj.deliveryDate.moment("YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm");
             }
             else {
                 deliveryDate = none;
@@ -80,7 +80,7 @@ class UpdateClients {
                 'delivery_date': deliveryDate,
                 'tracking_number': trackingObj.trackingId,
                 'tracking_url': `https://pickrr.com/tracking/#/?tracking_id=${trackingObj.tracking_id}`,
-                'shipment_date': trackingObj.pickupTime.moment(date, "YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm"),
+                'shipment_date': trackingObj.pickupTime.moment("YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm"),
                 'carrier': trackingObj.courierUsed
             }
             if (["DL", "OT"].includes(currentStatus)) {
@@ -93,7 +93,7 @@ class UpdateClients {
             throw new Error(error);
         }
     }
-    getWoocomBase(storeName) {
+    getWoocomBase = (storeName) => {
         if (storeName.startswith() == "http") {
             return `${store_name}/wp/json/wc/3`
         }
@@ -101,7 +101,7 @@ class UpdateClients {
             return `https://${store_name}/wp-json/wc/v3`
         }
     }
-    updateOrderStatusOnWoocom(woocomUser, status, clientOrderId) {
+    updateOrderStatusOnWoocom = (woocomUser, status, clientOrderId) => {
         try {
             Username = (woocomUser.username).toString()
             Password = (woocomUser.password).toString()
@@ -135,7 +135,7 @@ class UpdateClients {
             throw new Error(error);
         }
     }
-    updateClientBikayiStore(trackingObj, platformObj, currentStatus, client) {
+    updateClientBikayiStore = (trackingObj, platformObj, currentStatus, client) => {
         try {
             bikayiDict = {
                 "auth_token": client.auth_token,
@@ -152,7 +152,7 @@ class UpdateClients {
             throw new Error(error);
         }
     }
-    updateClientOpencartStore(trackingObj, platformObj, currentStatus, client) {
+    updateClientOpencartStore = (trackingObj, platformObj, currentStatus, client) => {
         try {
             opencartDict = {
                 "auth_token": client.auth_token,
@@ -169,7 +169,7 @@ class UpdateClients {
             throw new Error(error);
         }
     }
-    updateClientEasyecomStore(trackingObj, platformObj, currentStatus, client) {
+    updateClientEasyecomStore = (trackingObj, platformObj, currentStatus, client) => {
         try {
             easyecomDict = {
                 "auth_token": client.auth_token,
@@ -186,7 +186,7 @@ class UpdateClients {
             throw new Error(error);
         }
     }
-    updateClientMagento2Store(trackingObj, platformObj, currentStatus, client) {
+    updateClientMagento2Store = (trackingObj, platformObj, currentStatus, client) => {
         try {
             magento2Dict = {
                 "auth_token": client.auth_token,
@@ -205,9 +205,9 @@ class UpdateClients {
         }
     }
 
-    updateClientShopifyStore(trackingObj, platformObj, currentStatus, client) {
+    updateClientShopifyStore = (trackingObj, platformObj, currentStatus, client) => {
         try {
-            courierMap = CV
+            const courierMap = CV
             if (client.shopPlatform !== null) {
                 storeName = None
                 if ("-loc:" in trackingObj.clientExtraVar) {
@@ -286,9 +286,9 @@ class UpdateClients {
         }
     }
 
-    trackUpdatesToClientShopify(trackingObj) {
+    trackUpdatesToClientShopify = (trackingObj) => {
         try {
-            courierMap = CV
+            const courierMap = CV
             if ("-loc:" in trackingObj.clientExtraVar) {
                 shopifyOrderId = trackingObj.clientExtraVar.split('-loc:')[0]
                 locationId = trackingObj.clientExtraVar.split('-loc:')[1]
@@ -334,7 +334,7 @@ class UpdateClients {
             throw new Error(error);
         }
     }
-    updateClientEcwidStore(trackingObj, platformObj, currentStatus, client) {
+    updateClientEcwidStore = (trackingObj, platformObj, currentStatus, client) => {
         try {
             ecwidDict = {
                 "store_id": platformObj.shopToken,
