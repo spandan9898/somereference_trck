@@ -195,6 +195,20 @@ class MakeAPICall {
     }
   }
 
+  async put(otherConfigs) {
+    try {
+      const config = this.getConfig(otherConfigs);
+      const { data, status, headers } = await this.axios.get(this.url, this.payload, config);
+      return {
+        data,
+        statusCode: status,
+        headers,
+      };
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   async post(otherConfigs) {
     try {
       const config = this.getConfig(otherConfigs);
