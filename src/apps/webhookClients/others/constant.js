@@ -1,4 +1,4 @@
-const cv = {
+const CV = {
     'dtdc': 'DTDC',
     'dtdc_air': 'DTDC',
     'dtdc_docs_250': 'DTDC',
@@ -89,5 +89,5 @@ const cv = {
 }
 
 module.exports = {
-    order
+    CV
 }

@@ -1,11 +1,11 @@
 import MakeApiCall from '../utils/helpers.js'
 import get_current_track_status from './helpers'
-import cv from './constant'
+import CV from './constant'
 const moment = require("moment");
 
 class UpdateClients {
     update_instamojo_tracking(trackingObj, client) {
-        courier_map = cv
+        courier_map = CV
         try {
             instamojo_dict = {
                 "auth_token": client.mobile_token,
@@ -207,7 +207,7 @@ class UpdateClients {
 
     update_client_shopify_store(trackingObj, platform_obj, current_status, client) {
         try {
-            courier_map = cv
+            courier_map = CV
             if (client.shop_platform !== null) {
                 store_name = None
                 if ("-loc:" in trackingObj.order.client_extra_var) {
@@ -288,7 +288,7 @@ class UpdateClients {
 
     track_updates_to_client_shopify(trackingObj) {
         try {
-            courier_map = cv
+            courier_map = CV
             if ("-loc:" in trackingObj.order.client_extra_var) {
                 shopify_order_id = trackingObj.order.client_extra_var.split('-loc:')[0]
                 location_id = trackingObj.order.client_extra_var.split('-loc:')[1]
