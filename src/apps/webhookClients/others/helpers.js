@@ -22,7 +22,7 @@ const getCurrentTrackStatus = (trackingObj) => {
         case (trackingObj.isCancelled !== null):
             currentStatus = 'OC';
             break;
-        case (trackingObj.manifestTime !== null || trackingObj.order.placedAt !== null):
+        case (trackingObj.manifestTime !== null || trackingObj.placedAt !== null):
             currentStatus = 'OP';
             break;
         default: {

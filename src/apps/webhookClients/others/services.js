@@ -67,7 +67,7 @@ class UpdateClients {
             clientExtraVar = json.parse(trackingObj.clientExtraVar)
             platformOrderId = clientExtraVar.get('platform_order_id')
             if (trackingObj.deliveryDate) {
-                deliveryDate = trackingObj.deliveryDate.moment("YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm");
+                const deliveryDate = trackingObj.deliveryDate.moment("YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm");
             }
             else {
                 deliveryDate = none;
@@ -103,9 +103,9 @@ class UpdateClients {
     }
     updateOrderStatusOnWoocom = (woocomUser, status, clientOrderId) => {
         try {
-            Username = (woocomUser.username).toString()
-            Password = (woocomUser.password).toString()
-            storeName = (woocomUser.storeName).toString()
+            const Username = (woocomUser.username).toString()
+            const Password = (woocomUser.password).toString()
+            const storeName = (woocomUser.storeName).toString()
             const REQUESTTIMEOUT
             if (store_name in WOOCOMTIMEOUTSTORELIST)
                 REQUESTTIMEOUT = 10
