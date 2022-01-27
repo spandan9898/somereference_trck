@@ -1,6 +1,6 @@
 import MakeApiCall from '../utils/helpers.js'
 import getCurrentTrackStatus from './helpers'
-import CV from './constant'
+import CV from './constants'
 const moment = require("moment");
 
 class UpdateClients {
