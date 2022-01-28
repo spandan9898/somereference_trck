@@ -16,7 +16,7 @@ class UpdateClients {
             }
             url = "https://cfapi.pickrr.com/plugins/instamojo/api/v1/update-order-tracking/"
             let update = new MakeApiCall(url, instamojoDict)
-            response = update.post()
+            const response = await update.post()
             return response
         }
         catch (error) {
@@ -32,7 +32,7 @@ class UpdateClients {
                 'auth_token': client.auth_token
             }
             let update = new MakeApiCall(url, orderUpdateBody)
-            response = update.post()
+            const response = await update.post()
             return response
         }
         catch (error) {
@@ -42,9 +42,9 @@ class UpdateClients {
     updateZohoInventoryOrder = (trackingObj, client, currentStatus) => {
         try {
             url = 'https://cfapi.pickrr.com/plugins/zoho-inventory/api/v1/update-order-status/'
-            clientExtraVar = json.parse(trackingObj.clientExtraVar)
-            shopName = clientExtraVar.get('shop_name')
-            platformOrderId = clientExtraVar.get('platform_order_id')
+            const clientExtraVar = json.parse(trackingObj.clientExtraVar)
+            const shopName = clientExtraVar.get('shop_name')
+            const platformOrderId = clientExtraVar.get('platform_order_id')
             orderUpdateBody = {
                 'order_status': currentStatus,
                 'platform_order_id': platformOrderId,
@@ -53,7 +53,7 @@ class UpdateClients {
             }
             if (currentStatus == 'DL' || currentStatus == 'OC') {
                 let update = new MakeApiCall(url, orderUpdateBody)
-                response = update.post()
+                const response = await update.post()
                 return response
             }
         }
@@ -64,8 +64,8 @@ class UpdateClients {
     updateZohoOrder = (trackingObj, client, currentStatus) => {
         try {
             url = 'https://cfapi.pickrr.com//plugins/zoho/update-order-status/'
-            clientExtraVar = json.parse(trackingObj.clientExtraVar)
-            platformOrderId = clientExtraVar.get('platform_order_id')
+            const clientExtraVar = json.parse(trackingObj.clientExtraVar)
+            const platformOrderId = clientExtraVar.get('platform_order_id')
             if (trackingObj.deliveryDate) {
                 const deliveryDate = trackingObj.deliveryDate.moment("YYYY-MM-DD HH:mm:ss").format("DD-MM-YYYY HH:mm");
             }
@@ -85,7 +85,7 @@ class UpdateClients {
             }
             if (["DL", "OT"].includes(currentStatus)) {
                 let update = new MakeApiCall(url, orderUpdateBody)
-                response = update.post()
+                const response = await update.post()
                 return response
             }
         }
@@ -109,8 +109,8 @@ class UpdateClients {
             const REQUESTTIMEOUT
             if (store_name in WOOCOMTIMEOUTSTORELIST)
                 REQUESTTIMEOUT = 10
-            status = status
-            orderId = clientOrderId
+            const status = status
+            const orderId = clientOrderId
             data = {
                 "status": status
             }
@@ -123,11 +123,11 @@ class UpdateClients {
             url += `?consumer_key=${Username}&consumer_secret=${Password}`
             try {
                 let response = new MakeApiCall(url, data, headers, timeout = REQUESTTIMEOUT)
-                orderResponse = response.put()
+                const orderResponse = await response.put()
             }
             catch {
                 let response = new MakeApiCall(url, data, headers, timeout = REQUESTTIMEOUT)
-                orderResponse = response.post()
+                const orderResponse = await response.post()
             }
             return orderResponse
         }
@@ -145,7 +145,7 @@ class UpdateClients {
             }
             url = "https://cfapi.pickrr.com/plugins/bikayi/update-order-status/"
             let update = new MakeApiCall(url, bikayiDict)
-            response = update.post()
+            const response = await update.post()
             return response
         }
         catch (error) {
@@ -162,7 +162,7 @@ class UpdateClients {
             }
             url = "https://cfapi.pickrr.com/plugins/opencart/update-order-status/"
             let update = new MakeApiCall(url, opencartDict)
-            response = update.post()
+            const response = await update.post()
             return response
         }
         catch (error) {
@@ -179,7 +179,7 @@ class UpdateClients {
             }
             url = "https://cfapi.pickrr.com/plugins/easyecom/amazon/update-order-status/"
             let update = new MakeApiCall(url, easycomDict)
-            response = update.post()
+            const response = await update.post()
             return response
         }
         catch (error) {
@@ -197,7 +197,7 @@ class UpdateClients {
             }
             url = "https://cfapi.pickrr.com/plugins/magento2/update-order-status/"
             let update = new MakeApiCall(url, magento2Dict)
-            response = update.post()
+            const response = await update.post()
             return response
         }
         catch (error) {
@@ -209,19 +209,19 @@ class UpdateClients {
         try {
             const courierMap = CV
             if (client.shopPlatform !== null) {
-                storeName = None
+                const storeName = None
                 if ("-loc:" in trackingObj.clientExtraVar) {
-                    shopifyOrderId = trackingObj.clientExtraVar.split('-loc:')[0]
+                    const shopifyOrderId = trackingObj.clientExtraVar.split('-loc:')[0]
                     if ("-s-:" in trackingObj.clientExtraVar) {
                         storeName = trackingObj.clientExtraVar.split('-s-:')[1]
-                        locationId = trackingObj.clientExtraVar.split('-loc:')[1].split('-s-:')[0]
+                        const locationId = trackingObj.clientExtraVar.split('-loc:')[1].split('-s-:')[0]
                     }
                     else
-                        locationId = trackingObj.clientExtraVar.split('-loc:')[1]
+                        const locationId = trackingObj.clientExtraVar.split('-loc:')[1]
                 }
                 else {
-                    shopifyOrderId = trackingObj.clientExtraVar
-                    locationId = None
+                    const shopifyOrderId = trackingObj.clientExtraVar
+                    const locationId = None
                 }
                 shopifyDict = {
                     "shop_name": storeName,
@@ -247,12 +247,12 @@ class UpdateClients {
                 return response
             }
             if ("-loc:" in trackingObj.clientExtraVar) {
-                shopifyOrderId = trackingObj.clientExtraVar.split('-loc:')[0]
-                locationId = trackingObj.clientExtraVar.split('-loc:')[1]
+                const shopifyOrderId = trackingObj.clientExtraVar.split('-loc:')[0]
+                const locationId = trackingObj.clientExtraVar.split('-loc:')[1]
             }
             else {
-                shopifyOrderId = trackingObj.clientExtraVar
-                locationId = None
+                const shopifyOrderId = trackingObj.clientExtraVar
+                const locationId = None
             }
             shopify_dict = {
                 "shopify_token": platformObj.shopToken,
@@ -278,7 +278,7 @@ class UpdateClients {
                 url = str1.concat('=', str2, '&')
             }
             let update = new MakeApiCall(url, shopifyDict)
-            response = update.post()
+            const response = await update.post()
             return response
         }
         catch (error) {
@@ -290,14 +290,14 @@ class UpdateClients {
         try {
             const courierMap = CV
             if ("-loc:" in trackingObj.clientExtraVar) {
-                shopifyOrderId = trackingObj.clientExtraVar.split('-loc:')[0]
-                locationId = trackingObj.clientExtraVar.split('-loc:')[1]
+                const shopifyOrderId = trackingObj.clientExtraVar.split('-loc:')[0]
+                const locationId = trackingObj.clientExtraVar.split('-loc:')[1]
             }
             else {
-                shopifyOrderId = trackingObj.clientExtraVar
-                locationId = None
+                const shopifyOrderId = trackingObj.clientExtraVar
+                const locationId = None
             }
-            platformObj = trackingObj.user.shopPlatform
+            const platformObj = trackingObj.user.shopPlatform
             const status
             if (trackingObj.deliveryDate) {
                 status = "DL"
@@ -327,7 +327,7 @@ class UpdateClients {
                 url = str1.concat('=', str2, '&')
             }
             let update = new MakeApiCall(url, shopifyDict)
-            response = update.post()
+            const response = await update.post()
             return response
         }
         catch (error) {
@@ -344,7 +344,7 @@ class UpdateClients {
             }
             url = "https://cfapi.pickrr.com/plugins/ecwid/update-order-status/"
             let update = new MakeApiCall(url, ecwidDict)
-            response = update.post()
+            const response = await update.post()
             return response
         }
         catch (error) {
@@ -368,6 +368,7 @@ class OtherClienUpdate extends UpdateClients {
     }
     client = this.trackingObj.user
     init() {
+        const currentStatus = None
         switch (true) {
             case this.trackingObj.shopPlatform === 'instamojo':
                 currentStatus = getCurrentTrackStatus(this.trackingObj)
@@ -384,42 +385,51 @@ class OtherClienUpdate extends UpdateClients {
             case this.trackingObj.shopPlatform:
                 if (client.woocomPlatform && client.woocomPlatform.updateTrackingStatus) {
                     try {
-                        clientOrderId = trackingObj.clientExtraVar
-                        clientWoocomObj = client.woocomPlatform
-                        currentStatus = getCurrentTrackStatus(trackingObj)
-                        clientStatus = None
-                        if (currentStatus !== null)
-                            return False
-                        if (currentStatus == "PP") {
-                            if (clientWoocomObj.pickedUp)
-                                clientStatus = clientWoocomObj.pickedUp
-                        }
-                        else if (currentStatus == "OT") {
-                            if (clientWoocomObj.transit)
-                                clientStatus = clientWoocomObj.transit
-                        }
-                        else if (currentStatus == "RTO") {
-                            if (clientWoocomObj.rto)
-                                clientStatus = clientWoocomObj.rto
-                        }
-                        else if (currentStatus == "OC") {
-                            if (clientWoocomObj.cancelled)
-                                clientStatus = clientWoocomObj.cancelled
-                        }
-                        else if (currentStatus == "DL") {
-                            if (clientWoocomObj.delivered)
-                                clientStatus = clientWoocomObj.delivered
-                        }
-                        else if (currentStatus == "RTD") {
-                            if (clientWoocomObj.rtd)
-                                clientStatus = clientWoocomObj.rtd
-                        }
-                        else if (currentStatus == "OP") {
-                            if (clientWoocomObj.orderPlaced)
-                                clientStatus = clientWoocomObj.orderPlaced
+                        const clientOrderId = trackingObj.clientExtraVar
+                        const clientWoocomObj = client.woocomPlatform
+                        const currentStatus = getCurrentTrackStatus(trackingObj)
+                        const clientStatus = None
+                        switch (true) {
+                            case (currentStatus !== null):
+                                break;
+                            case (currentStatus == "PP"): {
+                                if (clientWoocomObj.pickedUp)
+                                    clientStatus = clientWoocomObj.pickedUp
+                                break;
+                            }
+                            case (currentStatus == "OT"): {
+                                if (clientWoocomObj.transit)
+                                    clientStatus = clientWoocomObj.transit
+                                break;
+                            }
+                            case (currentStatus == "RTO"): {
+                                if (clientWoocomObj.rto)
+                                    clientStatus = clientWoocomObj.rto
+                                break;
+                            }
+                            case (currentStatus == "OC"): {
+                                if (clientWoocomObj.cancelled)
+                                    clientStatus = clientWoocomObj.cancelled
+                                break;
+                            }
+                            case (currentStatus == "DL"): {
+                                if (clientWoocomObj.delivered)
+                                    clientStatus = clientWoocomObj.delivered
+                                break;
+                            }
+                            case (currentStatus == "RTD"): {
+                                if (clientWoocomObj.rtd)
+                                    clientStatus = clientWoocomObj.rtd
+                                break;
+                            }
+                            case (currentStatus == "OP"): {
+                                if (clientWoocomObj.orderPlaced)
+                                    clientStatus = clientWoocomObj.orderPlaced
+                                break;
+                            }
                         }
                         if (clientStatus) {
-                            res = this.updateOrderStatusOnWoocom(clientWoocomObj, clientStatus, clientOrderId)
+                            const res = this.updateOrderStatusOnWoocom(clientWoocomObj, clientStatus, clientOrderId)
                             return res
                         }
                     }
@@ -428,9 +438,9 @@ class OtherClienUpdate extends UpdateClients {
                     }
                 }
                 else {
-                    platform = client.shopPlatform
+                    const platform = client.shopPlatform
                     if (platform && client.hasWebhook) {
-                        currentStatus = getCurrentTrackStatus(trackingObj)
+                        const currentStatus = getCurrentTrackStatus(trackingObj)
                         if (currentStatus) {
                             platformFuncMap[platform.shopPlatform](trackingObj, platform, currentStatus, client)
                         }
