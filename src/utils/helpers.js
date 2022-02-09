@@ -23,7 +23,7 @@ const axiosInstance = axios.create();
  */
 const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray) => {
   try {
-    const { awb } = trackObj;
+    const { awb } = trackObj || {};
 
     const pullCollection = await commonTrackingInfoCol();
     const response = await pullCollection.findOne(

@@ -7,7 +7,10 @@ const { prepareDelhiveryData } = require("../../apps/delhivery/services");
 const { prepareEcommData } = require("../../apps/ecomm/services");
 const { prepareEkartData } = require("../../apps/ekart/services");
 const { prepareParceldoData } = require("../../apps/parceldo/services");
-const { prepareShadowfaxData } = require("../../apps/shadowfax/services");
+const {
+  prepareShadowfaxData,
+  preparePulledShadowfaxData,
+} = require("../../apps/shadowfax/services");
 const { prepareUdaanData } = require("../../apps/udaan/services");
 const { prepareXbsData } = require("../../apps/xpressbees/services");
 const logger = require("../../../logger");
@@ -40,6 +43,7 @@ class KafkaMessageHandler {
       ekart: prepareEkartData,
       parceldo: prepareParceldoData,
       shadowfax: prepareShadowfaxData,
+      shadowfax_pull: preparePulledShadowfaxData,
       udaan: prepareUdaanData,
       xpressbees: prepareXbsData,
     };
@@ -81,9 +85,13 @@ class KafkaMessageHandler {
       throw new Error(`${courierName} is not a valid courier`);
     }
     try {
-      const { message } = consumedPayload;
-
-      const res = prepareFunc(Object.values(JSON.parse(message.value.toString()))[0]);
+      let res;
+      try {
+        const { message } = consumedPayload;
+        res = prepareFunc(Object.values(JSON.parse(message.value.toString()))[0]);
+      } catch {
+        res = prepareFunc(consumedPayload);
+      }
 
       if (!res.awb) return;
       const trackData = await redisCheckAndReturnTrackData(res);
@@ -109,6 +117,10 @@ class KafkaMessageHandler {
 
       const result = await updateTrackDataToPullMongo(updatedTrackData, logger);
       if (!result) {
+        return;
+      }
+
+      if (process.env.IS_OTHERS_CALL === "false") {
         return;
       }
 
