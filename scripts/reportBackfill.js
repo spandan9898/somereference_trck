@@ -7,6 +7,7 @@ const logger = require("../logger");
 const initDB = require("../src/connector/db");
 const initELK = require("../src/connector/elkConnection");
 const updateStatusOnReport = require("../src/services/report");
+const sendTrackDataToV1 = require("../src/services/v1");
 const { getDbCollectionInstance } = require("../src/utils");
 const { HOST_NAMES, ELK_INSTANCE_NAMES } = require("../src/utils/constants");
 
@@ -24,14 +25,31 @@ const processBackfilling = async (data, collection, elkClient) => {
     .toArray();
 
   responses.forEach((response) => {
-    updateStatusOnReport(response, logger, elkClient);
+    // updateStatusOnReport(response, logger, elkClient);
+
+    sendTrackDataToV1(response);
     console.log("Done -->", response.tracking_id);
   });
+};
+
+/**
+ *
+ * @desc get count from terminal
+ */
+const getCount = () => {
+  let count = process.argv.slice(2);
+  if (!count.length) {
+    return 0;
+  }
+  count = +count[0];
+  return count;
 };
 
 /** */
 const main = async () => {
   try {
+    const count = getCount();
+
     const filePath = `${__dirname}/report.json`;
     const isExists = fs.existsSync(filePath);
     if (!isExists) {
@@ -40,6 +58,10 @@ const main = async () => {
 
     let records = fs.readFileSync(filePath, "utf8");
     records = JSON.parse(records);
+
+    if (count) {
+      records = records.slice(0, count);
+    }
 
     await initDB.connectDb(HOST_NAMES.PULL_DB, MONGO_DB_PROD_SERVER_HOST);
     await initDB.connectDb(HOST_NAMES.REPORT_DB, MONGO_DB_REPORT_SERVER_HOST);
