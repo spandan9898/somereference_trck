@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable no-continue */
 /* eslint-disable no-await-in-loop */
@@ -6,7 +7,7 @@ const RequestIp = require("@supercharge/request-ip");
 const { getString, setString } = require("../../utils/redis");
 const logger = require("../../../logger");
 const { VALIDATE_VIA_AUTH_TOKEN, ALLOWED_IPS, BLOCKED_IPS } = require("../../utils/constants");
-const { filterTrackingObj } = require("./preparator");
+const { filterTrackingObj, prepareConcatenatedTrackingIdList } = require("./preparator");
 const { fetchTrackingModelAndUpdateCache } = require("../../services/common/trackServices");
 const { fetchTrackingIdFromClientOrderId } = require("./models");
 
@@ -18,7 +19,7 @@ const { fetchTrackingIdFromClientOrderId } = require("./models");
  * @param {*} authToken
  * @param {*} ip
  */
-const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = null, IP = null) => {
+const fetchTrackingService = async (trackingIdsList, authToken = null, IP = null) => {
   let responseDict = {};
   const responseList = [];
   try {
@@ -29,48 +30,7 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
         allowFetchFromDB = true;
       }
     }
-    let trackingIdsList = [];
-    if (clientOrderIds) {
-      const clientOrderIdsList = clientOrderIds.replaceAll(" ", "").split(",");
-
-      if (clientOrderIdsList.length > 30) {
-        responseDict.err = "cannot track more than 30 clientOrderIds at once";
-        return responseDict;
-      }
-      for (let i = 0; i < clientOrderIdsList.length; i += 1) {
-        const clientOrderIdPattern = clientOrderIdsList[i];
-        const clientOrderId = clientOrderIdPattern.split("-PICK-")[0];
-        const userPK = Number(clientOrderIdPattern.split("-PICK-")[1]);
-        if (!clientOrderIdPattern.includes("-PICK-")) {
-          trackingIdsList.push("err");
-          continue;
-        }
-        const cachedAwb = (await getString(clientOrderIdPattern)) || {};
-        const clientOrderIdPatternExistInCache = !_.isEmpty(cachedAwb);
-
-        if (clientOrderIdPatternExistInCache) {
-          trackingIdsList.push(cachedAwb);
-        } else {
-          try {
-            const res = await fetchTrackingIdFromClientOrderId(clientOrderId, userPK);
-            const resExists = !_.isEmpty(res);
-            if (resExists) {
-              const awb = res?.tracking_id || "";
-              await setString(clientOrderIdPattern, awb);
-              trackingIdsList.push(awb);
-            } else {
-              trackingIdsList.push("err");
-            }
-          } catch (error) {
-            trackingIdsList.push("err");
-          }
-        }
-      }
-    } else if (trackingIds) {
-      trackingIdsList = trackingIds.replaceAll(" ", "").split(",");
-    } else {
-      return responseDict;
-    }
+    if (_.isEmpty(trackingIdsList)) return responseDict;
     if (trackingIdsList.length > 30) {
       responseDict.err = "cannot track more than 30 waybills at once";
       return responseDict;
@@ -203,4 +163,197 @@ const TrackingAuthenticationService = async (req) => {
   return { trackingIds, clientOrderIds, authToken, IP };
 };
 
-module.exports = { fetchTrackingService, TrackingAuthenticationService };
+/**
+ * fetche TrackingId From ClientOrderId and authtoken and stores it in cache
+ * @param {*} clientOrderIds
+ * @param {*} authToken
+ */
+const getTrackingIdFromClientOrderIdClientTrackingService = async (clientOrderIds, authToken) => {
+  const clientOrderIdsList = clientOrderIds.replaceAll(" ", "").split(",");
+  const trackingIdsList = [];
+  try {
+    for (const clientOrderId of clientOrderIdsList) {
+      let clientOrderIdPattern = "";
+
+      if (clientOrderId.includes("-PICK-")) {
+        clientOrderIdPattern = clientOrderId;
+        const splitList = clientOrderId.split("-PICK-");
+        const clientOrderIdNew = splitList[0];
+        const authTokenBySeller = splitList[1];
+        const cachedAwbs = (await getString(clientOrderIdPattern)) || {};
+        let cachedAwbsList = [];
+        if (!_.isEmpty(cachedAwbs)) {
+          cachedAwbsList = cachedAwbs.split(",");
+          trackingIdsList.push(...cachedAwbsList);
+        } else {
+          try {
+            const listDocs = await fetchTrackingIdFromClientOrderId({
+              clientOrderId: clientOrderIdNew,
+              authToken: authTokenBySeller,
+            });
+            if (!_.isEmpty(listDocs)) {
+              const concatenatedTrackingIds = await prepareConcatenatedTrackingIdList({
+                listDocs,
+                trackingIdsList,
+              });
+              await setString(clientOrderIdPattern, concatenatedTrackingIds);
+            } else {
+              trackingIdsList.push("err");
+            }
+          } catch (error) {
+            trackingIdsList.push("err");
+          }
+        }
+      } else {
+        clientOrderIdPattern = `${clientOrderId}-PICK-${authToken}`;
+        const cachedAwbs = (await getString(clientOrderIdPattern)) || {};
+        let cachedAwbsList = [];
+        if (!_.isEmpty(cachedAwbs)) {
+          cachedAwbsList = cachedAwbs.split(",");
+          trackingIdsList.push(...cachedAwbsList);
+        } else {
+          try {
+            const listDocs = await fetchTrackingIdFromClientOrderId({ clientOrderId, authToken });
+            if (!_.isEmpty(listDocs)) {
+              const concatenatedTrackingIds = await prepareConcatenatedTrackingIdList({
+                listDocs,
+                trackingIdsList,
+              });
+              await setString(clientOrderIdPattern, concatenatedTrackingIds);
+            } else {
+              trackingIdsList.push("err");
+            }
+          } catch (error) {
+            trackingIdsList.push("err");
+          }
+        }
+      }
+    }
+
+    return trackingIdsList;
+  } catch (error) {
+    logger.error("getTrackingIdFromClientOrderIdClientTrackingServiceError---->", error);
+    return trackingIdsList;
+  }
+};
+
+/**
+ *
+ * @param {*} clientOrderIds
+ * @param {*} authToken
+ */
+const getTrackingIdFromClientOrderIdPublicTrackingService = async (clientOrderIds) => {
+  const clientOrderIdsList = clientOrderIds.replaceAll(" ", "").split(",");
+  const trackingIdsList = [];
+  try {
+    for (const clientOrderIdPattern of clientOrderIdsList) {
+      if (clientOrderIdPattern.includes("-PICK-")) {
+        const clientOrderId = clientOrderIdPattern.split("-PICK-")[0];
+        const userPK = Number(clientOrderIdPattern.split("-PICK-")[1]);
+        const cachedAwbs = (await getString(clientOrderIdPattern)) || {};
+        let cachedAwbsList = [];
+        if (!_.isEmpty(cachedAwbs)) {
+          cachedAwbsList = cachedAwbs.split(",");
+          trackingIdsList.push(...cachedAwbsList);
+        } else {
+          try {
+            const listDocs = await fetchTrackingIdFromClientOrderId({
+              clientOrderId,
+              userPK,
+            });
+            if (!_.isEmpty(listDocs)) {
+              const concatenatedTrackingIds = await prepareConcatenatedTrackingIdList({
+                listDocs,
+                trackingIdsList,
+              });
+              await setString(clientOrderIdPattern, concatenatedTrackingIds);
+            } else {
+              trackingIdsList.push("err");
+            }
+          } catch (error) {
+            trackingIdsList.push("err");
+          }
+        }
+      }
+    }
+    return trackingIdsList;
+  } catch (error) {
+    logger.error("getTrackingIdFromClientOrderIdPublicTracking---->", error);
+    return trackingIdsList;
+  }
+};
+
+/**
+ *
+ * @param {*} req
+ */
+const authenticateUpdateClientOrderIdInCache = async (req) => {
+  try {
+    const authToken = req.query?.auth_token;
+    const { query } = req;
+    const clientOrderIdsList = query.client_order_id
+      .replaceAll(" ", "")
+      .replace("\n", "")
+      .replace("\t", "")
+      .replace("\r", "")
+      .replace(" ", "")
+      .split(",");
+    const userPK = query?.user_pk;
+    return { clientOrderIdsList, authToken, userPK };
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+/**
+ *
+ * @param {*} clientOrderIdsList
+ * @param {*} authToken
+ */
+const updateClientOrderIdPatternInCacheService = async ({
+  clientOrderIdsList,
+  authToken,
+  userPK,
+}) => {
+  try {
+    for (const clientOrderId of clientOrderIdsList) {
+      const trackingIdsList = [];
+      let clientOrderIdPattern = "";
+      if (authToken) {
+        clientOrderIdPattern = `${clientOrderId}-PICK-${authToken}`;
+      } else {
+        clientOrderIdPattern = `${clientOrderId}-PICK-${userPK}`;
+      }
+      let listDocs = [];
+      if (authToken) {
+        listDocs = await fetchTrackingIdFromClientOrderId({
+          clientOrderId,
+          authToken,
+        });
+      } else if (userPK) {
+        listDocs = await fetchTrackingIdFromClientOrderId({
+          clientOrderId,
+          userPK,
+        });
+      }
+      if (!_.isEmpty(listDocs)) {
+        const concatenatedTrackingIds = await prepareConcatenatedTrackingIdList({
+          listDocs,
+          trackingIdsList,
+        });
+        await setString(clientOrderIdPattern, concatenatedTrackingIds);
+      }
+    }
+    return { success: true };
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+module.exports = {
+  fetchTrackingService,
+  TrackingAuthenticationService,
+  getTrackingIdFromClientOrderIdClientTrackingService,
+  getTrackingIdFromClientOrderIdPublicTrackingService,
+  updateClientOrderIdPatternInCacheService,
+  authenticateUpdateClientOrderIdInCache,
+};
