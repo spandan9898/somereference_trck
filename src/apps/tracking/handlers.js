@@ -1,7 +1,6 @@
 /* eslint-disable import/no-unresolved */
 
 const { isEmpty } = require("lodash");
-const logger = require("../../../logger");
 const {
   prepareTrackingRes,
   prepareClientTracking,
