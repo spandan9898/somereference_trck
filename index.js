@@ -29,15 +29,15 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
     await initELK.connectELK(ELK_INSTANCE_NAMES.PROD.name, ELK_INSTANCE_NAMES.PROD.config);
     await initELK.connectELK(ELK_INSTANCE_NAMES.STAGING.name, ELK_INSTANCE_NAMES.STAGING.config);
 
-    // require("./src/apps/bluedart");
-    // require("./src/apps/delhivery");
-    // require("./src/apps/amaze");
-    // require("./src/apps/xpressbees");
-    // require("./src/apps/ekart");
-    // require("./src/apps/udaan");
-    // require("./src/apps/ecomm");
-    // require("./src/apps/shadowfax");
-    // require("./src/apps/parceldo");
+    require("./src/apps/bluedart");
+    require("./src/apps/delhivery");
+    require("./src/apps/amaze");
+    require("./src/apps/xpressbees");
+    require("./src/apps/ekart");
+    require("./src/apps/udaan");
+    require("./src/apps/ecomm");
+    require("./src/apps/shadowfax");
+    require("./src/apps/parceldo");
   } catch (error) {
     logger.error("DB Connection Error", error);
   }
