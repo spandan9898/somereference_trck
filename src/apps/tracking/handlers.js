@@ -37,7 +37,11 @@ module.exports.publicTracking = async (req, reply) => {
     return reply.code(200).send({ response_list: [] });
   }
 
-  let tracking = await fetchTrackingService(trackingIdsList, authToken, IP);
+  let tracking = await fetchTrackingService({
+    trackingIdsList,
+    authToken,
+    IP,
+  });
   if (
     !isEmpty(tracking) &&
     (("err" in tracking && !tracking.err && tracking) ||
@@ -83,7 +87,11 @@ module.exports.clientTracking = async (req, reply) => {
     } else {
       return reply.code(200).send({ response_list: [] });
     }
-    let tracking = await fetchTrackingService(trackingIdsList, authToken, IP);
+    let tracking = await fetchTrackingService({
+      trackingIdsList,
+      authToken,
+      IP,
+    });
     if (
       !isEmpty(tracking) &&
       (("err" in tracking && !tracking.err && tracking) ||

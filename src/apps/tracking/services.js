@@ -15,11 +15,10 @@ const { fetchTrackingIdFromClientOrderId } = require("./models");
  * fetches tracking response from cache if present, else fetches from db-> stores
  *  in cache and returns
  * @param {*} trackingIds
- * @param {*} clientOrderIds
  * @param {*} authToken
  * @param {*} ip
  */
-const fetchTrackingService = async (trackingIdsList, authToken = null, IP = null) => {
+const fetchTrackingService = async ({ trackingIdsList, authToken = null, IP = null }) => {
   let responseDict = {};
   const responseList = [];
   try {
@@ -40,6 +39,10 @@ const fetchTrackingService = async (trackingIdsList, authToken = null, IP = null
         if (trackingIdsList[0] === "err") {
           // client order id not found
 
+          responseDict.response_list = responseList;
+          return responseDict;
+        }
+        if (trackingIdsList[0] === "err_auth") {
           responseDict.response_list = responseList;
           return responseDict;
         }
@@ -74,6 +77,9 @@ const fetchTrackingService = async (trackingIdsList, authToken = null, IP = null
         // client order id not found
 
         responseList.push({ err: "Order ID not found" });
+        continue;
+      } else if (trackingId === "err_auth") {
+        responseList.push({ err: "authentication error" });
         continue;
       }
       if (!trackingId) {
@@ -179,7 +185,7 @@ const getTrackingIdFromClientOrderIdClientTrackingService = async (clientOrderId
         clientOrderIdPattern = clientOrderId;
         const splitList = clientOrderId.split("-PICK-");
         const clientOrderIdNew = splitList[0];
-        const authTokenBySeller = splitList[1];
+
         const cachedAwbs = (await getString(clientOrderIdPattern)) || {};
         let cachedAwbsList = [];
         if (!_.isEmpty(cachedAwbs)) {
@@ -189,7 +195,7 @@ const getTrackingIdFromClientOrderIdClientTrackingService = async (clientOrderId
           try {
             const listDocs = await fetchTrackingIdFromClientOrderId({
               clientOrderId: clientOrderIdNew,
-              authToken: authTokenBySeller,
+              authToken,
             });
             if (!_.isEmpty(listDocs)) {
               const concatenatedTrackingIds = await prepareConcatenatedTrackingIdList({
@@ -204,7 +210,7 @@ const getTrackingIdFromClientOrderIdClientTrackingService = async (clientOrderId
             trackingIdsList.push("err");
           }
         }
-      } else {
+      } else if (authToken) {
         clientOrderIdPattern = `${clientOrderId}-PICK-${authToken}`;
         const cachedAwbs = (await getString(clientOrderIdPattern)) || {};
         let cachedAwbsList = [];
@@ -227,6 +233,8 @@ const getTrackingIdFromClientOrderIdClientTrackingService = async (clientOrderId
             trackingIdsList.push("err");
           }
         }
+      } else {
+        trackingIdsList.push("err_auth");
       }
     }
 
