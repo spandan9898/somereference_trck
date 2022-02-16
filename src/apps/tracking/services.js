@@ -127,7 +127,7 @@ const TrackingAuthenticationService = async (req) => {
   const authToken = req.query?.auth_token || null;
   let IP = RequestIp.getClientIp(req);
   const hostName = req?.headers?.origin || "";
-  let verifiedByHost = false;
+  let verifiedByHost = true;
   let valid = true;
   if (BLOCKED_IPS.includes(IP)) {
     return { status: "" };
