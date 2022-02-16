@@ -105,12 +105,14 @@ class KafkaMessageHandler {
 
       if (!trackData) {
         logger.info(`data already exists or not found in DB! ${res.awb}`);
+        updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return;
       }
 
       const updatedTrackData = await updatePrepareDict(trackData);
       if (_.isEmpty(updatedTrackData)) {
         logger.error("Xpresbees reverse map not found", trackData);
+        updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return;
       }
 
