@@ -83,7 +83,7 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
           responseDict.response_list = responseList;
           return responseDict;
         }
-        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0]);
+        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0], true);
         const cacheAuthToken = trackingObj?.track_model?.auth_token || "";
         if (cacheAuthToken !== authToken) {
           if (IP && ALLOWED_IPS.includes(IP)) {
@@ -99,7 +99,7 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
         responseDict.err = " Tracking ID not found";
       }
       if ((IP && ALLOWED_IPS.includes(IP)) || allowFetchFromDB) {
-        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0]);
+        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0], true);
         const trackModel = await filterTrackingObj(trackingObj?.track_model);
         responseDict = trackModel;
         return responseDict;
@@ -120,7 +120,7 @@ const fetchTrackingService = async (trackingIds, clientOrderIds, authToken = nul
         continue;
       }
       try {
-        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingId);
+        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingId, true);
         const cacheAuthToken = trackingObj?.track_model?.auth_token || "";
         if (cacheAuthToken !== authToken) {
           if (IP && ALLOWED_IPS.includes(IP)) {
