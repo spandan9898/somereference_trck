@@ -1509,6 +1509,11 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
     scan_type: "RTO-OT",
     pickrr_sub_status_code: "",
   },
+  "ed-100_dl": {
+    courier_remark: "Delivered",
+    scan_type: "DL",
+    pickrr_sub_status_code: "",
+  },
 };
 
 const DELHIVERY_REVERSE_MAPPER = {
@@ -1550,13 +1555,13 @@ const DELHIVERY_REVERSE_MAPPER = {
   "x-lm1p_pp": { courier_remark: "Out for Pickup", scan_type: "OFP", pickrr_sub_status_code: "" },
   "eod-21_cn": {
     courier_remark: "Cancelled the pickup request",
-    scan_type: "PPF",
-    pickrr_sub_status_code: "CANC",
+    scan_type: "OC",
+    pickrr_sub_status_code: "",
   },
   "eod-84_cn": {
     courier_remark: "Product description mismatch",
-    scan_type: "PPF",
-    pickrr_sub_status_code: "OTH",
+    scan_type: "OC",
+    pickrr_sub_status_code: "",
   },
   "eod-131_cn": {
     courier_remark: "Brand Mismatch",
@@ -1580,8 +1585,8 @@ const DELHIVERY_REVERSE_MAPPER = {
   },
   "eod-108_cn": {
     courier_remark: "Product count mismatch",
-    scan_type: "PPF",
-    pickrr_sub_status_code: "OTH",
+    scan_type: "OC",
+    pickrr_sub_status_code: "",
   },
   "eod-73_pp": {
     courier_remark: "Bad/Incomplete address",
@@ -1953,8 +1958,8 @@ const DELHIVERY_REVERSE_MAPPER = {
   },
   "eod-148_pu": {
     courier_remark: "Consignee unavailable. Establishment closed",
-    scan_type: "PPF",
-    pickrr_sub_status_code: "SC",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
   },
   "dtup-213_pu": {
     courier_remark: "Scan Bulk Update",
