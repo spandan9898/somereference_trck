@@ -210,9 +210,54 @@ class MakeAPICall {
   }
 }
 
+/**
+ *
+ * validates if the expected dateobj is instance of datetime
+ * @returns True
+ */
+const ValidateDateField = (dateObj) => {
+  try {
+    if (moment(dateObj).isValid()) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+};
+
+/**
+ *
+ * @param {datetime Object field} dateObj1
+ * @param {datetime Object field} dateObj2
+ * @returns Minimum of Two Dates
+ */
+const getMinDate = (dateObj1, dateObj2) => {
+  if (moment(dateObj1).isBefore(dateObj2)) {
+    return moment(dateObj1).toDate();
+  }
+  return moment(dateObj2).toDate();
+};
+
+/**
+ *
+ * @param {datetime Object field} dateObj1
+ * @param {datetime Object field} dateObj2
+ * @returns maximum of Two Dates
+ */
+const getMaxDate = (dateObj1, dateObj2) => {
+  if (moment(dateObj1).isAfter(dateObj2)) {
+    return moment(dateObj1).toDate();
+  }
+  return moment(dateObj2).toDate();
+};
+
 module.exports = {
   checkAwbInCache,
   convertDatetimeFormat,
   convertDatetimeFormat2,
   MakeAPICall,
+  ValidateDateField,
+  getMinDate,
+  getMaxDate,
 };
