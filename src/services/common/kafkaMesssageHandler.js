@@ -94,6 +94,13 @@ class KafkaMessageHandler {
       }
 
       if (!res.awb) return;
+
+      const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
+
+      await new Promise((done) => setTimeout(() => done(), processCount * 1000));
+
+      await updateTrackingProcessingCount({ awb: res.awb });
+
       const trackData = await redisCheckAndReturnTrackData(res);
 
       if (!trackData) {
@@ -108,12 +115,6 @@ class KafkaMessageHandler {
       }
 
       const { prodElkClient } = KafkaMessageHandler.getElkClients();
-
-      const processCount = await getTrackingIdProcessingCount(updatedTrackData);
-
-      await new Promise((done) => setTimeout(() => done(), processCount * 1000));
-
-      await updateTrackingProcessingCount(updatedTrackData);
 
       const result = await updateTrackDataToPullMongo(updatedTrackData, logger);
       if (!result) {
