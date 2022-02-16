@@ -1,12 +1,20 @@
 /* eslint-disable import/no-unresolved */
 
 const { isEmpty } = require("lodash");
+const logger = require("../../../logger");
 const {
   prepareTrackingRes,
   prepareClientTracking,
   preparePublicTracking,
 } = require("./preparator");
-const { fetchTrackingService, TrackingAuthenticationService } = require("./services");
+const {
+  fetchTrackingService,
+  TrackingAuthenticationService,
+  getTrackingIdFromClientOrderIdClientTrackingService,
+  getTrackingIdFromClientOrderIdPublicTrackingService,
+  updateClientOrderIdPatternInCacheService,
+  authenticateUpdateClientOrderIdInCache,
+} = require("./services");
 
 module.exports.publicTracking = async (req, reply) => {
   const trackingAuth = await TrackingAuthenticationService(req);
@@ -21,7 +29,20 @@ module.exports.publicTracking = async (req, reply) => {
   const authToken = trackingAuth?.authToken;
   const IP = trackingAuth?.IP;
 
-  let tracking = await fetchTrackingService(trackingIds, clientOrderIds, authToken, IP);
+  let trackingIdsList = [];
+  if (clientOrderIds) {
+    trackingIdsList = await getTrackingIdFromClientOrderIdPublicTrackingService(clientOrderIds);
+  } else if (trackingIds) {
+    trackingIdsList = trackingIds.replaceAll(" ", "").split(",");
+  } else {
+    return reply.code(200).send({ response_list: [] });
+  }
+
+  let tracking = await fetchTrackingService({
+    trackingIdsList,
+    authToken,
+    IP,
+  });
   if (
     !isEmpty(tracking) &&
     (("err" in tracking && !tracking.err && tracking) ||
@@ -55,7 +76,23 @@ module.exports.clientTracking = async (req, reply) => {
     const trackingIds = trackingAuth?.trackingIds;
     const authToken = trackingAuth?.authToken;
     const IP = trackingAuth?.IP;
-    let tracking = await fetchTrackingService(trackingIds, clientOrderIds, authToken, IP);
+
+    let trackingIdsList = [];
+    if (clientOrderIds) {
+      trackingIdsList = await getTrackingIdFromClientOrderIdClientTrackingService(
+        clientOrderIds,
+        authToken
+      );
+    } else if (trackingIds) {
+      trackingIdsList = trackingIds.replaceAll(" ", "").split(",");
+    } else {
+      return reply.code(200).send({ response_list: [] });
+    }
+    let tracking = await fetchTrackingService({
+      trackingIdsList,
+      authToken,
+      IP,
+    });
     if (
       !isEmpty(tracking) &&
       (("err" in tracking && !tracking.err && tracking) ||
@@ -74,6 +111,24 @@ module.exports.clientTracking = async (req, reply) => {
     }
     tracking = await prepareClientTracking(tracking);
     return reply.code(200).send(tracking);
+  } catch (error) {
+    logger.error("client tracking handler error", error);
+    return reply.code(200).send(error.message);
+  }
+};
+
+module.exports.updateClientOrderIdCache = async (req, reply) => {
+  try {
+    const updateCacheAuthentication = await authenticateUpdateClientOrderIdInCache(req);
+    const clientOrderIdsList = updateCacheAuthentication?.clientOrderIdsList;
+    const authToken = updateCacheAuthentication?.authToken;
+    const userPK = Number(updateCacheAuthentication?.userPK);
+    const res = await updateClientOrderIdPatternInCacheService({
+      clientOrderIdsList,
+      authToken,
+      userPK,
+    });
+    return reply.code(200).send(res);
   } catch (error) {
     return reply.code(200).send(error.message);
   }
