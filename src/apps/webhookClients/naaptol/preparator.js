@@ -35,7 +35,7 @@ const createNaaptolTrackingJson = (trackResponse) => {
     const currentStatusDict = trackResponse.status || {};
     let currentStatusDatetime = currentStatusDict.current_status_time;
     if (moment(currentStatusDatetime).isValid()) {
-      currentStatusDatetime = moment(currentStatusDatetime).add(330, "minutes").format("HH:mm:ss");
+      currentStatusDatetime = moment(currentStatusDatetime).add(330, "minutes").format("YYYY-MM-DD HH:mm:ss");
     }
 
     let expectedDeliveryDate = trackResponse.edd_stamp;
@@ -51,7 +51,7 @@ const createNaaptolTrackingJson = (trackResponse) => {
 
     let statusType = currentStatusDict.current_status_type || "";
     let currentStatus = currentStatusDict.current_status_body || "";
-    let statusDescription = NAAPTOL_STATUS_DESCRIPTION_MAPPING[statusType];
+    let statusDescription = NAAPTOL_STATUS_DESCRIPTION_MAPPING[statusType] || currentStatus;
 
     if (trackResponse.track_arr) {
       const { track_arr: trackArr } = trackResponse;

@@ -28,7 +28,8 @@ const {
 const WebhookClient = require("../../apps/webhookClients");
 const { callLambdaFunction } = require("../../connector/lambda");
 const { WEBHOOK_USER_CACHE_KEY_NAME } = require("../../utils/constants");
-const { NAAPTOL_AUTH_TOKEN } = require("../../apps/webhookClients/constants");
+
+// const { NAAPTOL_AUTH_TOKEN } = require("../../apps/webhookClients/constants");
 
 const {
   SHOPCLUES_TOKEN_URL,
@@ -272,16 +273,18 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
 
     sendWebhookDataToELK(lambdaPayload.data, elkClient);
 
-    if (
-      ![
-        ...NAAPTOL_AUTH_TOKEN,
-        ...SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
-        ...SMART_SHIP_AUTH_TOKENS,
-      ].includes(trackingObj?.auth_token)
-    ) {
-      callLambdaFunction(lambdaPayload);
-      return false;
-    }
+    // if (
+    //   ![
+    //     ...NAAPTOL_AUTH_TOKEN,
+    //     ...SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
+    //     ...SMART_SHIP_AUTH_TOKENS,
+    //   ].includes(trackingObj?.auth_token)
+    // ) {
+    //   callLambdaFunction(lambdaPayload);
+    //   return false;
+    // }
+
+    callLambdaFunction(lambdaPayload);
 
     return true;
   } catch (error) {

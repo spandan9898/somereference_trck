@@ -1,3 +1,4 @@
+/* eslint-disable no-promise-executor-return */
 const _ = require("lodash");
 
 const { prepareAmazeData } = require("../../apps/amaze/services");
@@ -20,7 +21,11 @@ const triggerWebhook = require("../webhook");
 const updateStatusOnReport = require("../report");
 const { updatePrepareDict } = require("./helpers");
 const { ELK_INSTANCE_NAMES } = require("../../utils/constants");
-const { updateStatusELK } = require("./services");
+const {
+  updateStatusELK,
+  getTrackingIdProcessingCount,
+  updateTrackingProcessingCount,
+} = require("./services");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -61,15 +66,24 @@ class KafkaMessageHandler {
     }
   }
 
+  /**
+   *
+   * @desc about processCount ->
+   * 1. first fetch "processCount" from cache's awb object
+   * 2. use default value 0
+   * 3. Multiply this value with 1000
+   * 4. then delay accordingly
+   * 5. after DB update decrease "processCount" value by 1, handle negative case
+   */
   static async init(consumedPayload, courierName) {
-    const preapreFunc = KafkaMessageHandler.getPrepareFunction(courierName);
-    if (!preapreFunc) {
+    const prepareFunc = KafkaMessageHandler.getPrepareFunction(courierName);
+    if (!prepareFunc) {
       throw new Error(`${courierName} is not a valid courier`);
     }
     try {
       const { message } = consumedPayload;
 
-      const res = preapreFunc(Object.values(JSON.parse(message.value.toString()))[0]);
+      const res = prepareFunc(Object.values(JSON.parse(message.value.toString()))[0]);
 
       if (!res.awb) return;
       const trackData = await redisCheckAndReturnTrackData(res);
@@ -86,6 +100,12 @@ class KafkaMessageHandler {
       }
 
       const { prodElkClient } = KafkaMessageHandler.getElkClients();
+
+      const processCount = await getTrackingIdProcessingCount(updatedTrackData);
+
+      await new Promise((done) => setTimeout(() => done(), processCount * 1000));
+
+      await updateTrackingProcessingCount(updatedTrackData);
 
       const result = await updateTrackDataToPullMongo(updatedTrackData, logger);
       if (!result) {

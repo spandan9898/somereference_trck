@@ -45,6 +45,8 @@ const ELK_INSTANCE_NAMES = {
 
 const WEBHOOK_USER_CACHE_KEY_NAME = "webhookUser";
 
+const DEFAULT_REQUESTS_TIMEOUT = 10;
+
 module.exports = {
   BLOCKED_IPS,
   ALLOWED_IPS,
@@ -53,4 +55,5 @@ module.exports = {
   HOST_NAMES,
   WEBHOOK_USER_CACHE_KEY_NAME,
   ELK_INSTANCE_NAMES,
+  DEFAULT_REQUESTS_TIMEOUT,
 };

@@ -4,6 +4,7 @@ const _ = require("lodash");
 const { storeDataInCache, updateCacheTrackArray, softCancellationCheck } = require("./services");
 const { prepareTrackDataToUpdateInPullDb } = require("./preparator");
 const commonTrackingInfoCol = require("./model");
+const { updateTrackingProcessingCount } = require("../common/services");
 
 /**
  *
@@ -77,6 +78,7 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
       }
     );
     await storeDataInCache(result);
+    await updateTrackingProcessingCount(trackObj, "remove");
     updateCacheTrackArray({
       currentTrackObj: trackArr[0],
       trackArray: response.value.track_arr,
