@@ -20,4 +20,6 @@ const PICKRR_EDD_MATRIX = {
     max_tat: 9,
   },
 };
-module.exports = PICKRR_EDD_MATRIX;
+
+const ZONE_REQUIRED_STATUS_SET = ["OP", "OM", "PPF", "OFP", "PP", "SHP", "OT", "RAD"];
+module.exports = { PICKRR_EDD_MATRIX, ZONE_REQUIRED_STATUS_SET };

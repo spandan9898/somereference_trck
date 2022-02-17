@@ -61,10 +61,8 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
     if (softCancellationCheck(sortedTrackArray, trackObj)) {
       return false;
     }
-
     const firstTrackObjOfTrackArr = sortedTrackArray[0];
     const promiseEdd = res?.promise_edd;
-
     if (!promiseEdd && latestCourierEDD) {
       updatedObj.promise_edd = latestCourierEDD;
     }
@@ -80,7 +78,7 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
         eddStampInDb,
         statusType,
       });
-      updatedObj.edd_stamp = pickrrEDD;
+      updatedObj.edd_stamp = pickrrEDD || null;
     } catch (error) {
       logger.error(error.message);
     }

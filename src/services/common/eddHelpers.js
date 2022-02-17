@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 const moment = require("moment");
-const PICKRR_EDD_MATRIX = require("./constants");
+const { PICKRR_EDD_MATRIX, ZONE_REQUIRED_STATUS_SET } = require("./constants");
 const { ValidateDateField, getMinDate, getMaxDate } = require("../../utils/helpers");
 
 /**
@@ -106,6 +106,9 @@ class EddPrepareHelper {
     statusType,
   }) {
     let pickrrEDD;
+    if (PICKRR_EDD_MATRIX?.zone && ZONE_REQUIRED_STATUS_SET.includes(statusType)) {
+      return latestCourierEDD;
+    }
     if (["OP", "OM", "PPF", "OFP"].includes(statusType)) {
       pickrrEDD = this.getPickrrEDDforOrderPlaced({
         zone,
