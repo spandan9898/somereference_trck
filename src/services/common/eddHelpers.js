@@ -129,11 +129,7 @@ class EddPrepareHelper {
       });
     } else if (["RTO", "RTO-OT", "RTO-OO", "RTO UD"].includes(statusType)) {
       pickrrEDD = this.getPickrrEDDforRTO({ latestCourierEDD });
-    } else if (["DL", "RTD"].includes(statusType)) {
-      return null;
-    } else if (["OC"].includes(statusType)) {
-      return null;
-    } else if (["LT", "DM"].includes(statusType)) {
+    } else if (["DL", "RTD", "OC", "LT", "DM"].includes(statusType)) {
       return null;
     } else {
       return latestCourierEDD;
