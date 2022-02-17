@@ -106,7 +106,7 @@ class EddPrepareHelper {
     statusType,
   }) {
     let pickrrEDD;
-    if (PICKRR_EDD_MATRIX?.zone && ZONE_REQUIRED_STATUS_SET.includes(statusType)) {
+    if (!PICKRR_EDD_MATRIX?.zone && ZONE_REQUIRED_STATUS_SET.includes(statusType)) {
       return latestCourierEDD;
     }
     if (["OP", "OM", "PPF", "OFP"].includes(statusType)) {
