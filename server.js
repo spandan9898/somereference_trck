@@ -2,7 +2,11 @@
 
 const Fastify = require("fastify");
 const cors = require("fastify-cors");
-const { clientTracking, publicTracking } = require("./src/apps/tracking/handlers");
+const {
+  clientTracking,
+  publicTracking,
+  updateClientOrderIdCache,
+} = require("./src/apps/tracking/handlers");
 const routes = require("./src/routes");
 
 let serverInstance;
@@ -27,7 +31,7 @@ const createServer = async () => {
 
   server.get("/track/tracking", clientTracking);
   server.get("/tracking", publicTracking);
-
+  server.get("/update-client-order-id-cache", updateClientOrderIdCache);
   server.register(routes);
   await server.ready();
 

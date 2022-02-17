@@ -35,7 +35,9 @@ const createNaaptolTrackingJson = (trackResponse) => {
     const currentStatusDict = trackResponse.status || {};
     let currentStatusDatetime = currentStatusDict.current_status_time;
     if (moment(currentStatusDatetime).isValid()) {
-      currentStatusDatetime = moment(currentStatusDatetime).add(330, "minutes").format("YYYY-MM-DD HH:mm:ss");
+      currentStatusDatetime = moment(currentStatusDatetime)
+        .add(330, "minutes")
+        .format("YYYY-MM-DD HH:mm:ss");
     }
 
     let expectedDeliveryDate = trackResponse.edd_stamp;

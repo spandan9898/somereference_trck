@@ -392,9 +392,27 @@ const preparePublicTracking = async (trackingObj) => {
   }
 };
 
+/**
+ * returns concatenated list of tracking Ids
+ * @param {*} param0
+ * @returns
+ */
+const prepareConcatenatedTrackingIdList = async ({ listDocs, trackingIdsList }) => {
+  let concatenatedTrackingIds = "";
+  for (let i = 0; i < listDocs.length; i += 1) {
+    const doc = listDocs[i];
+    const trackingId = doc?.tracking_id;
+    if (i === listDocs.length - 1) concatenatedTrackingIds += trackingId;
+    else concatenatedTrackingIds += `${trackingId},`;
+    trackingIdsList.push(trackingId);
+  }
+  return concatenatedTrackingIds;
+};
+
 module.exports = {
   filterTrackingObj,
   prepareTrackingRes,
   prepareClientTracking,
   preparePublicTracking,
+  prepareConcatenatedTrackingIdList,
 };
