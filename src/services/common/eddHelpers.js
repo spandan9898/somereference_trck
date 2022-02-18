@@ -66,8 +66,14 @@ class EddPrepareHelper {
       }
       return getMaxDate(pickupAndMinTat, this.tomorrow);
     }
+
+    // courier edd  past date handled over here
+
     if (this.validatedCourierEdd) {
-      return getMinDate(latestCourierEDD, this.tomorrow);
+      if (moment(this.validatedCourierEdd).isAfter(moment())) {
+        return getMinDate(latestCourierEDD, this.tomorrow);
+      }
+      return this.tomorrow;
     }
     if (this.validatedEDDStamp) {
       return getMinDate(eddStampInDb, this.tomorrow);
@@ -132,6 +138,8 @@ class EddPrepareHelper {
     } else if (["DL", "RTD", "OC", "LT", "DM"].includes(statusType)) {
       return null;
     } else {
+      // changed here from latestCourierEDD
+
       return latestCourierEDD;
     }
     return pickrrEDD;
