@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 const moment = require("moment");
 const { PICKRR_EDD_MATRIX, ZONE_REQUIRED_STATUS_SET } = require("./constants");
-const { ValidateDateField, getMinDate, getMaxDate } = require("../../utils/helpers");
+const { ValidateDateField, getMaxDate } = require("../../utils/helpers");
 
 /**
  * EDD Helper Class
@@ -73,7 +73,7 @@ class EddPrepareHelper {
       return getMaxDate(this.tomorrow, latestCourierEDD);
     }
     if (this.validatedEDDStamp) {
-      return getMinDate(eddStampInDb, this.tomorrow);
+      return getMaxDate(eddStampInDb, this.tomorrow);
     }
     return this.tomorrow;
   }
