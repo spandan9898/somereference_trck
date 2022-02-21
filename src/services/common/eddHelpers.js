@@ -70,10 +70,7 @@ class EddPrepareHelper {
     // courier edd  past date handled over here
 
     if (this.validatedCourierEdd) {
-      if (moment(latestCourierEDD).isAfter(moment())) {
-        return getMinDate(latestCourierEDD, this.tomorrow);
-      }
-      return this.tomorrow;
+      return getMaxDate(this.tomorrow, latestCourierEDD);
     }
     if (this.validatedEDDStamp) {
       return getMinDate(eddStampInDb, this.tomorrow);
