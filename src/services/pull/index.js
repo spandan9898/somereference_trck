@@ -6,6 +6,7 @@ const { prepareTrackDataToUpdateInPullDb } = require("./preparator");
 const commonTrackingInfoCol = require("./model");
 const { updateTrackingProcessingCount } = require("../common/services");
 const { HOST_NAMES } = require("../../utils/constants");
+const { checkTriggerForPulledEvent } = require("./helpers");
 
 /**
  *
@@ -13,7 +14,7 @@ const { HOST_NAMES } = require("../../utils/constants");
  * @desc sending tracking data to pull mongodb
  * @returns success or error
  */
-const updateTrackDataToPullMongo = async (trackObj, logger) => {
+const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = false }) => {
   const result = prepareTrackDataToUpdateInPullDb(trackObj);
 
   if (!result.success) {
@@ -42,6 +43,12 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
 
     const res = await pullCollection.findOne({ tracking_id: result.awb });
 
+    if (isFromPulled) {
+      const isAllow = checkTriggerForPulledEvent(trackObj, res);
+      if (!isAllow) {
+        return false;
+      }
+    }
     if (!res) {
       sortedTrackArray = [...trackArr];
     } else {

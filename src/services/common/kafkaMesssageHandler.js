@@ -86,11 +86,13 @@ class KafkaMessageHandler {
     }
     try {
       let res;
+      let isFromPulled = false;
       try {
         const { message } = consumedPayload;
         res = prepareFunc(Object.values(JSON.parse(message.value.toString()))[0]);
       } catch {
         res = prepareFunc(consumedPayload);
+        isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
 
       if (!res.awb) return;
@@ -101,7 +103,7 @@ class KafkaMessageHandler {
 
       await updateTrackingProcessingCount({ awb: res.awb });
 
-      const trackData = await redisCheckAndReturnTrackData(res);
+      const trackData = await redisCheckAndReturnTrackData(res, isFromPulled);
 
       if (!trackData) {
         logger.info(`data already exists or not found in DB! ${res.awb}`);
@@ -118,7 +120,11 @@ class KafkaMessageHandler {
 
       const { prodElkClient } = KafkaMessageHandler.getElkClients();
 
-      const result = await updateTrackDataToPullMongo(updatedTrackData, logger);
+      const result = await updateTrackDataToPullMongo({
+        trackObj: updatedTrackData,
+        logger,
+        isFromPulled,
+      });
       if (!result) {
         return;
       }

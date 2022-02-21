@@ -3,6 +3,7 @@
 /* eslint-disable consistent-return */
 const moment = require("moment");
 const axios = require("axios");
+const size = require("lodash/size");
 
 const { setObject } = require("./redis");
 const { prepareTrackArrCacheData } = require("../services/pull/helpers");
@@ -113,11 +114,11 @@ const checkCurrentStatusAWBInCache = (trackObj, cachedData) => {
  * Otherwise -> return false i.e move foward
  * @returns true or false
  */
-const checkAwbInCache = async (trackObj, updateCacheTrackArray) => {
+const checkAwbInCache = async ({ trackObj, updateCacheTrackArray, isFromPulled }) => {
   const cachedData = await getObject(trackObj.awb);
   const newScanTime = moment(trackObj.scan_datetime).unix();
 
-  if (!cachedData) {
+  if (!cachedData || !(size(cachedData) >= 2)) {
     const res = await fetchTrackingDataAndStoreInCache(trackObj, updateCacheTrackArray);
     if (!res) {
       return false;
@@ -126,6 +127,9 @@ const checkAwbInCache = async (trackObj, updateCacheTrackArray) => {
       return true;
     }
     if (checkCurrentStatusAWBInCache(trackObj, res)) return true;
+    if (isFromPulled) {
+      return false;
+    }
     const isExists = await compareScanUnixTimeAndCheckIfExists(
       newScanTime,
       trackObj.scan_type,
@@ -134,6 +138,10 @@ const checkAwbInCache = async (trackObj, updateCacheTrackArray) => {
     return isExists;
   }
   if (checkCurrentStatusAWBInCache(trackObj, cachedData)) return true;
+
+  if (isFromPulled) {
+    return false;
+  }
 
   const isExists = await compareScanUnixTimeAndCheckIfExists(
     newScanTime,
