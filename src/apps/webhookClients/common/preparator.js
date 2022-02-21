@@ -1,7 +1,7 @@
 const _ = require("lodash");
 
 const logger = require("../../../../logger");
-const { NEW_STATUS_TO_OLD_MAPPING, REMOVE_ELEMENT_KEYS } = require("./constants");
+const { REMOVE_ELEMENT_KEYS } = require("./constants");
 const {
   validateTrackingJson,
   prepareEddStamp,
@@ -68,11 +68,8 @@ const prepareCommonTrackingInfo = async (trackingResponse) => {
     );
 
     const currentStatusType = _.get(updatedTrackingInfoDoc, "status.current_status_type", "");
-    if (NEW_STATUS_TO_OLD_MAPPING[currentStatusType]) {
-      updatedTrackingInfoDoc.status.current_status_type =
-        NEW_STATUS_TO_OLD_MAPPING[currentStatusType];
-    } else if (currentStatusType === "UD") {
-      updatedTrackingInfoDoc.status.current_status_type = "OT";
+    if (currentStatusType === "UD") {
+      updatedTrackingInfoDoc.status.current_status_type = "NDR";
     }
 
     _.set(updatedTrackingInfoDoc, "status.current_status_val", "");
