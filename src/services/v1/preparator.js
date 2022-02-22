@@ -20,20 +20,20 @@ const prepareTrackDictForV1 = (trackData) => {
       ? moment(trackData?.status?.current_status_time)
           .add(330, "minutes")
           .format("DD-MM-YYYY HH:mm")
-      : "",
+      : null,
     track_info: trackData?.status?.current_status_body,
     track_location: trackData?.status?.current_status_location,
     received_by: trackData?.status?.received_by,
     pickup_time: pickupTime
       ? moment(pickupTime).add(330, "minutes").format("DD-MM-YYYY HH:mm")
-      : "",
+      : null,
     EDD: trackData?.edd_stamp
       ? moment(trackData?.edd_stamp).add(330, "minutes").format("DD-MM-YYYY HH:mm")
-      : "",
+      : null,
     promise_edd: trackData?.promise_edd
       ? moment(trackData?.promise_edd).add(330, "minutes").format("DD-MM-YYYY HH:mm")
       : "",
-    pickrr_status: NEW_STATUS_TO_OLD_MAPPING[scanType],
+    pickrr_status: NEW_STATUS_TO_OLD_MAPPING[scanType] || scanType,
     pickrr_sub_status_code:
       trackData?.pickrr_sub_status_code ||
       _.get(trackData, "track_arr[0].pickrr_sub_status_code", ""),

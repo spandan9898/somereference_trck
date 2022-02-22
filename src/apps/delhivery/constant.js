@@ -1509,6 +1509,16 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
     scan_type: "RTO-OT",
     pickrr_sub_status_code: "",
   },
+  "ed-100_dl": {
+    courier_remark: "Delivered",
+    scan_type: "DL",
+    pickrr_sub_status_code: "",
+  },
+  "eod-6i_ud": {
+    courier_remark: "Customer cancelled- IVR verified",
+    scan_type: "UD",
+    pickrr_sub_status_code: "CR",
+  }
 };
 
 const DELHIVERY_REVERSE_MAPPER = {
