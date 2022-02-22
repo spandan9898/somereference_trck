@@ -85,7 +85,7 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
       if (moment(result.eventObj?.pickup_datetime).isValid()) {
         updatedObj.pickup_datetime = result.eventObj.pickup_datetime;
       }
-      updatedObj.edd_stamp = pickrrEDD || null;
+      updatedObj.edd_stamp = pickrrEDD;
     } catch (error) {
       logger.error(error.message);
     }
