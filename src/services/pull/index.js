@@ -15,7 +15,7 @@ const { checkTriggerForPulledEvent } = require("./helpers");
  * @returns success or error
  */
 const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = false }) => {
-  const result = prepareTrackDataToUpdateInPullDb(trackObj);
+  const result = prepareTrackDataToUpdateInPullDb(trackObj, isFromPulled);
 
   if (!result.success) {
     throw new Error(result.err);
@@ -31,7 +31,7 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     const pullCollection = await commonTrackingInfoCol();
     const trackArr = updatedObj.track_arr;
     const auditObj = {
-      from: "kafka_consumer",
+      from: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
       current_status_type: updatedObj["status.current_status_type"],
       current_status_time: updatedObj["status.current_status_time"],
       pulled_at: moment().toDate(),
