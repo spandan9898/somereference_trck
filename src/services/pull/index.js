@@ -78,6 +78,9 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
         eddStampInDb,
         statusType,
       });
+      if (result.statusMap.current_status_type === "PP") {
+        updatedObj.pickup_datetime = result.statusMap["status.current_status_time"];
+      }
       updatedObj.edd_stamp = pickrrEDD || null;
     } catch (error) {
       logger.error(error.message);
