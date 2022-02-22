@@ -76,10 +76,6 @@ const PrepareTrackModelFilters = async (trackingAwb) => {
   const projection = {
     _id: 0,
     audit: 0,
-    user_id: 0,
-    ops_profile: 0,
-    user_pk: 0,
-    updated_at: 0,
     pickup_address_pk: 0,
     mandatory_status_map: 0,
   };
@@ -110,11 +106,21 @@ const getTrackDocumentfromMongo = async (trackingAwb) => {
  *
  * b∫ @param {fetches tracking Model from Mongo} trackingAwbs
  */
-const fetchTrackingModelAndUpdateCache = async (trackingAwb) => {
+const fetchTrackingModelAndUpdateCache = async (trackingAwb, fromTrackingApi = false) => {
   try {
     const trackingObj = (await getObject(trackingAwb)) || {};
+    let isFetchFromDB = fromTrackingApi;
+    if (fromTrackingApi) {
+      const updatedAt = trackingObj?.track_model?.updated_at;
+      isFetchFromDB = !updatedAt || moment().diff(moment(updatedAt), "minutes") > 60;
+    }
 
-    if (IS_FETCH_FROM_DB || isEmpty(trackingObj) || isEmpty(trackingObj?.track_model)) {
+    if (
+      IS_FETCH_FROM_DB ||
+      isEmpty(trackingObj) ||
+      isEmpty(trackingObj?.track_model) ||
+      isFetchFromDB
+    ) {
       const trackDocument = await getTrackDocumentfromMongo(trackingAwb);
 
       if (isEmpty(trackDocument)) {
