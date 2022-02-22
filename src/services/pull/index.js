@@ -20,7 +20,7 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
     throw new Error(result.err);
   }
   const latestCourierEDD = result?.eddStamp;
-  const pickupDateTime = result?.eventObj?.pickup_datetime;
+  let pickupDateTime = result?.eventObj?.pickup_datetime;
   const statusType = result?.statusMap["status.current_status_type"];
 
   const updatedObj = {
@@ -70,7 +70,11 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
     // Pickrr EDD is fetch over here
 
     try {
+      if (!result.eventObj?.pickup_datetime) {
+        pickupDateTime = res?.pickup_datetime;
+      }
       const instance = new EddPrepareHelper({ latestCourierEDD, pickupDateTime, eddStampInDb });
+
       const pickrrEDD = await instance.callPickrrEDDEventFunc({
         zone,
         latestCourierEDD,
@@ -78,8 +82,8 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
         eddStampInDb,
         statusType,
       });
-      if (result.statusMap.current_status_type === "PP") {
-        updatedObj.pickup_datetime = result.statusMap["status.current_status_time"];
+      if (result.eventObj?.pickup_datetime) {
+        updatedObj.pickup_datetime = result.eventObj.pickup_datetime;
       }
       updatedObj.edd_stamp = pickrrEDD || null;
     } catch (error) {
