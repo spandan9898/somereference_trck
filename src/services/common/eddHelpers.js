@@ -1,16 +1,16 @@
 /* eslint-disable class-methods-use-this */
 const moment = require("moment");
 const { PICKRR_EDD_MATRIX, ZONE_REQUIRED_STATUS_SET } = require("./constants");
-const { ValidateDateField, getMaxDate } = require("../../utils/helpers");
+const { validateDateField, getMaxDate } = require("../../utils/helpers");
 
 /**
  * EDD Helper Class
  */
 class EddPrepareHelper {
   constructor({ latestCourierEDD, pickupDateTime, eddStampInDb }) {
-    this.validatedPickupDate = ValidateDateField(pickupDateTime);
-    this.validatedEDDStamp = ValidateDateField(eddStampInDb);
-    this.validatedCourierEdd = ValidateDateField(latestCourierEDD);
+    this.validatedPickupDate = validateDateField(pickupDateTime);
+    this.validatedEDDStamp = validateDateField(eddStampInDb);
+    this.validatedCourierEdd = validateDateField(latestCourierEDD);
     this.today = moment().set({ hour: 13, minute: 0, second: 0 }).toDate();
     this.tomorrow = moment().add(1, "days").set({ hour: 13, minute: 0, second: 0 }).toDate();
   }
@@ -109,7 +109,7 @@ class EddPrepareHelper {
     statusType,
   }) {
     let pickrrEDD;
-    if (!PICKRR_EDD_MATRIX?.zone && ZONE_REQUIRED_STATUS_SET.includes(statusType)) {
+    if (!PICKRR_EDD_MATRIX[zone] && ZONE_REQUIRED_STATUS_SET.includes(statusType)) {
       return latestCourierEDD;
     }
     if (["OP", "OM", "PPF", "OFP"].includes(statusType)) {
