@@ -23,7 +23,7 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
   const updatedObj = {
     ...result.statusMap,
     track_arr: [result.eventObj],
-    last_update_from: "kafka",
+    last_update_from: isFromPulled ? "kafka_pull" : "kafka",
     edd_stamp: result.eddStamp ? result.eddStamp : "",
     updated_at: moment().toDate(),
   };
