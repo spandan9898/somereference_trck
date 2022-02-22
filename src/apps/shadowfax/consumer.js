@@ -30,7 +30,10 @@ const initialize = async () => {
   const consumerMapWithPartitions = partitionsCount.map(async () => {
     try {
       await pullConsumer.connect();
-      await pullConsumer.subscribe({ topic: "n_shadowfax", fromBeginning: false }); // TODO:
+      await pullConsumer.subscribe({
+        topic: process.env.SHADOWFAX_TOPIC_NAME || "shadowfax",
+        fromBeginning: false,
+      });
       return pullConsumer;
     } catch (error) {
       logger.error("Shadowfax Initialize Error", error);
