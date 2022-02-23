@@ -46,7 +46,7 @@ const fetchTrackingService = async ({ trackingIdsList, authToken = null, IP = nu
           responseDict.response_list = responseList;
           return responseDict;
         }
-        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0]);
+        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0], true);
         const cacheAuthToken = trackingObj?.track_model?.auth_token || "";
         if (cacheAuthToken !== authToken) {
           if (IP && ALLOWED_IPS.includes(IP)) {
@@ -62,7 +62,7 @@ const fetchTrackingService = async ({ trackingIdsList, authToken = null, IP = nu
         responseDict.err = " Tracking ID not found";
       }
       if ((IP && ALLOWED_IPS.includes(IP)) || allowFetchFromDB) {
-        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0]);
+        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0], true);
         const trackModel = await filterTrackingObj(trackingObj?.track_model);
         responseDict = trackModel;
         return responseDict;
@@ -86,7 +86,7 @@ const fetchTrackingService = async ({ trackingIdsList, authToken = null, IP = nu
         continue;
       }
       try {
-        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingId);
+        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingId, true);
         const cacheAuthToken = trackingObj?.track_model?.auth_token || "";
         if (cacheAuthToken !== authToken) {
           if (IP && ALLOWED_IPS.includes(IP)) {
@@ -126,8 +126,8 @@ const TrackingAuthenticationService = async (req) => {
   let clientOrderIds = null;
   const authToken = req.query?.auth_token || null;
   let IP = RequestIp.getClientIp(req);
-  const hostName = req?.hostname || null;
-  let verifiedByHost = false;
+  const hostName = req?.headers?.origin || "";
+  let verifiedByHost = true;
   let valid = true;
   if (BLOCKED_IPS.includes(IP)) {
     return { status: "" };
