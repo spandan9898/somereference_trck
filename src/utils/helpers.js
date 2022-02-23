@@ -23,7 +23,7 @@ const axiosInstance = axios.create();
  */
 const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray) => {
   try {
-    const { awb } = trackObj;
+    const { awb } = trackObj || {};
 
     const pullCollection = await commonTrackingInfoCol();
     const response = await pullCollection.findOne(
@@ -185,6 +185,20 @@ class MakeAPICall {
     try {
       const config = this.getConfig(otherConfigs);
       const { data, status, headers } = await this.axios.get(this.url, config);
+      return {
+        data,
+        statusCode: status,
+        headers,
+      };
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  async put(otherConfigs) {
+    try {
+      const config = this.getConfig(otherConfigs);
+      const { data, status, headers } = await this.axios.put(this.url, this.payload, config);
       return {
         data,
         statusCode: status,

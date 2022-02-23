@@ -97,7 +97,14 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
     updatedObj["status.current_status_time"] = firstTrackObjOfTrackArr.scan_datetime;
     updatedObj["status.pickrr_sub_status_code"] = firstTrackObjOfTrackArr.pickrr_sub_status_code;
 
-    const response = await pullCollection.findOneAndUpdate(
+    // TODO:
+
+    const stagingPullCollection = await commonTrackingInfoCol({
+      dbName: process.env.MONGO_PULLL_DB_STAGING_DATABASE_NAME,
+      collectionName: process.env.MONGO_PULLL_DB_STAGING_COLLECTION_NAME,
+      hostName: HOST_NAMES.PULL_STATING_DB,
+    });
+    const response = await stagingPullCollection.findOneAndUpdate(
       { tracking_id: trackObj.awb },
       {
         $set: updatedObj,
@@ -108,7 +115,7 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
       {
         returnNewDocument: true,
         returnDocument: "after",
-        upsert: false,
+        upsert: true,
       }
     );
     await storeDataInCache(result);
