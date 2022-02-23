@@ -62,8 +62,29 @@ const TRACK_ARRAY_OMIT_FIELDS_CLIENT_TRACKING = [
   "pickup_datetime",
 ];
 
+const TRACK_ARRAY_OMIT_FIELDS_PUBLIC_TRACKING = [
+  "scan_datetime",
+  "scan_location",
+  "scan_status",
+  "system_updated_at",
+  "update_source",
+  "update_time",
+  "pickup_datetime",
+];
+
+const PUBLIC_TRACKING_TRACK_OBJ_OMIT_FIELDS = [
+  "user_pk",
+  "user_id",
+  "updated_at",
+  "label_logo",
+  "auth_token",
+  "ops_profile",
+  "last_update_from",
+];
 module.exports = {
   GetTrackingJsonParentKeys,
   GetTrackJsonInfokeys,
   TRACK_ARRAY_OMIT_FIELDS_CLIENT_TRACKING,
+  TRACK_ARRAY_OMIT_FIELDS_PUBLIC_TRACKING,
+  PUBLIC_TRACKING_TRACK_OBJ_OMIT_FIELDS,
 };
