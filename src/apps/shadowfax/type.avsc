@@ -1,0 +1,15 @@
+{
+  "name": "Shadowfax",
+  "type": "record",
+  "fields": [
+    { "name": "created", "type": "string" },
+    { "name": "location", "type": "string" },
+    { "name": "status_id", "type": "string" },
+    { "name": "status", "type": "string" },
+    { "name": "remarks", "type": "string" },
+    { "name": "awb_number", "type": "string" },
+    { "name": "event", "type": "string" },
+    { "name": "received_by", "type": "string" },
+    { "name": "edd", "type": "string" }
+  ]
+}
