@@ -26,6 +26,7 @@ const {
   getTrackingIdProcessingCount,
   updateTrackingProcessingCount,
 } = require("./services");
+const { prepareLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -117,6 +118,7 @@ class KafkaMessageHandler {
       triggerWebhook(result, prodElkClient);
       updateStatusOnReport(result, logger, prodElkClient);
       updateStatusELK(result, prodElkClient);
+      prepareLambdaPayloadAndCall({ trackingId: result.tracking_id, elkClient: prodElkClient });
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }
