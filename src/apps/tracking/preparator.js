@@ -104,6 +104,8 @@ const validateTrackingJson = async (trackingObj) => {
 
     if ("auth_token" in json && json.auth_token !== null) {
       json.xkt = crypto.createHash("sha512").update(json?.auth_token).digest().toString("hex");
+    } else {
+      json.xkt = "";
     }
     return json;
   } catch (error) {
