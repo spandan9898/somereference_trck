@@ -5,6 +5,7 @@ const { findOneDocumentFromMongo, getObject, setObject } = require("../../utils"
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { sortStatusArray } = require("./helpers");
 const { IS_FETCH_FROM_DB } = require("../../utils/constants");
+const logger = require("../../../logger");
 
 /**
  *
@@ -144,7 +145,8 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, fromTrackingApi = f
     }
     return trackingObj;
   } catch (error) {
-    throw new Error(error);
+    logger.error("fetchTrackingModelAndUpdateCache", error);
+    return false;
   }
 };
 

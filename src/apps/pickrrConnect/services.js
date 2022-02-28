@@ -12,11 +12,18 @@ const { getUserNotification } = require("./model");
  * @param {*} trackingId: string, isFromPull: boolean
  * @desc if isFromPull true then fetch data from DB and prepare data, otherwise fetch data from cache
  */
-const prepareLambdaPayloadAndCall = async ({ trackingId, elkClient, isFromPull = false }) => {
+const preparePickrrConnectLambdaPayloadAndCall = async ({
+  trackingId,
+  elkClient,
+  isFromPull = false,
+}) => {
   let trackObj;
 
   if (isFromPull) {
     const response = await fetchTrackingModelAndUpdateCache(trackingId);
+    if (!response) {
+      return false;
+    }
     trackObj = response.track_model;
   } else {
     const cacheData = await getObject(trackingId);
@@ -39,6 +46,23 @@ const prepareLambdaPayloadAndCall = async ({ trackingId, elkClient, isFromPull =
   const lambdaFunctionName =
     process.env.PICKRR_CONNECT_LAMBDA_FUNCTION_NAME ||
     "communication-SendNotificationFunction-e50PoANHl8DS";
+
+  set(trackObj, "info.to_phone_number", "9474669944");
+  set(trackObj, "info.to_email", "ruhan@pickrr.com");
+  set(trackObj, "user_email", "ruhan@pickrr.com");
+  userNotificationData.order_in_transit = ["sms", "email", "wp"];
+  userNotificationData.order_placed = ["sms", "email", "wp"];
+  userNotificationData.order_picked_up = ["sms", "email", "wp"];
+  userNotificationData.picked_up_delayed = ["sms", "email", "wp"];
+  userNotificationData.order_in_transit = ["sms", "email", "wp"];
+  userNotificationData.delivery_delay = ["sms", "email", "wp"];
+  userNotificationData.out_for_delivery_sd = ["sms", "email", "wp"];
+  userNotificationData.out_for_delivery_er = ["sms", "email", "wp"];
+  userNotificationData.order_delivered = ["sms", "email", "wp"];
+  userNotificationData.order_not_delivered = ["sms", "email", "wp"];
+  userNotificationData.order_cancelled = ["sms", "email", "wp"];
+  userNotificationData.email = "ruhan@pickrr.com";
+  userNotificationData.total_coins = 100;
 
   const payload = {
     data: [
@@ -67,4 +91,4 @@ const prepareLambdaPayloadAndCall = async ({ trackingId, elkClient, isFromPull =
   return true;
 };
 
-module.exports = { prepareLambdaPayloadAndCall };
+module.exports = { preparePickrrConnectLambdaPayloadAndCall };
