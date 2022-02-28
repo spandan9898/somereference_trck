@@ -1017,12 +1017,12 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
   "eod-137_ud": {
     courier_remark: "OTP code mismatch",
     scan_type: "UD",
-    pickrr_sub_status_code: "OTH",
+    pickrr_sub_status_code: "OTPF",
   },
   "eod-138_ud": {
     courier_remark: "OTP not available",
     scan_type: "UD",
-    pickrr_sub_status_code: "OTH",
+    pickrr_sub_status_code: "OTPF",
   },
   "lt-100_lt": {
     courier_remark: "Shipment Lost",
