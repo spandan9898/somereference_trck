@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-await-in-loop */
 
 const moment = require("moment");
@@ -10,6 +11,8 @@ const {
   GetTrackingJsonParentKeys,
   GetTrackJsonInfokeys,
   TRACK_ARRAY_OMIT_FIELDS_CLIENT_TRACKING,
+  TRACK_ARRAY_OMIT_FIELDS_PUBLIC_TRACKING,
+  PUBLIC_TRACKING_TRACK_OBJ_OMIT_FIELDS,
 } = require("./constant");
 const { checkShowClientDetails } = require("./helpers");
 
@@ -98,11 +101,12 @@ const validateTrackingJson = async (trackingObj) => {
         json.logo = "";
       }
     }
-    if ("billing_zone" in json) {
-      json.billing_zone = "";
-    }
-    json.xkt = crypto.createHash("sha512").update(json?.auth_token).digest().toString("hex");
 
+    if ("auth_token" in json && json.auth_token !== null) {
+      json.xkt = crypto.createHash("sha512").update(json?.auth_token).digest().toString("hex");
+    } else {
+      json.xkt = "";
+    }
     return json;
   } catch (error) {
     logger.error("validateTrackingJson error -->", error);
@@ -293,6 +297,40 @@ const prepareTrackingRes = async (trackingObj) => {
 };
 
 /**
+ *
+ * @param {*} trackingObj
+ */
+const prepareTrackObjForPublicTracking = (trackingObj) => {
+  let tracking = { ...trackingObj };
+  tracking.info = _.omit(tracking.info, ["user_id"]);
+  tracking = _.omit(tracking, PUBLIC_TRACKING_TRACK_OBJ_OMIT_FIELDS);
+  if ("status" in tracking) {
+    if (tracking.status?.current_status_val === null) {
+      tracking.status.current_status_val = "";
+    }
+  }
+  if ("courier_used" in tracking) {
+    if ("courier_parent_name" in tracking) {
+      tracking.courier_used = tracking.courier_parent_name;
+    }
+  }
+  let trackArr = tracking?.track_arr || [];
+  trackArr = trackArr.map((trackItem) => {
+    const statusArray = trackItem.status_array.map((item) => {
+      item.status_time = item.scan_datetime;
+      const obj = _.omit(item, TRACK_ARRAY_OMIT_FIELDS_PUBLIC_TRACKING);
+      return { courier_status_code: null, pickrr_sub_status_code: null, ...obj };
+    });
+    return {
+      ...trackItem,
+      status_array: statusArray,
+    };
+  });
+  if (!isEmpty(trackArr)) tracking.track_arr = trackArr;
+  return tracking;
+};
+
+/**
  * edits response from prepareClientTracking in responseList and single response
  * @param {*} trackingObj
  * @returns
@@ -303,7 +341,9 @@ const prepareTrackObjForClientTracking = async (trackingObj) => {
   tracking = _.omit(tracking, ["order_created_at"]);
   tracking = _.omit(tracking, ["created_at"]);
   tracking = _.omit(tracking, ["sync_count"]);
-
+  if ("billing_zone" in tracking) {
+    tracking.billing_zone = "";
+  }
   if ("edd_stamp" in tracking && tracking.edd_stamp !== "") {
     const convertedEddStamp = moment.utc(tracking.edd_stamp).add(330, "minute");
     if (convertedEddStamp.isValid()) {
@@ -377,12 +417,16 @@ const preparePublicTracking = async (trackingObj) => {
     let tracking = { ...trackingObj };
     if ("response_list" in tracking) {
       const responseList = tracking.response_list;
+      responseList.reverse();
       for (let i = 0; i < responseList.length; i += 1) {
         if (!isEmpty(responseList[i])) {
+          responseList[i] = prepareTrackObjForPublicTracking(responseList[i]);
           responseList[i] = fixStatusMapping(responseList[i]);
         }
       }
     } else if (!isEmpty(tracking)) {
+      tracking = prepareTrackObjForPublicTracking(tracking);
+
       tracking = fixStatusMapping(tracking);
     }
     return tracking;
