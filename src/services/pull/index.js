@@ -57,7 +57,7 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
       sortedTrackArray = updatedTrackArray;
     }
     updatedObj.track_arr = sortedTrackArray;
-    updatedObj.latest_courier_edd = latestCourierEDD;
+    updatedObj.courier_edd = latestCourierEDD;
 
     if (softCancellationCheck(sortedTrackArray, trackObj)) {
       return false;
