@@ -80,7 +80,7 @@ const prepareXbsData = (xbsDict) => {
     pickrrXbsDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrXbsDict.scan_datetime = statusDate;
     pickrrXbsDict.track_info =
-      statusType === "UD" ? xbsNdrMapper[reasonDict?.pickrr_sub_status_code] : trackData.Remarks;
+      statusType === "UD" ? xbsNdrMapper[reasonDict?.pickrr_sub_status_code] : PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrXbsDict.awb = trackData.AWBNO;
     pickrrXbsDict.track_location = trackData.CurrentLocation;
     pickrrXbsDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
