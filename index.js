@@ -38,6 +38,7 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
     require("./src/apps/ecomm");
     require("./src/apps/shadowfax");
     require("./src/apps/parceldo");
+    require("./src/apps/pickrrConnect");
   } catch (error) {
     logger.error("DB Connection Error", error);
   }

@@ -30,6 +30,9 @@ const prepareTrackDictForV1 = (trackData) => {
     EDD: trackData?.edd_stamp
       ? moment(trackData?.edd_stamp).add(330, "minutes").format("DD-MM-YYYY HH:mm")
       : null,
+    promise_edd: trackData?.promise_edd
+      ? moment(trackData?.promise_edd).add(330, "minutes").format("DD-MM-YYYY HH:mm")
+      : null,
     pickrr_status: NEW_STATUS_TO_OLD_MAPPING[scanType] || scanType,
     pickrr_sub_status_code:
       trackData?.pickrr_sub_status_code ||
