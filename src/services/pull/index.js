@@ -31,6 +31,9 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     edd_stamp: result.eddStamp ? result.eddStamp : "",
     updated_at: moment().toDate(),
   };
+  if (!updatedObj.edd_stamp) {
+    delete updatedObj.edd_stamp;
+  }
   try {
     const pullCollection = await commonTrackingInfoCol();
     const trackArr = updatedObj.track_arr;

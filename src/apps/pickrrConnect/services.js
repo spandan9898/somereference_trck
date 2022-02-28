@@ -47,6 +47,8 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
     process.env.PICKRR_CONNECT_LAMBDA_FUNCTION_NAME ||
     "communication-SendNotificationFunction-e50PoANHl8DS";
 
+  // TODO: For testing
+
   set(trackObj, "info.to_phone_number", "9474669944");
   set(trackObj, "info.to_email", "ruhan@pickrr.com");
   set(trackObj, "user_email", "ruhan@pickrr.com");
@@ -84,7 +86,7 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
   };
 
   await sendDataToElk({
-    indexName: "track_pickrr_connect",
+    indexName: "track-pickrr-connect",
     body,
     elkClient,
   });
