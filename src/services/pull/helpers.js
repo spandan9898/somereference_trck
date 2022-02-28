@@ -1,4 +1,7 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-prototype-builtins */
 const moment = require("moment");
+const logger = require("../../../logger");
 
 /**
  *
@@ -38,7 +41,45 @@ const prepareTrackArrCacheData = (trackArr) => {
   return { trackMap, isNDR };
 };
 
+/**
+ *
+ * @param {*} trackArr -> DB track_arr
+ * @desc check whether OC status present in track array
+ * @returns
+ */
+const checkCancelStatusInTrackArr = (trackArr) => {
+  try {
+    const isMatched = trackArr.find((trackObj) => trackObj.scan_type === "OC");
+
+    return !!isMatched;
+  } catch (error) {
+    logger.error("checkCancelStatusInTrackArr", error);
+    return false;
+  }
+};
+
+/**
+ * @desc update cache track_model, if key exists
+ */
+const updateTrackModel = (cacheTrakModel, trackingDocument) => {
+  try {
+    return Object.keys(cacheTrakModel).reduce((obj, key) => {
+      if (key === "track_arr") {
+        obj[key] = cacheTrakModel[key];
+      } else {
+        obj[key] = trackingDocument[key];
+      }
+      return obj;
+    }, {});
+  } catch (error) {
+    logger.error("updateTrackModel", error);
+    return cacheTrakModel;
+  }
+};
+
 module.exports = {
   mapStatusToEvent,
   prepareTrackArrCacheData,
+  checkCancelStatusInTrackArr,
+  updateTrackModel,
 };

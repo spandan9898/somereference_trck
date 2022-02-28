@@ -68,7 +68,7 @@ const ECOMM_CODE_MAPPER = {
   1260: { pickrr_status_code: "PP", pickrr_sub_status_code: "" },
   1310: { pickrr_status_code: "PPF", pickrr_sub_status_code: "OTH" },
   1320: { pickrr_status_code: "PPF", pickrr_sub_status_code: "HO" },
-  1330: { pickrr_status_code: "PPF", pickrr_sub_status_code: "CANC" },
+  1330: { pickrr_status_code: "OC", pickrr_sub_status_code: "CANC" },
   1340: { pickrr_status_code: "PPF", pickrr_sub_status_code: "SNR" },
   1350: { pickrr_status_code: "PPF", pickrr_sub_status_code: "SNR" },
   1360: { pickrr_status_code: "PPF", pickrr_sub_status_code: "SC" },

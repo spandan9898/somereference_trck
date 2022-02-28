@@ -6,7 +6,7 @@
   "scripts": {
     "test": "nodemon ./test.js",
     "start": "npm run lint && nodemon index.js",
-    "dev:script": "node script.js",
+    "dev:script": "node scripts/reportBackfill.js",
     "lint": "eslint src/*",
     "lint:fix": "eslint --fix src/*"
   },
@@ -22,15 +22,18 @@
   "homepage": "https://bitbucket.org/laxmanverma/trackingconsumersms#readme",
   "dependencies": {
     "@elastic/elasticsearch": "7.16.0",
+    "@supercharge/request-ip": "1.1.2",
     "aws-sdk": "2.1030.0",
     "axios": "0.24.0",
     "dotenv": "10.0.0",
     "fastify": "3.24.0",
     "fastify-autoload": "3.9.0",
+    "fastify-cors": "6.0.2",
     "kafkajs": "1.15.0",
     "lodash": "4.17.21",
     "moment": "2.29.1",
     "mongodb": "4.2.0",
+    "nanoid": "3.1.32",
     "redis": "4.0.1",
     "winston": "3.3.3",
     "winston-transport": "4.4.0"

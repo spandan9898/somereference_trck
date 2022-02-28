@@ -23,8 +23,12 @@ const updateStatusOnReport = async (trackObj, logger, elkClient) => {
     logger.info("scan type is CC", latestScanType);
     return false;
   }
-  const result = prepareDataForReportMongo(trackObj);
+  const result = _.pickBy(
+    prepareDataForReportMongo(trackObj),
+    (val) => val !== null && val !== undefined && val !== ""
+  );
   result.last_updated_date = moment().toDate();
+  result.last_update_from_kafka = result.last_updated_date;
   sendReportsDataToELK(result, elkClient);
   const opsReportColInstance = await reportMongoCol();
   try {

@@ -4,12 +4,12 @@ const moment = require("moment");
 
 const logger = require("../../../logger");
 const { setObject, getObject, checkAwbInCache } = require("../../utils");
-const { sortStatusArray } = require("../common/helpers");
 const {
   prepareTrackDataForTracking,
   fetchTrackingModelAndUpdateCache,
 } = require("../common/trackServices");
 const { updateIsNDRinCache } = require("../ndr/helpers");
+const { checkCancelStatusInTrackArr, updateTrackModel } = require("./helpers");
 
 /**
  *
@@ -19,7 +19,7 @@ const { updateIsNDRinCache } = require("../ndr/helpers");
  * and update cache's track_arr
  * @returns bool
  */
-const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
+const updateCacheTrackArray = async ({ trackArray, awb, trackingDocument }) => {
   try {
     const cacheData = await getObject(awb);
 
@@ -34,36 +34,12 @@ const updateCacheTrackArray = async ({ currentTrackObj, trackArray, awb }) => {
       return true;
     }
 
-    const cachedTrackArray = trackModel.track_arr;
-    if (_.isEmpty(cachedTrackArray)) {
-      // i.e first time,
-
-      const preparedTrackArray = prepareTrackDataForTracking(trackArray);
-      cacheData.trackModel.track_arr = preparedTrackArray;
-    } else {
-      // i.e track_arr data exists in cache
-      // Check the recent status_name, if it is same as current status_name
-      // then append currentTrackObj to status_array, and do sorting(scan_datetime)
-      // If it's not same then simply prepare new track object and append to top of cached track array.
-
-      currentTrackObj.status_time = moment(currentTrackObj.scan_datetime).format(
-        "DD MMM YYYY, HH:mm"
-      );
-      currentTrackObj.status_body = currentTrackObj.scan_status;
-      currentTrackObj.status_location = currentTrackObj.scan_location;
-      const cachedTopTrackObj = cachedTrackArray[0];
-      if (_.get(currentTrackObj, "scan_type") === _.get(cachedTopTrackObj, "status_name")) {
-        cachedTopTrackObj.status_array.push(_.omit(currentTrackObj, "scan_type"));
-        cachedTopTrackObj.status_array = sortStatusArray(cachedTopTrackObj.status_array);
-      } else {
-        cachedTrackArray.unshift({
-          status_name: currentTrackObj.scan_type,
-          status_array: sortStatusArray([_.omit(currentTrackObj, "scan_type")]),
-        });
-      }
-      cacheData.track_model.track_arr = cachedTrackArray;
+    const preparedTrackArray = prepareTrackDataForTracking(trackArray);
+    cacheData.track_model.track_arr = preparedTrackArray;
+    if (trackingDocument) {
+      const updatedTrackModel = updateTrackModel(cacheData.track_model, trackingDocument);
+      cacheData.track_model = updatedTrackModel;
     }
-
     await setObject(awb, cacheData);
     return true;
   } catch (error) {
@@ -121,8 +97,36 @@ const storeDataInCache = async (result) => {
   await setObject(awb, oldData);
 };
 
+/**
+ *
+ * @param {*} trackArr -> updated track_arr (after fetching from DB)
+ * @param {*} preparedTrackData
+ * @desc check OC status in track_arr. If present and current pushed status
+ * is in ["OFP", "OM", "OP", "PPF", "OC"] then break the process otherwise continue
+ * @returns true/false
+ */
+const softCancellationCheck = (trackArr, preparedTrackData) => {
+  try {
+    const isPresent = checkCancelStatusInTrackArr(trackArr);
+    if (!isPresent) {
+      return false;
+    }
+    const currentStatus = preparedTrackData.scan_type;
+
+    if (["OFP", "OM", "OP", "PPF", "OC"].includes(currentStatus)) {
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    logger.error("softCancellationCheck", error);
+    return false;
+  }
+};
+
 module.exports = {
   redisCheckAndReturnTrackData,
   storeDataInCache,
   updateCacheTrackArray,
+  softCancellationCheck,
 };

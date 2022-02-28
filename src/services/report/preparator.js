@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 const { findPickupDate, ofdCount } = require("../v1/helpers");
 const {
   prepareTrackingStatus,
@@ -16,10 +18,15 @@ const {
 const prepareDataForReportMongo = (trackData) => {
   const trackingStatus = prepareTrackingStatus(trackData);
   const NDRObject = findLatestNDRDetails(trackData?.track_arr || {});
+
+  let pickupDate = findPickupDate(trackData?.track_arr || {});
+  if (pickupDate) {
+    pickupDate = pickupDate instanceof Date ? pickupDate : moment(pickupDate).toDate();
+  }
   const data = {
-    pickup_date: findPickupDate(trackData?.track_arr || {}),
+    pickup_date: pickupDate,
     received_by: trackData?.status?.received_by || null,
-    current_status: trackingStatus.status_type || "FAILED",
+    current_status: trackingStatus.status_type || "NA",
     current_status_update: trackingStatus.status,
     current_status_datetime: trackingStatus.status_datetime,
     out_for_delivery_count: ofdCount(trackData?.track_arr || {}),
