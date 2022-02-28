@@ -29,7 +29,7 @@ const getTrackObjFromTrackArray = (trackArr) => {
 };
 
 /**
- *
+ * @desc helper for webhook proxy map
  */
 class WebhookHelper {
   prepareInitialFlagCheckReqObj() {
@@ -58,7 +58,20 @@ class WebhookHelper {
   }
 }
 
+/**
+ *
+ * @param {*} webhookuser document
+ * @desc check whether all mandatory data is present, if not present then we'll remove this document from webhookUserData cache
+ * @returns
+ */
+const isWebhookUserDataUpdateable = ({
+  track_url: trackUrl = "",
+  has_webhook_enabled: hasWebhookEnabled = false,
+  is_active: isActive = false,
+}) => trackUrl && hasWebhookEnabled && isActive;
+
 module.exports = {
   WebhookHelper,
   getTrackObjFromTrackArray,
+  isWebhookUserDataUpdateable,
 };

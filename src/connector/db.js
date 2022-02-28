@@ -2,7 +2,6 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 const logger = require("../../logger");
 
 /**
- * @param dbHostUrl -> Database Host URL
  * @desc Initialize Multiple DB and get DB instances
  */
 class InitDb {

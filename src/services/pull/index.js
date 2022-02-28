@@ -1,9 +1,10 @@
 const moment = require("moment");
 const _ = require("lodash");
 
-const { storeDataInCache, updateCacheTrackArray } = require("./services");
+const { storeDataInCache, updateCacheTrackArray, softCancellationCheck } = require("./services");
 const { prepareTrackDataToUpdateInPullDb } = require("./preparator");
 const commonTrackingInfoCol = require("./model");
+const { updateTrackingProcessingCount } = require("../common/services");
 
 /**
  *
@@ -49,6 +50,19 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
     }
     updatedObj.track_arr = sortedTrackArray;
 
+    if (softCancellationCheck(sortedTrackArray, trackObj)) {
+      return false;
+    }
+
+    const firstTrackObjOfTrackArr = sortedTrackArray[0];
+
+    updatedObj["status.current_status_type"] = firstTrackObjOfTrackArr.scan_type;
+    updatedObj["status.courier_status_code"] = firstTrackObjOfTrackArr.courier_status_code;
+    updatedObj["status.current_status_body"] = firstTrackObjOfTrackArr.scan_status;
+    updatedObj["status.current_status_location"] = firstTrackObjOfTrackArr.scan_location;
+    updatedObj["status.current_status_time"] = firstTrackObjOfTrackArr.scan_datetime;
+    updatedObj["status.pickrr_sub_status_code"] = firstTrackObjOfTrackArr.pickrr_sub_status_code;
+
     const response = await pullCollection.findOneAndUpdate(
       { tracking_id: trackObj.awb },
       {
@@ -64,10 +78,12 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
       }
     );
     await storeDataInCache(result);
+    await updateTrackingProcessingCount(trackObj, "remove");
     updateCacheTrackArray({
       currentTrackObj: trackArr[0],
-      trackArray: trackArr,
+      trackArray: response.value.track_arr,
       awb: result.awb,
+      trackingDocument: response.value,
     });
     return response.value;
   } catch (error) {

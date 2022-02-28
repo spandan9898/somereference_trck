@@ -1,3 +1,4 @@
+/* eslint-disable no-promise-executor-return */
 const _ = require("lodash");
 
 const { prepareAmazeData } = require("../../apps/amaze/services");
@@ -10,6 +11,7 @@ const { prepareShadowfaxData } = require("../../apps/shadowfax/services");
 const { prepareUdaanData } = require("../../apps/udaan/services");
 const { prepareXbsData } = require("../../apps/xpressbees/services");
 const logger = require("../../../logger");
+const initELK = require("../../connector/elkConnection");
 
 const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
@@ -17,8 +19,13 @@ const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
 const updateStatusOnReport = require("../report");
-const elkClient = require("../../connector/elk");
 const { updatePrepareDict } = require("./helpers");
+const { ELK_INSTANCE_NAMES } = require("../../utils/constants");
+const {
+  updateStatusELK,
+  getTrackingIdProcessingCount,
+  updateTrackingProcessingCount,
+} = require("./services");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -39,15 +46,44 @@ class KafkaMessageHandler {
     return courierPrepareMapFunctions[courierName];
   }
 
+  static getElkClients() {
+    let prodElkClient = "";
+    let stagingElkClient = "";
+    try {
+      prodElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.PROD.name);
+      stagingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.STAGING.name);
+
+      return {
+        prodElkClient,
+        stagingElkClient,
+      };
+    } catch (error) {
+      logger.error("getElkClients", error);
+      return {
+        prodElkClient,
+        stagingElkClient,
+      };
+    }
+  }
+
+  /**
+   *
+   * @desc about processCount ->
+   * 1. first fetch "processCount" from cache's awb object
+   * 2. use default value 0
+   * 3. Multiply this value with 1000
+   * 4. then delay accordingly
+   * 5. after DB update decrease "processCount" value by 1, handle negative case
+   */
   static async init(consumedPayload, courierName) {
-    const preapreFunc = KafkaMessageHandler.getPrepareFunction(courierName);
-    if (!preapreFunc) {
+    const prepareFunc = KafkaMessageHandler.getPrepareFunction(courierName);
+    if (!prepareFunc) {
       throw new Error(`${courierName} is not a valid courier`);
     }
     try {
       const { message } = consumedPayload;
 
-      const res = preapreFunc(Object.values(JSON.parse(message.value.toString()))[0]);
+      const res = prepareFunc(Object.values(JSON.parse(message.value.toString()))[0]);
 
       if (!res.awb) return;
       const trackData = await redisCheckAndReturnTrackData(res);
@@ -63,11 +99,24 @@ class KafkaMessageHandler {
         return;
       }
 
+      const { prodElkClient } = KafkaMessageHandler.getElkClients();
+
+      const processCount = await getTrackingIdProcessingCount(updatedTrackData);
+
+      await new Promise((done) => setTimeout(() => done(), processCount * 1000));
+
+      await updateTrackingProcessingCount(updatedTrackData);
+
       const result = await updateTrackDataToPullMongo(updatedTrackData, logger);
+      if (!result) {
+        return;
+      }
+
       sendDataToNdr(result);
       sendTrackDataToV1(result);
-      triggerWebhook(result, elkClient);
-      updateStatusOnReport(result, logger, elkClient);
+      triggerWebhook(result, prodElkClient);
+      updateStatusOnReport(result, logger, prodElkClient);
+      updateStatusELK(result, prodElkClient);
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }
