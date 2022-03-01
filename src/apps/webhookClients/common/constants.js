@@ -105,7 +105,6 @@ const REMOVE_ELEMENT_KEYS = [
   "mandatory_status_map",
   "label_logo",
   "user_email",
-  "billing_zone",
 ];
 module.exports = {
   TRACKING_INFO_PARENT_KEYS,
