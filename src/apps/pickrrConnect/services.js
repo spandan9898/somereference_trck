@@ -47,25 +47,6 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
     process.env.PICKRR_CONNECT_LAMBDA_FUNCTION_NAME ||
     "communication-SendNotificationFunction-e50PoANHl8DS";
 
-  // TODO: For testing
-
-  set(trackObj, "info.to_phone_number", "9474669944");
-  set(trackObj, "info.to_email", "ruhan@pickrr.com");
-  set(trackObj, "user_email", "ruhan@pickrr.com");
-  userNotificationData.order_in_transit = ["sms", "email", "wp"];
-  userNotificationData.order_placed = ["sms", "email", "wp"];
-  userNotificationData.order_picked_up = ["sms", "email", "wp"];
-  userNotificationData.picked_up_delayed = ["sms", "email", "wp"];
-  userNotificationData.order_in_transit = ["sms", "email", "wp"];
-  userNotificationData.delivery_delay = ["sms", "email", "wp"];
-  userNotificationData.out_for_delivery_sd = ["sms", "email", "wp"];
-  userNotificationData.out_for_delivery_er = ["sms", "email", "wp"];
-  userNotificationData.order_delivered = ["sms", "email", "wp"];
-  userNotificationData.order_not_delivered = ["sms", "email", "wp"];
-  userNotificationData.order_cancelled = ["sms", "email", "wp"];
-  userNotificationData.email = "ruhan@pickrr.com";
-  userNotificationData.total_coins = 100;
-
   const payload = {
     data: [
       {
