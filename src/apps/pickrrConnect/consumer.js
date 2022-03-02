@@ -14,7 +14,7 @@ const initialize = async () => {
     try {
       await consumer.connect();
       await consumer.subscribe({
-        topic: "pickrr-connect",
+        topic: process.env.PICKRR_CONNECT_TOPIC_NAME,
         fromBeginning: false,
       });
       return consumer;
