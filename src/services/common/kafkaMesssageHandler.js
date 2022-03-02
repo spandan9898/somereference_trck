@@ -18,7 +18,9 @@ const logger = require("../../../logger");
 const initELK = require("../../connector/elkConnection");
 
 const { updateTrackDataToPullMongo } = require("../pull");
-const { redisCheckAndReturnTrackData } = require("../pull/services");
+
+// const { redisCheckAndReturnTrackData } = require("../pull/services");
+
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
@@ -96,9 +98,9 @@ class KafkaMessageHandler {
       } catch {
         res = prepareFunc(consumedPayload);
       }
-
       if (!res.awb) return;
-      const trackData = await redisCheckAndReturnTrackData(res);
+      const trackData = { ...res };
+      // const trackData = await redisCheckAndReturnTrackData(res);
 
       if (!trackData) {
         logger.info(`data already exists or not found in DB! ${res.awb}`);
