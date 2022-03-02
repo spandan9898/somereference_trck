@@ -57,6 +57,9 @@ const preparePidgeData = (pidgeDict) => {
         statusString = pidgeDict.status.toString();
       }
     }
+    if (!statusString) {
+      return {};
+    }
     const scanType = PIDGE_CODE_MAPPER[statusString.toLowerCase()];
     if (!scanType) {
       return { err: "Unknown status code" };
