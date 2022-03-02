@@ -26,14 +26,14 @@ const callLambdaFunction = async (data, functionName) => {
     };
     const lambdaRequestObj = lambda.invoke(params);
     lambdaRequestObj.on("error", (response) => {
-      logger.error("lambda trigger error", response);
+      logger.error(`${functionName} lambda trigger error`, response);
     });
     lambdaRequestObj.on("success", () => {
-      logger.verbose("Webhook Lambda Success");
+      logger.verbose(`${functionName} Lambda Success`);
     });
     lambdaRequestObj.send();
   } catch (error) {
-    logger.error("callLambdaFunction", error);
+    logger.error(`${functionName} callLambdaFunction`, error);
   }
 };
 

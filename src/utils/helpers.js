@@ -23,7 +23,7 @@ const axiosInstance = axios.create();
  */
 const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray) => {
   try {
-    const { awb } = trackObj;
+    const { awb } = trackObj || {};
 
     const pullCollection = await commonTrackingInfoCol();
     const response = await pullCollection.findOne(
@@ -195,6 +195,20 @@ class MakeAPICall {
     }
   }
 
+  async put(otherConfigs) {
+    try {
+      const config = this.getConfig(otherConfigs);
+      const { data, status, headers } = await this.axios.put(this.url, this.payload, config);
+      return {
+        data,
+        statusCode: status,
+        headers,
+      };
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   async post(otherConfigs) {
     try {
       const config = this.getConfig(otherConfigs);
@@ -210,9 +224,37 @@ class MakeAPICall {
   }
 }
 
+/**
+ *
+ * validates if the expected dateobj is instance of datetime
+ * @returns True
+ */
+const validateDateField = (dateObj) => moment(dateObj).isValid();
+
+/**
+ *
+ * @param {datetime Object field} dateObj1
+ * @param {datetime Object field} dateObj2
+ * @returns Minimum of Two Dates
+ */
+const getMinDate = (dateObj1, dateObj2) =>
+  moment(dateObj1).isBefore(dateObj2) ? moment(dateObj1).toDate() : moment(dateObj2).toDate();
+
+/**
+ *
+ * @param {datetime Object field} dateObj1
+ * @param {datetime Object field} dateObj2
+ * @returns maximum of Two Dates
+ */
+const getMaxDate = (dateObj1, dateObj2) =>
+  moment(dateObj1).isAfter(dateObj2) ? moment(dateObj1).toDate() : moment(dateObj2).toDate();
+
 module.exports = {
   checkAwbInCache,
   convertDatetimeFormat,
   convertDatetimeFormat2,
   MakeAPICall,
+  validateDateField,
+  getMinDate,
+  getMaxDate,
 };

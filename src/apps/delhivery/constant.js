@@ -1518,7 +1518,7 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
     courier_remark: "Customer cancelled- IVR verified",
     scan_type: "UD",
     pickrr_sub_status_code: "CR",
-  }
+  },
 };
 
 const DELHIVERY_REVERSE_MAPPER = {
