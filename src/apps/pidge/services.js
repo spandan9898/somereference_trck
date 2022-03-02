@@ -52,7 +52,7 @@ const preparePidgeData = (pidgeDict) => {
       if ([13, 12, 21].includes(pidgeDict.status)) {
         statusString = pidgeDict?.remarks
           ? `${pidgeDict.status}_${pidgeDict.remarks}`
-          : pidgeDict.status;
+          : pidgeDict.status.toString();
       } else {
         statusString = pidgeDict.status.toString();
       }
