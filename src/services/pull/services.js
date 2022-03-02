@@ -67,10 +67,10 @@ const updateCacheTrackArray = async ({ trackArray, awb, trackingDocument }) => {
   * @desc check in cache and if exists then return false otherwise return tracking object, which will be move forward
  * @returns {string}
  */
-const redisCheckAndReturnTrackData = async (preparedTrackData) => {
+const redisCheckAndReturnTrackData = async (preparedTrackData, isFromPulled) => {
   const trackObj = { ...preparedTrackData };
 
-  const isExists = await checkAwbInCache(trackObj, updateCacheTrackArray);
+  const isExists = await checkAwbInCache({ trackObj, updateCacheTrackArray, isFromPulled });
   if (isExists) {
     return false;
   }
