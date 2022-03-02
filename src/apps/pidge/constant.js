@@ -1,5 +1,6 @@
 const PIDGE_PARTITION_COUNT = 10;
-const PIDGE_TOPIC_COUNT = 1;
+const PIDGE_TOPIC_NAME = "pidge_push";
+const PIDGE_GROUP_ID = "pidge-push-group";
 const PIDGE_CODE_MAPPER = {
   3: { scan_type: "OFP", pickrr_sub_status_code: "" },
   "13_cx unavailable": { scan_type: "PPF", pickrr_sub_status_code: "SU" },
@@ -38,5 +39,6 @@ const PIDGE_CODE_MAPPER = {
 module.exports = {
   PIDGE_PARTITION_COUNT,
   PIDGE_CODE_MAPPER,
-  PIDGE_TOPIC_COUNT,
+  PIDGE_TOPIC_NAME,
+  PIDGE_GROUP_ID,
 };
