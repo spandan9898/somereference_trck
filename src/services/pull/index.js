@@ -74,7 +74,7 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
       {
         returnNewDocument: true,
         returnDocument: "after",
-        upsert: false,
+        upsert: true,
       }
     );
     await storeDataInCache(result);
