@@ -48,16 +48,16 @@ const preparePidgeData = (pidgeDict) => {
   try {
     pickrrPidgeDict.awb = _.get(pidgeDict, "PBID", "").toString();
     let statusString = null;
-    if ("status" in pidgeDict && pidgeDict.status) {
+    if (pidgeDict.status) {
       if ([13, 12, 21].includes(pidgeDict.status)) {
         statusString = pidgeDict?.remarks
           ? `${pidgeDict.status}_${pidgeDict.remarks}`
-          : pidgeDict.status.toString();
+          : pidgeDict.status;
       } else {
         statusString = pidgeDict.status.toString();
       }
     }
-    const scanType = PIDGE_CODE_MAPPER[statusString];
+    const scanType = PIDGE_CODE_MAPPER[statusString.toLowerCase()];
     if (!scanType) {
       return { err: "Unknown status code" };
     }
