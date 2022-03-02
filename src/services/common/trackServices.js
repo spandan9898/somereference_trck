@@ -145,7 +145,8 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, fromTrackingApi = f
     }
     return trackingObj;
   } catch (error) {
-    logger.error("fetchTrackingModelAndUpdateCache", error);
+    logger.info(`fetchTrackingModelAndUpdateCache: ${error.message}`);
+
     return false;
   }
 };
