@@ -3,13 +3,24 @@ const { initialize, listener } = require("./consumer");
 
 (async () => {
   try {
-    const consumers = await initialize();
+    const { consumerMapWithTopics, consumerMapWithPartitions } = await initialize();
 
-    consumers.forEach((consumer) => {
+    consumerMapWithTopics.forEach((consumer) => {
       consumer
         .then((res) => {
           if (res) {
             listener(res);
+          }
+        })
+        .catch((error) => {
+          logger.error("Shadowfax Consumer Initialize Error", error);
+        });
+    });
+    consumerMapWithPartitions.forEach((consumer) => {
+      consumer
+        .then((res) => {
+          if (res) {
+            listener(res, true);
           }
         })
         .catch((error) => {

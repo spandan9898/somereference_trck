@@ -7,7 +7,10 @@ const { prepareDelhiveryData } = require("../../apps/delhivery/services");
 const { prepareEcommData } = require("../../apps/ecomm/services");
 const { prepareEkartData } = require("../../apps/ekart/services");
 const { prepareParceldoData } = require("../../apps/parceldo/services");
-const { prepareShadowfaxData } = require("../../apps/shadowfax/services");
+const {
+  prepareShadowfaxData,
+  preparePulledShadowfaxData,
+} = require("../../apps/shadowfax/services");
 const { prepareUdaanData } = require("../../apps/udaan/services");
 const { prepareXbsData } = require("../../apps/xpressbees/services");
 const logger = require("../../../logger");
@@ -26,6 +29,7 @@ const {
   getTrackingIdProcessingCount,
   updateTrackingProcessingCount,
 } = require("./services");
+const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -40,6 +44,7 @@ class KafkaMessageHandler {
       ekart: prepareEkartData,
       parceldo: prepareParceldoData,
       shadowfax: prepareShadowfaxData,
+      shadowfax_pull: preparePulledShadowfaxData,
       udaan: prepareUdaanData,
       xpressbees: prepareXbsData,
     };
@@ -81,34 +86,51 @@ class KafkaMessageHandler {
       throw new Error(`${courierName} is not a valid courier`);
     }
     try {
-      const { message } = consumedPayload;
-
-      const res = prepareFunc(Object.values(JSON.parse(message.value.toString()))[0]);
+      let res;
+      let isFromPulled = false;
+      try {
+        const { message } = consumedPayload;
+        res = prepareFunc(Object.values(JSON.parse(message.value.toString()))[0]);
+      } catch {
+        res = prepareFunc(consumedPayload);
+        isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
+      }
 
       if (!res.awb) return;
-      const trackData = await redisCheckAndReturnTrackData(res);
+
+      const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
+
+      await new Promise((done) => setTimeout(() => done(), processCount * 1000));
+
+      await updateTrackingProcessingCount({ awb: res.awb });
+
+      const trackData = await redisCheckAndReturnTrackData(res, isFromPulled);
 
       if (!trackData) {
         logger.info(`data already exists or not found in DB! ${res.awb}`);
+        updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return;
       }
 
       const updatedTrackData = await updatePrepareDict(trackData);
       if (_.isEmpty(updatedTrackData)) {
         logger.error("Xpresbees reverse map not found", trackData);
+        updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return;
       }
 
       const { prodElkClient } = KafkaMessageHandler.getElkClients();
 
-      const processCount = await getTrackingIdProcessingCount(updatedTrackData);
-
-      await new Promise((done) => setTimeout(() => done(), processCount * 1000));
-
-      await updateTrackingProcessingCount(updatedTrackData);
-
-      const result = await updateTrackDataToPullMongo(updatedTrackData, logger);
+      const result = await updateTrackDataToPullMongo({
+        trackObj: updatedTrackData,
+        logger,
+        isFromPulled,
+      });
       if (!result) {
+        return;
+      }
+
+      if (process.env.IS_OTHERS_CALL === "false") {
         return;
       }
 
@@ -117,6 +139,12 @@ class KafkaMessageHandler {
       triggerWebhook(result, prodElkClient);
       updateStatusOnReport(result, logger, prodElkClient);
       updateStatusELK(result, prodElkClient);
+      if (result.auth_token === "cb5a8b1c3df0477e9c39e1fc2baa516c163743") {
+        preparePickrrConnectLambdaPayloadAndCall({
+          trackingId: result.tracking_id,
+          elkClient: prodElkClient,
+        });
+      }
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }

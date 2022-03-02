@@ -22,6 +22,7 @@ const IS_FETCH_FROM_DB = false;
 const HOST_NAMES = {
   PULL_DB: "PULL_DB",
   REPORT_DB: "REPORT_DB",
+  PULL_STATING_DB: "PULL_STATING_DB",
 };
 
 const ELK_INSTANCE_NAMES = {
