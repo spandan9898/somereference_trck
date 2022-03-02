@@ -1,6 +1,10 @@
 /* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
-const { PARTITON_COUNT } = require("./constant");
+const {
+  PARTITON_COUNT,
+  PICKRR_CONNECT_TOPIC_NAME,
+  PICKRR_CONNECT_GROUP_NAME,
+} = require("./constant");
 const logger = require("../../../logger");
 const { pickrrConnectKafkaMessageHandler } = require("../../services/pickrrConnect");
 
@@ -8,13 +12,13 @@ const { pickrrConnectKafkaMessageHandler } = require("../../services/pickrrConne
  * initialize consumer for Pickrr Connect
  */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: "pickrr-connect-group" });
+  const consumer = kafka.consumer({ groupId: PICKRR_CONNECT_GROUP_NAME });
   const partitionsCount = new Array(PARTITON_COUNT).fill(1);
   return partitionsCount.map(async () => {
     try {
       await consumer.connect();
       await consumer.subscribe({
-        topic: process.env.PICKRR_CONNECT_TOPIC_NAME,
+        topic: PICKRR_CONNECT_TOPIC_NAME,
         fromBeginning: false,
       });
       return consumer;
