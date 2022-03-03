@@ -84,7 +84,6 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
         pickupDateTime = res?.pickup_datetime;
       }
       const instance = new EddPrepareHelper({ latestCourierEDD, pickupDateTime, eddStampInDb });
-
       const pickrrEDD = await instance.callPickrrEDDEventFunc({
         zone,
         latestCourierEDD,
@@ -95,7 +94,9 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
       if (moment(result.eventObj?.pickup_datetime).isValid()) {
         updatedObj.pickup_datetime = result.eventObj.pickup_datetime;
       }
-      updatedObj.edd_stamp = pickrrEDD;
+      if (pickrrEDD) {
+        updatedObj.edd_stamp = pickrrEDD;
+      }
     } catch (error) {
       logger.error(error.message);
     }
