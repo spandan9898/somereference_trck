@@ -142,6 +142,7 @@ class KafkaMessageHandler {
       preparePickrrConnectLambdaPayloadAndCall({
         trackingId: result.tracking_id,
         elkClient: prodElkClient,
+        result,
       });
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
