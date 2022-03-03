@@ -1,4 +1,5 @@
 const isEmpty = require("lodash/isEmpty");
+const omit = require("lodash/omit");
 
 const logger = require("../../../logger");
 const { callLambdaFunction } = require("../../connector/lambda");
@@ -8,6 +9,7 @@ const {
   getTrackDocumentfromMongo,
 } = require("../../services/common/trackServices");
 const { getObject } = require("../../utils");
+const { UNUSED_FIELDS_FROM_TRACKING_OBJ } = require("./constant");
 const { getUserNotification } = require("./model");
 
 /**
@@ -50,7 +52,8 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
   fetchFromCache = false,
 }) => {
   try {
-    const trackObj = await getTrackingObj({ trackingId, isFromPull, result, fetchFromCache });
+    let trackObj = await getTrackingObj({ trackingId, isFromPull, result, fetchFromCache });
+    trackObj = omit(trackObj, UNUSED_FIELDS_FROM_TRACKING_OBJ);
 
     const email = trackObj.user_email;
     if (!email) {
