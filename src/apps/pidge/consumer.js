@@ -34,7 +34,7 @@ const initialize = async () => {
 const listener = async (consumer, isPartition) => {
   try {
     await consumer.run({
-      autoCommitInterval: 6000,
+      autoCommitInterval: 60000,
       partitionsConsumedConcurrently: isPartition ? PIDGE_PARTITION_COUNT : 1,
       eachMessage: (consumedPayload) => {
         KafkaMessageHandler.init(consumedPayload, "pidge");
