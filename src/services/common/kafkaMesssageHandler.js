@@ -13,6 +13,7 @@ const {
 } = require("../../apps/shadowfax/services");
 const { prepareUdaanData } = require("../../apps/udaan/services");
 const { prepareXbsData } = require("../../apps/xpressbees/services");
+const { preparePidgeData } = require("../../apps/pidge/services");
 const logger = require("../../../logger");
 const initELK = require("../../connector/elkConnection");
 
@@ -47,6 +48,7 @@ class KafkaMessageHandler {
       shadowfax_pull: preparePulledShadowfaxData,
       udaan: prepareUdaanData,
       xpressbees: prepareXbsData,
+      pidge: preparePidgeData,
     };
     return courierPrepareMapFunctions[courierName];
   }
