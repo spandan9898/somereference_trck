@@ -154,4 +154,5 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, fromTrackingApi = f
 module.exports = {
   fetchTrackingModelAndUpdateCache,
   prepareTrackDataForTracking,
+  getTrackDocumentfromMongo,
 };
