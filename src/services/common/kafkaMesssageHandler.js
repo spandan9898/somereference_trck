@@ -13,11 +13,14 @@ const {
 } = require("../../apps/shadowfax/services");
 const { prepareUdaanData } = require("../../apps/udaan/services");
 const { prepareXbsData } = require("../../apps/xpressbees/services");
+const { preparePidgeData } = require("../../apps/pidge/services");
 const logger = require("../../../logger");
 const initELK = require("../../connector/elkConnection");
 
 const { updateTrackDataToPullMongo } = require("../pull");
-const { redisCheckAndReturnTrackData } = require("../pull/services");
+
+// const { redisCheckAndReturnTrackData } = require("../pull/services");
+
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
@@ -48,6 +51,7 @@ class KafkaMessageHandler {
       shadowfax_pull: preparePulledShadowfaxData,
       udaan: prepareUdaanData,
       xpressbees: prepareXbsData,
+      pidge: preparePidgeData,
     };
     return courierPrepareMapFunctions[courierName];
   }
@@ -94,9 +98,9 @@ class KafkaMessageHandler {
       } catch {
         res = prepareFunc(consumedPayload);
       }
-
       if (!res.awb) return;
-      const trackData = await redisCheckAndReturnTrackData(res);
+      const trackData = { ...res };
+      // const trackData = await redisCheckAndReturnTrackData(res);
 
       if (!trackData) {
         logger.info(`data already exists or not found in DB! ${res.awb}`);
