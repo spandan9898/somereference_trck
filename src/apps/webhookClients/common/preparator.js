@@ -8,6 +8,7 @@ const {
   checkShowDetailsClient,
   getCurrentStatusTime,
   mapTrackArray,
+  removeSecondsFromDateString,
 } = require("./helpers");
 
 /**
@@ -45,6 +46,32 @@ const filterTrackingParamsForTracker = async (trackDict) => {
   _.set(trackObj, "info.to_name", "");
 
   return trackObj;
+};
+
+/**
+ *
+ * @param {*} payload -> prepared data
+ * @desc https://pickrr.atlassian.net/browse/PE-2310
+ */
+const prepareDataForCred = (payload) => {
+  const updatedPayload = _.omit(payload, [
+    "edd_stamp_one_more_day",
+    "courier_edd",
+    "pickup_address_pk",
+    "status_pk",
+    "promise_edd",
+  ]);
+  _.set(
+    updatedPayload,
+    "pickup_datetime",
+    removeSecondsFromDateString(_.get(updatedPayload, "pickup_datetime"))
+  );
+  _.set(
+    updatedPayload,
+    "edd_stamp",
+    removeSecondsFromDateString(_.get(updatedPayload, "edd_stamp"))
+  );
+  return updatedPayload;
 };
 
 /**
@@ -86,7 +113,13 @@ const prepareCommonTrackingInfo = async (trackingResponse) => {
     }
     updatedTrackingInfoDoc.fetched_from = "kafka_lambda";
 
-    return _.omit(updatedTrackingInfoDoc, REMOVE_ELEMENT_KEYS);
+    let payload = _.omit(updatedTrackingInfoDoc, REMOVE_ELEMENT_KEYS);
+
+    if (["2a5117e87dbec8dbcb003c0c9df483d0243411"].includes(trackingResponse.auth_token)) {
+      payload = prepareDataForCred(payload);
+    }
+
+    return payload;
   } catch (error) {
     logger.error("prepareCommonTrackingInfo", error);
     return {};
