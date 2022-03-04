@@ -59,6 +59,7 @@ const prepareDataForCred = (payload) => {
     "courier_edd",
     "pickup_address_pk",
     "status_pk",
+    "promise_edd",
   ]);
   _.set(
     updatedPayload,
