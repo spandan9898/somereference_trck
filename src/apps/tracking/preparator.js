@@ -160,7 +160,7 @@ const prepareTrackingRes = async (trackingObj) => {
   let tracking = { ...trackingObj };
   try {
     if ("response_list" in tracking) {
-      const responseList = tracking.response_list;
+      const responseList = tracking.response_list || [];
       responseList.reverse();
       for (let i = 0; i < responseList.length; i += 1) {
         if ("err" in responseList[i] && responseList[i].err) {

@@ -13,6 +13,7 @@ const {
 } = require("../../apps/shadowfax/services");
 const { prepareUdaanData } = require("../../apps/udaan/services");
 const { prepareXbsData } = require("../../apps/xpressbees/services");
+const { preparePidgeData } = require("../../apps/pidge/services");
 const logger = require("../../../logger");
 const initELK = require("../../connector/elkConnection");
 
@@ -47,6 +48,7 @@ class KafkaMessageHandler {
       shadowfax_pull: preparePulledShadowfaxData,
       udaan: prepareUdaanData,
       xpressbees: prepareXbsData,
+      pidge: preparePidgeData,
     };
     return courierPrepareMapFunctions[courierName];
   }
@@ -139,12 +141,11 @@ class KafkaMessageHandler {
       triggerWebhook(result, prodElkClient);
       updateStatusOnReport(result, logger, prodElkClient);
       updateStatusELK(result, prodElkClient);
-      if (result.auth_token === "cb5a8b1c3df0477e9c39e1fc2baa516c163743") {
-        preparePickrrConnectLambdaPayloadAndCall({
-          trackingId: result.tracking_id,
-          elkClient: prodElkClient,
-        });
-      }
+      preparePickrrConnectLambdaPayloadAndCall({
+        trackingId: result.tracking_id,
+        elkClient: prodElkClient,
+        result,
+      });
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }

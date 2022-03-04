@@ -88,6 +88,7 @@ module.exports.clientTracking = async (req, reply) => {
     } else {
       return reply.code(200).send({ response_list: [] });
     }
+    trackingIdsList = trackingIdsList.filter(Boolean);
     let tracking = await fetchTrackingService({
       trackingIdsList,
       authToken,
