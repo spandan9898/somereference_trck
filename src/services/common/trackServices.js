@@ -1,7 +1,7 @@
 const { isEmpty, omit, get, last } = require("lodash");
 const moment = require("moment");
 
-const { findOneDocumentFromMongo, getObject, setObject, storeInCache } = require("../../utils");
+const { findOneDocumentFromMongo, getObject, storeInCache } = require("../../utils");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { sortStatusArray } = require("./helpers");
 const { IS_FETCH_FROM_DB } = require("../../utils/constants");
