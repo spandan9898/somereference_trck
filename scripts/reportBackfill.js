@@ -134,7 +134,7 @@ const getBatchData = async () => {
 
     for (const chunkData of chunkedData) {
       await main(chunkData);
-      await new Promise((done) => setTimeout(() => done(), 5000));
+      await new Promise((done) => setTimeout(() => done(), 3000));
     }
     logger.info("==== Process Completed ====");
     return true;
