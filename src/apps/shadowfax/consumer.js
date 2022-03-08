@@ -18,8 +18,7 @@ const avroType = avro.parse(`${__dirname}/type.avsc`);
  * initialize consumer for shadowfax payload
  */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: SHADOWFAX_GROUP_NAME }); // Basis on multiple topic
-  const pullConsumer = kafka.consumer({ groupId: SHADOWFAX_GROUP_NAME }); // Basis on multiple partitions, but one topic
+  const consumer = kafka.consumer({ groupId: SHADOWFAX_GROUP_NAME }); // Basis on single topic only
   const partitionsCount = new Array(SHADOWFAX_PARTITIONS_COUNT).fill(1);
   const pushPartitionConsumerInstances = partitionsCount.map(async () => {
     try {
@@ -32,12 +31,12 @@ const initialize = async () => {
   });
   const pullPartitionConsumerInstances = partitionsCount.map(async () => {
     try {
-      await pullConsumer.connect();
-      await pullConsumer.subscribe({
+      await consumer.connect();
+      await consumer.subscribe({
         topic: SHADOWFAX_PULL_TOPIC_NAME,
         fromBeginning: false,
       });
-      return pullConsumer;
+      return consumer;
     } catch (error) {
       logger.error("Shadowfax Initialize Error", error);
     }
