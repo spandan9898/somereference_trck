@@ -7,6 +7,7 @@ const {
   SHADOWFAX_PARTITIONS_COUNT,
   SHADOWFAX_PULL_TOPIC_NAME,
   SHADOWFAX_GROUP_NAME,
+  SHADOWFAX_PUSH_TOPIC_NAME,
 } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
@@ -23,7 +24,7 @@ const initialize = async () => {
   const partitionConsumerInstances = partitionsCount.map(async () => {
     try {
       await consumer.connect();
-      await consumer.subscribe({ topic: "shadowfax", fromBeginning: false });
+      await consumer.subscribe({ topic: SHADOWFAX_PUSH_TOPIC_NAME, fromBeginning: false });
       return consumer;
     } catch (error) {
       logger.error("Shadowfax Initialize Error!", error);
