@@ -21,7 +21,7 @@ const initialize = async () => {
   const consumer = kafka.consumer({ groupId: SHADOWFAX_GROUP_NAME }); // Basis on multiple topic
   const pullConsumer = kafka.consumer({ groupId: SHADOWFAX_GROUP_NAME }); // Basis on multiple partitions, but one topic
   const partitionsCount = new Array(SHADOWFAX_PARTITIONS_COUNT).fill(1);
-  const partitionConsumerInstances = partitionsCount.map(async () => {
+  const pushPartitionConsumerInstances = partitionsCount.map(async () => {
     try {
       await consumer.connect();
       await consumer.subscribe({ topic: SHADOWFAX_PUSH_TOPIC_NAME, fromBeginning: false });
@@ -30,7 +30,7 @@ const initialize = async () => {
       logger.error("Shadowfax Initialize Error!", error);
     }
   });
-  const consumerMapWithPartitions = partitionsCount.map(async () => {
+  const pullPartitionConsumerInstances = partitionsCount.map(async () => {
     try {
       await pullConsumer.connect();
       await pullConsumer.subscribe({
@@ -43,8 +43,8 @@ const initialize = async () => {
     }
   });
   return {
-    partitionConsumerInstances,
-    consumerMapWithPartitions,
+    pushPartitionConsumerInstances,
+    pullPartitionConsumerInstances,
   };
 };
 

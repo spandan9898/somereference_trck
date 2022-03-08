@@ -3,9 +3,9 @@ const { initialize, listener } = require("./consumer");
 
 (async () => {
   try {
-    const { partitionConsumerInstances, consumerMapWithPartitions } = await initialize();
+    const { pushPartitionConsumerInstances, pullPartitionConsumerInstances } = await initialize();
 
-    partitionConsumerInstances.forEach((consumer) => {
+    pushPartitionConsumerInstances.forEach((consumer) => {
       consumer
         .then((res) => {
           if (res) {
@@ -16,7 +16,7 @@ const { initialize, listener } = require("./consumer");
           logger.error("Shadowfax  Push Consumer Initialize Error", error);
         });
     });
-    consumerMapWithPartitions.forEach((consumer) => {
+    pullPartitionConsumerInstances.forEach((consumer) => {
       consumer
         .then((res) => {
           if (res) {
