@@ -15,7 +15,7 @@ const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
     "strOrigin": "BANGALORE",
     "strBookedOn": "21062017"
   },
-  "shipmentStatus": [
+  "shipmentStatus": 
     {
       "strAction": "BKD",
       "strActionDesc": "Booked",
@@ -25,30 +25,29 @@ const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
       "strActionTime": "1530",
       "strRemarks": ""
     }
-  ]
 }
  */
 const prepareDtdcData = (dtdcDict) => {
   const pickrrDtdcDict = {
     awb: "",
-    scan_type: "", //
+    scan_type: "",
     scan_datetime: "",
     track_info: "",
     track_location: "",
     received_by: "",
     pickup_datetime: "",
     EDD: "",
-    pickrr_status: "", //
+    pickrr_status: "",
     pickrr_sub_status_code: "",
     courier_status_code: "",
   };
   try {
     pickrrDtdcDict.awb = _.get(dtdcDict, "shipment.strShipmentNo", "").toString();
-    const actionString = _.get(dtdcDict, "shipmentStatus[0].strAction", "");
-    const actionRemarks = _.get(dtdcDict, "shipmentStatus[0].strRemarks");
+    const actionString = _.get(dtdcDict, "shipmentStatus.strAction", "");
+    const actionRemarks = _.get(dtdcDict, "shipmentStatus.strRemarks");
     let statusString = "";
     if (actionString) {
-      if (["NONDLV", "PCNO"].includes(actionString)) {
+      if (["nondlv", "pcno"].includes(actionString.toLowerCase())) {
         statusString = actionRemarks ? `${actionString}_${actionRemarks}` : `${actionString}`;
       } else {
         statusString = `${actionString}`;
@@ -61,8 +60,8 @@ const prepareDtdcData = (dtdcDict) => {
       return { err: "Unknown status code" };
     }
 
-    const statusDatetime = `${dtdcDict.shipmentStatus[0].strActionDate} ${dtdcDict.shipmentStatus[0].strActionTime}`;
-    const statusDate = statusDatetime
+    const statusDatetime = `${dtdcDict.shipmentStatus.strActionDate} ${dtdcDict.shipmentStatus.strActionTime}`;
+    const statusDate = moment(statusDatetime, "DDMMYYYY hhm").isValid()
       ? moment(statusDatetime, "DDMMYYYY hhm").format("YYYY-MM-DD HH:mm:ss")
       : moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
     if (scanType.scan_type === "PP") {
@@ -74,7 +73,7 @@ const prepareDtdcData = (dtdcDict) => {
     pickrrDtdcDict.track_info = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrDtdcDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrDtdcDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
-    pickrrDtdcDict.track_location = _.get(dtdcDict, "shipmentStatus[0].strOrigin", "");
+    pickrrDtdcDict.track_location = _.get(dtdcDict, "shipmentStatus.strOrigin", "");
     return pickrrDtdcDict;
   } catch (error) {
     pickrrDtdcDict.err = error.message;
