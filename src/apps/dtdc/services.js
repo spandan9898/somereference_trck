@@ -63,8 +63,8 @@ const prepareDtdcData = (dtdcDict) => {
     const statusDatetime = `${dtdcDict.shipmentStatus.strActionDate} ${dtdcDict.shipmentStatus.strActionTime}`;
     let statusDate = moment(statusDatetime, "DDMMYYYY hhm");
     statusDate = statusDate.isValid()
-      ? moment(statusDatetime, "DDMMYYYY hhm").format("YYYY-MM-DD HH:mm:ss")
-      : moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
+      ? statusDate.format("YYYY-MM-DD HH:mm:ss")
+      : moment().format("YYYY-MM-DD HH:mm:ss");
     if (scanType.scan_type === "PP") {
       pickrrDtdcDict.pickup_datetime = statusDate;
     }
