@@ -14,6 +14,7 @@ const {
 const { prepareUdaanData } = require("../../apps/udaan/services");
 const { prepareXbsData } = require("../../apps/xpressbees/services");
 const { preparePidgeData } = require("../../apps/pidge/services");
+const { prepareDtdcData } = require("../../apps/dtdc/services");
 const logger = require("../../../logger");
 const initELK = require("../../connector/elkConnection");
 
@@ -52,6 +53,7 @@ class KafkaMessageHandler {
       udaan: prepareUdaanData,
       xpressbees: prepareXbsData,
       pidge: preparePidgeData,
+      dtdc: prepareDtdcData,
     };
     return courierPrepareMapFunctions[courierName];
   }
@@ -100,6 +102,7 @@ class KafkaMessageHandler {
       }
       if (!res.awb) return;
       const trackData = { ...res };
+
       // const trackData = await redisCheckAndReturnTrackData(res);
 
       if (!trackData) {
