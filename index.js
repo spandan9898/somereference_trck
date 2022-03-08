@@ -44,6 +44,7 @@ const {
     require("./src/apps/shadowfax");
     require("./src/apps/parceldo");
     require("./src/apps/pidge");
+    require("./src/apps/dtdc");
     require("./src/apps/pickrrConnect");
   } catch (error) {
     logger.error("DB Connection Error", error);
