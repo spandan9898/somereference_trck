@@ -120,10 +120,25 @@ const mapTrackArray = (trackArr) =>
     };
   });
 
+/**
+ *
+ * @param {*} dateString -> 08-03-2022 00:00:00 or 2022-03-03T17:07:09.792Z
+ * @return 08-03-2022 00:00
+ */
+const removeSecondsFromDateString = (dateString) => {
+  let newDateString;
+  newDateString = moment(dateString, moment.ISO_8601);
+  if (!newDateString.isValid()) {
+    newDateString = moment(dateString, "DD-MM-YYYY HH:mm:ss");
+  }
+
+  return newDateString.format("DD-MM-YYYY HH:mm");
+};
 module.exports = {
   validateTrackingJson,
   prepareEddStamp,
   checkShowDetailsClient,
   getCurrentStatusTime,
   mapTrackArray,
+  removeSecondsFromDateString,
 };
