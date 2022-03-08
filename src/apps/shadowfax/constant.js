@@ -135,7 +135,7 @@ const SHADOWFAX_TOPICS_COUNT = 1;
 const SHADOWFAX_PARTITIONS_COUNT = 10;
 const SHADOWFAX_PULL_TOPIC_NAME = "shadowfax_pull";
 const SHADOWFAX_GROUP_NAME = "shadowfax";
-const SHADOWFAX_PUSH_TOPIC_NAME = "shadowfax";
+const SHADOWFAX_PUSH_TOPIC_NAME = "shadowfax_push";
 
 module.exports = {
   SHADOWFAX_CODE_MAPPER,
