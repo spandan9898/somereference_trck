@@ -1,13 +1,38 @@
 const moment = require("moment");
-const _ = require("lodash");
 
-const {
-  SHADOWFAX_CODE_MAPPER,
-  SHADOWFAX_PULL_CODE_MAPPER_1,
-  SHADOWFAX_PULL_CODE_MAPPER_2,
-} = require("./constant");
-const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
+const { SHADOWFAX_PULL_CODE_MAPPER_1, SHADOWFAX_PULL_CODE_MAPPER_2 } = require("./constant");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("../../services/v1/constants");
+
+/**
+ *
+ * get Custom Scan Type for ShdadowFax
+ *
+ */
+const getEventInfoData = ({ event, comments }) => {
+  let mapperString;
+  let scanType;
+  let pickrrSubStatusCode;
+  if (["pickup_on_hold", "on_hold", "nc", "na", "recd_at_fwd_dc"].includes(event.toLowerCase())) {
+    mapperString = `${event}_${comments}`;
+    if (SHADOWFAX_PULL_CODE_MAPPER_1[mapperString.toLowerCase()]?.scan_type) {
+      scanType = SHADOWFAX_PULL_CODE_MAPPER_1[mapperString.toLowerCase()]?.scan_type || "";
+      pickrrSubStatusCode =
+        SHADOWFAX_PULL_CODE_MAPPER_1[mapperString.toLowerCase()]?.pickrr_sub_status_code || "";
+    }
+    scanType = NEW_STATUS_TO_OLD_MAPPING[scanType] || scanType;
+  } else if (event.toLowerCase() in SHADOWFAX_PULL_CODE_MAPPER_2) {
+    mapperString = event;
+    if (SHADOWFAX_PULL_CODE_MAPPER_2[mapperString.toLowerCase()]?.scan_type) {
+      scanType = SHADOWFAX_PULL_CODE_MAPPER_2[mapperString.toLowerCase()]?.scan_type || "";
+      pickrrSubStatusCode =
+        SHADOWFAX_PULL_CODE_MAPPER_2[mapperString.toLowerCase()]?.pickrr_sub_status_code || "";
+    }
+    scanType = NEW_STATUS_TO_OLD_MAPPING[scanType] || scanType;
+  } else {
+    return {};
+  }
+  return { scanType, mapperString, pickrrSubStatusCode };
+};
 
 /*
 shadowfax courier payload --
@@ -22,7 +47,7 @@ shadowfax courier payload --
 */
 
 /**
- *
+ *Prepares PickrrData from Shadowfax's Pushed Info
  */
 const prepareShadowfaxData = (shadowfaxDict) => {
   const pickrrShadowfaxDict = {
@@ -40,19 +65,29 @@ const prepareShadowfaxData = (shadowfaxDict) => {
   };
 
   try {
-    const { event, received_by: receivedBy, EDD } = shadowfaxDict || {};
-    if (event.toLowerCase() in SHADOWFAX_CODE_MAPPER) {
-      const scanType = SHADOWFAX_CODE_MAPPER[event.toLowerCase()];
-      const scanDatetime = moment(shadowfaxDict.event_timestamp).format("YYYY-MM-DD HH:mm:ss");
-      pickrrShadowfaxDict.EDD = EDD ? moment(EDD).format("YYYY-MM-DD HH:mm:ss") : "";
-      pickrrShadowfaxDict.received_by = receivedBy || "";
-      pickrrShadowfaxDict.scan_type = scanType;
-      pickrrShadowfaxDict.scan_datetime = scanDatetime;
-      pickrrShadowfaxDict.track_info = _.get(shadowfaxDict, "comments", "");
-      pickrrShadowfaxDict.awb = _.get(shadowfaxDict, "awb_number", "");
-      pickrrShadowfaxDict.track_location = _.get(shadowfaxDict, "location", "");
-      pickrrShadowfaxDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];
+    const {
+      awb_number: awb,
+      event,
+      comments,
+      event_timestamp: eventTimeStamp,
+      event_location: eventLocation,
+    } = shadowfaxDict || {};
+
+    pickrrShadowfaxDict.awb = awb;
+
+    const { scanType, mapperString, pickrrSubStatusCode } = getEventInfoData({ event, comments });
+    if (!scanType) {
+      return pickrrShadowfaxDict;
     }
+
+    pickrrShadowfaxDict.scan_type = scanType;
+    pickrrShadowfaxDict.scan_datetime = moment(eventTimeStamp)
+      .add(330, "minute")
+      .format("YYYY-MM-DD HH:mm:ss");
+    pickrrShadowfaxDict.track_info = comments;
+    pickrrShadowfaxDict.track_location = eventLocation;
+    pickrrShadowfaxDict.courier_status_code = mapperString;
+    pickrrShadowfaxDict.pickrr_sub_status_code = pickrrSubStatusCode;
     return pickrrShadowfaxDict;
   } catch (error) {
     pickrrShadowfaxDict.err = error.message;
