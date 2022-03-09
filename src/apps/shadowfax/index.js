@@ -9,7 +9,7 @@ const { initialize, listener } = require("./consumer");
       consumer
         .then((res) => {
           if (res) {
-            listener(res);
+            listener(res, true);
           }
         })
         .catch((error) => {
