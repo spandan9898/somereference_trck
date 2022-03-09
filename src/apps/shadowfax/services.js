@@ -86,9 +86,7 @@ const prepareShadowfaxData = (shadowfaxDict) => {
       return pickrrShadowfaxDict;
     }
     pickrrShadowfaxDict.scan_type = scanType;
-    pickrrShadowfaxDict.scan_datetime = moment(eventTimeStamp)
-      .add(330, "minute")
-      .format("YYYY-MM-DD HH:mm:ss");
+    pickrrShadowfaxDict.scan_datetime = moment(eventTimeStamp).format("YYYY-MM-DD HH:mm:ss");
     pickrrShadowfaxDict.track_info = comments;
     pickrrShadowfaxDict.track_location = eventLocation;
     pickrrShadowfaxDict.courier_status_code = mapperString;
