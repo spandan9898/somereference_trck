@@ -33,7 +33,6 @@ const getEventInfoData = ({ event, comments, statusId, remarks }) => {
       pickrrSubStatusCode =
         SHADOWFAX_PULL_CODE_MAPPER_2[mapperString.toLowerCase()]?.pickrr_sub_status_code || "";
     }
-    scanType = NEW_STATUS_TO_OLD_MAPPING[scanType] || scanType;
   } else {
     return {};
   }
@@ -129,12 +128,9 @@ const preparePulledShadowfaxData = (pulledData) => {
       edd = "",
     } = pulledData;
 
-    const trackDetails = {};
     const { scanType, mapperString, pickrrSubStatusCode } = getEventInfoData({ statusId, remarks });
     if (!scanType) {
-      // TODO: SET a logger
-
-      return pickrrShadowfaxDict;
+      return { err: "Scan type not found" };
     }
 
     pickrrShadowfaxDict.awb = awbNumber;
@@ -149,8 +145,8 @@ const preparePulledShadowfaxData = (pulledData) => {
       pickrrShadowfaxDict.received_by = receivedBy || "";
     }
 
-    if (trackDetails.scan_type === "PP") {
-      pickrrShadowfaxDict.pickup_datetime = trackDetails.scan_datetime;
+    if (pickrrShadowfaxDict.scan_type === "PP") {
+      pickrrShadowfaxDict.pickup_datetime = pickrrShadowfaxDict.scan_datetime;
     }
     return pickrrShadowfaxDict;
   } catch (error) {
