@@ -6,8 +6,9 @@ const kafka = require("../../connector/kafka");
 const {
   SHADOWFAX_PARTITIONS_COUNT,
   SHADOWFAX_PULL_TOPIC_NAME,
-  SHADOWFAX_GROUP_NAME,
   SHADOWFAX_PUSH_TOPIC_NAME,
+  SHADOWFAX_PUSH_GROUP_NAME,
+  SHADOWFAX_PULL_GROUP_NAME,
 } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
@@ -18,25 +19,29 @@ const avroType = avro.parse(`${__dirname}/type.avsc`);
  * initialize consumer for shadowfax payload
  */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: SHADOWFAX_GROUP_NAME }); // Basis on single topic only
+  const pushConsumer = kafka.consumer({ groupId: SHADOWFAX_PUSH_GROUP_NAME });
+  const pullConsumer = kafka.consumer({ groupId: SHADOWFAX_PULL_GROUP_NAME });
   const partitionsCount = new Array(SHADOWFAX_PARTITIONS_COUNT).fill(1);
   const pushPartitionConsumerInstances = partitionsCount.map(async () => {
     try {
-      await consumer.connect();
-      await consumer.subscribe({ topic: SHADOWFAX_PUSH_TOPIC_NAME, fromBeginning: false });
-      return consumer;
+      await pushConsumer.connect();
+      await pushConsumer.subscribe({
+        topic: SHADOWFAX_PUSH_TOPIC_NAME,
+        fromBeginning: false,
+      });
+      return pushConsumer;
     } catch (error) {
       logger.error("Shadowfax Initialize Error!", error);
     }
   });
   const pullPartitionConsumerInstances = partitionsCount.map(async () => {
     try {
-      await consumer.connect();
-      await consumer.subscribe({
+      await pullConsumer.connect();
+      await pullConsumer.subscribe({
         topic: SHADOWFAX_PULL_TOPIC_NAME,
         fromBeginning: false,
       });
-      return consumer;
+      return pullConsumer;
     } catch (error) {
       logger.error("Shadowfax Initialize Error", error);
     }
