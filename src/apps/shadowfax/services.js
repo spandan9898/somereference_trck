@@ -83,7 +83,7 @@ const prepareShadowfaxData = (shadowfaxDict) => {
 
     const { scanType, mapperString, pickrrSubStatusCode } = getEventInfoData({ event, comments });
     if (!scanType) {
-      return pickrrShadowfaxDict;
+      return { err: "Scan type not found" };
     }
     pickrrShadowfaxDict.scan_type = scanType;
     pickrrShadowfaxDict.scan_datetime = moment(eventTimeStamp).format("YYYY-MM-DD HH:mm:ss");
