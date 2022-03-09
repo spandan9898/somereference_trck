@@ -5,7 +5,7 @@ const { storeDataInCache, updateCacheTrackArray, softCancellationCheck } = requi
 const { prepareTrackDataToUpdateInPullDb } = require("./preparator");
 const commonTrackingInfoCol = require("./model");
 const { updateTrackingProcessingCount } = require("../common/services");
-const { HOST_NAMES } = require("../../utils/constants");
+const { checkTriggerForPulledEvent } = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
 
 /**
@@ -14,8 +14,8 @@ const { EddPrepareHelper } = require("../common/eddHelpers");
  * @desc sending tracking data to pull mongodb
  * @returns success or error
  */
-const updateTrackDataToPullMongo = async (trackObj, logger) => {
-  const result = prepareTrackDataToUpdateInPullDb(trackObj);
+const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = false }) => {
+  const result = prepareTrackDataToUpdateInPullDb(trackObj, isFromPulled);
 
   if (!result.success) {
     throw new Error(result.err);
@@ -27,15 +27,18 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
   const updatedObj = {
     ...result.statusMap,
     track_arr: [result.eventObj],
-    last_update_from: "kafka",
+    last_update_from: isFromPulled ? "kafka_pull" : "kafka",
     edd_stamp: result.eddStamp ? result.eddStamp : "",
     updated_at: moment().toDate(),
   };
+  if (!updatedObj.edd_stamp) {
+    delete updatedObj.edd_stamp;
+  }
   try {
     const pullCollection = await commonTrackingInfoCol();
     const trackArr = updatedObj.track_arr;
     const auditObj = {
-      from: "kafka_consumer",
+      from: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
       current_status_type: updatedObj["status.current_status_type"],
       current_status_time: updatedObj["status.current_status_time"],
       pulled_at: moment().toDate(),
@@ -49,6 +52,12 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
     const zone = res?.billing_zone;
     const eddStampInDb = res?.edd_stamp;
 
+    if (isFromPulled) {
+      const isAllow = checkTriggerForPulledEvent(trackObj, res);
+      if (!isAllow) {
+        return false;
+      }
+    }
     if (!res) {
       sortedTrackArray = [...trackArr];
     } else {
@@ -75,7 +84,6 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
         pickupDateTime = res?.pickup_datetime;
       }
       const instance = new EddPrepareHelper({ latestCourierEDD, pickupDateTime, eddStampInDb });
-
       const pickrrEDD = await instance.callPickrrEDDEventFunc({
         zone,
         latestCourierEDD,
@@ -86,7 +94,9 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
       if (moment(result.eventObj?.pickup_datetime).isValid()) {
         updatedObj.pickup_datetime = result.eventObj.pickup_datetime;
       }
-      updatedObj.edd_stamp = pickrrEDD;
+      if (pickrrEDD) {
+        updatedObj.edd_stamp = pickrrEDD;
+      }
     } catch (error) {
       logger.error(error.message);
     }
@@ -97,14 +107,7 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
     updatedObj["status.current_status_time"] = firstTrackObjOfTrackArr.scan_datetime;
     updatedObj["status.pickrr_sub_status_code"] = firstTrackObjOfTrackArr.pickrr_sub_status_code;
 
-    // TODO:
-
-    const stagingPullCollection = await commonTrackingInfoCol({
-      dbName: process.env.MONGO_PULLL_DB_STAGING_DATABASE_NAME,
-      collectionName: process.env.MONGO_PULLL_DB_STAGING_COLLECTION_NAME,
-      hostName: HOST_NAMES.PULL_STATING_DB,
-    });
-    const response = await stagingPullCollection.findOneAndUpdate(
+    const response = await pullCollection.findOneAndUpdate(
       { tracking_id: trackObj.awb },
       {
         $set: updatedObj,
@@ -115,7 +118,7 @@ const updateTrackDataToPullMongo = async (trackObj, logger) => {
       {
         returnNewDocument: true,
         returnDocument: "after",
-        upsert: true,
+        upsert: false,
       }
     );
     await storeDataInCache(result);

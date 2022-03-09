@@ -3,17 +3,17 @@ const XBS_STATUS_MAPPER = {
   "pickup created-puc": { scan_type: "OM", pickrr_sub_status_code: "" },
   "out for pickup-ofp": { scan_type: "OFP", pickrr_sub_status_code: "" },
   "pickdone-pud": { scan_type: "PP", pickrr_sub_status_code: "" },
-  "6-pnd": { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
+  "6-pnd": { scan_type: "PPF", pickrr_sub_status_code: "NA" },
   "9-pnd": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   "0-pnd": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
-  "7-pnd": { scan_type: "PPF", pickrr_sub_status_code: "AI" },
+  "7-pnd": { scan_type: "PPF", pickrr_sub_status_code: "NSL" },
   "3-pnd": { scan_type: "PPF", pickrr_sub_status_code: "NA" },
   "13-pnd": { scan_type: "PPF", pickrr_sub_status_code: "HO" },
   "14-pnd": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   "10-pnd": { scan_type: "PPF", pickrr_sub_status_code: "SU" },
   "18-pnd": { scan_type: "PPF", pickrr_sub_status_code: "AI" },
   "1-pnd": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
-  "8-pnd": { scan_type: "PPF", pickrr_sub_status_code: "SU" },
+  "8-pnd": { scan_type: "PPF", pickrr_sub_status_code: "AI" },
   "12-pnd": { scan_type: "PPF", pickrr_sub_status_code: "SC" },
   "4-pnd": { scan_type: "PPF", pickrr_sub_status_code: "NA" },
   "picked-pkd": { scan_type: "SHP", pickrr_sub_status_code: "" },
@@ -79,6 +79,12 @@ const XBS_STATUS_MAPPER = {
   "88-ud": { scan_type: "UD", pickrr_sub_status_code: "OTH" },
   "89-ud": { scan_type: "UD", pickrr_sub_status_code: "OTH" },
   "intransit-it": { scan_type: "OT", pickrr_sub_status_code: "" },
+  "21-pnd": { scan_type: "PPF", pickrr_sub_status_code: "NA" },
+  "30-pnd": { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
+  "6-pnd": { scan_type: "PPF", pickrr_sub_status_code: "NA" },
+  "5-pnd": { scan_type: "PPF", pickrr_sub_status_code: "NSL" },
+  "11-pnd": { scan_type: "PPF", pickrr_sub_status_code: "AI" },
+  "31-pnd": { scan_type: "PPF", pickrr_sub_status_code: "CANC" }
 };
 const XBS_TOPICS_COUNT = 8;
 

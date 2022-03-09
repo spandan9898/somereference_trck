@@ -7,7 +7,7 @@ const { KafkaMessageHandler } = require("../common");
  * @param {*} consumedPayload
  * @desc payload format: {
  * tracking_id: "",
- * if_from_pull: ""
+ * if_from_pull: true/false
  * }
  */
 const pickrrConnectKafkaMessageHandler = (consumedPayload) => {

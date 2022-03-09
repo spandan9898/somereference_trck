@@ -29,7 +29,6 @@ const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
     },
     "status": 11  
 }
-
  */
 const preparePidgeData = (pidgeDict) => {
   const pickrrPidgeDict = {

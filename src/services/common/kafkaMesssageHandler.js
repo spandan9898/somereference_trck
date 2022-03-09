@@ -19,7 +19,7 @@ const initELK = require("../../connector/elkConnection");
 
 const { updateTrackDataToPullMongo } = require("../pull");
 
-// const { redisCheckAndReturnTrackData } = require("../pull/services");
+const { redisCheckAndReturnTrackData } = require("../pull/services");
 
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
@@ -32,8 +32,7 @@ const {
   getTrackingIdProcessingCount,
   updateTrackingProcessingCount,
 } = require("./services");
-
-// const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
+const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -92,36 +91,44 @@ class KafkaMessageHandler {
     }
     try {
       let res;
+      let isFromPulled = false;
       try {
         const { message } = consumedPayload;
         res = prepareFunc(Object.values(JSON.parse(message.value.toString()))[0]);
       } catch {
         res = prepareFunc(consumedPayload);
+        isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
       if (!res.awb) return;
-      const trackData = { ...res };
-      // const trackData = await redisCheckAndReturnTrackData(res);
+
+      const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
+
+      await new Promise((done) => setTimeout(() => done(), processCount * 1000));
+
+      await updateTrackingProcessingCount({ awb: res.awb });
+
+      const trackData = await redisCheckAndReturnTrackData(res, isFromPulled);
 
       if (!trackData) {
         logger.info(`data already exists or not found in DB! ${res.awb}`);
+        updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return;
       }
 
       const updatedTrackData = await updatePrepareDict(trackData);
       if (_.isEmpty(updatedTrackData)) {
         logger.error("Xpresbees reverse map not found", trackData);
+        updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return;
       }
 
       const { prodElkClient } = KafkaMessageHandler.getElkClients();
 
-      const processCount = await getTrackingIdProcessingCount(updatedTrackData);
-
-      await new Promise((done) => setTimeout(() => done(), processCount * 1000));
-
-      await updateTrackingProcessingCount(updatedTrackData);
-
-      const result = await updateTrackDataToPullMongo(updatedTrackData, logger);
+      const result = await updateTrackDataToPullMongo({
+        trackObj: updatedTrackData,
+        logger,
+        isFromPulled,
+      });
       if (!result) {
         return;
       }
@@ -135,11 +142,11 @@ class KafkaMessageHandler {
       triggerWebhook(result, prodElkClient);
       updateStatusOnReport(result, logger, prodElkClient);
       updateStatusELK(result, prodElkClient);
-
-      // preparePickrrConnectLambdaPayloadAndCall({
-      //   trackingId: result.tracking_id,
-      //   elkClient: prodElkClient,
-      // });
+      preparePickrrConnectLambdaPayloadAndCall({
+        trackingId: result.tracking_id,
+        elkClient: prodElkClient,
+        result,
+      });
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }

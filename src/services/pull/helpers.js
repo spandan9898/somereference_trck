@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-prototype-builtins */
 const moment = require("moment");
+const _ = require("lodash");
+
 const logger = require("../../../logger");
 
 /**
@@ -77,9 +79,46 @@ const updateTrackModel = (cacheTrakModel, trackingDocument) => {
   }
 };
 
+/**
+ *
+ * @param {*} preparedDict
+ * @param {*} dbResponse
+ * @desc https://drive.google.com/file/d/1U-Kh18Yfj1-iJDD9Rd8d887PxM7hZ8AK/view?usp=sharing
+ */
+const checkTriggerForPulledEvent = (preparedDict, dbResponse) => {
+  const latestCurrentStatusTimeInDB = _.get(dbResponse, "track_arr[0].current_status_time");
+  const pulledCurrentStatusTime = _.get(preparedDict, "scan_datetime");
+
+  const currentStatusTypeInDB = _.get(dbResponse, "track_arr[0].scan_type");
+  const pulledCurrentStatusType = _.get(preparedDict, "scan_type");
+
+  if (!["DL", "RTO", "RTD", "PP"].includes(preparedDict.scan_type)) {
+    if (moment(latestCurrentStatusTimeInDB).isAfter(moment(pulledCurrentStatusTime))) {
+      return false;
+    }
+    if (
+      currentStatusTypeInDB === "DL" &&
+      !["RTO", "RTO-OO", "RTO-OT", "RTD"].includes(pulledCurrentStatusType)
+    ) {
+      return false;
+    }
+  }
+
+  if (
+    moment(pulledCurrentStatusTime).isAfter(moment(latestCurrentStatusTimeInDB)) &&
+    currentStatusTypeInDB === "DL" &&
+    pulledCurrentStatusType === "PP"
+  ) {
+    return false;
+  }
+
+  return true;
+};
+
 module.exports = {
   mapStatusToEvent,
   prepareTrackArrCacheData,
   checkCancelStatusInTrackArr,
   updateTrackModel,
+  checkTriggerForPulledEvent,
 };

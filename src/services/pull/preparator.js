@@ -9,7 +9,7 @@ const logger = require("../../../logger");
  *@param {*} trackObj : same as above example
  * preparing track data for pull db update
  */
-const prepareTrackDataToUpdateInPullDb = (trackObj) => {
+const prepareTrackDataToUpdateInPullDb = (trackObj, isFromPulled) => {
   const trackData = _.cloneDeep(trackObj);
   const {
     scan_type: scanType = "",
@@ -51,7 +51,7 @@ const prepareTrackDataToUpdateInPullDb = (trackObj) => {
   const eventObj = mapStatusToEvent(statusMap);
   eventObj.pickrr_sub_status_code = trackData.pickrr_sub_status_code;
   eventObj.courier_status_code = trackData.courier_status_code;
-  eventObj.update_source = "kafka";
+  eventObj.update_source = isFromPulled ? "kafka_pull" : "kafka";
   eventObj.update_time = moment().toDate();
   eventObj.system_updated_at = moment().toDate();
   if (pickupDatetime) {

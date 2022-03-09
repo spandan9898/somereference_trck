@@ -87,6 +87,9 @@ const fetchTrackingService = async ({ trackingIdsList, authToken = null, IP = nu
       }
       try {
         const trackingObj = await fetchTrackingModelAndUpdateCache(trackingId, true);
+        if (!trackingObj) {
+          throw new Error();
+        }
         const cacheAuthToken = trackingObj?.track_model?.auth_token || "";
         if (cacheAuthToken !== authToken) {
           if (IP && ALLOWED_IPS.includes(IP)) {
@@ -110,8 +113,9 @@ const fetchTrackingService = async ({ trackingIdsList, authToken = null, IP = nu
   } catch (error) {
     if (error.message.includes("failed")) {
       responseDict.err = "Tracking ID not found";
+    } else {
+      logger.error(error.message);
     }
-    logger.error(error.message);
     return responseDict;
   }
 };
