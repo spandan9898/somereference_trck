@@ -3,20 +3,20 @@ const { initialize, listener } = require("./consumer");
 
 (async () => {
   try {
-    const { consumerMapWithTopics, consumerMapWithPartitions } = await initialize();
+    const { pushPartitionConsumerInstances, pullPartitionConsumerInstances } = await initialize();
 
-    consumerMapWithTopics.forEach((consumer) => {
+    pushPartitionConsumerInstances.forEach((consumer) => {
       consumer
         .then((res) => {
           if (res) {
-            listener(res);
+            listener(res, true);
           }
         })
         .catch((error) => {
-          logger.error("Shadowfax Consumer Initialize Error", error);
+          logger.error("Shadowfax  Push Consumer Initialize Error", error);
         });
     });
-    consumerMapWithPartitions.forEach((consumer) => {
+    pullPartitionConsumerInstances.forEach((consumer) => {
       consumer
         .then((res) => {
           if (res) {

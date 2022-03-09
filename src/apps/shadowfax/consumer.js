@@ -3,7 +3,13 @@ const avro = require("avro-js");
 const get = require("lodash/get");
 
 const kafka = require("../../connector/kafka");
-const { SHADOWFAX_TOPICS_COUNT, SHADOWFAX_PARTITIONS_COUNT } = require("./constant");
+const {
+  SHADOWFAX_PARTITIONS_COUNT,
+  SHADOWFAX_PULL_TOPIC_NAME,
+  SHADOWFAX_PUSH_TOPIC_NAME,
+  SHADOWFAX_PUSH_GROUP_NAME,
+  SHADOWFAX_PULL_GROUP_NAME,
+} = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
 
@@ -13,32 +19,36 @@ const avroType = avro.parse(`${__dirname}/type.avsc`);
  * initialize consumer for shadowfax payload
  */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: "shadowfax-group" });
-  const pullConsumer = kafka.consumer({ groupId: "shadowfax" });
-  const topicsCount = new Array(SHADOWFAX_TOPICS_COUNT).fill(1);
+  const pushConsumer = kafka.consumer({ groupId: SHADOWFAX_PUSH_GROUP_NAME });
+  const pullConsumer = kafka.consumer({ groupId: SHADOWFAX_PULL_GROUP_NAME });
   const partitionsCount = new Array(SHADOWFAX_PARTITIONS_COUNT).fill(1);
-
-  const consumerMapWithTopics = topicsCount.map(async (_, index) => {
+  const pushPartitionConsumerInstances = partitionsCount.map(async () => {
     try {
-      await consumer.connect();
-      await consumer.subscribe({ topic: `shadowfax_${index}`, fromBeginning: false });
-      return consumer;
+      await pushConsumer.connect();
+      await pushConsumer.subscribe({
+        topic: SHADOWFAX_PUSH_TOPIC_NAME,
+        fromBeginning: false,
+      });
+      return pushConsumer;
     } catch (error) {
-      logger.error("Shadowfax Initialize Error", error);
+      logger.error("Shadowfax Initialize Error!", error);
     }
   });
-  const consumerMapWithPartitions = partitionsCount.map(async () => {
+  const pullPartitionConsumerInstances = partitionsCount.map(async () => {
     try {
       await pullConsumer.connect();
-      await pullConsumer.subscribe({ topic: "n_shadowfax", fromBeginning: false }); // TODO:
+      await pullConsumer.subscribe({
+        topic: SHADOWFAX_PULL_TOPIC_NAME,
+        fromBeginning: false,
+      });
       return pullConsumer;
     } catch (error) {
       logger.error("Shadowfax Initialize Error", error);
     }
   });
   return {
-    consumerMapWithTopics,
-    consumerMapWithPartitions,
+    pushPartitionConsumerInstances,
+    pullPartitionConsumerInstances,
   };
 };
 
