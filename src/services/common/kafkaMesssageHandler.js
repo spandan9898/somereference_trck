@@ -58,13 +58,16 @@ class KafkaMessageHandler {
   static getElkClients() {
     let prodElkClient = "";
     let stagingElkClient = "";
+    let trackingElkClient = "";
     try {
       prodElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.PROD.name);
       stagingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.STAGING.name);
+      trackingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.TRACKING.name);
 
       return {
         prodElkClient,
         stagingElkClient,
+        trackingElkClient,
       };
     } catch (error) {
       logger.error("getElkClients", error);
@@ -122,7 +125,7 @@ class KafkaMessageHandler {
         return;
       }
 
-      const { prodElkClient } = KafkaMessageHandler.getElkClients();
+      const { prodElkClient, trackingElkClient } = KafkaMessageHandler.getElkClients();
 
       const result = await updateTrackDataToPullMongo({
         trackObj: updatedTrackData,
@@ -139,12 +142,12 @@ class KafkaMessageHandler {
 
       sendDataToNdr(result);
       sendTrackDataToV1(result);
-      triggerWebhook(result, prodElkClient);
-      updateStatusOnReport(result, logger, prodElkClient);
+      triggerWebhook(result, trackingElkClient);
+      updateStatusOnReport(result, logger, trackingElkClient);
       updateStatusELK(result, prodElkClient);
       preparePickrrConnectLambdaPayloadAndCall({
         trackingId: result.tracking_id,
-        elkClient: prodElkClient,
+        elkClient: trackingElkClient,
         result,
       });
     } catch (error) {
