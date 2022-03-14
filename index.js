@@ -36,9 +36,7 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
     require("./src/apps/ekart");
     require("./src/apps/udaan");
     require("./src/apps/ecomm");
-
-    // require("./src/apps/shadowfax");
-
+    require("./src/apps/shadowfax");
     require("./src/apps/parceldo");
     require("./src/apps/pidge");
     require("./src/apps/dtdc");
