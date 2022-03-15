@@ -60,11 +60,11 @@ const prepareDtdcData = (dtdcDict) => {
       return { err: "Unknown status code" };
     }
 
-    const statusDatetime = `${dtdcDict.shipmentStatus.strActionDate} ${dtdcDict.shipmentStatus.strActionTime}59`;
-    let statusDate = moment(statusDatetime, "DDMMYYYY hhms");
+    const statusDatetime = `${dtdcDict.shipmentStatus.strActionDate} ${dtdcDict.shipmentStatus.strActionTime}59999`;
+    let statusDate = moment(statusDatetime, "DDMMYYYY hhms.SSS");
     statusDate = statusDate.isValid()
-      ? statusDate.format("YYYY-MM-DD HH:mm:ss")
-      : moment().format("YYYY-MM-DD HH:mm:ss");
+      ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
+      : moment().format("YYYY-MM-DD HH:mm:ss.SSS");
     if (scanType.scan_type === "PP") {
       pickrrDtdcDict.pickup_datetime = statusDate;
     }
