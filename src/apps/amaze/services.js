@@ -64,7 +64,7 @@ const prepareAmazeData = (amazeDict) => {
 
     pickrrAmazeDict.received_by = amazeDict.received_by || "";
 
-    pickrrAmazeDict.scan_type = scanType;
+    pickrrAmazeDict.scan_type = scanType === "UD" ? "NDR" : scanType;
     pickrrAmazeDict.scan_datetime = scanDatetime;
     pickrrAmazeDict.track_info = amazeDict.current_status;
     pickrrAmazeDict.awb = amazeDict.awb;
