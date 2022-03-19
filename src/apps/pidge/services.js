@@ -68,7 +68,7 @@ const preparePidgeData = (pidgeDict) => {
       .format("YYYY-MM-DD HH:mm:ss");
     pickrrPidgeDict.scan_datetime = scanDatetime;
     pickrrPidgeDict.courier_status_code = statusString;
-    pickrrPidgeDict.scan_type = scanType.scan_type;
+    pickrrPidgeDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
     pickrrPidgeDict.track_info = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrPidgeDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrPidgeDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
