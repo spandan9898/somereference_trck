@@ -8,9 +8,23 @@ const {
   fetchTrackingModelAndUpdateCache,
   getTrackDocumentfromMongo,
 } = require("../../services/common/trackServices");
-const { getObject } = require("../../utils");
+const updateStatusOnReport = require("../../services/report");
+const { getObject, getElkClients } = require("../../utils");
 const { UNUSED_FIELDS_FROM_TRACKING_OBJ } = require("./constant");
 const { getUserNotification } = require("./model");
+
+/**
+ *
+ * @param {dict} trackingObj
+ * @desc preapre data and call updateStatusOnReport
+ */
+const callSendReportDataForPulledEvent = (trackingObj) => {
+  const { trackingElkClient } = getElkClients();
+
+  updateStatusOnReport(trackingObj, logger, trackingElkClient);
+
+  return true;
+};
 
 /**
  *
@@ -53,6 +67,13 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
 }) => {
   try {
     let trackObj = await getTrackingObj({ trackingId, isFromPull, result, fetchFromCache });
+
+    if (isFromPull) {
+      process.nextTick(() => {
+        callSendReportDataForPulledEvent(trackObj);
+      });
+    }
+
     trackObj = omit(trackObj, UNUSED_FIELDS_FROM_TRACKING_OBJ);
 
     const email = trackObj.user_email;
