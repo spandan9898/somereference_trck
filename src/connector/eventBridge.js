@@ -34,7 +34,8 @@ const sendDataToEventBridge = async ({ source, detailType, data, eventBusName })
 
     eventBridge.putEvents({ Entries: input }, (err, responseData) => {
       if (err) logger.error("sendDataToEventBridge Put Events err ->", err, err.stack);
-      logger.info(`responseData eventBridge: ${responseData}`);
+      logger.verbose(`responseData eventBridge:`);
+      logger.verbose(responseData);
     });
   } catch (error) {
     logger.error("sendDataToEventBridge err", error);
