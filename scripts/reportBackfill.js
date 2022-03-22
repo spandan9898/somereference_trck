@@ -113,7 +113,7 @@ const getBatchData = async (collection, elkClient, count, type) => {
 
     for (const chunkData of chunkedData) {
       await main(chunkData, collection, elkClient, type);
-      await new Promise((done) => setTimeout(() => done(), 30000));
+      await new Promise((done) => setTimeout(() => done(), 25000));
     }
     logger.info("==== Process Completed ====");
     return true;
@@ -158,13 +158,28 @@ const fetchDataFromDB = async ({
     for await (const doc of aggCursor) {
       trackingData.push(doc);
     }
-    for (const trackingItem of trackingData) {
-      if (type === "report") {
-        updateStatusOnReport(trackingItem, logger, elkClient);
-      } else if (type === "v1") {
-        sendTrackDataToV1(trackingItem);
+
+    if (!trackingData.length) {
+      return;
+    }
+
+    console.log("total", trackingData.length);
+
+    const chunkedData = chunk(trackingData, 1);
+
+    for (const chunkData of chunkedData) {
+      for (const trackingItem of chunkData) {
+        if (type === "report") {
+          updateStatusOnReport(trackingItem, logger, elkClient);
+        } else if (type === "v1") {
+          sendTrackDataToV1(trackingItem);
+        }
+
+        // await new Promise((done) => setTimeout(() => done(), 25000));
+
+        console.log("Done -->", trackingItem.tracking_id);
       }
-      console.log("Done -->", trackingItem.tracking_id);
+      await new Promise((done) => setTimeout(() => done(), 25000));
     }
   } catch (error) {
     logger.error("fetchDataFromDB error", error);
