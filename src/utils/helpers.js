@@ -12,7 +12,8 @@ const commonTrackingInfoCol = require("../services/pull/model");
 const { getObject } = require("./redis");
 const logger = require("../../logger");
 const { updateIsNDRinCache } = require("../services/ndr/helpers");
-const { DEFAULT_REQUESTS_TIMEOUT } = require("./constants");
+const { DEFAULT_REQUESTS_TIMEOUT, ELK_INSTANCE_NAMES } = require("./constants");
+const initELK = require("../connector/elkConnection");
 
 const axiosInstance = axios.create();
 
@@ -251,6 +252,33 @@ const getMinDate = (dateObj1, dateObj2) =>
 const getMaxDate = (dateObj1, dateObj2) =>
   moment(dateObj1).isAfter(dateObj2) ? moment(dateObj1).toDate() : moment(dateObj2).toDate();
 
+/**
+ *
+ * @desc get all ELK instances
+ */
+const getElkClients = () => {
+  let prodElkClient = "";
+  let stagingElkClient = "";
+  let trackingElkClient = "";
+  try {
+    prodElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.PROD.name);
+    stagingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.STAGING.name);
+    trackingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.TRACKING.name);
+
+    return {
+      prodElkClient,
+      stagingElkClient,
+      trackingElkClient,
+    };
+  } catch (error) {
+    logger.error("getElkClients", error);
+    return {
+      prodElkClient,
+      stagingElkClient,
+    };
+  }
+};
+
 module.exports = {
   checkAwbInCache,
   convertDatetimeFormat,
@@ -259,4 +287,5 @@ module.exports = {
   validateDateField,
   getMinDate,
   getMaxDate,
+  getElkClients,
 };
