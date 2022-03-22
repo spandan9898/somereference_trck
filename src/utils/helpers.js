@@ -258,11 +258,13 @@ const getMaxDate = (dateObj1, dateObj2) =>
  */
 const getElkClients = () => {
   let prodElkClient = "";
-  let stagingElkClient = "";
+  const stagingElkClient = "";
   let trackingElkClient = "";
   try {
     prodElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.PROD.name);
-    stagingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.STAGING.name);
+
+    // stagingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.STAGING.name);
+
     trackingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.TRACKING.name);
 
     return {
