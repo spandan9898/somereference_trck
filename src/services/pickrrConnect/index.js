@@ -18,12 +18,12 @@ const pickrrConnectKafkaMessageHandler = (consumedPayload) => {
     if (!trackingId || !isFromPull) {
       return false;
     }
-    const { prodElkClient } = KafkaMessageHandler.getElkClients();
-    if (trackingId && isFromPull && prodElkClient) {
+    const { trackingElkClient } = KafkaMessageHandler.getElkClients();
+    if (trackingId && isFromPull && trackingElkClient) {
       preparePickrrConnectLambdaPayloadAndCall({
         trackingId,
         isFromPull,
-        elkClient: prodElkClient,
+        elkClient: trackingElkClient,
       });
     }
     return true;
