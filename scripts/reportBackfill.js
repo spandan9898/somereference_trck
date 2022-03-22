@@ -121,11 +121,11 @@ const getBatchData = async (collection, elkClient) => {
 
     console.log("Total Data -->", records.length);
 
-    const chunkedData = chunk(records, 2000);
+    const chunkedData = chunk(records, 500);
 
     for (const chunkData of chunkedData) {
       await main(chunkData, collection, elkClient);
-      await new Promise((done) => setTimeout(() => done(), 15000));
+      await new Promise((done) => setTimeout(() => done(), 30000));
     }
     logger.info("==== Process Completed ====");
     return true;
