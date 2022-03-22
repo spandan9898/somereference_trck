@@ -84,7 +84,7 @@ const prepareShadowfaxData = (shadowfaxDict) => {
     if (!scanType) {
       return { err: "Scan type not found" };
     }
-    pickrrShadowfaxDict.scan_type = scanType;
+    pickrrShadowfaxDict.scan_type = scanType === "UD" ? "NDR" : scanType;
     pickrrShadowfaxDict.scan_datetime = moment(eventTimeStamp).format("YYYY-MM-DD HH:mm:ss");
     pickrrShadowfaxDict.track_info = comments;
     pickrrShadowfaxDict.track_location = eventLocation;
