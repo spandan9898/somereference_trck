@@ -165,7 +165,7 @@ const fetchDataFromDB = async ({
 
     console.log("total", trackingData.length);
 
-    const chunkedData = chunk(trackingData, 1);
+    const chunkedData = chunk(trackingData, 500);
 
     for (const chunkData of chunkedData) {
       for (const trackingItem of chunkData) {
