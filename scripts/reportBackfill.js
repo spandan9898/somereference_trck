@@ -17,6 +17,7 @@ const sendTrackDataToV1 = require("../src/services/v1");
 const { getDbCollectionInstance } = require("../src/utils");
 const { HOST_NAMES, ELK_INSTANCE_NAMES } = require("../src/utils/constants");
 const { convertDate } = require("./helper");
+const { updateStatusELK } = require("../src/services/common/services");
 
 const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
 
@@ -24,7 +25,7 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
  *
  * @param {*} records
  */
-const processBackfilling = async (data, collection, elkClient, type) => {
+const processBackfilling = async (data, collection, elkClient, type, prodElkClient) => {
   const courierTrackingIds = data.map((awb) => `${awb}`);
 
   const responses = await collection
@@ -37,18 +38,20 @@ const processBackfilling = async (data, collection, elkClient, type) => {
       sendTrackDataToV1(response);
     } else if (type === "report") {
       updateStatusOnReport(response, logger, elkClient);
+    } else if (type === "elk") {
+      updateStatusELK(response, prodElkClient);
     }
     console.log("Done -->", response.tracking_id);
   });
 };
 
 /** */
-const main = async (records, collection, elkClient, type) => {
+const main = async (records, collection, elkClient, type, prodElkClient) => {
   try {
     const chunkedData = chunk(records, 1000);
 
     chunkedData.forEach((data) => {
-      processBackfilling(data, collection, elkClient, type);
+      processBackfilling(data, collection, elkClient, type, prodElkClient);
     });
   } catch (error) {
     console.log("Main ERROR", error);
@@ -58,7 +61,7 @@ const main = async (records, collection, elkClient, type) => {
 /**
  * read data from csv file
  */
-const readCsvData = (cb, collection, elkClient, limit, type) => {
+const readCsvData = (cb, collection, elkClient, limit, type, prodElkClient) => {
   const allData = [];
   try {
     const filePath = `${__dirname}/data.csv`;
@@ -77,7 +80,7 @@ const readCsvData = (cb, collection, elkClient, limit, type) => {
       },
       complete() {
         fs.writeFileSync(`${__dirname}/report.json`, JSON.stringify(allData), "utf8");
-        cb(collection, elkClient, limit, type);
+        cb(collection, elkClient, limit, type, prodElkClient);
       },
     });
   } catch (error) {
@@ -88,7 +91,7 @@ const readCsvData = (cb, collection, elkClient, limit, type) => {
 /**
  * @desc process 2k batch  data
  */
-const getBatchData = async (collection, elkClient, count, type) => {
+const getBatchData = async (collection, elkClient, count, type, prodElkClient) => {
   try {
     const filePath = `${__dirname}/report.json`;
     const isExists = fs.existsSync(filePath);
@@ -112,7 +115,7 @@ const getBatchData = async (collection, elkClient, count, type) => {
     const chunkedData = chunk(records, 500);
 
     for (const chunkData of chunkedData) {
-      await main(chunkData, collection, elkClient, type);
+      await main(chunkData, collection, elkClient, type, prodElkClient);
       await new Promise((done) => setTimeout(() => done(), 25000));
     }
     logger.info("==== Process Completed ====");
@@ -131,6 +134,7 @@ const fetchDataFromDB = async ({
   collection,
   elkClient,
   type,
+  prodElkClient,
 }) => {
   try {
     const filters = {};
@@ -173,6 +177,8 @@ const fetchDataFromDB = async ({
           updateStatusOnReport(trackingItem, logger, elkClient);
         } else if (type === "v1") {
           sendTrackDataToV1(trackingItem);
+        } else if (type === "elk") {
+          updateStatusELK(trackingItem, prodElkClient);
         }
 
         // await new Promise((done) => setTimeout(() => done(), 25000));
@@ -195,10 +201,21 @@ const startProcess = async ({ authToken, endDate, startDate, limit, type }) => {
   const collection = await getDbCollectionInstance();
 
   const elkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.TRACKING.name);
+  const prodElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.PROD.name);
+
   if (!startDate || !endDate) {
-    readCsvData(getBatchData, collection, elkClient, limit, type);
+    readCsvData(getBatchData, collection, elkClient, limit, type, prodElkClient);
   } else {
-    fetchDataFromDB({ authToken, endDate, startDate, limit, collection, elkClient, type });
+    fetchDataFromDB({
+      authToken,
+      endDate,
+      startDate,
+      limit,
+      collection,
+      elkClient,
+      type,
+      prodElkClient,
+    });
   }
 };
 
