@@ -311,8 +311,8 @@ class WebhookServices extends WebhookHelper {
     try {
       const trackObj = getTrackObjFromTrackArray(trackArray);
       const eventStatusProxyList = STATUS_PROXY_LIST[event];
-      let proxyStatus = null;
       for (const proxyEvent of eventStatusProxyList) {
+        let proxyStatus = null;
         if (trackObj[proxyEvent]) {
           if (proxyEvent === "OO") {
             proxyStatus = this.mapEventTotStatus(first(trackObj[proxyEvent]) || []);
