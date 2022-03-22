@@ -11,7 +11,7 @@ const { argv } = yargs(hideBin(process.argv));
 const main = () => {
   const { authToken, endDate, startDate, limit, type = "v1" } = argv;
 
-  if (!["report", "v1"].includes(type)) {
+  if (!["report", "v1", "elk"].includes(type)) {
     throw new Error("Type must be either 'v1' or 'report'");
   }
 
