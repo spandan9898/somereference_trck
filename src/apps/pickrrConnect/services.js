@@ -4,6 +4,7 @@ const omit = require("lodash/omit");
 const logger = require("../../../logger");
 const { callLambdaFunction } = require("../../connector/lambda");
 const { sendDataToElk } = require("../../services/common/elk");
+const { updateStatusELK } = require("../../services/common/services");
 const {
   fetchTrackingModelAndUpdateCache,
   getTrackDocumentfromMongo,
@@ -19,9 +20,10 @@ const { getUserNotification } = require("./model");
  * @desc preapre data and call updateStatusOnReport
  */
 const callSendReportDataForPulledEvent = (trackingObj) => {
-  const { trackingElkClient } = getElkClients();
+  const { trackingElkClient, prodElkClient } = getElkClients();
 
   updateStatusOnReport(trackingObj, logger, trackingElkClient);
+  updateStatusELK(trackingObj, prodElkClient);
 
   return true;
 };
