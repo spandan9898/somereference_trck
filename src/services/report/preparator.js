@@ -1,6 +1,8 @@
 const moment = require("moment");
+const { ofdCount } = require("../../utils");
 
-const { findPickupDate, ofdCount } = require("../v1/helpers");
+const { findPickupDate } = require("../v1/helpers");
+
 const {
   prepareTrackingStatus,
   findLatestTrackingInfo,
@@ -23,13 +25,15 @@ const prepareDataForReportMongo = (trackData) => {
   if (pickupDate) {
     pickupDate = pickupDate instanceof Date ? pickupDate : moment(pickupDate).toDate();
   }
+  const scanType = trackData?.status?.current_status_type;
+
   const data = {
     pickup_date: pickupDate,
     received_by: trackData?.status?.received_by || null,
     current_status: trackingStatus.status_type || "NA",
     current_status_update: trackingStatus.status,
     current_status_datetime: trackingStatus.status_datetime,
-    out_for_delivery_count: ofdCount(trackData?.track_arr || {}),
+    out_for_delivery_count: ofdCount(trackData?.track_arr || [], scanType),
     edd_date: trackData?.edd_stamp,
     latest_track_info: findLatestTrackingInfo(trackData),
     latest_location: findLatestLocation(trackData),

@@ -2,7 +2,7 @@ const _ = require("lodash");
 const moment = require("moment");
 
 const { findPickupDate } = require("./helpers");
-const { ofdCount } = require("./helpers");
+const { ofdCount } = require("../../utils");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("./constants");
 
 /**
@@ -38,7 +38,7 @@ const prepareTrackDictForV1 = (trackData) => {
       trackData?.pickrr_sub_status_code ||
       _.get(trackData, "track_arr[0].pickrr_sub_status_code", ""),
     courier_status_code: _.get(trackData, "track_arr[0].courier_status_code", ""),
-    ofd_count: trackData?.track_arr ? ofdCount(trackData?.track_arr) : 0,
+    ofd_count: trackData?.track_arr ? ofdCount(trackData?.track_arr, scanType) : 0,
     source: "node-kafka",
   };
   return trackDict;
