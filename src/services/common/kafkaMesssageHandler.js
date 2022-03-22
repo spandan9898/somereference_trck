@@ -14,11 +14,14 @@ const {
 const { prepareUdaanData } = require("../../apps/udaan/services");
 const { prepareXbsData } = require("../../apps/xpressbees/services");
 const { preparePidgeData } = require("../../apps/pidge/services");
+const { prepareDtdcData } = require("../../apps/dtdc/services");
 const logger = require("../../../logger");
 const initELK = require("../../connector/elkConnection");
 
 const { updateTrackDataToPullMongo } = require("../pull");
+
 const { redisCheckAndReturnTrackData } = require("../pull/services");
+
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
@@ -49,6 +52,7 @@ class KafkaMessageHandler {
       udaan: prepareUdaanData,
       xpressbees: prepareXbsData,
       pidge: preparePidgeData,
+      dtdc: prepareDtdcData,
     };
     return courierPrepareMapFunctions[courierName];
   }
@@ -56,13 +60,16 @@ class KafkaMessageHandler {
   static getElkClients() {
     let prodElkClient = "";
     let stagingElkClient = "";
+    let trackingElkClient = "";
     try {
       prodElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.PROD.name);
       stagingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.STAGING.name);
+      trackingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.TRACKING.name);
 
       return {
         prodElkClient,
         stagingElkClient,
+        trackingElkClient,
       };
     } catch (error) {
       logger.error("getElkClients", error);
@@ -97,7 +104,6 @@ class KafkaMessageHandler {
         res = prepareFunc(consumedPayload);
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
-
       if (!res.awb) return;
 
       const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
@@ -121,7 +127,7 @@ class KafkaMessageHandler {
         return;
       }
 
-      const { prodElkClient } = KafkaMessageHandler.getElkClients();
+      const { prodElkClient, trackingElkClient } = KafkaMessageHandler.getElkClients();
 
       const result = await updateTrackDataToPullMongo({
         trackObj: updatedTrackData,
@@ -138,12 +144,12 @@ class KafkaMessageHandler {
 
       sendDataToNdr(result);
       sendTrackDataToV1(result);
-      triggerWebhook(result, prodElkClient);
-      updateStatusOnReport(result, logger, prodElkClient);
+      triggerWebhook(result, trackingElkClient);
+      updateStatusOnReport(result, logger, trackingElkClient);
       updateStatusELK(result, prodElkClient);
       preparePickrrConnectLambdaPayloadAndCall({
         trackingId: result.tracking_id,
-        elkClient: prodElkClient,
+        elkClient: trackingElkClient,
         result,
       });
     } catch (error) {

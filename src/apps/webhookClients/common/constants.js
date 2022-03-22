@@ -108,6 +108,18 @@ const REMOVE_ELEMENT_KEYS = [
   "shp_sent",
   "rad_sent",
   "oo_sent",
+  "woocom_platform_obj",
+  "wh_id",
+  "waybill_type",
+  "shop_platform_obj",
+  "shop_platform",
+  "sales_poc",
+  "pdd_date",
+  "ops_profile",
+  "last_update_from",
+  "kam",
+  "err",
+  "client_extra_var",
 ];
 module.exports = {
   TRACKING_INFO_PARENT_KEYS,
