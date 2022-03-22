@@ -81,10 +81,9 @@ const XBS_STATUS_MAPPER = {
   "intransit-it": { scan_type: "OT", pickrr_sub_status_code: "" },
   "21-pnd": { scan_type: "PPF", pickrr_sub_status_code: "NA" },
   "30-pnd": { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
-  "6-pnd": { scan_type: "PPF", pickrr_sub_status_code: "NA" },
   "5-pnd": { scan_type: "PPF", pickrr_sub_status_code: "NSL" },
   "11-pnd": { scan_type: "PPF", pickrr_sub_status_code: "AI" },
-  "31-pnd": { scan_type: "PPF", pickrr_sub_status_code: "CANC" }
+  "31-pnd": { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
 };
 const XBS_TOPICS_COUNT = 8;
 

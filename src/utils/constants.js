@@ -5,6 +5,9 @@ const {
   STAGING_ELASTICO_ID,
   STAGING_ELASTICO_USERNAME,
   STAGING_ELASTICO_PASSWORD,
+  TRACKING_ELASTICO_ID,
+  TRACKING_ELASTICO_USERNAME,
+  TRACKING_ELASTICO_PASSWORD,
 } = process.env;
 
 const BLOCKED_IPS = ["54.179.209.160"];
@@ -40,6 +43,14 @@ const ELK_INSTANCE_NAMES = {
       elasticoid: STAGING_ELASTICO_ID,
       username: STAGING_ELASTICO_USERNAME,
       password: STAGING_ELASTICO_PASSWORD,
+    },
+  },
+  TRACKING: {
+    name: "TRACKING",
+    config: {
+      elasticoid: TRACKING_ELASTICO_ID,
+      username: TRACKING_ELASTICO_USERNAME,
+      password: TRACKING_ELASTICO_PASSWORD,
     },
   },
 };
