@@ -4,7 +4,7 @@
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable class-methods-use-this */
 const _ = require("lodash");
-const { isEmpty, get, last, cloneDeep, omit } = require("lodash");
+const { isEmpty, get, last, cloneDeep, omit, first } = require("lodash");
 const axios = require("axios");
 
 const logger = require("../../../logger");
@@ -205,7 +205,10 @@ const statusCheckInHistoryMap = async (trackingObj) => {
 const checkIfCompulsoryEventAlreadySent = (trackingObj) => {
   try {
     const currentEvent = get(trackingObj, "status.current_status_type", "");
-    if (!["PP", "RTO", "RTD", "DL"].includes(currentEvent)) {
+    if (!["PP", "RTO", "RTD", "DL", "OO", "SHP", "RAD"].includes(currentEvent)) {
+      return false;
+    }
+    if (currentEvent === "OO") {
       return false;
     }
     const mandatoryStatusMap = get(trackingObj, `mandatory_status_map[${currentEvent}]`);
@@ -308,9 +311,14 @@ class WebhookServices extends WebhookHelper {
     try {
       const trackObj = getTrackObjFromTrackArray(trackArray);
       const eventStatusProxyList = STATUS_PROXY_LIST[event];
+      let proxyStatus = null;
       for (const proxyEvent of eventStatusProxyList) {
         if (trackObj[proxyEvent]) {
-          const proxyStatus = this.mapEventTotStatus(last(trackObj[proxyEvent]) || []);
+          if (proxyEvent === "OO") {
+            proxyStatus = this.mapEventTotStatus(first(trackObj[proxyEvent]) || []);
+          } else {
+            proxyStatus = this.mapEventTotStatus(last(trackObj[proxyEvent]) || []);
+          }
           proxyStatus.current_status_type = event;
           return proxyStatus;
         }
