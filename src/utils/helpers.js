@@ -290,8 +290,7 @@ const ofdCount = (trackArr, scanType) => {
   trackArr.forEach((trackArrObj) => {
     if (trackArrObj?.scan_type === "OO") {
       ofdCountNum += 1;
-    }
-    if (trackArrObj?.scan_type === "NDR") {
+    } else if (trackArrObj?.scan_type === "NDR") {
       ndrCountNum += 1;
     }
   });
