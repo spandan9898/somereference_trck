@@ -144,7 +144,7 @@ const processForDbData = async ({ batchData: trackingData, type, elkClient, prod
           updateStatusELK(trackingItem, prodElkClient);
         }
 
-        await new Promise((done) => setTimeout(() => done(), 50));
+        await new Promise((done) => setTimeout(() => done(), 10));
 
         console.log("Done -->", trackingItem.tracking_id);
       }
