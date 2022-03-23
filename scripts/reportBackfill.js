@@ -126,6 +126,35 @@ const getBatchData = async (collection, elkClient, count, type, prodElkClient) =
   }
 };
 
+const processForDbData = async ({ batchData: trackingData, type, elkClient, prodElkClient }) => {
+  try {
+    if (!trackingData.length) {
+      return;
+    }
+
+    const chunkedData = chunk(trackingData, 500);
+
+    for (const chunkData of chunkedData) {
+      for (const trackingItem of chunkData) {
+        if (type === "report") {
+          updateStatusOnReport(trackingItem, logger, elkClient);
+        } else if (type === "v1") {
+          sendTrackDataToV1(trackingItem);
+        } else if (type === "elk") {
+          updateStatusELK(trackingItem, prodElkClient);
+        }
+
+        await new Promise((done) => setTimeout(() => done(), 10));
+
+        console.log("Done -->", trackingItem.tracking_id);
+      }
+      await new Promise((done) => setTimeout(() => done(), 25000));
+    }
+  } catch (error) {
+    logger.error("processForData", error);
+  }
+};
+
 const fetchDataFromDB = async ({
   authToken,
   endDate,
@@ -147,46 +176,55 @@ const fetchDataFromDB = async ({
       $gte: convertDate(startDate, "start"),
       $lte: convertDate(endDate),
     };
-    const pipeline = [{ $match: filters }];
-    if (limit) {
-      pipeline.push({ $limit: limit });
-    }
+    const pipeline = [
+      {
+        $sort: { _id: -1 },
+      },
+      { $match: filters },
+    ];
 
     pipeline.push({
       $project: { audit: 0, mandatory_status_map: 0, _id: 0 },
     });
 
-    const aggCursor = await collection.aggregate(pipeline);
+    if (limit && limit < 4999) {
+      pipeline.push({ $limit: limit });
+      const aggCursor = await collection.aggregate(pipeline);
+      const batchData = [];
 
-    const trackingData = [];
-    for await (const doc of aggCursor) {
-      trackingData.push(doc);
-    }
+      for await (const doc of aggCursor) {
+        batchData.push(doc);
+      }
 
-    if (!trackingData.length) {
-      return;
-    }
+      await processForDbData({ batchData, elkClient, type, prodElkClient });
+    } else {
+      // do the batching
 
-    console.log("total", trackingData.length);
+      let skip = 0;
+      const LIMIT = 50000;
+      let isDataAvailable = false;
 
-    const chunkedData = chunk(trackingData, 500);
+      do {
+        pipeline[3] = { $skip: skip };
+        pipeline[4] = { $limit: LIMIT };
 
-    for (const chunkData of chunkedData) {
-      for (const trackingItem of chunkData) {
-        if (type === "report") {
-          updateStatusOnReport(trackingItem, logger, elkClient);
-        } else if (type === "v1") {
-          sendTrackDataToV1(trackingItem);
-        } else if (type === "elk") {
-          updateStatusELK(trackingItem, prodElkClient);
+        const batchData = [];
+
+        const aggCursor = await collection.aggregate(pipeline, { allowDiskUse: true });
+        let isPresent = false;
+
+        for await (const doc of aggCursor) {
+          batchData.push(doc);
+          isPresent = true;
         }
 
-        // await new Promise((done) => setTimeout(() => done(), 25000));
-
-        console.log("Done -->", trackingItem.tracking_id);
-      }
-      await new Promise((done) => setTimeout(() => done(), 25000));
+        await processForDbData({ batchData, elkClient, type, prodElkClient });
+        await new Promise((done) => setTimeout(() => done(), 60000));
+        skip += LIMIT;
+        isDataAvailable = isPresent;
+      } while (isDataAvailable);
     }
+    logger.verbose("DONE");
   } catch (error) {
     logger.error("fetchDataFromDB error", error);
   }
