@@ -33,7 +33,7 @@ const processBackfilling = async (data, collection, elkClient, type, prodElkClie
     .project({ audit: 0, mandatory_status_map: 0, _id: 0 })
     .toArray();
 
-  responses.forEach((response) => {
+  for (const response of responses) {
     if (type === "v1") {
       sendTrackDataToV1(response);
     } else if (type === "report") {
@@ -41,8 +41,8 @@ const processBackfilling = async (data, collection, elkClient, type, prodElkClie
     } else if (type === "elk") {
       updateStatusELK(response, prodElkClient);
     }
-    console.log("Done -->", response.tracking_id);
-  });
+    await new Promise((done) => setTimeout(() => done(), 5));
+  }
 };
 
 /** */
@@ -50,9 +50,10 @@ const main = async (records, collection, elkClient, type, prodElkClient) => {
   try {
     const chunkedData = chunk(records, 1000);
 
-    chunkedData.forEach((data) => {
+    for (const data of chunkedData) {
       processBackfilling(data, collection, elkClient, type, prodElkClient);
-    });
+      await new Promise((done) => setTimeout(() => done(), 100));
+    }
   } catch (error) {
     console.log("Main ERROR", error);
   }
@@ -195,7 +196,7 @@ const fetchDataFromDB = async ({
       for await (const doc of aggCursor) {
         batchData.push(doc);
       }
-
+      logger.verbose(`batchData : ${batchData.length}`);
       await processForDbData({ batchData, elkClient, type, prodElkClient });
     } else {
       // do the batching
@@ -209,7 +210,6 @@ const fetchDataFromDB = async ({
         pipeline[4] = { $limit: LIMIT };
 
         const batchData = [];
-
         const aggCursor = await collection.aggregate(pipeline, { allowDiskUse: true });
         let isPresent = false;
 
@@ -217,6 +217,8 @@ const fetchDataFromDB = async ({
           batchData.push(doc);
           isPresent = true;
         }
+
+        logger.verbose(`batchDat In Loop : ${batchData.length}`);
 
         await processForDbData({ batchData, elkClient, type, prodElkClient });
         await new Promise((done) => setTimeout(() => done(), 60000));
