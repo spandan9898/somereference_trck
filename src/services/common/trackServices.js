@@ -1,10 +1,11 @@
 const { isEmpty, omit, get, last } = require("lodash");
 const moment = require("moment");
 
-const { findOneDocumentFromMongo, getObject, setObject } = require("../../utils");
+const { findOneDocumentFromMongo, getObject, storeInCache } = require("../../utils");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { sortStatusArray } = require("./helpers");
 const { IS_FETCH_FROM_DB } = require("../../utils/constants");
+const logger = require("../../../logger");
 
 /**
  *
@@ -138,17 +139,21 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, fromTrackingApi = f
       trackDocument.track_arr = modifiedTrackArr;
       trackingObj.track_model = trackDocument;
 
-      await setObject(trackingAwb, trackingObj);
+      const expiryTime = fromTrackingApi ? 2 * 60 * 60 : undefined;
+      await storeInCache(trackingAwb, trackingObj, expiryTime);
 
       return trackingObj;
     }
     return trackingObj;
   } catch (error) {
-    throw new Error(error);
+    logger.info(`fetchTrackingModelAndUpdateCache: ${error.message}`);
+
+    return false;
   }
 };
 
 module.exports = {
   fetchTrackingModelAndUpdateCache,
   prepareTrackDataForTracking,
+  getTrackDocumentfromMongo,
 };

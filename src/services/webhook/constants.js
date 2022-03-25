@@ -21,9 +21,12 @@ const COMPULSORY_EVENTS = {
   DL: ["OP", "OM", "OFP", "PPF", "PP", "SHP", "OT", "OO", "RTD"],
   RTO: ["OP", "OM", "OFP", "PPF", "PP", "SHP", "OT", "OO"],
   RTD: ["OP", "OM", "OFP", "PPF", "OT", "OO", "UD", "NDR", "RTO", "RTO-OT", "RTO-OO", "RTO-UD"],
+  SHP: ["OP", "OM", "OFP", "PPF", "PP"],
+  RAD: ["OP", "OM", "OFP", "PPF", "PP", "OT"],
+  OO: ["OP", "OM", "OFP", "PPF", "PP", "OT", "RAD"],
 };
 
-const COMPULSORY_EVENTS_PRECEDENCE = [["PP"], ["DL", "RTO", "RTD"]];
+const COMPULSORY_EVENTS_PRECEDENCE = [["PP"], ["SHP", "RAD", "OO"], ["DL", "RTO", "RTD"]];
 
 const STATUS_PROXY_LIST = {
   PP: [
@@ -42,6 +45,23 @@ const STATUS_PROXY_LIST = {
     "LT",
     "DM",
   ],
+  SHP: [
+    "SHP",
+    "OT",
+    "RAD",
+    "OO",
+    "NDR",
+    "DL",
+    "RTO",
+    "RTO-OT",
+    "RTO-OO",
+    "RTO-UD",
+    "RTD",
+    "LT",
+    "DM",
+  ],
+  RAD: ["RAD", "OO", "NDR", "DL", "RTO", "RTO-OT", "RTO-OO", "RTO-UD", "RTD", "LT", "DM"],
+  OO: ["OO", "NDR", "DL", "RTO", "RTO-OT", "RTO-OO", "RTO-UD", "RTD", "LT", "DM"],
   RTO: ["RTO", "RTO-OT", "RTO-OO", "RTO-UD", "RTD"],
   RTD: ["RTD"],
   DL: ["DL"],

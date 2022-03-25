@@ -1,8 +1,43 @@
 const moment = require("moment");
-const _ = require("lodash");
 
-const { SHADOWFAX_CODE_MAPPER } = require("./constant");
-const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
+const { SHADOWFAX_PULL_CODE_MAPPER_1, SHADOWFAX_PULL_CODE_MAPPER_2 } = require("./constant");
+const { NEW_STATUS_TO_OLD_MAPPING } = require("../../services/v1/constants");
+
+/**
+ *
+ * get Custom Scan Type for ShdadowFax
+ *
+ */
+const getEventInfoData = ({ event, comments, statusId, remarks }) => {
+  let mapperString;
+  let scanType;
+  let pickrrSubStatusCode;
+  const courierStatus = event || statusId;
+  const courierRemark = comments || remarks;
+  if (
+    ["pickup_on_hold", "on_hold", "nc", "na", "recd_at_fwd_dc"].includes(
+      courierStatus.toLowerCase()
+    )
+  ) {
+    mapperString = `${courierStatus}_${courierRemark}`;
+    if (SHADOWFAX_PULL_CODE_MAPPER_1[mapperString.toLowerCase()]?.scan_type) {
+      scanType = SHADOWFAX_PULL_CODE_MAPPER_1[mapperString.toLowerCase()]?.scan_type || "";
+      pickrrSubStatusCode =
+        SHADOWFAX_PULL_CODE_MAPPER_1[mapperString.toLowerCase()]?.pickrr_sub_status_code || "";
+    }
+    scanType = NEW_STATUS_TO_OLD_MAPPING[scanType] || scanType;
+  } else if (courierStatus.toLowerCase() in SHADOWFAX_PULL_CODE_MAPPER_2) {
+    mapperString = courierStatus;
+    if (SHADOWFAX_PULL_CODE_MAPPER_2[mapperString.toLowerCase()]?.scan_type) {
+      scanType = SHADOWFAX_PULL_CODE_MAPPER_2[mapperString.toLowerCase()]?.scan_type || "";
+      pickrrSubStatusCode =
+        SHADOWFAX_PULL_CODE_MAPPER_2[mapperString.toLowerCase()]?.pickrr_sub_status_code || "";
+    }
+  } else {
+    return {};
+  }
+  return { scanType, mapperString, pickrrSubStatusCode };
+};
 
 /*
 shadowfax courier payload --
@@ -17,7 +52,7 @@ shadowfax courier payload --
 */
 
 /**
- *
+ *Prepares PickrrData from Shadowfax's Pushed Info
  */
 const prepareShadowfaxData = (shadowfaxDict) => {
   const pickrrShadowfaxDict = {
@@ -35,18 +70,83 @@ const prepareShadowfaxData = (shadowfaxDict) => {
   };
 
   try {
-    const { event, received_by: receivedBy, EDD } = shadowfaxDict || {};
-    if (event.toLowerCase() in SHADOWFAX_CODE_MAPPER) {
-      const scanType = SHADOWFAX_CODE_MAPPER[event.toLowerCase()];
-      const scanDatetime = moment(shadowfaxDict.event_timestamp).format("YYYY-MM-DD HH:mm:ss");
-      pickrrShadowfaxDict.EDD = EDD ? moment(EDD).format("YYYY-MM-DD HH:mm:ss") : "";
+    const {
+      awb_number: awb,
+      event,
+      comments,
+      event_timestamp: eventTimeStamp,
+      event_location: eventLocation,
+    } = shadowfaxDict || {};
+
+    pickrrShadowfaxDict.awb = awb;
+
+    const { scanType, mapperString, pickrrSubStatusCode } = getEventInfoData({ event, comments });
+    if (!scanType) {
+      return { err: "Scan type not found" };
+    }
+    pickrrShadowfaxDict.scan_type = scanType === "UD" ? "NDR" : scanType;
+    pickrrShadowfaxDict.scan_datetime = moment(eventTimeStamp).format("YYYY-MM-DD HH:mm:ss");
+    pickrrShadowfaxDict.track_info = comments;
+    pickrrShadowfaxDict.track_location = eventLocation;
+    pickrrShadowfaxDict.courier_status_code = mapperString;
+    pickrrShadowfaxDict.pickrr_sub_status_code = pickrrSubStatusCode;
+    return pickrrShadowfaxDict;
+  } catch (error) {
+    pickrrShadowfaxDict.err = error.message;
+    return pickrrShadowfaxDict;
+  }
+};
+
+/**
+ *
+ * @param {*} pulledData -> Check avsc
+ * @desc prepare pulled data
+ *
+ */
+const preparePulledShadowfaxData = (pulledData) => {
+  const pickrrShadowfaxDict = {
+    awb: "",
+    scan_type: "",
+    scan_datetime: "",
+    track_info: "",
+    track_location: "",
+    received_by: "",
+    pickup_datetime: "",
+    EDD: "",
+    pickrr_status: "",
+    pickrr_sub_status_code: "",
+    courier_status_code: "",
+  };
+  try {
+    const {
+      awb_number: awbNumber,
+      created,
+      location = "",
+      remarks = "",
+      status_id: statusId,
+      received_by: receivedBy = "",
+      edd = "",
+    } = pulledData;
+
+    const { scanType, mapperString, pickrrSubStatusCode } = getEventInfoData({ statusId, remarks });
+    if (!scanType) {
+      return { err: "Scan type not found" };
+    }
+
+    pickrrShadowfaxDict.awb = awbNumber;
+    pickrrShadowfaxDict.scan_type = scanType;
+    pickrrShadowfaxDict.scan_datetime = moment(created).toDate();
+    pickrrShadowfaxDict.track_info = remarks;
+    pickrrShadowfaxDict.track_location = location;
+    pickrrShadowfaxDict.courier_status_code = mapperString;
+    pickrrShadowfaxDict.pickrr_sub_status_code = pickrrSubStatusCode;
+    pickrrShadowfaxDict.EDD = edd || "";
+    if (scanType === "DL") {
       pickrrShadowfaxDict.received_by = receivedBy || "";
-      pickrrShadowfaxDict.scan_type = scanType;
-      pickrrShadowfaxDict.scan_datetime = scanDatetime;
-      pickrrShadowfaxDict.track_info = _.get(shadowfaxDict, "comments", "");
-      pickrrShadowfaxDict.awb = _.get(shadowfaxDict, "awb_number", "");
-      pickrrShadowfaxDict.track_location = _.get(shadowfaxDict, "location", "");
-      pickrrShadowfaxDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];
+    }
+
+    if (pickrrShadowfaxDict.scan_type === "PP") {
+      pickrrShadowfaxDict.pickup_datetime = pickrrShadowfaxDict.scan_datetime;
     }
     return pickrrShadowfaxDict;
   } catch (error) {
@@ -57,4 +157,5 @@ const prepareShadowfaxData = (shadowfaxDict) => {
 
 module.exports = {
   prepareShadowfaxData,
+  preparePulledShadowfaxData,
 };

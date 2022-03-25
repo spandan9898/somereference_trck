@@ -5,12 +5,14 @@ const {
   STAGING_ELASTICO_ID,
   STAGING_ELASTICO_USERNAME,
   STAGING_ELASTICO_PASSWORD,
+  TRACKING_ELASTICO_ID,
+  TRACKING_ELASTICO_USERNAME,
+  TRACKING_ELASTICO_PASSWORD,
 } = process.env;
 
 const BLOCKED_IPS = ["54.179.209.160"];
 
 const ALLOWED_IPS = [
-  "3.110.69.182",
   "3.110.95.224",
   "13.233.11.82",
   "13.233.62.47",
@@ -23,6 +25,7 @@ const IS_FETCH_FROM_DB = false;
 const HOST_NAMES = {
   PULL_DB: "PULL_DB",
   REPORT_DB: "REPORT_DB",
+  PULL_STATING_DB: "PULL_STATING_DB",
 };
 
 const ELK_INSTANCE_NAMES = {
@@ -40,6 +43,14 @@ const ELK_INSTANCE_NAMES = {
       elasticoid: STAGING_ELASTICO_ID,
       username: STAGING_ELASTICO_USERNAME,
       password: STAGING_ELASTICO_PASSWORD,
+    },
+  },
+  TRACKING: {
+    name: "TRACKING",
+    config: {
+      elasticoid: TRACKING_ELASTICO_ID,
+      username: TRACKING_ELASTICO_USERNAME,
+      password: TRACKING_ELASTICO_PASSWORD,
     },
   },
 };

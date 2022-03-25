@@ -3,6 +3,7 @@
 /* eslint-disable consistent-return */
 const moment = require("moment");
 const axios = require("axios");
+const size = require("lodash/size");
 
 const { setObject } = require("./redis");
 const { prepareTrackArrCacheData } = require("../services/pull/helpers");
@@ -11,7 +12,8 @@ const commonTrackingInfoCol = require("../services/pull/model");
 const { getObject } = require("./redis");
 const logger = require("../../logger");
 const { updateIsNDRinCache } = require("../services/ndr/helpers");
-const { DEFAULT_REQUESTS_TIMEOUT } = require("./constants");
+const { DEFAULT_REQUESTS_TIMEOUT, ELK_INSTANCE_NAMES } = require("./constants");
+const initELK = require("../connector/elkConnection");
 
 const axiosInstance = axios.create();
 
@@ -23,7 +25,7 @@ const axiosInstance = axios.create();
  */
 const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray) => {
   try {
-    const { awb } = trackObj;
+    const { awb } = trackObj || {};
 
     const pullCollection = await commonTrackingInfoCol();
     const response = await pullCollection.findOne(
@@ -113,11 +115,11 @@ const checkCurrentStatusAWBInCache = (trackObj, cachedData) => {
  * Otherwise -> return false i.e move foward
  * @returns true or false
  */
-const checkAwbInCache = async (trackObj, updateCacheTrackArray) => {
+const checkAwbInCache = async ({ trackObj, updateCacheTrackArray, isFromPulled }) => {
   const cachedData = await getObject(trackObj.awb);
   const newScanTime = moment(trackObj.scan_datetime).unix();
 
-  if (!cachedData) {
+  if (!cachedData || !(size(cachedData) >= 2)) {
     const res = await fetchTrackingDataAndStoreInCache(trackObj, updateCacheTrackArray);
     if (!res) {
       return false;
@@ -125,7 +127,8 @@ const checkAwbInCache = async (trackObj, updateCacheTrackArray) => {
     if (res === "NA") {
       return true;
     }
-    if (checkCurrentStatusAWBInCache(trackObj, res)) return true;
+    if (checkCurrentStatusAWBInCache(trackObj, res) && !isFromPulled) return true;
+
     const isExists = await compareScanUnixTimeAndCheckIfExists(
       newScanTime,
       trackObj.scan_type,
@@ -133,7 +136,7 @@ const checkAwbInCache = async (trackObj, updateCacheTrackArray) => {
     );
     return isExists;
   }
-  if (checkCurrentStatusAWBInCache(trackObj, cachedData)) return true;
+  if (checkCurrentStatusAWBInCache(trackObj, cachedData) && !isFromPulled) return true;
 
   const isExists = await compareScanUnixTimeAndCheckIfExists(
     newScanTime,
@@ -195,6 +198,20 @@ class MakeAPICall {
     }
   }
 
+  async put(otherConfigs) {
+    try {
+      const config = this.getConfig(otherConfigs);
+      const { data, status, headers } = await this.axios.put(this.url, this.payload, config);
+      return {
+        data,
+        statusCode: status,
+        headers,
+      };
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
   async post(otherConfigs) {
     try {
       const config = this.getConfig(otherConfigs);
@@ -210,9 +227,90 @@ class MakeAPICall {
   }
 }
 
+/**
+ *
+ * validates if the expected dateobj is instance of datetime
+ * @returns True
+ */
+const validateDateField = (dateObj) => moment(dateObj).isValid();
+
+/**
+ *
+ * @param {datetime Object field} dateObj1
+ * @param {datetime Object field} dateObj2
+ * @returns Minimum of Two Dates
+ */
+const getMinDate = (dateObj1, dateObj2) =>
+  moment(dateObj1).isBefore(dateObj2) ? moment(dateObj1).toDate() : moment(dateObj2).toDate();
+
+/**
+ *
+ * @param {datetime Object field} dateObj1
+ * @param {datetime Object field} dateObj2
+ * @returns maximum of Two Dates
+ */
+const getMaxDate = (dateObj1, dateObj2) =>
+  moment(dateObj1).isAfter(dateObj2) ? moment(dateObj1).toDate() : moment(dateObj2).toDate();
+
+/**
+ *
+ * @desc get all ELK instances
+ */
+const getElkClients = () => {
+  let prodElkClient = "";
+  const stagingElkClient = "";
+  let trackingElkClient = "";
+  try {
+    prodElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.PROD.name);
+
+    // stagingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.STAGING.name);
+
+    trackingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.TRACKING.name);
+
+    return {
+      prodElkClient,
+      stagingElkClient,
+      trackingElkClient,
+    };
+  } catch (error) {
+    logger.error("getElkClients", error);
+    return {
+      prodElkClient,
+      stagingElkClient,
+    };
+  }
+};
+
+/**
+ *
+ * @param {*} track_arr
+ */
+const ofdCount = (trackArr, scanType) => {
+  let ofdCountNum = 0;
+  let ndrCountNum = 0;
+
+  trackArr.forEach((trackArrObj) => {
+    if (trackArrObj?.scan_type === "OO") {
+      ofdCountNum += 1;
+    } else if (trackArrObj?.scan_type === "NDR") {
+      ndrCountNum += 1;
+    }
+  });
+  let finalOfdCount = 0;
+  if (["UD", "NDR", "DL", "RTO", "RTO-OO", "RTO UD", "RTD", "OO"].includes(scanType)) {
+    finalOfdCount = Math.max(1, ofdCountNum, ndrCountNum);
+  } else finalOfdCount = ofdCountNum;
+
+  return finalOfdCount;
+};
 module.exports = {
   checkAwbInCache,
   convertDatetimeFormat,
   convertDatetimeFormat2,
   MakeAPICall,
+  validateDateField,
+  getMinDate,
+  getMaxDate,
+  getElkClients,
+  ofdCount,
 };
