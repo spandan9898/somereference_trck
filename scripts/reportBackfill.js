@@ -41,6 +41,7 @@ const processBackfilling = async (data, collection, elkClient, type, prodElkClie
     } else if (type === "elk") {
       updateStatusELK(response, prodElkClient);
     }
+    console.log("Done -->", response.tracking_id);
     await new Promise((done) => setTimeout(() => done(), 5));
   }
 };
@@ -218,7 +219,7 @@ const fetchDataFromDB = async ({
           isPresent = true;
         }
 
-        logger.verbose(`batchDat In Loop : ${batchData.length}`);
+        logger.verbose(`batchData In Loop : ${batchData.length}`);
 
         await processForDbData({ batchData, elkClient, type, prodElkClient });
         await new Promise((done) => setTimeout(() => done(), 60000));
