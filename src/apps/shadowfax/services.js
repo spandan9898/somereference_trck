@@ -15,7 +15,7 @@ const getEventInfoData = ({ event, comments, statusId, remarks }) => {
   const courierStatus = event || statusId;
   const courierRemark = comments || remarks;
   if (
-    ["pickup_on_hold", "on_hold", "nc", "na", "recd_at_fwd_dc"].includes(
+    ["pickup_on_hold", "on_hold", "nc", "na", "recd_at_fwd_dc", "cancelled_by_customer"].includes(
       courierStatus.toLowerCase()
     )
   ) {
