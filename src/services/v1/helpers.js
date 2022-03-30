@@ -1,11 +1,13 @@
+const { PP_PROXY_LIST } = require("./constants");
+
 /**
  *
- * @param {*} track_arr
+ * @param {*} trackData
  */
-const findPickupDate = (trackArr) => {
-  for (let i = 0; i < trackArr.length; i += 1) {
-    if (trackArr[i].scan_type === "PP") {
-      return trackArr[i]?.scan_datetime;
+const findPickupDate = (trackData, updateObj) => {
+  if (!trackData.pickup_datetime || updateObj?.status?.current_status_type === "PP") {
+    if (PP_PROXY_LIST.includes(updateObj?.status?.current_status_type)) {
+      return updateObj?.status?.current_status_time;
     }
   }
   return "";
