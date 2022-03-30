@@ -37,9 +37,12 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
   }
   try {
     const pullProdCollectionInstance = await commonTrackingInfoCol();
-    const pullStagingCollectionInstance = await commonTrackingInfoCol({
-      hostName: HOST_NAMES.PULL_STATING_DB,
-    });
+    let pullStagingCollectionInstance;
+    if (process.env.NODE_ENV === "staging") {
+      pullStagingCollectionInstance = await commonTrackingInfoCol({
+        hostName: HOST_NAMES.PULL_STATING_DB,
+      });
+    }
     const trackArr = updatedObj.track_arr;
     const auditObj = {
       from: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
