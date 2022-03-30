@@ -7,6 +7,7 @@ const commonTrackingInfoCol = require("./model");
 const { updateTrackingProcessingCount } = require("../common/services");
 const { checkTriggerForPulledEvent } = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
+const { findPickupDate } = require("../v1/helpers");
 
 /**
  *
@@ -91,9 +92,11 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
         eddStampInDb,
         statusType,
       });
-      if (moment(result.eventObj?.pickup_datetime).isValid() && statusType.includes(["PP"])) {
-        updatedObj.pickup_datetime = result.statusMap["status.current_status_time"];
-      }
+
+      // if (moment(result.eventObj?.pickup_datetime).isValid() && statusType.includes(["PP"])) {
+      //   updatedObj.pickup_datetime = result.statusMap["status.current_status_time"];
+      // }
+
       if (pickrrEDD) {
         updatedObj.edd_stamp = pickrrEDD;
       }
@@ -106,6 +109,10 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     updatedObj["status.current_status_location"] = firstTrackObjOfTrackArr.scan_location;
     updatedObj["status.current_status_time"] = firstTrackObjOfTrackArr.scan_datetime;
     updatedObj["status.pickrr_sub_status_code"] = firstTrackObjOfTrackArr.pickrr_sub_status_code;
+
+    if (res) {
+      updatedObj.pickup_datetime = findPickupDate(res, updatedObj);
+    }
 
     const response = await pullCollection.findOneAndUpdate(
       { tracking_id: trackObj.awb },
