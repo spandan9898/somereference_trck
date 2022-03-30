@@ -3,8 +3,8 @@ const { initialize, listener } = require("./consumer");
 
 (async () => {
   try {
-    const consumers = await initialize();
-    consumers.forEach((consumer) => {
+    const { consumersWithMultiTopics, pullConsumer } = await initialize();
+    consumersWithMultiTopics.forEach((consumer) => {
       consumer
         .then((res) => {
           if (res) {
@@ -15,6 +15,7 @@ const { initialize, listener } = require("./consumer");
           logger.error("Delhivery Consumer Initialize Error ", error);
         });
     });
+    listener(pullConsumer, true);
   } catch (error) {
     logger.error("Delhivery Consumer Error ", error);
   }
