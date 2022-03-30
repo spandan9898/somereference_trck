@@ -1,17 +1,17 @@
 const logger = require("../../../logger");
 const { getObject, setObject } = require("../../utils/redis");
+const { PP_PROXY_LIST } = require("../v1/constants");
 
 /**
  *
- * @param {*} track_arr
+ * @param {*} trackData
  */
-const findPickupDate = (trackArr) => {
-  // eslint-disable-next-line consistent-return
-  trackArr.forEach((trackArrObj) => {
-    if (trackArrObj?.scan_type === "PP") {
-      return trackArrObj.scan_datetime;
+const findPickupDate = (trackData, updateObj) => {
+  if (!trackData.pickup_datetime || updateObj?.status?.current_status_type === "PP") {
+    if (PP_PROXY_LIST.includes(updateObj?.status?.current_status_type)) {
+      return updateObj?.status?.current_status_time;
     }
-  });
+  }
   return "";
 };
 

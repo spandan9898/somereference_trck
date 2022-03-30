@@ -8,7 +8,7 @@ const { findPickupDate } = require("./helpers");
  * @returns
  */
 const prepareTrackingEventDictForNDR = (trackData) => {
-  const pickupDatetime = findPickupDate(trackData?.track_arr || []);
+  const pickupDatetime = findPickupDate(trackData, trackData?.status || {});
   const scanDatetime = trackData?.status?.current_status_time || "";
   const EDDTimestamp = trackData?.edd_stamp || "";
   const scanType = trackData?.status?.current_status_type;
