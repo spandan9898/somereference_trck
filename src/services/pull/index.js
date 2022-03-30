@@ -7,6 +7,7 @@ const commonTrackingInfoCol = require("./model");
 const { updateTrackingProcessingCount } = require("../common/services");
 const { checkTriggerForPulledEvent } = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
+const { HOST_NAMES } = require("../../utils/constants");
 
 /**
  *
@@ -35,7 +36,13 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     delete updatedObj.edd_stamp;
   }
   try {
-    const pullCollection = await commonTrackingInfoCol();
+    const pullProdCollectionInstance = await commonTrackingInfoCol();
+    let pullStagingCollectionInstance;
+    if (process.env.NODE_ENV === "staging") {
+      pullStagingCollectionInstance = await commonTrackingInfoCol({
+        hostName: HOST_NAMES.PULL_STATING_DB,
+      });
+    }
     const trackArr = updatedObj.track_arr;
     const auditObj = {
       from: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
@@ -48,7 +55,7 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
 
     let sortedTrackArray;
 
-    const res = await pullCollection.findOne({ tracking_id: result.awb });
+    const res = await pullProdCollectionInstance.findOne({ tracking_id: result.awb });
     const zone = res?.billing_zone;
     const eddStampInDb = res?.edd_stamp;
 
@@ -107,7 +114,12 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     updatedObj["status.current_status_time"] = firstTrackObjOfTrackArr.scan_datetime;
     updatedObj["status.pickrr_sub_status_code"] = firstTrackObjOfTrackArr.pickrr_sub_status_code;
 
-    const response = await pullCollection.findOneAndUpdate(
+    const pullInstance =
+      process.env.NODE_ENV === "staging"
+        ? pullStagingCollectionInstance
+        : pullProdCollectionInstance;
+
+    const response = await pullInstance.findOneAndUpdate(
       { tracking_id: trackObj.awb },
       {
         $set: updatedObj,
@@ -118,7 +130,7 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
       {
         returnNewDocument: true,
         returnDocument: "after",
-        upsert: false,
+        upsert: process.env.NODE_ENV === "staging",
       }
     );
     await storeDataInCache(result);
