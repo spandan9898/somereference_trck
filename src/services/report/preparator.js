@@ -21,7 +21,7 @@ const prepareDataForReportMongo = (trackData) => {
   const trackingStatus = prepareTrackingStatus(trackData);
   const NDRObject = findLatestNDRDetails(trackData?.track_arr || {});
 
-  let pickupDate = findPickupDate(trackData?.track_arr || {});
+  let pickupDate = findPickupDate(trackData, trackData?.status || {});
   if (pickupDate) {
     pickupDate = pickupDate instanceof Date ? pickupDate : moment(pickupDate).toDate();
   }
