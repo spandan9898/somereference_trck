@@ -140,7 +140,7 @@ const prepareDelhiveryData = (delhiveryDict) => {
       edd: '',
       event: 'pull',
       courierName: 'delhivery_air',
-      awbNumber: '7420187003175'
+      trackingId: '7420187003175'
     }
  */
 const prepareDelhiveryPulledData = (delhiveryDict) => {
@@ -167,11 +167,11 @@ const prepareDelhiveryPulledData = (delhiveryDict) => {
     receivedBy,
     edd,
     courierName,
-    awbNumber,
+    trackingId,
     pickUpDate,
   } = delhiveryDict || {};
 
-  if (!awbNumber) {
+  if (!trackingId) {
     return {
       err: "Tracking ID not available",
     };
@@ -215,7 +215,7 @@ const prepareDelhiveryPulledData = (delhiveryDict) => {
   pickrrDelhiveryDict.scan_datetime = moment(StatusDateTime).toDate();
   pickrrDelhiveryDict.received_by = receivedBy || "";
   pickrrDelhiveryDict.EDD = edd ? moment(edd).toDate() : "";
-  pickrrDelhiveryDict.awb = awbNumber;
+  pickrrDelhiveryDict.awb = trackingId;
   pickrrDelhiveryDict.courier_status_code = mapperString;
   pickrrDelhiveryDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];
 
