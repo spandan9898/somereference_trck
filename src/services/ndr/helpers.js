@@ -7,7 +7,7 @@ const { PP_PROXY_LIST } = require("../v1/constants");
  * @param {*} trackData
  */
 const findPickupDate = (trackData) => {
-  if (trackData?.pp_time || trackData?.pickup_datetime) {
+  if (trackData?.pickup_datetime) {
     return trackData?.pickup_datetime;
   }
 
