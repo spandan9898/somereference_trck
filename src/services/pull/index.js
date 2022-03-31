@@ -67,20 +67,20 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     updatedObj.track_arr = sortedTrackArray;
     updatedObj.courier_edd = latestCourierEDD;
 
-    let pickupDatetime = null;
+    let pickupDateTime = null;
 
     if (res?.pp_time && statusType !== "PP") {
-      pickupDatetime = res?.pickup_datetime;
+      pickupDateTime = res?.pickup_datetime;
     } else {
       sortedTrackArray.forEach((trackEvent) => {
         if (PP_PROXY_LIST.includes(trackEvent?.scan_type)) {
-          pickupDatetime = trackEvent?.scan_datetime;
+          pickupDateTime = trackEvent?.scan_datetime;
           if (trackEvent?.scan_type === "PP") {
             updatedObj.pp_time = true;
           }
         }
       });
-      updatedObj.pickup_datetime = pickupDatetime;
+      updatedObj.pickup_datetime = pickupDateTime;
     }
 
     if (softCancellationCheck(sortedTrackArray, trackObj)) {
@@ -95,11 +95,11 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     // Pickrr EDD is fetch over here
 
     try {
-      const instance = new EddPrepareHelper({ latestCourierEDD, pickupDatetime, eddStampInDb });
+      const instance = new EddPrepareHelper({ latestCourierEDD, pickupDateTime, eddStampInDb });
       const pickrrEDD = await instance.callPickrrEDDEventFunc({
         zone,
         latestCourierEDD,
-        pickupDatetime,
+        pickupDateTime,
         eddStampInDb,
         statusType,
       });
