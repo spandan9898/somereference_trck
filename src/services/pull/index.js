@@ -103,7 +103,6 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
         eddStampInDb,
         statusType,
       });
-
       if (pickrrEDD) {
         updatedObj.edd_stamp = pickrrEDD;
       }
