@@ -50,7 +50,7 @@ const createNaaptolTrackingJson = (trackResponse) => {
     let isRto = false;
     let rtoComment = "";
     let pickrrSubStatusCode = "";
-
+    let ndrCount = 0;
     let statusType = currentStatusDict.current_status_type || "";
     let currentStatus = currentStatusDict.current_status_body || "";
     let statusDescription = NAAPTOL_STATUS_DESCRIPTION_MAPPING[statusType] || currentStatus;
@@ -67,6 +67,7 @@ const createNaaptolTrackingJson = (trackResponse) => {
 
         if (["ndr", "ud"].includes(scanType)) {
           currentlyNdr = true;
+          ndrCount += 1;
           reasonCode = trackItem.scan_status;
           pickrrSubStatusCode = trackItem.pickrr_sub_status_code || "";
         } else {
@@ -104,7 +105,10 @@ const createNaaptolTrackingJson = (trackResponse) => {
     } else {
       currentStatus = NAAPTOL_STATUS_MAPPING[statusType] || "";
     }
-
+    let finalOfdCount = 0;
+    if (["UD", "NDR", "DL", "RTO", "RTO-OO", "RTO UD", "RTD", "OO"].includes(statusType)) {
+      finalOfdCount = Math.max(1, attemptCount, ndrCount);
+    } else finalOfdCount = attemptCount;
     const infoDict = trackResponse.info || {};
     const price = infoDict.invoice_value || 0;
 
@@ -117,7 +121,7 @@ const createNaaptolTrackingJson = (trackResponse) => {
     naaptolTrackingJson.originCity = infoDict.from_city || "";
     naaptolTrackingJson.destinationCity = infoDict.to_city || "";
     naaptolTrackingJson.destinationPincode = infoDict.to_pincode || "";
-    naaptolTrackingJson.noOfAttempt = attemptCount;
+    naaptolTrackingJson.noOfAttempt = finalOfdCount;
     naaptolTrackingJson.expectedDeliverydate = expectedDeliveryDate;
     naaptolTrackingJson.shipmenttype = trackResponse.is_reverse ? "R" : "F";
     naaptolTrackingJson.scanDateTime = currentStatusDatetime;

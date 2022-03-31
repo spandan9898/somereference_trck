@@ -16,21 +16,6 @@ const findPickupDate = (trackArr) => {
 };
 
 /**
- *
- * @param {*} track_arr
- */
-const ofdCount = (trackArr) => {
-  // eslint-disable-next-line consistent-return
-  let ofdCountNum = 0;
-  trackArr.forEach((trackArrObj) => {
-    if (trackArrObj?.scan_type === "OO") {
-      ofdCountNum += 1;
-    }
-  });
-  return ofdCountNum;
-};
-
-/**
  * @desc if current status is in UD & NDR then trigger
  *    if not then check isNDR true from cache. if it is true we need to send all status to NDR
  */
@@ -68,7 +53,6 @@ const updateIsNDRinCache = async (awb) => {
 
 module.exports = {
   findPickupDate,
-  ofdCount,
   checkIfTriggerNDREb,
   updateIsNDRinCache,
 };
