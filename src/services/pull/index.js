@@ -91,7 +91,7 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
         eddStampInDb,
         statusType,
       });
-      if (moment(result.eventObj?.pickup_datetime).isValid() && statusType.includes(["PP"])) {
+      if (moment(result.eventObj?.pickup_datetime).isValid() && statusType === "PP") {
         updatedObj.pickup_datetime = result.statusMap["status.current_status_time"];
       }
       if (pickrrEDD) {
