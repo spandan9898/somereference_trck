@@ -136,13 +136,16 @@ const checkAwbInCache = async ({ trackObj, updateCacheTrackArray, isFromPulled }
     );
     return isExists;
   }
-  if (checkCurrentStatusAWBInCache(trackObj, cachedData) && !isFromPulled) return true;
-
   const isExists = await compareScanUnixTimeAndCheckIfExists(
     newScanTime,
     trackObj.scan_type,
     cachedData
   );
+  if (isExists) {
+    return true;
+  }
+  if (checkCurrentStatusAWBInCache(trackObj, cachedData) && !isFromPulled) return true;
+
   return isExists;
 };
 
