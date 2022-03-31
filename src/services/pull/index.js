@@ -7,6 +7,7 @@ const commonTrackingInfoCol = require("./model");
 const { updateTrackingProcessingCount } = require("../common/services");
 const { checkTriggerForPulledEvent } = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
+const { PP_PROXY_LIST } = require("../v1/constants");
 
 /**
  *
@@ -16,12 +17,11 @@ const { EddPrepareHelper } = require("../common/eddHelpers");
  */
 const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = false }) => {
   const result = prepareTrackDataToUpdateInPullDb(trackObj, isFromPulled);
-
   if (!result.success) {
     throw new Error(result.err);
   }
   const latestCourierEDD = result?.eddStamp;
-  let pickupDateTime = result?.eventObj?.pickup_datetime;
+
   const statusType = result?.statusMap["status.current_status_type"];
 
   const updatedObj = {
@@ -51,7 +51,6 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     const res = await pullCollection.findOne({ tracking_id: result.awb });
     const zone = res?.billing_zone;
     const eddStampInDb = res?.edd_stamp;
-
     if (isFromPulled) {
       const isAllow = checkTriggerForPulledEvent(trackObj, res);
       if (!isAllow) {
@@ -68,6 +67,19 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     updatedObj.track_arr = sortedTrackArray;
     updatedObj.courier_edd = latestCourierEDD;
 
+    let pickupDateTime = null;
+
+    if (res?.pickup_datetime && statusType !== "PP") {
+      pickupDateTime = res?.pickup_datetime;
+    } else {
+      sortedTrackArray.forEach((trackEvent) => {
+        if (PP_PROXY_LIST.includes(trackEvent?.scan_type)) {
+          pickupDateTime = trackEvent?.scan_datetime;
+        }
+      });
+      updatedObj.pickup_datetime = pickupDateTime;
+    }
+
     if (softCancellationCheck(sortedTrackArray, trackObj)) {
       return false;
     }
@@ -80,9 +92,6 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     // Pickrr EDD is fetch over here
 
     try {
-      if (!result.eventObj?.pickup_datetime) {
-        pickupDateTime = res?.pickup_datetime;
-      }
       const instance = new EddPrepareHelper({ latestCourierEDD, pickupDateTime, eddStampInDb });
       const pickrrEDD = await instance.callPickrrEDDEventFunc({
         zone,
@@ -91,9 +100,6 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
         eddStampInDb,
         statusType,
       });
-      if (moment(result.eventObj?.pickup_datetime).isValid() && statusType.includes(["PP"])) {
-        updatedObj.pickup_datetime = result.statusMap["status.current_status_time"];
-      }
       if (pickrrEDD) {
         updatedObj.edd_stamp = pickrrEDD;
       }
