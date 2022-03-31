@@ -4,13 +4,19 @@ const { PP_PROXY_LIST } = require("./constants");
  *
  * @param {*} trackData
  */
-const findPickupDate = (trackData, updateObj) => {
-  if (!trackData.pickup_datetime || updateObj?.status?.current_status_type === "PP") {
-    if (PP_PROXY_LIST.includes(updateObj?.status?.current_status_type)) {
-      return updateObj?.status?.current_status_time;
+const findPickupDate = (trackData) => {
+  if (trackData?.pp_time || trackData?.pickup_datetime) {
+    return trackData?.pickup_datetime;
+  }
+
+  let pickupDatetime = "";
+  const trackArr = trackData?.track_arr || [];
+  for (let i = 0; i < trackArr.length; i += 1) {
+    if (PP_PROXY_LIST.includes(trackArr[i]?.scan_type)) {
+      pickupDatetime = trackArr[i]?.scan_datetime;
     }
   }
-  return "";
+  return pickupDatetime;
 };
 module.exports = {
   findPickupDate,

@@ -12,7 +12,7 @@ const { NEW_STATUS_TO_OLD_MAPPING } = require("./constants");
  */
 const prepareTrackDictForV1 = (trackData) => {
   const scanType = trackData?.status?.current_status_type;
-  const pickupTime = findPickupDate(trackData, trackData?.status || {});
+  const pickupTime = findPickupDate(trackData);
   const trackDict = {
     awb: trackData?.tracking_id,
     scan_type: NEW_STATUS_TO_OLD_MAPPING[scanType] || scanType,
