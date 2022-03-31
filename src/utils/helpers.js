@@ -66,13 +66,22 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
  * and return true if exists otherwise return  false
  * @returns true/false
  */
-const compareScanUnixTimeAndCheckIfExists = (newScanTime, newScanType, cachedData) => {
+const compareScanUnixTimeAndCheckIfExists = (
+  newScanTime,
+  newScanType,
+  cachedData,
+  isFromPulled
+) => {
   const cacheKeys = Object.keys(cachedData);
   return cacheKeys.some((key) => {
     const keys = key.split("_");
     if (keys[0] === newScanType) {
       let oldScanTime = +keys[1];
-      oldScanTime += 330 * 60;
+
+      if (!isFromPulled) {
+        oldScanTime += 330 * 60;
+      }
+
       const diff = (newScanTime - oldScanTime) / 60;
       return diff >= -1 && diff <= 1;
     }
@@ -127,19 +136,26 @@ const checkAwbInCache = async ({ trackObj, updateCacheTrackArray, isFromPulled }
     if (res === "NA") {
       return true;
     }
-    if (checkCurrentStatusAWBInCache(trackObj, res) && !isFromPulled) return true;
 
     const isExists = await compareScanUnixTimeAndCheckIfExists(
       newScanTime,
       trackObj.scan_type,
-      res
+      res,
+      isFromPulled
     );
+
+    if (isExists) {
+      return true;
+    }
+    if (checkCurrentStatusAWBInCache(trackObj, res) && !isFromPulled) return true;
+
     return isExists;
   }
   const isExists = await compareScanUnixTimeAndCheckIfExists(
     newScanTime,
     trackObj.scan_type,
-    cachedData
+    cachedData,
+    isFromPulled
   );
   if (isExists) {
     return true;
