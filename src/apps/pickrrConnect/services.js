@@ -118,7 +118,7 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
     });
     return true;
   } catch (error) {
-    logger.error("preparePickrrConnectLambdaPayloadAndCall error", error);
+    logger.error("preparePickrrConnectLambdaPayloadAndCall error", error.message);
     return false;
   }
 };
