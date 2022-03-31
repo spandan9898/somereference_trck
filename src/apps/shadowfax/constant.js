@@ -103,6 +103,13 @@ const SHADOWFAX_PULL_CODE_MAPPER_1 = {
   "na_heavy rain": { scan_type: "UD", pickrr_sub_status_code: "SD" },
   "recd_at_fwd_dc_received at forward dc": { scan_type: "OT", pickrr_sub_status_code: "" },
   "recd_at_fwd_dc_received at rts dc": { scan_type: "RTO", pickrr_sub_status_code: "" },
+  "cancelled_by_customer_cancelled by customer": { scan_type: "UD", pickrr_sub_status_code: "CR" },
+  "cancelled_by_customer_cancelled as per client's request": {
+    scan_type: "OC",
+    pickrr_sub_status_code: "",
+  },
+  "cancelled_by_customer_third successful attempt": { scan_type: "OC", pickrr_sub_status_code: "" },
+  "cancelled_by_customer_cancelled by client": { scan_type: "OC", pickrr_sub_status_code: "" },
 };
 
 const SHADOWFAX_PULL_CODE_MAPPER_2 = {
@@ -117,10 +124,8 @@ const SHADOWFAX_PULL_CODE_MAPPER_2 = {
   recd_at_fwd_hub: { scan_type: "RAD", pickrr_sub_status_code: "" },
   assigned_for_delivery: { scan_type: "RAD", pickrr_sub_status_code: "" },
   ofd: { scan_type: "OO", pickrr_sub_status_code: "" },
-  cancelled_by_customer: { scan_type: "OC", pickrr_sub_status_code: "" },
   seller_not_contactable: { scan_type: "PPF", pickrr_sub_status_code: "SU" },
   pickup_not_attempted: { scan_type: "PPF", pickrr_sub_status_code: "NA" },
-  reopen_ndr: { scan_type: "UD", pickrr_sub_status_code: "OTH" },
   seller_initiated_delay: { scan_type: "PPF", pickrr_sub_status_code: "" },
   cid: { scan_type: "UD", pickrr_sub_status_code: "CD" },
   rts_in_process: { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
@@ -129,6 +134,8 @@ const SHADOWFAX_PULL_CODE_MAPPER_2 = {
   lost: { scan_type: "LT", pickrr_sub_status_code: "" },
   delivered: { scan_type: "DL", pickrr_sub_status_code: "" },
   item_delivered_at: { scan_type: "DL", pickrr_sub_status_code: "" },
+  rts_ofd: { scan_type: "RTO-OO", pickrr_sub_status_code: "" },
+  in_transit_return: { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
 };
 
 const SHADOWFAX_TOPICS_COUNT = 1;

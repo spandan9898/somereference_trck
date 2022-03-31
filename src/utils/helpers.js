@@ -281,6 +281,28 @@ const getElkClients = () => {
   }
 };
 
+/**
+ *
+ * @param {*} track_arr
+ */
+const ofdCount = (trackArr, scanType) => {
+  let ofdCountNum = 0;
+  let ndrCountNum = 0;
+
+  trackArr.forEach((trackArrObj) => {
+    if (trackArrObj?.scan_type === "OO") {
+      ofdCountNum += 1;
+    } else if (trackArrObj?.scan_type === "NDR") {
+      ndrCountNum += 1;
+    }
+  });
+  let finalOfdCount = 0;
+  if (["UD", "NDR", "DL", "RTO", "RTO-OO", "RTO UD", "RTD", "OO"].includes(scanType)) {
+    finalOfdCount = Math.max(1, ofdCountNum, ndrCountNum);
+  } else finalOfdCount = ofdCountNum;
+
+  return finalOfdCount;
+};
 module.exports = {
   checkAwbInCache,
   convertDatetimeFormat,
@@ -290,4 +312,5 @@ module.exports = {
   getMinDate,
   getMaxDate,
   getElkClients,
+  ofdCount,
 };
