@@ -19,10 +19,12 @@ const main = () => {
     throw new Error("Type must be either 'v1' or 'report'");
   }
 
-  if (pFor === "db") {
+  if (pFor === "db" && !startDate && !endDate) {
     startDate = moment().subtract(3, "days").format("DD-MM-YYYY");
     endDate = moment().format("DD-MM-YYYY");
   }
+
+  console.log(startDate, endDate);
 
   startProcess({ authToken, endDate, startDate, limit, type });
 };
