@@ -263,8 +263,10 @@ const startProcess = async ({ authToken, endDate, startDate, limit, type }) => {
   logger.verbose("Start Processing");
 
   if (!startDate || !endDate) {
+    logger.verbose("Read CSV");
     readCsvData(getBatchData, collection, elkClient, limit, type, prodElkClient);
   } else {
+    logger.verbose("Read DB");
     fetchDataFromDB({
       authToken,
       endDate,

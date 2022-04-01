@@ -51,6 +51,9 @@ const prepareDataForReportMongo = (trackData) => {
     rto_date: findRTODate(trackData?.track_arr || {}),
     pickrr_tracking_id: trackData.tracking_id,
   };
+  if (trackData.promise_edd) {
+    data.promise_edd = trackData.promise_edd;
+  }
   if (!data.status_pk) {
     delete data.status_pk;
   }
