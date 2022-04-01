@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 const moment = require("moment");
 const _ = require("lodash");
 
@@ -68,6 +69,21 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     if (!res) {
       sortedTrackArray = [...trackArr];
     } else {
+      // Handle duplicate Entry
+
+      if (isFromPulled) {
+        for (const trackItem of res.track_arr) {
+          const isSameScanType = updatedObj["status.current_status_type"] === trackItem.scan_type;
+          const scanTimeCheck = moment(trackItem.scan_datetime).diff(
+            moment(updatedObj["status.current_status_time"]),
+            "seconds"
+          );
+          if (isSameScanType && scanTimeCheck <= 60) {
+            return false;
+          }
+        }
+      }
+
       let updatedTrackArray = [...trackArr, ...res.track_arr];
       updatedTrackArray = _.orderBy(updatedTrackArray, ["scan_datetime"], ["desc"]);
       sortedTrackArray = updatedTrackArray;
