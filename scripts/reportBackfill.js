@@ -6,6 +6,7 @@
 require("dotenv").config();
 const fs = require("fs");
 const Papa = require("papaparse");
+const { ObjectId } = require("mongodb");
 
 const chunk = require("lodash/chunk");
 const logger = require("../logger");
@@ -34,11 +35,13 @@ const processBackfilling = async (data, collection, elkClient, type, prodElkClie
     .toArray();
 
   for (const response of responses) {
-    if (type === "v1") {
+    if (type === "v1" || type === "all") {
       sendTrackDataToV1(response);
-    } else if (type === "report") {
+    }
+    if (type === "report" || type === "all") {
       updateStatusOnReport(response, logger, elkClient);
-    } else if (type === "elk") {
+    }
+    if (type === "elk" || type === "all") {
       updateStatusELK(response, prodElkClient);
     }
     console.log("Done -->", response.tracking_id);
@@ -138,11 +141,13 @@ const processForDbData = async ({ batchData: trackingData, type, elkClient, prod
 
     for (const chunkData of chunkedData) {
       for (const trackingItem of chunkData) {
-        if (type === "report") {
+        if (type === "report" || type === "all") {
           updateStatusOnReport(trackingItem, logger, elkClient);
-        } else if (type === "v1") {
+        }
+        if (type === "v1" || type === "all") {
           sendTrackDataToV1(trackingItem);
-        } else if (type === "elk") {
+        }
+        if (type === "elk" || type === "all") {
           updateStatusELK(trackingItem, prodElkClient);
         }
 
@@ -168,68 +173,78 @@ const fetchDataFromDB = async ({
   prodElkClient,
 }) => {
   try {
-    const filters = {};
+    const filters = {
+      $and: [],
+    };
 
     if (authToken) {
-      filters.auth_token = authToken;
+      filters.$and.push({
+        auth_token: authToken,
+      });
     }
 
-    filters.order_created_at = {
-      $gte: convertDate(startDate, "start"),
-      $lte: convertDate(endDate),
-    };
-    const pipeline = [
-      {
-        $sort: { _id: -1 },
+    filters.$and.push({
+      order_created_at: {
+        $gt: convertDate(startDate, "start"),
+        $lt: convertDate(endDate),
       },
-      { $match: filters },
-    ];
-
-    pipeline.push({
-      $project: { audit: 0, mandatory_status_map: 0, _id: 0 },
     });
 
+    const projection = { audit: 0, mandatory_status_map: 0 };
+
+    const filtersLength = filters.$and.length;
     if (limit && limit < 4999) {
-      pipeline.push({ $limit: limit });
-      const aggCursor = await collection.aggregate(pipeline);
       const batchData = [];
+
+      const aggCursor = await collection.find(filters, projection).limit(limit);
 
       for await (const doc of aggCursor) {
         batchData.push(doc);
       }
-      logger.verbose(`batchData : ${batchData.length}`);
+      logger.verbose(`batchData ${limit}: ${batchData.length}`);
+
       await processForDbData({ batchData, elkClient, type, prodElkClient });
     } else {
       // do the batching
 
-      let skip = 0;
       const LIMIT = 50000;
       let isDataAvailable = false;
+      let lastId;
 
       do {
-        pipeline[3] = { $skip: skip };
-        pipeline[4] = { $limit: LIMIT };
+        if (lastId) {
+          filters.$and[filtersLength] = {
+            _id: {
+              $gt: ObjectId(lastId),
+            },
+          };
+        }
+
+        let isPresent = false;
 
         const batchData = [];
-        const aggCursor = await collection.aggregate(pipeline, { allowDiskUse: true });
-        let isPresent = false;
+
+        const aggCursor = await collection.find(filters, projection).limit(LIMIT);
 
         for await (const doc of aggCursor) {
           batchData.push(doc);
+          lastId = doc._id;
           isPresent = true;
         }
 
         logger.verbose(`batchData In Loop : ${batchData.length}`);
 
         await processForDbData({ batchData, elkClient, type, prodElkClient });
-        await new Promise((done) => setTimeout(() => done(), 60000));
-        skip += LIMIT;
+
+        await new Promise((done) => setTimeout(() => done(), 60));
+
         isDataAvailable = isPresent;
       } while (isDataAvailable);
     }
+
     logger.verbose("DONE");
   } catch (error) {
-    logger.error("fetchDataFromDB error", error);
+    logger.error("fetchDataFromDB error", error.message);
   }
 };
 
@@ -245,9 +260,13 @@ const startProcess = async ({ authToken, endDate, startDate, limit, type }) => {
   const elkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.TRACKING.name);
   const prodElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.PROD.name);
 
+  logger.verbose("Start Processing");
+
   if (!startDate || !endDate) {
+    logger.verbose("Read CSV");
     readCsvData(getBatchData, collection, elkClient, limit, type, prodElkClient);
   } else {
+    logger.verbose("Read DB");
     fetchDataFromDB({
       authToken,
       endDate,
