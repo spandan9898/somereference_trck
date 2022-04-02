@@ -23,9 +23,9 @@ const { getUserNotification } = require("./model");
 const callSendReportDataForPulledEvent = (trackingObj) => {
   const { trackingElkClient, prodElkClient } = getElkClients();
 
+  sendTrackDataToV1(trackingObj);
   updateStatusOnReport(trackingObj, logger, trackingElkClient);
   updateStatusELK(trackingObj, prodElkClient);
-  sendTrackDataToV1(trackingObj);
 
   return true;
 };
