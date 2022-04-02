@@ -10,6 +10,7 @@ const {
   getTrackDocumentfromMongo,
 } = require("../../services/common/trackServices");
 const updateStatusOnReport = require("../../services/report");
+const sendTrackDataToV1 = require("../../services/v1");
 const { getObject, getElkClients } = require("../../utils");
 const { UNUSED_FIELDS_FROM_TRACKING_OBJ } = require("./constant");
 const { getUserNotification } = require("./model");
@@ -24,6 +25,7 @@ const callSendReportDataForPulledEvent = (trackingObj) => {
 
   updateStatusOnReport(trackingObj, logger, trackingElkClient);
   updateStatusELK(trackingObj, prodElkClient);
+  sendTrackDataToV1(trackingObj);
 
   return true;
 };
