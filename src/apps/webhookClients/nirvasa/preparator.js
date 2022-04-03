@@ -30,10 +30,10 @@ const prepareNirvasaWebhookData = (trackObj) => {
     preparedWebhookData.remarks = status.current_status_body;
     preparedWebhookData.preparedWebhookData.ref_awb = "";
     preparedWebhookData.product_type = trackObj.info?.cod_amount ? "cod" : "prepaid";
-
     return preparedWebhookData;
   } catch (error) {
     logger.error("failed while preparing nirvasa webhook data", error);
+    return {};
   }
 };
 
