@@ -42,7 +42,7 @@ const prepareNirvasaWebhookData = (trackObj) => {
     preparedWebhookData.order_number = trackObj.pickrr_order_id || trackObj.client_order_id;
     preparedWebhookData.city = trackObj.info.to_city || "";
     preparedWebhookData.remarks = status.current_status_body || "";
-    preparedWebhookData.product_type = trackObj.info?.cod_amount ? "cod" : "prepaid";
+    preparedWebhookData.product_type = (trackObj.info?.cod_amount || 0) > 0 ? "cod" : "prepaid";
     return preparedWebhookData;
   } catch (error) {
     logger.error("failed while psreparing nirvasa webhook data", error);
