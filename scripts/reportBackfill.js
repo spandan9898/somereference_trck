@@ -195,7 +195,7 @@ const fetchDataFromDB = async ({
     }
 
     filters.$and.push({
-      order_created_at: {
+      updated_at: {
         $gt: convertDate(startDate, "start"),
         $lt: convertDate(endDate),
       },
@@ -247,7 +247,7 @@ const fetchDataFromDB = async ({
 
         await processForDbData({ batchData, elkClient, type, prodElkClient });
 
-        await new Promise((done) => setTimeout(() => done(), 60));
+        await new Promise((done) => setTimeout(() => done(), 6000));
 
         isDataAvailable = isPresent;
       } while (isDataAvailable);

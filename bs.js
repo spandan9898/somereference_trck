@@ -4,8 +4,6 @@ const { hideBin } = require("yargs/helpers");
 const moment = require("moment");
 const startProcess = require("./scripts/reportBackfill");
 
-// const { redisClient } = require("./src/utils");
-
 const { argv } = yargs(hideBin(process.argv));
 
 /**
@@ -21,11 +19,9 @@ const main = async () => {
     endDate = moment().format("DD-MM-YYYY");
   }
 
-  // await redisClient.connect();
-
   let types = type.split(",");
 
-  types = type === "all" ? ["v1", "report", "elk", "ndr"] : types;
+  types = type === "all" ? ["v1", "report", "elk"] : types;
 
   startProcess({ authToken, endDate, startDate, limit, type: types });
 };
