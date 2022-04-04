@@ -38,9 +38,7 @@ const prepareNirvasaWebhookData = (trackObj) => {
       : "";
     preparedWebhookData.status = NIRVASA_STATUS_MAPPER[statusType] || "";
     preparedWebhookData.reason_code = status.current_status_type || "";
-    preparedWebhookData.reason_code_number = "";
     preparedWebhookData.location = status?.current_status_location || "";
-    preparedWebhookData.status_update_number = "";
     preparedWebhookData.order_number = trackObj.pickrr_order_id || trackObj.client_order_id;
     preparedWebhookData.city = trackObj?.info?.to_city || "";
     preparedWebhookData.remarks = status.current_status_body || "";
