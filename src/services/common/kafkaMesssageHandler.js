@@ -1,87 +1,29 @@
 /* eslint-disable no-promise-executor-return */
 const _ = require("lodash");
 
-const { prepareAmazeData } = require("../../apps/amaze/services");
-const { preparePickrrBluedartDict } = require("../../apps/bluedart/services");
-const { prepareDelhiveryData } = require("../../apps/delhivery/services");
-const { prepareEcommData } = require("../../apps/ecomm/services");
-const { prepareEkartData } = require("../../apps/ekart/services");
-const { prepareParceldoData } = require("../../apps/parceldo/services");
-const {
-  prepareShadowfaxData,
-  preparePulledShadowfaxData,
-} = require("../../apps/shadowfax/services");
-const { prepareUdaanData } = require("../../apps/udaan/services");
-const { prepareXbsData } = require("../../apps/xpressbees/services");
-const { preparePidgeData } = require("../../apps/pidge/services");
-const { prepareDtdcData } = require("../../apps/dtdc/services");
-const logger = require("../../../logger");
-const initELK = require("../../connector/elkConnection");
+const { getPrepareFunction } = require("./helpers");
 
 const { updateTrackDataToPullMongo } = require("../pull");
-
 const { redisCheckAndReturnTrackData } = require("../pull/services");
-
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
 const updateStatusOnReport = require("../report");
+const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
+
 const { updatePrepareDict } = require("./helpers");
-const { ELK_INSTANCE_NAMES } = require("../../utils/constants");
 const {
   updateStatusELK,
   getTrackingIdProcessingCount,
   updateTrackingProcessingCount,
 } = require("./services");
-const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
+const { getElkClients } = require("../../utils");
+const logger = require("../../../logger");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
  */
 class KafkaMessageHandler {
-  static getPrepareFunction(courierName) {
-    const courierPrepareMapFunctions = {
-      amaze: prepareAmazeData,
-      bluedart: preparePickrrBluedartDict,
-      delhivery: prepareDelhiveryData,
-      ecomm: prepareEcommData,
-      ekart: prepareEkartData,
-      parceldo: prepareParceldoData,
-      shadowfax: prepareShadowfaxData,
-      shadowfax_pull: preparePulledShadowfaxData,
-      udaan: prepareUdaanData,
-      xpressbees: prepareXbsData,
-      pidge: preparePidgeData,
-      dtdc: prepareDtdcData,
-    };
-    return courierPrepareMapFunctions[courierName];
-  }
-
-  static getElkClients() {
-    let prodElkClient = "";
-    const stagingElkClient = "";
-    let trackingElkClient = "";
-    try {
-      prodElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.PROD.name);
-
-      // stagingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.STAGING.name);
-
-      trackingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.TRACKING.name);
-
-      return {
-        prodElkClient,
-        stagingElkClient,
-        trackingElkClient,
-      };
-    } catch (error) {
-      logger.error("getElkClients", error);
-      return {
-        prodElkClient,
-        stagingElkClient,
-      };
-    }
-  }
-
   /**
    *
    * @desc about processCount ->
@@ -92,7 +34,7 @@ class KafkaMessageHandler {
    * 5. after DB update decrease "processCount" value by 1, handle negative case
    */
   static async init(consumedPayload, courierName) {
-    const prepareFunc = KafkaMessageHandler.getPrepareFunction(courierName);
+    const prepareFunc = getPrepareFunction(courierName);
     if (!prepareFunc) {
       throw new Error(`${courierName} is not a valid courier`);
     }
@@ -101,7 +43,13 @@ class KafkaMessageHandler {
       let isFromPulled = false;
       try {
         const { message } = consumedPayload;
-        res = prepareFunc(Object.values(JSON.parse(message.value.toString()))[0]);
+        const consumedData = JSON.parse(message.value.toString());
+        if (consumedData?.event === "pull") {
+          isFromPulled = true;
+          res = prepareFunc(consumedData);
+        } else {
+          res = prepareFunc(Object.values(consumedData)[0]);
+        }
       } catch {
         res = prepareFunc(consumedPayload);
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
@@ -129,7 +77,7 @@ class KafkaMessageHandler {
         return;
       }
 
-      const { prodElkClient, trackingElkClient } = KafkaMessageHandler.getElkClients();
+      const { prodElkClient, trackingElkClient } = getElkClients();
 
       const result = await updateTrackDataToPullMongo({
         trackObj: updatedTrackData,

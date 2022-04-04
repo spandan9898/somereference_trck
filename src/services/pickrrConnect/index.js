@@ -1,6 +1,6 @@
 const logger = require("../../../logger");
 const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
-const { KafkaMessageHandler } = require("../common");
+const { getElkClients } = require("../../utils");
 
 /**
  *
@@ -18,7 +18,7 @@ const pickrrConnectKafkaMessageHandler = (consumedPayload) => {
     if (!trackingId || !isFromPull) {
       return false;
     }
-    const { trackingElkClient } = KafkaMessageHandler.getElkClients();
+    const { trackingElkClient } = getElkClients();
     if (trackingId && isFromPull && trackingElkClient) {
       preparePickrrConnectLambdaPayloadAndCall({
         trackingId,
@@ -28,7 +28,7 @@ const pickrrConnectKafkaMessageHandler = (consumedPayload) => {
     }
     return true;
   } catch (error) {
-    logger.error("pickrrConnectKafkaMessageHandler", error);
+    logger.error("pickrrConnectKafkaMessageHandler", error.message);
     return false;
   }
 };
