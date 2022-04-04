@@ -10,6 +10,7 @@ const {
   getTrackDocumentfromMongo,
 } = require("../../services/common/trackServices");
 const updateStatusOnReport = require("../../services/report");
+const sendTrackDataToV1 = require("../../services/v1");
 const { getObject, getElkClients } = require("../../utils");
 const { UNUSED_FIELDS_FROM_TRACKING_OBJ } = require("./constant");
 const { getUserNotification } = require("./model");
@@ -22,6 +23,7 @@ const { getUserNotification } = require("./model");
 const callSendReportDataForPulledEvent = (trackingObj) => {
   const { trackingElkClient, prodElkClient } = getElkClients();
 
+  sendTrackDataToV1(trackingObj);
   updateStatusOnReport(trackingObj, logger, trackingElkClient);
   updateStatusELK(trackingObj, prodElkClient);
 
@@ -118,7 +120,7 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
     });
     return true;
   } catch (error) {
-    logger.error("preparePickrrConnectLambdaPayloadAndCall error", error);
+    logger.error("preparePickrrConnectLambdaPayloadAndCall error", error.message);
     return false;
   }
 };
