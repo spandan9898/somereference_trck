@@ -1,4 +1,4 @@
-const NIRVANA_STATUS_MAPPER = {
+const NIRVASA_STATUS_MAPPER = {
   OP: "Order Placed",
   OM: "Order Manifested",
   OC: "Order Cancelled",
@@ -23,4 +23,4 @@ const NIRVANA_STATUS_MAPPER = {
   DM: "Order in Transit",
 };
 
-module.export = { NIRVANA_STATUS_MAPPER };
+module.exports = { NIRVASA_STATUS_MAPPER };

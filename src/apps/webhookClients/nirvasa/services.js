@@ -1,4 +1,4 @@
-const prepareNirvasaWebhookData = require("./preparator");
+const { prepareNirvasaWebhookData } = require("./preparator");
 
 /**
  * init prepare webhook data for Nirvasa
