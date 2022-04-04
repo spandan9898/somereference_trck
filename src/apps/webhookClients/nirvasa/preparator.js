@@ -32,10 +32,10 @@ const prepareNirvasaWebhookData = (trackObj) => {
     const statusType = status?.current_status_type;
     preparedWebhookData.datetime = moment(statusTime).isValid()
       ? moment(statusTime).add(330, "minute").format("YYYY-MM-DD HH:MM:SS")
-      : null;
+      : "";
     preparedWebhookData.edd = moment(trackObj.edd_stamp).isValid()
       ? moment(statusTime).add(330, "minute").format("YYYY-MM-DD")
-      : null;
+      : "";
     preparedWebhookData.status = NIRVASA_STATUS_MAPPER[statusType] || "";
     preparedWebhookData.reason_code = status.current_status_type || "";
     preparedWebhookData.reason_code_number = "";
