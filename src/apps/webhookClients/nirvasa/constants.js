@@ -19,8 +19,8 @@ const NIRVASA_STATUS_MAPPER = {
   PPF: "Pickup Failed",
   SHP: "Shipped",
   RAD: "Reached at Destination",
-  LT: "Order in Transit",
-  DM: "Order in Transit",
+  LT: "Shipment Lost",
+  DM: "Shipment Damaged",
 };
 
 module.exports = { NIRVASA_STATUS_MAPPER };
