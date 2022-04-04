@@ -110,6 +110,18 @@ const SHADOWFAX_PULL_CODE_MAPPER_1 = {
   },
   "cancelled_by_customer_third successful attempt": { scan_type: "OC", pickrr_sub_status_code: "" },
   "cancelled_by_customer_cancelled by client": { scan_type: "OC", pickrr_sub_status_code: "" },
+  "nc_customer is not contactable for delivery": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  "na_customer delivery was not attempted by shadowfax rider": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  "cancelled_by_customer_delivery request has been cancelled by customer": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CR",
+  },
 };
 
 const SHADOWFAX_PULL_CODE_MAPPER_2 = {
@@ -136,6 +148,10 @@ const SHADOWFAX_PULL_CODE_MAPPER_2 = {
   item_delivered_at: { scan_type: "DL", pickrr_sub_status_code: "" },
   rts_ofd: { scan_type: "RTO-OO", pickrr_sub_status_code: "" },
   in_transit_return: { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
+  item_manifested: { scan_type: "OT", pickrr_sub_status_code: "" },
+  bag_in_transit: { scan_type: "OT", pickrr_sub_status_code: "" },
+  bag_received_at_via: { scan_type: "OT", pickrr_sub_status_code: "" },
+  assigned_for_seller_pickup: { scan_type: "OM", pickrr_sub_status_code: "" },
 };
 
 const SHADOWFAX_TOPICS_COUNT = 1;
