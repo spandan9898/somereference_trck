@@ -9,8 +9,10 @@ const {
   SMART_SHIP_AUTH_TOKENS,
   NAAPTOL_AUTH_TOKEN,
   NIRVASA_AUTH_TOKEN,
+  BELLAVITA_AUTH_TOKEN,
 } = require("./constants");
 const logger = require("../../../logger");
+const BellavitaService = require("./bellavita/services");
 
 /**
  * Return prepared data based on auth token
@@ -36,6 +38,9 @@ class WebhookClient {
     }
     if (NIRVASA_AUTH_TOKEN.includes(this.authToken)) {
       return NirvasaServices.init(this.trackingObj);
+    }
+    if (BELLAVITA_AUTH_TOKEN.includes(this.authToken)) {
+      return BellavitaService.init(this.trackingObj);
     }
     return CommonServices.init(this.trackingObj);
   }
