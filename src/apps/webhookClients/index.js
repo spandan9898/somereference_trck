@@ -3,6 +3,7 @@ const NaaptolServices = require("./naaptol/services");
 const ShopcluesServices = require("./shopclues/services");
 const SmartShipServices = require("./smartShip/services");
 const NirvasaServices = require("./nirvasa/services");
+const BellavitaService = require("./bellavita/services");
 
 const {
   SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
@@ -12,7 +13,6 @@ const {
   BELLAVITA_AUTH_TOKEN,
 } = require("./constants");
 const logger = require("../../../logger");
-const BellavitaService = require("./bellavita/services");
 
 /**
  * Return prepared data based on auth token
