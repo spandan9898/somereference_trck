@@ -24,7 +24,7 @@ const prepareBellavitaWebhookData = (trackObj) => {
     const eventInfo = {
       action: trackObj?.status?.current_status_type || "",
       current_time: `${moment().format("YYYY-MM-DDTHH:MM:SS")}Z` || "",
-      user_timezone_offset: moment(trackObj?.status?.current_status_time).utcOffset() * 60 || "",
+      user_timezone_offset: 19800,
     };
     preparedWebhookData.actions[0] = eventInfo;
     return preparedWebhookData;
