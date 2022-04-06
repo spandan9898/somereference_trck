@@ -13,7 +13,7 @@ module.exports.returnHeaders = async (req, reply) => {
 
 module.exports.reportBackfilling = async (req, reply) => {
   const { body } = req;
-  const { authToken, lastNDays = 1, type = ["v1"], limit } = body || {};
+  const { authToken, lastNDays = 1, type = ["v1"], limit, dateFilter = "updated_at" } = body || {};
   const startDate = moment().subtract(lastNDays, "days").format("DD-MM-YYYY");
   const endDate = moment().format("DD-MM-YYYY");
   await startProcess({
@@ -22,6 +22,7 @@ module.exports.reportBackfilling = async (req, reply) => {
     endDate,
     type,
     limit,
+    dateFilter,
   });
   return reply.code(200).send(body);
 };

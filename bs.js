@@ -12,7 +12,15 @@ const { argv } = yargs(hideBin(process.argv));
  * pFor = process for
  */
 const main = async () => {
-  let { authToken, endDate, startDate, limit, type = "v1", pFor = "db" } = argv;
+  let {
+    authToken,
+    endDate,
+    startDate,
+    limit,
+    type = "v1",
+    pFor = "db",
+    dateFilter = "updated_at",
+  } = argv;
 
   if (pFor === "db" && !startDate && !endDate) {
     startDate = moment().subtract(3, "days").format("DD-MM-YYYY");
@@ -23,7 +31,7 @@ const main = async () => {
 
   types = type === "all" ? ["v1", "report", "elk"] : types;
 
-  startProcess({ authToken, endDate, startDate, limit, type: types });
+  startProcess({ authToken, endDate, startDate, limit, type: types, dateFilter });
 };
 
 main();

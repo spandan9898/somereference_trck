@@ -182,12 +182,13 @@ const fetchDataFromDB = async ({
   elkClient,
   type,
   prodElkClient,
+  dateFilter,
 }) => {
   try {
     const filters = {
       $and: [],
     };
-
+    const dateFilterOn = dateFilter === "order_created_at" ? "order_created_at" : "updated_at";
     if (authToken) {
       filters.$and.push({
         auth_token: authToken,
@@ -195,7 +196,7 @@ const fetchDataFromDB = async ({
     }
 
     filters.$and.push({
-      updated_at: {
+      [dateFilterOn]: {
         $gt: convertDate(startDate, "start"),
         $lt: convertDate(endDate),
       },
@@ -207,7 +208,7 @@ const fetchDataFromDB = async ({
     if (limit && limit < 4999) {
       const batchData = [];
 
-      const aggCursor = await collection.find(filters, projection).limit(limit);
+      const aggCursor = await collection.find(filters, { projection }).limit(limit);
 
       for await (const doc of aggCursor) {
         batchData.push(doc);
@@ -235,7 +236,7 @@ const fetchDataFromDB = async ({
 
         const batchData = [];
 
-        const aggCursor = await collection.find(filters, projection).limit(LIMIT);
+        const aggCursor = await collection.find(filters, { projection }).limit(LIMIT);
 
         for await (const doc of aggCursor) {
           batchData.push(doc);
@@ -260,7 +261,7 @@ const fetchDataFromDB = async ({
 };
 
 /** */
-const startProcess = async ({ authToken, endDate, startDate, limit, type }) => {
+const startProcess = async ({ authToken, endDate, startDate, limit, type, dateFilter }) => {
   await initDB.connectDb(HOST_NAMES.PULL_DB, MONGO_DB_PROD_SERVER_HOST);
   await initDB.connectDb(HOST_NAMES.REPORT_DB, MONGO_DB_REPORT_SERVER_HOST);
   await initELK.connectELK(ELK_INSTANCE_NAMES.TRACKING.name, ELK_INSTANCE_NAMES.TRACKING.config);
@@ -287,6 +288,7 @@ const startProcess = async ({ authToken, endDate, startDate, limit, type }) => {
       elkClient,
       type,
       prodElkClient,
+      dateFilter,
     });
   }
 };
