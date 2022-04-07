@@ -20,10 +20,12 @@ const prepareBellavitaWebhookData = (trackObj) => {
   };
   try {
     preparedWebhookData.customer_id = trackObj?.info?.to_email || "";
-
+    const { status } = trackObj;
     const eventInfo = {
-      action: trackObj?.status?.current_status_type || "",
-      current_time: `${moment().format("YYYY-MM-DDTHH:MM:SS")}Z` || "",
+      action: status?.current_status_type || "",
+      current_time: moment(status?.current_status_time).isValid()
+        ? `${moment(status?.current_status_time).format("YYYY-MM-DDTHH:MM:SS")}Z`
+        : "",
       user_timezone_offset: 19800,
     };
     preparedWebhookData.actions[0] = eventInfo;

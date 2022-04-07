@@ -1,11 +1,11 @@
-const prepareBellavitaWebhookData = require("./preparator");
+const { prepareBellavitaWebhookData } = require("./preparator");
 
 /**
  *
  */
 class BellavitaService {
   static init(trackObj) {
-    prepareBellavitaWebhookData(trackObj);
+    return prepareBellavitaWebhookData(trackObj);
   }
 }
 
