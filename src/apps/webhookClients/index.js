@@ -2,11 +2,13 @@ const CommonServices = require("./common/services");
 const NaaptolServices = require("./naaptol/services");
 const ShopcluesServices = require("./shopclues/services");
 const SmartShipServices = require("./smartShip/services");
+const NirvasaServices = require("./nirvasa/services");
 
 const {
   SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
   SMART_SHIP_AUTH_TOKENS,
   NAAPTOL_AUTH_TOKEN,
+  NIRVASA_AUTH_TOKEN,
 } = require("./constants");
 const logger = require("../../../logger");
 
@@ -31,6 +33,9 @@ class WebhookClient {
     }
     if (NAAPTOL_AUTH_TOKEN.includes(this.authToken)) {
       return NaaptolServices.init(this.trackingObj);
+    }
+    if (NIRVASA_AUTH_TOKEN.includes(this.authToken)) {
+      return NirvasaServices.init(this.trackingObj);
     }
     return CommonServices.init(this.trackingObj);
   }
