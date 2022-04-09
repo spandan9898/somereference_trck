@@ -3,6 +3,7 @@ const yargs = require("yargs/yargs");
 const { hideBin } = require("yargs/helpers");
 const moment = require("moment");
 const startProcess = require("./scripts/reportBackfill");
+const reportToPullBackfilling = require("./scripts/reportToPullBackfilling");
 
 const { argv } = yargs(hideBin(process.argv));
 
@@ -20,18 +21,25 @@ const main = async () => {
     type = "v1",
     pFor = "db",
     dateFilter = "updated_at",
+    scriptFor,
   } = argv;
 
-  if (pFor === "db" && !startDate && !endDate) {
-    startDate = moment().subtract(3, "days").format("DD-MM-YYYY");
-    endDate = moment().format("DD-MM-YYYY");
+  // Report To Pull
+
+  if (scriptFor === "rtp") {
+    reportToPullBackfilling({ startDate, endDate, limit });
+  } else {
+    if (pFor === "db" && !startDate && !endDate) {
+      startDate = moment().subtract(3, "days").format("DD-MM-YYYY");
+      endDate = moment().format("DD-MM-YYYY");
+    }
+
+    let types = type.split(",");
+
+    types = type === "all" ? ["v1", "report", "elk"] : types;
+
+    startProcess({ authToken, endDate, startDate, limit, type: types, dateFilter });
   }
-
-  let types = type.split(",");
-
-  types = type === "all" ? ["v1", "report", "elk"] : types;
-
-  startProcess({ authToken, endDate, startDate, limit, type: types, dateFilter });
 };
 
 main();
