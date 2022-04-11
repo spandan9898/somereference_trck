@@ -2,9 +2,8 @@ const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
 
 (async () => {
-  const ekartConsumers = await initialize();
-
-  ekartConsumers.forEach((consumer) => {
+  const { consumersWithMultiTopics, pullConsumerInstance } = await initialize();
+  consumersWithMultiTopics.forEach((consumer) => {
     consumer
       .then((res) => {
         if (res) {
@@ -13,4 +12,5 @@ const { initialize, listener } = require("./consumer");
       })
       .catch((err) => logger.error("Ekart Consumer Error ", err));
   });
+  listener(pullConsumerInstance, true);
 })();

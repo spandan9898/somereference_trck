@@ -1,6 +1,6 @@
 /* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
-const { EKART_TOPICS_COUNT } = require("./constant");
+const { EKART_TOPICS_COUNT, PULL_CONSUMER_PARTITION_COUNT } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
 
@@ -8,29 +8,38 @@ const logger = require("../../../logger");
  * Initialize consumer and subscribe to topics
  */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: "ekart-group" });
+  const pushConsumer = kafka.consumer({ groupId: "ekart-group" });
+  const pullConsumerInstance = kafka.consumer({ groupId: "ekart-group-pull" });
   const topicsCount = new Array(EKART_TOPICS_COUNT).fill(1);
-  return topicsCount.map(async (_, index) => {
+  const consumersWithMultiTopics = topicsCount.map(async (_, index) => {
     try {
-      await consumer.connect();
-      await consumer.subscribe({ topic: `ekart_${index}`, fromBeginning: false });
-      return consumer;
+      await pushConsumer.connect();
+      await pushConsumer.subscribe({ topic: `ekart_${index}`, fromBeginning: false });
+      return pushConsumer;
     } catch (error) {
-      logger.error("Ekart Initialize error -->", error.message);
+      logger.error("Ekart Push Initialise Error", error);
     }
   });
+  pullConsumerInstance.connect();
+  pullConsumerInstance.subscribe({ topic: "ekart_pull", fromBeginning: false });
+  return {
+    consumersWithMultiTopics,
+    pullConsumerInstance,
+  };
 };
 
 /**
  *
  * Listening kafka consumer
  */
-const listener = async (consumer) => {
+const listener = async (consumer, isPartition) => {
   try {
     await consumer.run({
       autoCommitInterval: 60000,
+      partitionsConsumedConcurrently: isPartition ? PULL_CONSUMER_PARTITION_COUNT : 1,
       eachMessage: (consumedPayload) => {
-        KafkaMessageHandler.init(consumedPayload, "ekart");
+        const courierName = consumedPayload.topic === "ekart_pull" ? "ekart_pull" : "ekart";
+        KafkaMessageHandler.init(consumedPayload, courierName);
       },
     });
   } catch (error) {
