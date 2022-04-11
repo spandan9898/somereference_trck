@@ -38,6 +38,7 @@ const prepareNirvasaWebhookData = (trackObj) => {
       : "";
     preparedWebhookData.status = NIRVASA_STATUS_MAPPER[statusType] || "";
     preparedWebhookData.reason_code = status.current_status_type || "";
+    preparedWebhookData.reason_code_number = preparedWebhookData.reason_code;
     preparedWebhookData.location = status.current_status_location || "";
     preparedWebhookData.order_number = trackObj.pickrr_order_id || trackObj.client_order_id;
     preparedWebhookData.city = trackObj.info.to_city || "";
@@ -45,7 +46,7 @@ const prepareNirvasaWebhookData = (trackObj) => {
     preparedWebhookData.product_type = (trackObj.info?.cod_amount || 0) > 0 ? "cod" : "prepaid";
     return preparedWebhookData;
   } catch (error) {
-    logger.error("failed while psreparing nirvasa webhook data", error);
+    logger.error("failed while preparing nirvasa webhook data", error);
     return {};
   }
 };
