@@ -3,7 +3,7 @@ const { initialize, listener } = require("./consumer");
 
 (async () => {
   try {
-    const { topicConsumerInstances, pushPartitionsConsumerInstances } = await initialize();
+    const { topicConsumerInstances, pushConsumerInstance } = await initialize();
 
     topicConsumerInstances.forEach((consumer) => {
       consumer
@@ -16,17 +16,7 @@ const { initialize, listener } = require("./consumer");
           logger.error("XBS Consumer Initialize Error", error);
         });
     });
-    pushPartitionsConsumerInstances.forEach((consumer) => {
-      consumer
-        .then((res) => {
-          if (res) {
-            listener(res, true);
-          }
-        })
-        .catch((error) => {
-          logger.error("XBS Consumer Initialize Error", error);
-        });
-    });
+    listener(pushConsumerInstance, true);
   } catch (error) {
     logger.error("XBS Consumer Error", error);
     throw new Error(error);

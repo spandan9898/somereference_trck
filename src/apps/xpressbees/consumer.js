@@ -14,7 +14,7 @@ const {
  */
 const initialize = async () => {
   const consumer = kafka.consumer({ groupId: "xbs-group" });
-  const pushConsumer = kafka.consumer({ groupId: XBS_PUSH_GROUP_NAME });
+  const pushConsumerInstance = kafka.consumer({ groupId: XBS_PUSH_GROUP_NAME });
   const topicsCount = new Array(XBS_TOPICS_COUNT).fill(1);
   const topicConsumerInstances = topicsCount.map(async (_, index) => {
     try {
@@ -25,19 +25,11 @@ const initialize = async () => {
       logger.error("XBS Initialize Error", error);
     }
   });
-  const partitionCount = new Array(XBS_PARTITION_COUNT).fill(1);
-  const pushPartitionsConsumerInstances = partitionCount.map(async () => {
-    try {
-      await pushConsumer.connect();
-      await pushConsumer.subscribe({ topic: XBS_PUSH_TOPIC_NAME, fromBeginning: false });
-      return pushConsumer;
-    } catch (error) {
-      logger.error("XBS Initialize Error", error);
-    }
-  });
+  await pushConsumerInstance.connect();
+  await pushConsumerInstance.subscribe({ topic: XBS_PUSH_TOPIC_NAME, fromBeginning: false });
   return {
     topicConsumerInstances,
-    pushPartitionsConsumerInstances,
+    pushConsumerInstance,
   };
 };
 
