@@ -129,7 +129,7 @@ const preparePulledEkartData = (ekartDict) => {
     const ekartEDD = ekartDict.edd;
     const ekartEventDate = ekartDict.event_date;
     if (_.has(EKART_PULL_MAPPER, ekartStatus)) {
-      const eventInfo = EKART_PULL_MAPPER[ekartStatus].toUpperCase();
+      const eventInfo = EKART_PULL_MAPPER[ekartStatus];
       pickrrEkartDict.scan_type = eventInfo.pickrr_code;
       pickrrEkartDict.pickrr_sub_status_code = eventInfo.pickrr_sub_status_code;
     }
