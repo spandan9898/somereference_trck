@@ -142,14 +142,15 @@ const preparePulledEkartData = (ekartDict) => {
     pickrrEkartDict.scan_datetime = moment(ekartEventDate).isValid()
       ? moment(ekartEventDate).format("YYYY-MM-DD HH:MM:SS")
       : "";
-    pickrrEkartDict.track_location = ekartDict.city || "";
+    pickrrEkartDict.track_location = ekartDict?.city || "";
     if (pickrrEkartDict.scan_type === "PP") {
-      pickrrEkartDict.pickup_datetime = pickrrEkartDict.scan_datetime;
+      pickrrEkartDict.pickup_datetime = pickrrEkartDict?.scan_datetime;
     }
     return pickrrEkartDict;
   } catch (error) {
     logger.error("Error While Preparng Ekart Data ---->", error);
-    return {};
+    pickrrEkartDict.err = error.message;
+    return pickrrEkartDict;
   }
 };
 module.exports = { prepareEkartData, preparePulledEkartData };
