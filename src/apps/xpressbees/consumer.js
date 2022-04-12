@@ -2,33 +2,16 @@
 const kafka = require("../../connector/kafka");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
-const {
-  XBS_PARTITION_COUNT,
-  XBS_TOPICS_COUNT,
-  XBS_PUSH_TOPIC_NAME,
-  XBS_PUSH_GROUP_NAME,
-} = require("./constant");
+const { XBS_PUSH_TOPIC_NAME, XBS_PUSH_GROUP_NAME } = require("./constant");
 
 /**
  * Initialize consumer and subscribe to topics
  */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: "xbs-group" });
   const pushConsumerInstance = kafka.consumer({ groupId: XBS_PUSH_GROUP_NAME });
-  const topicsCount = new Array(XBS_TOPICS_COUNT).fill(1);
-  const topicConsumerInstances = topicsCount.map(async (_, index) => {
-    try {
-      await consumer.connect();
-      await consumer.subscribe({ topic: `xbs_${index}`, fromBeginning: false });
-      return consumer;
-    } catch (error) {
-      logger.error("XBS Initialize Error", error);
-    }
-  });
   await pushConsumerInstance.connect();
   await pushConsumerInstance.subscribe({ topic: XBS_PUSH_TOPIC_NAME, fromBeginning: false });
   return {
-    topicConsumerInstances,
     pushConsumerInstance,
   };
 };
@@ -37,11 +20,11 @@ const initialize = async () => {
  *
  * Listening kafka consumer
  */
-const listener = async (consumer, isMultiplePartition) => {
+const listener = async (consumer, partitionsCount) => {
   try {
     await consumer.run({
       autoCommitInterval: 60000,
-      partitionsConsumedConcurrently: isMultiplePartition ? XBS_PARTITION_COUNT : 1,
+      partitionsConsumedConcurrently: partitionsCount,
       eachMessage: (consumedPayload) => {
         KafkaMessageHandler.init(consumedPayload, "xpressbees");
       },

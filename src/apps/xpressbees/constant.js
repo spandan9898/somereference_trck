@@ -85,8 +85,6 @@ const XBS_STATUS_MAPPER = {
   "11-pnd": { scan_type: "PPF", pickrr_sub_status_code: "AI" },
   "31-pnd": { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
 };
-const XBS_TOPICS_COUNT = 8;
-const XBS_PARTITION_COUNT = 10;
 
 const XBS_NDR_MAPPER = {
   CR: "Customer Refused Shipment",
@@ -141,12 +139,12 @@ const XBS_REVERSE_MAPPER = {
 
 const XBS_PUSH_GROUP_NAME = "xbs-push-group";
 const XBS_PUSH_TOPIC_NAME = "xbs_push";
+const XBS_PUSH_PARTITION_COUNT = 10;
 module.exports = {
   XBS_STATUS_MAPPER,
-  XBS_TOPICS_COUNT,
   XBS_NDR_MAPPER,
   XBS_REVERSE_MAPPER,
-  XBS_PARTITION_COUNT,
+  XBS_PUSH_PARTITION_COUNT,
   XBS_PUSH_GROUP_NAME,
   XBS_PUSH_TOPIC_NAME,
 };
