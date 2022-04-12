@@ -15,7 +15,6 @@ const prepareNirvasaWebhookData = (trackObj) => {
       datetime: "",
       edd: "",
       status: "",
-      reason_code: "",
       reason_code_number: "",
       location: "",
       Employee: "",
@@ -37,8 +36,7 @@ const prepareNirvasaWebhookData = (trackObj) => {
       ? moment(trackObj.edd_stamp).add(330, "minute").format("YYYY-MM-DD")
       : "";
     preparedWebhookData.status = NIRVASA_STATUS_MAPPER[statusType] || "";
-    preparedWebhookData.reason_code = status.current_status_type || "";
-    preparedWebhookData.reason_code_number = preparedWebhookData.reason_code;
+    preparedWebhookData.reason_code_number = status.current_status_type || "";
     preparedWebhookData.location = status.current_status_location || "";
     preparedWebhookData.order_number = trackObj.pickrr_order_id || trackObj.client_order_id;
     preparedWebhookData.city = trackObj.info.to_city || "";
