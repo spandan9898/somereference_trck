@@ -148,10 +148,14 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "020-s": { scan_type: "OT", pickrr_sub_status_code: "" },
   "003-s": { scan_type: "OT", pickrr_sub_status_code: "" },
 };
-
-const TOTAL_TOPIC_COUNT = 5;
-
+const BLUEDART_TOPICS_COUNT = 5;
+const BLUEDART_PUSH_PARTITION_COUNT = 10;
+const BLUEDART_PUSH_GROUP_NAME = "bluedart-push-group";
+const BLUEDART_PUSH_TOPIC_NAME = "bluedart_push";
 module.exports = {
   BLUEDART_CODE_MAPPER_V2,
-  TOTAL_TOPIC_COUNT,
+  BLUEDART_TOPICS_COUNT,
+  BLUEDART_PUSH_PARTITION_COUNT,
+  BLUEDART_PUSH_GROUP_NAME,
+  BLUEDART_PUSH_TOPIC_NAME,
 };
