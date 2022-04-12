@@ -1,10 +1,10 @@
 const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
-const { BLUEDART_PUSH_PARTITION_COUNT } = require("./constant");
+const { PUSH_PARTITION_COUNT } = require("./constant");
 
 (async () => {
   try {
-    const { topicConsumerInstances, pushConsumer } = await initialize();
+    const { pushConsumer, topicConsumerInstances } = await initialize();
 
     topicConsumerInstances.forEach((consumer) => {
       consumer
@@ -17,7 +17,8 @@ const { BLUEDART_PUSH_PARTITION_COUNT } = require("./constant");
           logger.error("Bluedart Consumer Initialize Error", error);
         });
     });
-    listener(pushConsumer, BLUEDART_PUSH_PARTITION_COUNT);
+
+    listener(pushConsumer, PUSH_PARTITION_COUNT);
   } catch (error) {
     logger.error("Bluedart Consumer Error", error);
     throw new Error(error);
