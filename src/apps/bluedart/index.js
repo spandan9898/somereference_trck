@@ -10,7 +10,7 @@ const { BLUEDART_PUSH_PARTITION_COUNT } = require("./constant");
       consumer
         .then((res) => {
           if (res) {
-            listener(res);
+            listener(res, 1);
           }
         })
         .catch((error) => {
