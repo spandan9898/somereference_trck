@@ -1,23 +1,26 @@
 const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
+const { PUSH_PARTITION_COUNT } = require("./constant");
 
 (async () => {
   try {
-    const consumers = await initialize();
+    const { pushConsumer, topicConsumerInstances } = await initialize();
 
-    consumers.forEach((consumer) => {
+    topicConsumerInstances.forEach((consumer) => {
       consumer
         .then((res) => {
           if (res) {
-            listener(res);
+            listener(res, 1);
           }
         })
         .catch((error) => {
-          logger.error("Consumer Initialize Error In Loop", error);
+          logger.error("Bluedart Consumer Initialize Error", error);
         });
     });
+
+    listener(pushConsumer, PUSH_PARTITION_COUNT);
   } catch (error) {
-    logger.error("Consumer Initialize Error", error);
+    logger.error("Bluedart Consumer Error", error);
     throw new Error(error);
   }
 })();
