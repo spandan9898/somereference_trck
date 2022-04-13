@@ -73,10 +73,18 @@ const main = async (records, collection, elkClient, type, prodElkClient) => {
 /**
  * read data from csv file
  */
-const readCsvData = (cb, collection, elkClient, limit, type, prodElkClient) => {
+const readCsvData = ({
+  cb,
+  collection,
+  elkClient,
+  limit,
+  type,
+  prodElkClient,
+  csvReadfilepath = `${__dirname}/data.csv`,
+}) => {
   const allData = [];
   try {
-    const filePath = `${__dirname}/data.csv`;
+    const filePath = csvReadfilepath;
     const isExists = fs.existsSync(filePath);
     if (!isExists) {
       logger.warn(`File does not exist: ${filePath}`);
@@ -261,9 +269,18 @@ const fetchDataFromDB = async ({
 };
 
 /** */
-const startProcess = async ({ authToken, endDate, startDate, limit, type, dateFilter }) => {
+const startProcess = async ({
+  authToken,
+  endDate,
+  startDate,
+  limit = 2000,
+  type,
+  dateFilter,
+  csvSavefilepath,
+}) => {
   await initDB.connectDb(HOST_NAMES.PULL_DB, MONGO_DB_PROD_SERVER_HOST);
   await initDB.connectDb(HOST_NAMES.REPORT_DB, MONGO_DB_REPORT_SERVER_HOST);
+
   await initELK.connectELK(ELK_INSTANCE_NAMES.TRACKING.name, ELK_INSTANCE_NAMES.TRACKING.config);
   await initELK.connectELK(ELK_INSTANCE_NAMES.PROD.name, ELK_INSTANCE_NAMES.PROD.config);
 
@@ -276,7 +293,15 @@ const startProcess = async ({ authToken, endDate, startDate, limit, type, dateFi
 
   if (!startDate || !endDate) {
     logger.verbose("Read CSV");
-    readCsvData(getBatchData, collection, elkClient, limit, type, prodElkClient);
+    readCsvData({
+      getBatchData,
+      collection,
+      elkClient,
+      limit,
+      type,
+      prodElkClient,
+      csvSavefilepath,
+    });
   } else {
     logger.verbose("Read DB");
     fetchDataFromDB({
