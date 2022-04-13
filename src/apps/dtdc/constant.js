@@ -1,6 +1,9 @@
 const DTDC_PARTITION_COUNT = 10;
 const DTDC_TOPIC_NAME = "dtdc_push";
 const DTDC_GROUP_ID = "dtdc-push-group";
+const PULL_CONSUMER_TOPIC_NAME = "dtdc_pull";
+const PULL_CONSUMER_GROUP_NAME = "dtdc-pull-group";
+const PULL_CONSUMER_PARTITION_COUNT = 10;
 const DTDC_CODE_MAPPER = {
   bkd: {
     scan_type: "SHP",
@@ -353,4 +356,7 @@ module.exports = {
   DTDC_PARTITION_COUNT,
   DTDC_GROUP_ID,
   DTDC_TOPIC_NAME,
+  PULL_CONSUMER_GROUP_NAME,
+  PULL_CONSUMER_TOPIC_NAME,
+  PULL_CONSUMER_PARTITION_COUNT,
 };
