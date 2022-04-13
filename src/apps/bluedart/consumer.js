@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
 const { KafkaMessageHandler } = require("../../services/common");
-const { TOPICS_COUNT, PUSH_GROUP_NAME, PUSH_TOPIC_NAME } = require("./constant");
+const { PUSH_GROUP_NAME, PUSH_TOPIC_NAME } = require("./constant");
 const logger = require("../../../logger");
 
 /**
@@ -9,25 +9,11 @@ const logger = require("../../../logger");
  *
  * */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: "bluedart-group" });
   const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
-  const topicsCount = new Array(TOPICS_COUNT).fill(1);
-
-  const topicConsumerInstances = topicsCount.map(async (_, index) => {
-    try {
-      await consumer.connect();
-      await consumer.subscribe({ topic: `bluedart_${index}`, fromBeginning: false });
-      return consumer;
-    } catch (error) {
-      logger.error("Bluedart Initialize Error", error);
-    }
-  });
-
   await pushConsumer.connect();
   await pushConsumer.subscribe({ topic: PUSH_TOPIC_NAME, fromBeginning: false });
 
   return {
-    topicConsumerInstances,
     pushConsumer,
   };
 };
