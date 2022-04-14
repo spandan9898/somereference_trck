@@ -4,19 +4,7 @@ const { PARTITION_COUNT } = require("./constant");
 
 (async () => {
   try {
-    const { topicConsumerInstances, pushConsumer } = await initialize();
-
-    topicConsumerInstances.forEach((consumer) => {
-      consumer
-        .then((res) => {
-          if (res) {
-            listener(res, 1);
-          }
-        })
-        .catch((error) => {
-          logger.error("Ekart Consumer Initialize Error", error);
-        });
-    });
+    const { pushConsumer } = await initialize();
     listener(pushConsumer, PARTITION_COUNT);
   } catch (error) {
     logger.error("Ekart Consumer Error", error);

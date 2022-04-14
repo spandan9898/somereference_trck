@@ -111,13 +111,11 @@ const UDAAN_STATUS_MAPPING = {
   rt_delivered: { scan_type: "RTD", pickrr_sub_status_code: "" },
 };
 
-const PUSH_TOPIC_COUNT = 1;
 const PUSH_PARTITION_COUNT = 10;
 const PUSH_GROUP_NAME = "udaan-push-group";
 const PUSH_TOPIC_NAME = "udaan_push";
 module.exports = {
   UDAAN_STATUS_MAPPING,
-  PUSH_TOPIC_COUNT,
   PUSH_PARTITION_COUNT,
   PUSH_GROUP_NAME,
   PUSH_TOPIC_NAME,
