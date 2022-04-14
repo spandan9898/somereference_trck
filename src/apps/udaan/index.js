@@ -1,6 +1,6 @@
 const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
-const { UDAAN_PARTITION_COUNT } = require("./constant");
+const { PUSH_PARTITION_COUNT } = require("./constant");
 
 (async () => {
   try {
@@ -17,7 +17,7 @@ const { UDAAN_PARTITION_COUNT } = require("./constant");
           logger.error("Udaan Consumer Initialize Error", error);
         });
     });
-    await listener(pushConsumer, UDAAN_PARTITION_COUNT);
+    await listener(pushConsumer, PUSH_PARTITION_COUNT);
   } catch (error) {
     logger.error("Udaan Consumer Error", error);
     throw new Error(error);
