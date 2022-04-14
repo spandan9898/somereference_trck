@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-const { PIDGE_PARTITION_COUNT, PIDGE_TOPIC_NAME, PIDGE_GROUP_ID } = require("./constant");
+const { PUSH_TOPIC_NAME, PUSH_GROUP_NAME } = require("./constant");
 const kafka = require("../../connector/kafka");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
@@ -8,22 +8,11 @@ const logger = require("../../../logger");
  * initialize consumers for pidge payload
  */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: PIDGE_GROUP_ID });
-  const partitionsCount = new Array(PIDGE_PARTITION_COUNT).fill(1);
-  const consumerMapwithPartitions = partitionsCount.map(async () => {
-    try {
-      await consumer.connect();
-      await consumer.subscribe({
-        topic: PIDGE_TOPIC_NAME,
-        fromBeginning: false,
-      });
-      return consumer;
-    } catch (error) {
-      logger.error("Pidge Initialization Error", error);
-    }
-  });
+  const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
+  await pushConsumer.connect();
+  await pushConsumer.subscribe({ topic: PUSH_TOPIC_NAME, fromBeginning: false });
   return {
-    consumerMapwithPartitions,
+    pushConsumer,
   };
 };
 
@@ -31,11 +20,11 @@ const initialize = async () => {
  *
  * @param {*} consumer
  */
-const listener = async (consumer, isPartition) => {
+const listener = async (consumer, partitionCount) => {
   try {
     await consumer.run({
       autoCommitInterval: 60000,
-      partitionsConsumedConcurrently: isPartition ? PIDGE_PARTITION_COUNT : 1,
+      partitionsConsumedConcurrently: partitionCount,
       eachMessage: (consumedPayload) => {
         KafkaMessageHandler.init(consumedPayload, "pidge");
       },

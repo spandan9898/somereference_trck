@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-const { DTDC_GROUP_ID, DTDC_PARTITION_COUNT, DTDC_TOPIC_NAME } = require("./constant");
+const { PUSH_GROUP_NAME, PUSH_TOPIC_NAME } = require("./constant");
 const kafka = require("../../connector/kafka");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
@@ -8,22 +8,11 @@ const logger = require("../../../logger");
  * initialize consumers for pidge payload
  */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: DTDC_GROUP_ID });
-  const partitionsCount = new Array(DTDC_PARTITION_COUNT).fill(1);
-  const consumerMapwithPartitions = partitionsCount.map(async () => {
-    try {
-      await consumer.connect();
-      await consumer.subscribe({
-        topic: DTDC_TOPIC_NAME,
-        fromBeginning: false,
-      });
-      return consumer;
-    } catch (error) {
-      logger.error("DTDC Initialization Error", error);
-    }
-  });
+  const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
+  pushConsumer.connect();
+  pushConsumer.subscribe({ topic: PUSH_TOPIC_NAME, fromBeginning: false });
   return {
-    consumerMapwithPartitions,
+    pushConsumer,
   };
 };
 
@@ -31,11 +20,11 @@ const initialize = async () => {
  *
  * @param {*} consumer
  */
-const listener = async (consumer, isPartition) => {
+const listener = async (consumer, partitionCount) => {
   try {
     await consumer.run({
       autoCommitInterval: 60000,
-      partitionsConsumedConcurrently: isPartition ? DTDC_PARTITION_COUNT : 1,
+      partitionsConsumedConcurrently: partitionCount,
       eachMessage: (consumedPayload) => {
         KafkaMessageHandler.init(consumedPayload, "dtdc");
       },
