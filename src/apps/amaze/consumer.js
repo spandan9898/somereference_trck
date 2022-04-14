@@ -1,24 +1,31 @@
 /* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
-const { AMAZE_TOPICS_COUNT } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
+const { AMAZE_TOPICS_COUNT, PUSH_GROUP_NAME, PUSH_TOPIC_NAME } = require("./constant");
 
 /**
  * initialize consumer for amaze payload
  */
 const initialize = async () => {
   const consumer = kafka.consumer({ groupId: "amaze-group" });
+  const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
   const topicsCount = new Array(AMAZE_TOPICS_COUNT).fill(1);
-  return topicsCount.map(async (_, index) => {
+  const topicConsumerInstances = topicsCount.map(async (_, index) => {
     try {
       await consumer.connect();
       await consumer.subscribe({ topic: `amaze_${index}`, fromBeginning: false });
       return consumer;
     } catch (error) {
-      logger.error("Amaze Consumer Initialize Error --> ", error);
+      logger.error("amaze Initialize Error", error);
     }
   });
+  await pushConsumer.connect();
+  await pushConsumer.subscribe({ groupId: PUSH_TOPIC_NAME, fromBeginning: false });
+  return {
+    topicConsumerInstances,
+    pushConsumer,
+  };
 };
 
 /**
@@ -27,10 +34,11 @@ const initialize = async () => {
  * check redis
  * update pull mongodb
  */
-const listener = async (consumer) => {
+const listener = async (consumer, partitionCount) => {
   try {
     await consumer.run({
       autoCommitInterval: 60000,
+      partitionsConsumedConcurrently: partitionCount,
       eachMessage: (consumedPayload) => {
         KafkaMessageHandler.init(consumedPayload, "amaze");
       },
@@ -39,5 +47,4 @@ const listener = async (consumer) => {
     logger.error("Amaze Listener Error ", error);
   }
 };
-
 module.exports = { listener, initialize };
