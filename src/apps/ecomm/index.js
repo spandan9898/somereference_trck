@@ -4,19 +4,7 @@ const { PUSH_PARTITION_COUNT } = require("./constant");
 
 (async () => {
   try {
-    const { topicConsumerInstances, pushConsumer } = await initialize();
-
-    topicConsumerInstances.forEach((consumer) => {
-      consumer
-        .then((res) => {
-          if (res) {
-            listener(res, 1);
-          }
-        })
-        .catch((error) => {
-          logger.error("Ecomm Consumer Initialize Error", error);
-        });
-    });
+    const { pushConsumer } = await initialize();
     listener(pushConsumer, PUSH_PARTITION_COUNT);
   } catch (error) {
     logger.error("Ecomm Consumer Error", error);

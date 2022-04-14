@@ -4,19 +4,7 @@ const { listener, initialize } = require("./consumer");
 
 (async () => {
   try {
-    const { topicConsumerInstances, pushConsumer } = await initialize();
-
-    topicConsumerInstances.forEach((consumer) => {
-      consumer
-        .then((res) => {
-          if (res) {
-            listener(res, 1);
-          }
-        })
-        .catch((error) => {
-          logger.error("Parceldo Consumer Initialize Error", error);
-        });
-    });
+    const { pushConsumer } = await initialize();
     listener(pushConsumer, PUSH_PARTITION_COUNT);
   } catch (error) {
     logger.error("Parceldo Consumer Error", error);

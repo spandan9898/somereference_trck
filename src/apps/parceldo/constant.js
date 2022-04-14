@@ -426,13 +426,12 @@ const PARCELDO_CODE_MAPPER = {
     pickrr_sub_status_code: "CNA",
   },
 };
-const PARCELDO_TOPICS_COUNT = 1;
+
 const PUSH_PARTITION_COUNT = 10;
 const PUSH_GROUP_NAME = "parceldo-push-group";
 const PUSH_TOPIC_NAME = "parceldo_push";
 module.exports = {
   PARCELDO_CODE_MAPPER,
-  PARCELDO_TOPICS_COUNT,
   PUSH_PARTITION_COUNT,
   PUSH_GROUP_NAME,
   PUSH_TOPIC_NAME,

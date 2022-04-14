@@ -145,7 +145,6 @@ const ECOMM_CHILD_CODE_MAPPER = {
   24204: { pickrr_status_code: "UD", pickrr_sub_status_code: "OTPF" },
 };
 
-const ECOMM_TOPIC_COUNT = 3;
 const PUSH_PARTITION_COUNT = 10;
 const PUSH_GROUP_NAME = "ecomm-push-group";
 const PUSH_TOPIC_NAME = "ecomm_push";
@@ -153,7 +152,6 @@ const PUSH_TOPIC_NAME = "ecomm_push";
 module.exports = {
   ECOMM_CODE_MAPPER,
   ECOMM_CHILD_CODE_MAPPER,
-  ECOMM_TOPIC_COUNT,
   PUSH_PARTITION_COUNT,
   PUSH_GROUP_NAME,
   PUSH_TOPIC_NAME,
