@@ -21,7 +21,7 @@ const initialize = async () => {
     }
   });
   await pushConsumer.connect();
-  await pushConsumer.subscribe({ groupId: PUSH_TOPIC_NAME, fromBeginning: false });
+  await pushConsumer.subscribe({ topic: PUSH_TOPIC_NAME, fromBeginning: false });
   return {
     topicConsumerInstances,
     pushConsumer,
