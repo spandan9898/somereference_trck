@@ -137,14 +137,14 @@ const XBS_REVERSE_MAPPER = {
   "dlvd-": { scan_type: "DL", pickrr_sub_status_code: "" },
 };
 
-const XBS_PUSH_GROUP_NAME = "xbs-push-group";
-const XBS_PUSH_TOPIC_NAME = "xbs_push";
-const XBS_PUSH_PARTITION_COUNT = 10;
+const PUSH_GROUP_NAME = "xbs-push-group";
+const PUSH_TOPIC_NAME = "xbs_push";
+const PUSH_PARTITION_COUNT = 10;
 module.exports = {
   XBS_STATUS_MAPPER,
   XBS_NDR_MAPPER,
   XBS_REVERSE_MAPPER,
-  XBS_PUSH_PARTITION_COUNT,
-  XBS_PUSH_GROUP_NAME,
-  XBS_PUSH_TOPIC_NAME,
+  PUSH_PARTITION_COUNT,
+  PUSH_GROUP_NAME,
+  PUSH_TOPIC_NAME,
 };
