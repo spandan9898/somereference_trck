@@ -50,7 +50,7 @@ exports.backfillHandler = async function backfillHandler(req, reply) {
       payload.dateFilter = req.body.date_filter || "updated_at";
     }
 
-    await startProcess(payload);
+    startProcess(payload);
 
     return reply.code(200).send({ success: true });
   } catch (error) {
