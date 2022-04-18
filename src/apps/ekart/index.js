@@ -1,16 +1,13 @@
 const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
+const { PARTITION_COUNT } = require("./constant");
 
 (async () => {
-  const ekartConsumers = await initialize();
-
-  ekartConsumers.forEach((consumer) => {
-    consumer
-      .then((res) => {
-        if (res) {
-          listener(res);
-        }
-      })
-      .catch((err) => logger.error("Ekart Consumer Error ", err));
-  });
+  try {
+    const { pushConsumer } = await initialize();
+    listener(pushConsumer, PARTITION_COUNT);
+  } catch (error) {
+    logger.error("Ekart Consumer Error", error);
+    throw new Error(error);
+  }
 })();

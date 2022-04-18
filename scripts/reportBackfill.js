@@ -73,26 +73,38 @@ const main = async (records, collection, elkClient, type, prodElkClient) => {
 /**
  * read data from csv file
  */
-const readCsvData = (cb, collection, elkClient, limit, type, prodElkClient) => {
+const readCsvData = ({
+  cb,
+  collection,
+  elkClient,
+  limit,
+  type,
+  prodElkClient,
+  filePath: csvFilePath,
+  timestamp,
+}) => {
   const allData = [];
   try {
-    const filePath = `${__dirname}/data.csv`;
+    const filePath = csvFilePath || `${__dirname}/data.csv`;
+    const jsonFilePath = timestamp
+      ? `${__dirname}/report_${timestamp}.json`
+      : `${__dirname}/report.json`;
+
     const isExists = fs.existsSync(filePath);
     if (!isExists) {
       logger.warn(`File does not exist: ${filePath}`);
     }
 
-    fs.writeFileSync(`${__dirname}/report.json`, JSON.stringify([]), "utf8");
-
     const file = fs.createReadStream(filePath);
+
     Papa.parse(file, {
       worker: true,
       step(results) {
         allData.push(results.data[0]);
       },
       complete() {
-        fs.writeFileSync(`${__dirname}/report.json`, JSON.stringify(allData), "utf8");
-        cb(collection, elkClient, limit, type, prodElkClient);
+        fs.writeFileSync(jsonFilePath, JSON.stringify(allData), "utf8");
+        cb({ collection, elkClient, limit, type, prodElkClient, filePath, jsonFilePath });
       },
     });
   } catch (error) {
@@ -103,15 +115,22 @@ const readCsvData = (cb, collection, elkClient, limit, type, prodElkClient) => {
 /**
  * @desc process 2k batch  data
  */
-const getBatchData = async (collection, elkClient, count, type, prodElkClient) => {
+const getBatchData = async ({
+  collection,
+  elkClient,
+  count,
+  type,
+  prodElkClient,
+  filePath: csvFilePath,
+  jsonFilePath,
+}) => {
   try {
-    const filePath = `${__dirname}/report.json`;
-    const isExists = fs.existsSync(filePath);
+    const isExists = fs.existsSync(jsonFilePath);
     if (!isExists) {
-      logger.warn(`File does not exist: ${filePath}`);
+      logger.warn(`File does not exist: ${jsonFilePath}`);
     }
 
-    let records = fs.readFileSync(filePath, "utf8");
+    let records = fs.readFileSync(jsonFilePath, "utf8");
     if (!records) {
       logger.warn("Data not found in report.json");
       return false;
@@ -122,14 +141,26 @@ const getBatchData = async (collection, elkClient, count, type, prodElkClient) =
       records = records.slice(0, count);
     }
 
-    console.log("Total Data -->", records.length);
-
     const chunkedData = chunk(records, 500);
 
     for (const chunkData of chunkedData) {
       await main(chunkData, collection, elkClient, type, prodElkClient);
       await new Promise((done) => setTimeout(() => done(), 25000));
     }
+
+    if (csvFilePath && !csvFilePath.endsWith("data.csv")) {
+      fs.unlink(csvFilePath, (err) => {
+        logger.verbose(`${csvFilePath} DELETED`);
+        if (err) throw err;
+      });
+    }
+    if (jsonFilePath) {
+      fs.unlink(jsonFilePath, (err) => {
+        logger.verbose(`${jsonFilePath} DELETED`);
+        if (err) throw err;
+      });
+    }
+
     logger.info("==== Process Completed ====");
     return true;
   } catch (error) {
@@ -261,11 +292,23 @@ const fetchDataFromDB = async ({
 };
 
 /** */
-const startProcess = async ({ authToken, endDate, startDate, limit, type, dateFilter }) => {
-  await initDB.connectDb(HOST_NAMES.PULL_DB, MONGO_DB_PROD_SERVER_HOST);
-  await initDB.connectDb(HOST_NAMES.REPORT_DB, MONGO_DB_REPORT_SERVER_HOST);
-  await initELK.connectELK(ELK_INSTANCE_NAMES.TRACKING.name, ELK_INSTANCE_NAMES.TRACKING.config);
-  await initELK.connectELK(ELK_INSTANCE_NAMES.PROD.name, ELK_INSTANCE_NAMES.PROD.config);
+const startProcess = async ({
+  authToken,
+  endDate,
+  startDate,
+  limit,
+  type,
+  dateFilter,
+  filePath,
+  timestamp,
+}) => {
+  if (!timestamp) {
+    await initDB.connectDb(HOST_NAMES.PULL_DB, MONGO_DB_PROD_SERVER_HOST);
+    await initDB.connectDb(HOST_NAMES.REPORT_DB, MONGO_DB_REPORT_SERVER_HOST);
+
+    await initELK.connectELK(ELK_INSTANCE_NAMES.TRACKING.name, ELK_INSTANCE_NAMES.TRACKING.config);
+    await initELK.connectELK(ELK_INSTANCE_NAMES.PROD.name, ELK_INSTANCE_NAMES.PROD.config);
+  }
 
   const collection = await getDbCollectionInstance();
 
@@ -276,7 +319,16 @@ const startProcess = async ({ authToken, endDate, startDate, limit, type, dateFi
 
   if (!startDate || !endDate) {
     logger.verbose("Read CSV");
-    readCsvData(getBatchData, collection, elkClient, limit, type, prodElkClient);
+    readCsvData({
+      cb: getBatchData,
+      collection,
+      elkClient,
+      limit,
+      type,
+      prodElkClient,
+      filePath,
+      timestamp,
+    });
   } else {
     logger.verbose("Read DB");
     fetchDataFromDB({

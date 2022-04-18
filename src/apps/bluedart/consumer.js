@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
-const { TOTAL_TOPIC_COUNT } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
+const { PUSH_GROUP_NAME, PUSH_TOPIC_NAME } = require("./constant");
 const logger = require("../../../logger");
 
 /**
@@ -9,17 +9,13 @@ const logger = require("../../../logger");
  *
  * */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: "bluedart-group" });
-  const totalTopicsCount = new Array(TOTAL_TOPIC_COUNT).fill(1);
-  return totalTopicsCount.map(async (_, index) => {
-    try {
-      await consumer.connect();
-      await consumer.subscribe({ topic: `bluedart_${index}`, fromBeginning: false });
-      return consumer;
-    } catch (error) {
-      logger.error("Bluedart Initialize error -->", error);
-    }
-  });
+  const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
+  await pushConsumer.connect();
+  await pushConsumer.subscribe({ topic: PUSH_TOPIC_NAME, fromBeginning: false });
+
+  return {
+    pushConsumer,
+  };
 };
 
 /**
@@ -29,10 +25,11 @@ const initialize = async () => {
  * 3. update pull mongodb
  * 4. TODO
  */
-const listener = async (consumer) => {
+const listener = async (consumer, partitionsCount) => {
   try {
     await consumer.run({
       autoCommitInterval: 60000,
+      partitionsConsumedConcurrently: partitionsCount,
       eachMessage: (consumedPayload) => {
         KafkaMessageHandler.init(consumedPayload, "bluedart");
       },

@@ -1,4 +1,5 @@
 const logger = require("../../../logger");
+const { DTDC_PARTITION_COUNT, PULL_CONSUMER_PARTITION_COUNT } = require("./constant");
 const { initialize, listener } = require("./consumer");
 
 /**
@@ -6,20 +7,10 @@ const { initialize, listener } = require("./consumer");
  */
 (async () => {
   try {
-    const { consumerMapwithPartitions, pullConsumer } = await initialize();
-    consumerMapwithPartitions.forEach((consumer) => {
-      consumer
-        .then((res) => {
-          if (res) {
-            listener(res, true);
-          }
-        })
-        .catch((error) => {
-          logger.error("Dtdc Consumer Initialization Error", error);
-        });
-    });
-    listener(pullConsumer, true);
+    const { pullConsumer, pushConsumer } = await initialize();
+    listener(pullConsumer, PULL_CONSUMER_PARTITION_COUNT);
+    listener(pushConsumer, DTDC_PARTITION_COUNT);
   } catch (error) {
-    logger.error("Dtdc Consumer Error", error);
+    logger.error("Delhivery Consumer Error ", error);
   }
 })();

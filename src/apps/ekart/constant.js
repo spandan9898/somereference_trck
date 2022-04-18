@@ -102,9 +102,13 @@ const EKART_STATUS_MAPPER = {
   },
 };
 
-const EKART_TOPICS_COUNT = 3;
+const PARTITION_COUNT = 10;
+const PUSH_GROUP_NAME = "ekart-push-group";
+const PUSH_TOPIC_NAME = "ekart_push";
 
 module.exports = {
   EKART_STATUS_MAPPER,
-  EKART_TOPICS_COUNT,
+  PARTITION_COUNT,
+  PUSH_GROUP_NAME,
+  PUSH_TOPIC_NAME,
 };

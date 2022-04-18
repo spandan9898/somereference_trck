@@ -1,34 +1,30 @@
 /* eslint-disable consistent-return */
 const kafka = require("../../connector/kafka");
-const { XBS_TOPICS_COUNT } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
+const { PUSH_TOPIC_NAME, PUSH_GROUP_NAME } = require("./constant");
 
 /**
  * Initialize consumer and subscribe to topics
  */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: "xbs-group" });
-  const topicsCount = new Array(XBS_TOPICS_COUNT).fill(1);
-  return topicsCount.map(async (_, index) => {
-    try {
-      await consumer.connect();
-      await consumer.subscribe({ topic: `xbs_${index}`, fromBeginning: false });
-      return consumer;
-    } catch (error) {
-      logger.error("XBS Initialize error --> ", error.message);
-    }
-  });
+  const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
+  await pushConsumer.connect();
+  await pushConsumer.subscribe({ topic: PUSH_TOPIC_NAME, fromBeginning: false });
+  return {
+    pushConsumer,
+  };
 };
 
 /**
  *
  * Listening kafka consumer
  */
-const listener = async (consumer) => {
+const listener = async (consumer, partitionsCount) => {
   try {
     await consumer.run({
       autoCommitInterval: 60000,
+      partitionsConsumedConcurrently: partitionsCount,
       eachMessage: (consumedPayload) => {
         KafkaMessageHandler.init(consumedPayload, "xpressbees");
       },

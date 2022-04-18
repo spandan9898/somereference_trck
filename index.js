@@ -37,6 +37,9 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST, MONGO_DB_STAGING
 
     await initELK.connectELK(ELK_INSTANCE_NAMES.TRACKING.name, ELK_INSTANCE_NAMES.TRACKING.config);
 
+    if (process.env.IS_CONSUME_ALL === "false") {
+      return false;
+    }
     require("./src/apps/bluedart");
     require("./src/apps/delhivery");
     require("./src/apps/amaze");
@@ -49,8 +52,10 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST, MONGO_DB_STAGING
     require("./src/apps/pidge");
     require("./src/apps/dtdc");
     require("./src/apps/pickrrConnect");
+    return true;
   } catch (error) {
     logger.error("DB Connection Error", error);
+    return false;
   }
 })();
 

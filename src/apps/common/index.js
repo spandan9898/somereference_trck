@@ -1,5 +1,6 @@
 const { webhookUserUpdateSchema } = require("./schemas");
 const { webhookUserUpdateHandler } = require("./handlers");
+const { backfillHandler } = require("../../../scripts/handlers");
 const { returnHeaders, reportBackfilling } = require("./handlers/common");
 
 module.exports = async (fastify) => {
@@ -13,6 +14,11 @@ module.exports = async (fastify) => {
     method: "GET",
     url: "return-headers",
     handler: returnHeaders,
+  });
+  fastify.route({
+    method: "POST",
+    url: "backfill",
+    handler: backfillHandler,
   });
   fastify.route({
     method: "POST",
