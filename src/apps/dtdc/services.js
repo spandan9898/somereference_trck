@@ -100,7 +100,6 @@ const prepareDtdcData = (dtdcDict) => {
     "event" : "pull",
     "edd" : "",
     "receivedBy" : "",
-    "pickUpDate" : ""
 }
  */
 const prepareDtdcPulledData = (dtdcDict) => {
@@ -119,7 +118,6 @@ const prepareDtdcPulledData = (dtdcDict) => {
   };
   const {
     strCode,
-    pickUpDate,
     receivedBy,
     strOrigin,
     strDestination,
@@ -154,9 +152,13 @@ const prepareDtdcPulledData = (dtdcDict) => {
   statusDate = statusDate.isValid()
     ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
     : moment().format("YYYY-MM-DD HH:mm:ss.SSS");
-  if (pickUpDate || scanType === "PP") {
-    const pickupDateTime = pickUpDate || statusDate;
+  if (scanType === "PP") {
+    const pickupDateTime = statusDate;
     pickrrDtdcDict.pickup_datetime = moment(pickupDateTime).toDate();
+  }
+  let received = "";
+  if (scanType === "DL") {
+    received = receivedBy;
   }
   const trackLocation = strDestination || strOrigin;
   pickrrDtdcDict.scan_datetime = statusDate;
@@ -167,7 +169,7 @@ const prepareDtdcPulledData = (dtdcDict) => {
   pickrrDtdcDict.track_info = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
   pickrrDtdcDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
   pickrrDtdcDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
-  pickrrDtdcDict.received_by = receivedBy || "";
+  pickrrDtdcDict.received_by = received;
   pickrrDtdcDict.EDD = edd ? moment(edd).toDate() : "";
 
   return pickrrDtdcDict;
