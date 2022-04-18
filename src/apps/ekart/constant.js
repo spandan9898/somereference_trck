@@ -317,7 +317,7 @@ const EKART_PULL_MAPPER = {
   },
 };
 
-const PARTITION_COUNT = 10;
+const PUSH_PARTITION_COUNT = 10;
 const PUSH_GROUP_NAME = "ekart-push-group";
 const PUSH_TOPIC_NAME = "ekart_push";
 const PULL_GROUP_NAME = "ekart-pull-group";
@@ -326,7 +326,8 @@ const PULL_PARTITION_COUNT = 10;
 
 module.exports = {
   EKART_STATUS_MAPPER,
-  PARTITION_COUNT,
+  EKART_PULL_MAPPER,
+  PUSH_PARTITION_COUNT,
   PUSH_GROUP_NAME,
   PUSH_TOPIC_NAME,
   PULL_GROUP_NAME,
