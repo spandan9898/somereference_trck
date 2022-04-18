@@ -154,21 +154,169 @@ const SHADOWFAX_PULL_CODE_MAPPER_2 = {
   assigned_for_seller_pickup: { scan_type: "OM", pickrr_sub_status_code: "" },
 };
 
-const SHADOWFAX_TOPICS_COUNT = 1;
-const SHADOWFAX_PARTITIONS_COUNT = 10;
-const SHADOWFAX_PULL_TOPIC_NAME = "shadowfax_pull";
-const SHADOWFAX_PUSH_TOPIC_NAME = "shadowfax_push";
-const SHADOWFAX_PULL_GROUP_NAME = "shadowfax-pull-group";
-const SHADOWFAX_PUSH_GROUP_NAME = "shadowfax-push-group";
+const REVERSE_MAPPER = {
+  "Not Contactable": {
+    pickrr_sub_status_code: "CNA",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Customer changed his/her mind": {
+    pickrr_sub_status_code: "SNR",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Customer wants replacement/refund first": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "QC Failed": {
+    pickrr_sub_status_code: "CI",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Customer want pick-up from Non-Serviceable area": {
+    pickrr_sub_status_code: "NSL",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Doorstep QC Product Damage": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "Not Attempted": {
+    pickrr_sub_status_code: "SD",
+    scan_type: "PPF",
+  },
+  New: {
+    pickrr_sub_status_code: "",
+    scan_type: "OP",
+  },
+  "pickup_on_hold_Address issue": {
+    pickrr_sub_status_code: "AI",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Doorstep QC Brandbox not available": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Shipment is not picked": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Mandatory check not available": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Customer wants pickup beyond cut off time": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Doorstep QC Product Mismatch": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Large Shipment": {
+    pickrr_sub_status_code: "NA",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Incomplete information received from client": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  Undelivered: {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "UD",
+  },
+  "pickup_on_hold_COVID Restricted Area": {
+    pickrr_sub_status_code: "NSL",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Doorstep QC Price Tag missing": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  Received: {
+    pickrr_sub_status_code: "",
+    scan_type: "OT",
+  },
+  "pickup_on_hold_Unable to pickup in given slot": {
+    pickrr_sub_status_code: "NA",
+    scan_type: "PPF",
+  },
+  "Out For Pickup": {
+    pickrr_sub_status_code: "",
+    scan_type: "OFP",
+  },
+  Lost: {
+    pickrr_sub_status_code: "",
+    scan_type: "LT",
+  },
+  "pickup_on_hold_Incorrect contact number": {
+    pickrr_sub_status_code: "SU",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Seller wants pickup beyond cut off time": {
+    pickrr_sub_status_code: "SNR",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Non Serviceable Area": {
+    pickrr_sub_status_code: "NSL",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Pickup already done by other DSP": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "Returned To Client": {
+    pickrr_sub_status_code: "",
+    scan_type: "DL",
+  },
+  "Assigned For Customer Pickup": {
+    pickrr_sub_status_code: "",
+    scan_type: "OM",
+  },
+  cid: {
+    pickrr_sub_status_code: "CI",
+    scan_type: "PPF",
+  },
+  "Received at Return DC": {
+    pickrr_sub_status_code: "",
+    scan_type: "OT",
+  },
+  "pickup_on_hold_Successful 3 attempts done": {
+    pickrr_sub_status_code: "SNR",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Doorstep QC Used Item": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_Pincode Address Mismatch": {
+    pickrr_sub_status_code: "AI",
+    scan_type: "PPF",
+  },
+  Picked: {
+    pickrr_sub_status_code: "",
+    scan_type: "PP",
+  },
+  cancelled: {
+    pickrr_sub_status_code: "",
+    scan_type: "OC",
+  },
+};
+
+const PUSH_PARTITION_COUNT = 10;
+const PULL_PARTITION_COUNT = 10;
+const PULL_TOPIC_NAME = "shadowfax_pull";
+const PUSH_TOPIC_NAME = "shadowfax_push";
+const PULL_GROUP_NAME = "shadowfax-pull-group";
+const PUSH_GROUP_NAME = "shadowfax-push-group";
 
 module.exports = {
   SHADOWFAX_CODE_MAPPER,
-  SHADOWFAX_TOPICS_COUNT,
-  SHADOWFAX_PARTITIONS_COUNT,
+  PUSH_PARTITION_COUNT,
+  PULL_PARTITION_COUNT,
   SHADOWFAX_PULL_CODE_MAPPER_1,
   SHADOWFAX_PULL_CODE_MAPPER_2,
-  SHADOWFAX_PULL_TOPIC_NAME,
-  SHADOWFAX_PUSH_TOPIC_NAME,
-  SHADOWFAX_PULL_GROUP_NAME,
-  SHADOWFAX_PUSH_GROUP_NAME,
+  PULL_TOPIC_NAME,
+  PUSH_TOPIC_NAME,
+  PULL_GROUP_NAME,
+  PUSH_GROUP_NAME,
+  REVERSE_MAPPER,
 };
