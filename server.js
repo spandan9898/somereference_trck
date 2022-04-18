@@ -2,6 +2,7 @@
 
 const Fastify = require("fastify");
 const cors = require("fastify-cors");
+const fastifyMultipart = require("fastify-multipart");
 const {
   clientTracking,
   publicTracking,
@@ -27,8 +28,17 @@ const createServer = async () => {
 
   // server.register(trackRoutes, { prefix: "/track" });
 
+  server.register(fastifyMultipart, {
+    limits: {
+      fieldNameSize: 100, // Max field name size in bytes
+      fieldSize: 100, // Max field value size in bytes
+      fields: 10, // Max number of non-file fields
+      fileSize: 10000000, // For multipart forms, the max file size in bytes
+      files: 1, // Max number of file fields
+      headerPairs: 2000, // Max number of header key=>value pairs
+    },
+  });
   server.register(cors);
-
   server.get("/track/tracking", clientTracking);
   server.get("/tracking", publicTracking);
   server.get("/update-client-order-id-cache", updateClientOrderIdCache);
