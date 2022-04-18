@@ -146,6 +146,7 @@ const preparePulledEkartData = (ekartDict) => {
     if (pickrrEkartDict.scan_type === "PP") {
       pickrrEkartDict.pickup_datetime = pickrrEkartDict?.scan_datetime;
     }
+    pickrrEkartDict.courier_status_code = ekartStatus;
     return pickrrEkartDict;
   } catch (error) {
     logger.error("Error While Preparng Ekart Data ---->", error);
