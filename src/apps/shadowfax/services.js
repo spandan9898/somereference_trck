@@ -3,7 +3,7 @@ const moment = require("moment");
 const {
   SHADOWFAX_PULL_CODE_MAPPER_1,
   SHADOWFAX_PULL_CODE_MAPPER_2,
-  REVERSE_MAPPER,
+  SHADOWFAX_REVERSE_MAPPER,
 } = require("./constant");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("../../services/v1/constants");
 
@@ -26,9 +26,9 @@ const getEventInfoData = ({ event, comments, statusId, remarks, isReverse }) => 
     if (["pickup_on_hold"].includes(courierStatus.toLowerCase())) {
       mapperString = `${courierStatus}_${courierRemark}`;
     }
-    if (mapperString in REVERSE_MAPPER) {
-      scanType = REVERSE_MAPPER[mapperString].scan_type;
-      pickrrSubStatusCode = REVERSE_MAPPER[mapperString].pickrr_sub_status_code;
+    if (mapperString in SHADOWFAX_REVERSE_MAPPER) {
+      scanType = SHADOWFAX_REVERSE_MAPPER[mapperString].scan_type;
+      pickrrSubStatusCode = SHADOWFAX_REVERSE_MAPPER[mapperString].pickrr_sub_status_code;
       return { scanType, pickrrSubStatusCode, mapperString };
     }
     return {};

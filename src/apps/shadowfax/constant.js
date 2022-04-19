@@ -154,7 +154,7 @@ const SHADOWFAX_PULL_CODE_MAPPER_2 = {
   assigned_for_seller_pickup: { scan_type: "OM", pickrr_sub_status_code: "" },
 };
 
-const REVERSE_MAPPER = {
+const SHADOWFAX_REVERSE_MAPPER = {
   "Not Contactable": {
     pickrr_sub_status_code: "CNA",
     scan_type: "PPF",
@@ -318,5 +318,5 @@ module.exports = {
   PUSH_TOPIC_NAME,
   PULL_GROUP_NAME,
   PUSH_GROUP_NAME,
-  REVERSE_MAPPER,
+  SHADOWFAX_REVERSE_MAPPER,
 };
