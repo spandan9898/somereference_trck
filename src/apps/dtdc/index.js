@@ -11,6 +11,6 @@ const { initialize, listener } = require("./consumer");
     listener(pullConsumer, PULL_CONSUMER_PARTITION_COUNT);
     listener(pushConsumer, DTDC_PARTITION_COUNT);
   } catch (error) {
-    logger.error("Delhivery Consumer Error ", error);
+    logger.error("Dtdc Consumer Error ", error);
   }
 })();
