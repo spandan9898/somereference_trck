@@ -155,150 +155,78 @@ const SHADOWFAX_PULL_CODE_MAPPER_2 = {
 };
 
 const SHADOWFAX_REVERSE_MAPPER = {
-  "Not Contactable": {
-    pickrr_sub_status_code: "CNA",
-    scan_type: "PPF",
-  },
-  "pickup_on_hold_Customer changed his/her mind": {
+  "not contactable": { pickrr_sub_status_code: "CNA", scan_type: "PPF" },
+  "pickup_on_hold_customer changed his/her mind": {
     pickrr_sub_status_code: "SNR",
     scan_type: "PPF",
   },
-  "pickup_on_hold_Customer wants replacement/refund first": {
+  "pickup_on_hold_customer wants replacement/refund first": {
     pickrr_sub_status_code: "OTH",
     scan_type: "PPF",
   },
-  "QC Failed": {
-    pickrr_sub_status_code: "CI",
-    scan_type: "PPF",
-  },
-  "pickup_on_hold_Customer want pick-up from Non-Serviceable area": {
+  "qc failed": { pickrr_sub_status_code: "CI", scan_type: "PPF" },
+  "pickup_on_hold_customer want pick-up from non-serviceable area": {
     pickrr_sub_status_code: "NSL",
     scan_type: "PPF",
   },
-  "pickup_on_hold_Doorstep QC Product Damage": {
+  "pickup_on_hold_doorstep qc product damage": { pickrr_sub_status_code: "OTH", scan_type: "PPF" },
+  "not attempted": { pickrr_sub_status_code: "SD", scan_type: "PPF" },
+  new: { pickrr_sub_status_code: "", scan_type: "OP" },
+  "pickup_on_hold_address issue": { pickrr_sub_status_code: "AI", scan_type: "PPF" },
+  "pickup_on_hold_doorstep qc brandbox not available": {
     pickrr_sub_status_code: "OTH",
     scan_type: "PPF",
   },
-  "Not Attempted": {
-    pickrr_sub_status_code: "SD",
-    scan_type: "PPF",
-  },
-  New: {
-    pickrr_sub_status_code: "",
-    scan_type: "OP",
-  },
-  "pickup_on_hold_Address issue": {
-    pickrr_sub_status_code: "AI",
-    scan_type: "PPF",
-  },
-  "pickup_on_hold_Doorstep QC Brandbox not available": {
+  "pickup_on_hold_shipment is not picked": { pickrr_sub_status_code: "OTH", scan_type: "PPF" },
+  "pickup_on_hold_mandatory check not available": {
     pickrr_sub_status_code: "OTH",
     scan_type: "PPF",
   },
-  "pickup_on_hold_Shipment is not picked": {
+  "pickup_on_hold_customer wants pickup beyond cut off time": {
     pickrr_sub_status_code: "OTH",
     scan_type: "PPF",
   },
-  "pickup_on_hold_Mandatory check not available": {
+  "pickup_on_hold_doorstep qc product mismatch": {
     pickrr_sub_status_code: "OTH",
     scan_type: "PPF",
   },
-  "pickup_on_hold_Customer wants pickup beyond cut off time": {
+  "pickup_on_hold_large shipment": { pickrr_sub_status_code: "NA", scan_type: "PPF" },
+  "pickup_on_hold_incomplete information received from client": {
     pickrr_sub_status_code: "OTH",
     scan_type: "PPF",
   },
-  "pickup_on_hold_Doorstep QC Product Mismatch": {
+  undelivered: { pickrr_sub_status_code: "OTH", scan_type: "UD" },
+  "pickup_on_hold_covid restricted area": { pickrr_sub_status_code: "NSL", scan_type: "PPF" },
+  "pickup_on_hold_doorstep qc price tag missing": {
     pickrr_sub_status_code: "OTH",
     scan_type: "PPF",
   },
-  "pickup_on_hold_Large Shipment": {
+  received: { pickrr_sub_status_code: "", scan_type: "OT" },
+  "pickup_on_hold_unable to pickup in given slot": {
     pickrr_sub_status_code: "NA",
     scan_type: "PPF",
   },
-  "pickup_on_hold_Incomplete information received from client": {
-    pickrr_sub_status_code: "OTH",
-    scan_type: "PPF",
-  },
-  Undelivered: {
-    pickrr_sub_status_code: "OTH",
-    scan_type: "UD",
-  },
-  "pickup_on_hold_COVID Restricted Area": {
-    pickrr_sub_status_code: "NSL",
-    scan_type: "PPF",
-  },
-  "pickup_on_hold_Doorstep QC Price Tag missing": {
-    pickrr_sub_status_code: "OTH",
-    scan_type: "PPF",
-  },
-  Received: {
-    pickrr_sub_status_code: "",
-    scan_type: "OT",
-  },
-  "pickup_on_hold_Unable to pickup in given slot": {
-    pickrr_sub_status_code: "NA",
-    scan_type: "PPF",
-  },
-  "Out For Pickup": {
-    pickrr_sub_status_code: "",
-    scan_type: "OFP",
-  },
-  Lost: {
-    pickrr_sub_status_code: "",
-    scan_type: "LT",
-  },
-  "pickup_on_hold_Incorrect contact number": {
-    pickrr_sub_status_code: "SU",
-    scan_type: "PPF",
-  },
-  "pickup_on_hold_Seller wants pickup beyond cut off time": {
+  "out for pickup": { pickrr_sub_status_code: "", scan_type: "OFP" },
+  lost: { pickrr_sub_status_code: "", scan_type: "LT" },
+  "pickup_on_hold_incorrect contact number": { pickrr_sub_status_code: "SU", scan_type: "PPF" },
+  "pickup_on_hold_seller wants pickup beyond cut off time": {
     pickrr_sub_status_code: "SNR",
     scan_type: "PPF",
   },
-  "pickup_on_hold_Non Serviceable Area": {
-    pickrr_sub_status_code: "NSL",
-    scan_type: "PPF",
-  },
-  "pickup_on_hold_Pickup already done by other DSP": {
+  "pickup_on_hold_non serviceable area": { pickrr_sub_status_code: "NSL", scan_type: "PPF" },
+  "pickup_on_hold_pickup already done by other dsp": {
     pickrr_sub_status_code: "OTH",
     scan_type: "PPF",
   },
-  "Returned To Client": {
-    pickrr_sub_status_code: "",
-    scan_type: "DL",
-  },
-  "Assigned For Customer Pickup": {
-    pickrr_sub_status_code: "",
-    scan_type: "OM",
-  },
-  cid: {
-    pickrr_sub_status_code: "CI",
-    scan_type: "PPF",
-  },
-  "Received at Return DC": {
-    pickrr_sub_status_code: "",
-    scan_type: "OT",
-  },
-  "pickup_on_hold_Successful 3 attempts done": {
-    pickrr_sub_status_code: "SNR",
-    scan_type: "PPF",
-  },
-  "pickup_on_hold_Doorstep QC Used Item": {
-    pickrr_sub_status_code: "OTH",
-    scan_type: "PPF",
-  },
-  "pickup_on_hold_Pincode Address Mismatch": {
-    pickrr_sub_status_code: "AI",
-    scan_type: "PPF",
-  },
-  Picked: {
-    pickrr_sub_status_code: "",
-    scan_type: "PP",
-  },
-  cancelled: {
-    pickrr_sub_status_code: "",
-    scan_type: "OC",
-  },
+  "returned to client": { pickrr_sub_status_code: "", scan_type: "DL" },
+  "assigned for customer pickup": { pickrr_sub_status_code: "", scan_type: "OM" },
+  cid: { pickrr_sub_status_code: "CI", scan_type: "PPF" },
+  "received at return dc": { pickrr_sub_status_code: "", scan_type: "OT" },
+  "pickup_on_hold_successful 3 attempts done": { pickrr_sub_status_code: "SNR", scan_type: "PPF" },
+  "pickup_on_hold_doorstep qc used item": { pickrr_sub_status_code: "OTH", scan_type: "PPF" },
+  "pickup_on_hold_pincode address mismatch": { pickrr_sub_status_code: "AI", scan_type: "PPF" },
+  picked: { pickrr_sub_status_code: "", scan_type: "PP" },
+  cancelled: { pickrr_sub_status_code: "", scan_type: "OC" },
 };
 
 const PUSH_PARTITION_COUNT = 10;
