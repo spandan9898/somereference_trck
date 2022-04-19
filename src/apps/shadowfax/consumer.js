@@ -33,11 +33,11 @@ const initialize = async () => {
 /**
  * consumer function for Shadowfax Payload
  */
-const listener = async (consumer, isPartition) => {
+const listener = async (consumer, partitionCount) => {
   try {
     await consumer.run({
       autoCommitInterval: 60000,
-      partitionsConsumedConcurrently: isPartition ? SHADOWFAX_PARTITIONS_COUNT : 1,
+      partitionsConsumedConcurrently: partitionCount,
       eachMessage: (consumedPayload) => {
         try {
           const payload = avroType.fromBuffer(consumedPayload.message.value);

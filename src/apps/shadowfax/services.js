@@ -1,6 +1,10 @@
 const moment = require("moment");
 
-const { SHADOWFAX_PULL_CODE_MAPPER_1, SHADOWFAX_PULL_CODE_MAPPER_2 } = require("./constant");
+const {
+  SHADOWFAX_PULL_CODE_MAPPER_1,
+  SHADOWFAX_PULL_CODE_MAPPER_2,
+  REVERSE_MAPPER,
+} = require("./constant");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("../../services/v1/constants");
 
 /**
@@ -8,12 +12,30 @@ const { NEW_STATUS_TO_OLD_MAPPING } = require("../../services/v1/constants");
  * get Custom Scan Type for ShdadowFax
  *
  */
-const getEventInfoData = ({ event, comments, statusId, remarks }) => {
+const getEventInfoData = ({ event, comments, statusId, remarks, isReverse }) => {
   let mapperString;
   let scanType;
   let pickrrSubStatusCode;
   const courierStatus = event || statusId;
   const courierRemark = comments || remarks;
+
+  // ShadowFax Reverse Mapping is handled over here
+
+  if (isReverse) {
+    mapperString = courierStatus;
+    if (["pickup_on_hold"].includes(courierStatus.toLowerCase())) {
+      mapperString = `${courierStatus}_${courierRemark}`;
+    }
+    if (mapperString in REVERSE_MAPPER) {
+      scanType = REVERSE_MAPPER[mapperString].scan_type;
+      pickrrSubStatusCode = REVERSE_MAPPER[mapperString].pickrr_sub_status_code;
+      return { scanType, pickrrSubStatusCode, mapperString };
+    }
+    return {};
+  }
+
+  // ShadowFax Forward Mapping
+
   if (
     ["pickup_on_hold", "on_hold", "nc", "na", "recd_at_fwd_dc", "cancelled_by_customer"].includes(
       courierStatus.toLowerCase()
@@ -79,8 +101,15 @@ const prepareShadowfaxData = (shadowfaxDict) => {
     } = shadowfaxDict || {};
 
     pickrrShadowfaxDict.awb = awb;
-
-    const { scanType, mapperString, pickrrSubStatusCode } = getEventInfoData({ event, comments });
+    let isReverse = false;
+    if (["R"].includes(awb)) {
+      isReverse = true;
+    }
+    const { scanType, mapperString, pickrrSubStatusCode } = getEventInfoData({
+      event,
+      comments,
+      isReverse,
+    });
     if (!scanType) {
       return { err: "Scan type not found" };
     }
