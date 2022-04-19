@@ -55,6 +55,27 @@ const ELK_INSTANCE_NAMES = {
   },
 };
 
+const KAFKA_INSTANCE_CONFIG = {
+  PROD: {
+    name: "PROD",
+    config: {
+      brokerUrl: process.env.KAFKA_BROKER_URL,
+      username: process.env.KAFKA_USER_NAME,
+      password: process.env.KAFKA_PASSWORD,
+      clientId: process.env.KAFKA_CLIENT_ID,
+    },
+  },
+  STAGING: {
+    name: "STAGING",
+    config: {
+      brokerUrl: process.env.STAGING_KAFKA_BROKER_URL,
+      username: process.env.STAGING_KAFKA_USER_NAME,
+      password: process.env.STAGING_KAFKA_PASSWORD,
+      clientId: process.env.STAGING_KAFKA_CLIENT_ID,
+    },
+  },
+};
+
 const WEBHOOK_USER_CACHE_KEY_NAME = "webhookUser";
 
 const DEFAULT_REQUESTS_TIMEOUT = 10;
@@ -68,4 +89,5 @@ module.exports = {
   WEBHOOK_USER_CACHE_KEY_NAME,
   ELK_INSTANCE_NAMES,
   DEFAULT_REQUESTS_TIMEOUT,
+  KAFKA_INSTANCE_CONFIG,
 };
