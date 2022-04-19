@@ -102,7 +102,7 @@ const prepareShadowfaxData = (shadowfaxDict) => {
 
     pickrrShadowfaxDict.awb = awb;
     let isReverse = false;
-    if (["R"].includes(awb)) {
+    if (["R"].includes(awb[0])) {
       isReverse = true;
     }
     const { scanType, mapperString, pickrrSubStatusCode } = getEventInfoData({
