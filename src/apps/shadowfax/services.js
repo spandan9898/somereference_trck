@@ -1,9 +1,9 @@
 const moment = require("moment");
 
 const {
+  SHADOWFAX_REVERSE_MAPPER,
   SHADOWFAX_PULL_CODE_MAPPER_1,
   SHADOWFAX_PULL_CODE_MAPPER_2,
-  SHADOWFAX_REVERSE_MAPPER,
 } = require("./constant");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("../../services/v1/constants");
 
