@@ -154,8 +154,7 @@ const prepareDtdcPulledData = (dtdcDict) => {
       ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
       : moment().format("YYYY-MM-DD HH:mm:ss.SSS");
     if (scanType === "PP") {
-      const pickupDateTime = statusDate;
-      pickrrDtdcDict.pickup_datetime = moment(pickupDateTime).toDate();
+      pickrrDtdcDict.pickup_datetime = moment(statusDate).toDate();
     }
     let received = "";
     if (scanType === "DL") {
@@ -173,8 +172,6 @@ const prepareDtdcPulledData = (dtdcDict) => {
     pickrrDtdcDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrDtdcDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
     pickrrDtdcDict.received_by = received;
-
-    // pickrrDtdcDict.EDD = edd ? moment(edd).toDate() : "";
 
     pickrrDtdcDict.EDD = eddDate;
     return pickrrDtdcDict;
