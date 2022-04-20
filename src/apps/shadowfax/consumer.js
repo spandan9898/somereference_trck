@@ -4,11 +4,10 @@ const get = require("lodash/get");
 
 const kafkaInstance = require("../../connector/kafka");
 const {
-  SHADOWFAX_PARTITIONS_COUNT,
-  SHADOWFAX_PULL_TOPIC_NAME,
-  SHADOWFAX_PUSH_TOPIC_NAME,
-  SHADOWFAX_PUSH_GROUP_NAME,
-  SHADOWFAX_PULL_GROUP_NAME,
+  PULL_TOPIC_NAME,
+  PUSH_TOPIC_NAME,
+  PUSH_GROUP_NAME,
+  PULL_GROUP_NAME,
 } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
@@ -22,47 +21,26 @@ const avroType = avro.parse(`${__dirname}/type.avsc`);
 const initialize = async () => {
   const kafka = kafkaInstance.getInstance(KAFKA_INSTANCE_CONFIG.PROD.name);
 
-  const pushConsumer = kafka.consumer({ groupId: SHADOWFAX_PUSH_GROUP_NAME });
-  const pullConsumer = kafka.consumer({ groupId: SHADOWFAX_PULL_GROUP_NAME });
-  const partitionsCount = new Array(SHADOWFAX_PARTITIONS_COUNT).fill(1);
-  const pushPartitionConsumerInstances = partitionsCount.map(async () => {
-    try {
-      await pushConsumer.connect();
-      await pushConsumer.subscribe({
-        topic: SHADOWFAX_PUSH_TOPIC_NAME,
-        fromBeginning: false,
-      });
-      return pushConsumer;
-    } catch (error) {
-      logger.error("Shadowfax Initialize Error!", error);
-    }
-  });
-  const pullPartitionConsumerInstances = partitionsCount.map(async () => {
-    try {
-      await pullConsumer.connect();
-      await pullConsumer.subscribe({
-        topic: SHADOWFAX_PULL_TOPIC_NAME,
-        fromBeginning: false,
-      });
-      return pullConsumer;
-    } catch (error) {
-      logger.error("Shadowfax Initialize Error", error);
-    }
-  });
+  const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
+  const pullConsumer = kafka.consumer({ groupId: PULL_GROUP_NAME });
+  await pushConsumer.connect();
+  await pullConsumer.connect();
+  await pushConsumer.subscribe({ topic: PUSH_TOPIC_NAME, frombeginning: false });
+  await pullConsumer.subscribe({ topic: PULL_TOPIC_NAME, frombeginning: false });
   return {
-    pushPartitionConsumerInstances,
-    pullPartitionConsumerInstances,
+    pushConsumer,
+    pullConsumer,
   };
 };
 
 /**
  * consumer function for Shadowfax Payload
  */
-const listener = async (consumer, isPartition) => {
+const listener = async (consumer, partitionCount) => {
   try {
     await consumer.run({
       autoCommitInterval: 60000,
-      partitionsConsumedConcurrently: isPartition ? SHADOWFAX_PARTITIONS_COUNT : 1,
+      partitionsConsumedConcurrently: partitionCount,
       eachMessage: (consumedPayload) => {
         try {
           const payload = avroType.fromBuffer(consumedPayload.message.value);
