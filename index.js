@@ -41,6 +41,7 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST, MONGO_DB_STAGING
     await kafka.connect(KAFKA_INSTANCE_CONFIG.PROD.name, KAFKA_INSTANCE_CONFIG.PROD.config);
 
     if (process.env.IS_CONSUME_ALL === "false") {
+      require("./src/apps/autosync");
       return false;
     }
     require("./src/apps/bluedart");
