@@ -1,5 +1,4 @@
 const moment = require("moment");
-const _ = require("lodash");
 
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { EKART_STATUS_MAPPER, EKART_PULL_MAPPER } = require("./constant");
@@ -134,7 +133,10 @@ const preparePulledEkartData = (ekartDict) => {
       pickrrEkartDict.scan_type = pickrrCode;
       pickrrEkartDict.pickrr_sub_status_code = pickrrSubStatusCode;
     }
-    if (ekartStatus === "delivered" && ekartDict.cs_notes === "Marked_As_RTO") {
+    if (
+      ekartStatus === "delivered" &&
+      (ekartDict.cs_notes || "").toLowerCase() === "marked_as_rto"
+    ) {
       pickrrEkartDict.scan_type = "RTO";
     }
     pickrrEkartDict.EDD = moment(ekartEDD).isValid()
