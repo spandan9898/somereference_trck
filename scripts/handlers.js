@@ -5,7 +5,6 @@ const moment = require("moment");
 
 const pump = util.promisify(pipeline);
 const startProcess = require("./reportBackfill");
-const logger = require("../logger");
 
 /**
  *
@@ -39,9 +38,15 @@ exports.backfillHandler = async function backfillHandler(req, reply) {
       if (type) {
         payload.type = type.split(",");
       }
-      const authToken = body?.austh_token?.value || null;
+      const authToken = body?.auth_token?.value || null;
       payload.authToken = authToken;
     } else {
+      const trackingIdList = req.body.tracking_id_list || [];
+
+      if (trackingIdList.length > 2000) {
+        throw new Error("You can not send more than 2000 tracking awbs. Please use CSV option");
+      }
+      payload.trackingIdList = trackingIdList;
       payload.authToken = req.body.auth_token;
       payload.startDate = req.body._start_date || moment().subtract(3, "d").format("DD-MM-YYYY");
       payload.endDate = req.body._end_date || moment().format("DD-MM-YYYY");
@@ -54,6 +59,6 @@ exports.backfillHandler = async function backfillHandler(req, reply) {
 
     return reply.code(200).send({ success: true });
   } catch (error) {
-    return reply.code(200).send({ success: false, err: error.message });
+    return reply.code(400).send({ success: false, err: error.message });
   }
 };
