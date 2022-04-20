@@ -26,7 +26,7 @@ const getEventInfoData = ({ event, comments, statusId, remarks, isReverse }) => 
     if (["pickup_on_hold"].includes(courierStatus.toLowerCase())) {
       mapperString = `${courierStatus}_${courierRemark}`;
     }
-    if (mapperString in SHADOWFAX_REVERSE_MAPPER) {
+    if (mapperString.toLowerCase() in SHADOWFAX_REVERSE_MAPPER) {
       scanType = SHADOWFAX_REVERSE_MAPPER[mapperString.lowerCase()].scan_type;
       pickrrSubStatusCode =
         SHADOWFAX_REVERSE_MAPPER[mapperString.lowerCase()].pickrr_sub_status_code;
