@@ -214,24 +214,34 @@ const fetchDataFromDB = async ({
   type,
   prodElkClient,
   dateFilter,
+  trackingIdList = [],
 }) => {
   try {
     const filters = {
       $and: [],
     };
-    const dateFilterOn = dateFilter === "order_created_at" ? "order_created_at" : "updated_at";
-    if (authToken) {
+
+    if (trackingIdList.length) {
       filters.$and.push({
-        auth_token: authToken,
+        tracking_id: {
+          $in: trackingIdList,
+        },
+      });
+    } else {
+      const dateFilterOn = dateFilter === "order_created_at" ? "order_created_at" : "updated_at";
+      if (authToken) {
+        filters.$and.push({
+          auth_token: authToken,
+        });
+      }
+
+      filters.$and.push({
+        [dateFilterOn]: {
+          $gt: convertDate(startDate, "start"),
+          $lt: convertDate(endDate),
+        },
       });
     }
-
-    filters.$and.push({
-      [dateFilterOn]: {
-        $gt: convertDate(startDate, "start"),
-        $lt: convertDate(endDate),
-      },
-    });
 
     const projection = { audit: 0, mandatory_status_map: 0 };
 
@@ -301,6 +311,7 @@ const startProcess = async ({
   dateFilter,
   filePath,
   timestamp,
+  trackingIdList = [],
 }) => {
   if (!timestamp) {
     await initDB.connectDb(HOST_NAMES.PULL_DB, MONGO_DB_PROD_SERVER_HOST);
@@ -341,6 +352,7 @@ const startProcess = async ({
       type,
       prodElkClient,
       dateFilter,
+      trackingIdList,
     });
   }
 };

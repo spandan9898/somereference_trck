@@ -3,6 +3,8 @@
 const Fastify = require("fastify");
 const cors = require("fastify-cors");
 const fastifyMultipart = require("fastify-multipart");
+const fasitfyRateLimit = require("fastify-rate-limit");
+
 const {
   clientTracking,
   publicTracking,
@@ -27,6 +29,10 @@ const createServer = async () => {
   // start the server
 
   // server.register(trackRoutes, { prefix: "/track" });
+
+  server.register(fasitfyRateLimit, {
+    global: false,
+  });
 
   server.register(fastifyMultipart, {
     limits: {
