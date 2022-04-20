@@ -52,11 +52,11 @@ const findLatestStatusDatetime = (trackDict) => {
  */
 const findFirstAttemptedDate = (trackArr) => {
   let firstAttemptDate = null;
-  for (let i = 0; i < trackArr.length; i += 1) {
-    if (trackArr[i].scan_type === "NDR") {
-      firstAttemptDate = trackArr[i].scan_datetime;
+  trackArr.forEach(({ scan_type: scanType, scan_datetime: scanDateTime }) => {
+    if (["OO", "NDR", "DL"].includes(scanType)) {
+      firstAttemptDate = scanDateTime;
     }
-  }
+  });
   return firstAttemptDate;
 };
 

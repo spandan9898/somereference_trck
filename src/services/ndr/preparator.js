@@ -65,6 +65,8 @@ const prepareOtherDetailsFromTrackDataForNDR = (trackData) => {
     edd_stamp: convertDatetimeFormat(eddStamp),
     ops_profile: trackData?.ops_profile || "",
     pickrr_order_id: trackData?.pickrr_order_id || "",
+    item_list: trackData?.item_list || [],
+    user_email: trackData?.user_email || "",
   };
   return otherDetailsDict;
 };

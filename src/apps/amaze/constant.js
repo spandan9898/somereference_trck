@@ -48,9 +48,13 @@ const AMAZE_CODE_MAPPER = {
   "rto delivered": { scan_type: "RTD", pickrr_sub_status_code: "" },
 };
 
-const AMAZE_TOPICS_COUNT = 1;
+const PUSH_PARTITION_COUNT = 10;
+const PUSH_GROUP_NAME = "amaze-push-group";
+const PUSH_TOPIC_NAME = "amaze_push";
 
 module.exports = {
   AMAZE_CODE_MAPPER,
-  AMAZE_TOPICS_COUNT,
+  PUSH_PARTITION_COUNT,
+  PUSH_GROUP_NAME,
+  PUSH_TOPIC_NAME,
 };

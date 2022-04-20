@@ -136,6 +136,10 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     updatedObj["status.current_status_time"] = firstTrackObjOfTrackArr.scan_datetime;
     updatedObj["status.pickrr_sub_status_code"] = firstTrackObjOfTrackArr.pickrr_sub_status_code;
 
+    if (["NDR", "UD"].includes(firstTrackObjOfTrackArr.scan_type)) {
+      updatedObj.is_ndr = true;
+    }
+
     const pullInstance =
       process.env.NODE_ENV === "staging"
         ? pullStagingCollectionInstance

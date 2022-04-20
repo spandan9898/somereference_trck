@@ -2,7 +2,7 @@
 const avro = require("avro-js");
 const get = require("lodash/get");
 
-const kafka = require("../../connector/kafka");
+const kafkaInstance = require("../../connector/kafka");
 const {
   SHADOWFAX_PARTITIONS_COUNT,
   SHADOWFAX_PULL_TOPIC_NAME,
@@ -12,6 +12,7 @@ const {
 } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
+const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 
 const avroType = avro.parse(`${__dirname}/type.avsc`);
 
@@ -19,6 +20,8 @@ const avroType = avro.parse(`${__dirname}/type.avsc`);
  * initialize consumer for shadowfax payload
  */
 const initialize = async () => {
+  const kafka = kafkaInstance.getInstance(KAFKA_INSTANCE_CONFIG.PROD.name);
+
   const pushConsumer = kafka.consumer({ groupId: SHADOWFAX_PUSH_GROUP_NAME });
   const pullConsumer = kafka.consumer({ groupId: SHADOWFAX_PULL_GROUP_NAME });
   const partitionsCount = new Array(SHADOWFAX_PARTITIONS_COUNT).fill(1);

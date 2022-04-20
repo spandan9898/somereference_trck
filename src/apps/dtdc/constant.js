@@ -1,6 +1,6 @@
-const DTDC_PARTITION_COUNT = 10;
-const DTDC_TOPIC_NAME = "dtdc_push";
-const DTDC_GROUP_ID = "dtdc-push-group";
+const PUSH_PARTITION_COUNT = 10;
+const PUSH_TOPIC_NAME = "dtdc_push";
+const PUSH_GROUP_NAME = "dtdc-push-group";
 const DTDC_CODE_MAPPER = {
   bkd: {
     scan_type: "SHP",
@@ -350,7 +350,7 @@ const DTDC_CODE_MAPPER = {
 
 module.exports = {
   DTDC_CODE_MAPPER,
-  DTDC_PARTITION_COUNT,
-  DTDC_GROUP_ID,
-  DTDC_TOPIC_NAME,
+  PUSH_PARTITION_COUNT,
+  PUSH_GROUP_NAME,
+  PUSH_TOPIC_NAME,
 };

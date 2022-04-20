@@ -1,13 +1,13 @@
 const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
-const { PUSH_PARTITION_COUNT } = require("./constant");
+const { PARTITION_COUNT } = require("./constants");
 
 (async () => {
   try {
     const { pushConsumer } = await initialize();
-    await listener(pushConsumer, PUSH_PARTITION_COUNT);
+    listener(pushConsumer, PARTITION_COUNT);
   } catch (error) {
-    logger.error("Udaan Consumer Error", error);
+    logger.error("Auto Sync Consumer Error", error);
     throw new Error(error);
   }
 })();

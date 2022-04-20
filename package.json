@@ -30,6 +30,8 @@
     "fastify": "3.24.0",
     "fastify-autoload": "3.9.0",
     "fastify-cors": "6.0.2",
+    "fastify-multipart": "5.3.1",
+    "fastify-rate-limit": "5.8.0",
     "kafkajs": "1.15.0",
     "lodash": "4.17.21",
     "moment": "2.29.1",
