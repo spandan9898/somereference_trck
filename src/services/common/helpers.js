@@ -7,7 +7,7 @@ const {
   prepareDelhiveryPulledData,
 } = require("../../apps/delhivery/services");
 const { prepareEcommData } = require("../../apps/ecomm/services");
-const { prepareEkartData } = require("../../apps/ekart/services");
+const { prepareEkartData, preparePulledEkartData } = require("../../apps/ekart/services");
 const { prepareParceldoData } = require("../../apps/parceldo/services");
 const {
   prepareShadowfaxData,
@@ -143,6 +143,7 @@ const getPrepareFunction = (courierName) => {
     delhivery_pull: prepareDelhiveryPulledData,
     ecomm: prepareEcommData,
     ekart: prepareEkartData,
+    ekart_pull: preparePulledEkartData,
     parceldo: prepareParceldoData,
     shadowfax: prepareShadowfaxData,
     shadowfax_pull: preparePulledShadowfaxData,

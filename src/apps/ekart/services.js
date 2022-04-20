@@ -1,7 +1,8 @@
 const moment = require("moment");
 
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { EKART_STATUS_MAPPER } = require("./constant");
+const { EKART_STATUS_MAPPER, EKART_PULL_MAPPER } = require("./constant");
+const logger = require("../../../logger");
 
 /*
   :param ekart_dict: {
@@ -101,4 +102,59 @@ const prepareEkartData = (ekartDict) => {
   }
 };
 
-module.exports = { prepareEkartData };
+// {"status":"out_for_pickup","event_date":"2022-04-11T12:38:05+0530","event_date_iso8601":"2022-04-11T12:38:05+05:30","city":"Dwarka","description":"shipment_out_for_pickup","public_description":"shipment_out_for_pickup","cs_notes":null,"awbNumber":"WSPP2789544767","pickupTime":"","edd":""}
+
+/**
+ *
+ * @param {*} ekartDict prepares data for pulled events
+ */
+const preparePulledEkartData = (ekartDict) => {
+  const pickrrEkartDict = {
+    awb: "",
+    scan_type: "",
+    scan_datetime: "",
+    track_info: "",
+    track_location: "",
+    received_by: "",
+    pickup_datetime: "",
+    EDD: "",
+    pickrr_status: "",
+    pickrr_sub_status_code: "",
+    courier_status_code: "",
+  };
+  try {
+    pickrrEkartDict.awb = ekartDict.awbNumber;
+    const ekartStatus = ekartDict.status ? ekartDict.status.toString().toUpperCase() : "";
+    const ekartEDD = ekartDict.edd;
+    const ekartEventDate = ekartDict.event_date;
+    if (EKART_PULL_MAPPER[ekartStatus]) {
+      const { pickrr_code: pickrrCode, pickrr_sub_status_code: pickrrSubStatusCode } =
+        EKART_PULL_MAPPER[ekartStatus];
+      pickrrEkartDict.scan_type = pickrrCode;
+      pickrrEkartDict.pickrr_sub_status_code = pickrrSubStatusCode;
+    }
+    if (
+      ekartStatus === "delivered" &&
+      (ekartDict.cs_notes || "").toLowerCase() === "marked_as_rto"
+    ) {
+      pickrrEkartDict.scan_type = "RTO";
+    }
+    pickrrEkartDict.EDD = moment(ekartEDD).isValid()
+      ? moment(ekartEDD).format("YYYY-MM-DD HH:MM:SS")
+      : "";
+    pickrrEkartDict.scan_datetime = moment(ekartEventDate).isValid()
+      ? moment(ekartEventDate).format("YYYY-MM-DD HH:MM:SS")
+      : "";
+    pickrrEkartDict.track_location = ekartDict?.city || "";
+    if (pickrrEkartDict.scan_type === "PP") {
+      pickrrEkartDict.pickup_datetime = pickrrEkartDict?.scan_datetime;
+    }
+    pickrrEkartDict.courier_status_code = ekartStatus;
+    return pickrrEkartDict;
+  } catch (error) {
+    logger.error("Error While Preparng Ekart Data ---->", error);
+    pickrrEkartDict.err = error.message;
+    return pickrrEkartDict;
+  }
+};
+module.exports = { prepareEkartData, preparePulledEkartData };

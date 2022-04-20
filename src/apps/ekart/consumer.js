@@ -2,16 +2,25 @@
 const kafka = require("../../connector/kafka");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
-const { PUSH_TOPIC_NAME, PUSH_GROUP_NAME } = require("./constant");
+const {
+  PUSH_TOPIC_NAME,
+  PUSH_GROUP_NAME,
+  PULL_GROUP_NAME,
+  PULL_TOPIC_NAME,
+} = require("./constant");
 
 /**
  * Initialize consumer and subscribe to topics
  */
 const initialize = async () => {
+  const pullConsumer = kafka.consumer({ groupId: PULL_GROUP_NAME });
   const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
+  await pullConsumer.connect();
   await pushConsumer.connect();
+  await pullConsumer.subscribe({ topic: PULL_TOPIC_NAME, fromBeginning: false });
   await pushConsumer.subscribe({ topic: PUSH_TOPIC_NAME, fromBeginning: false });
   return {
+    pullConsumer,
     pushConsumer,
   };
 };
@@ -26,7 +35,8 @@ const listener = async (consumer, partitionsCount) => {
       autoCommitInterval: 60000,
       partitionsConsumedConcurrently: partitionsCount,
       eachMessage: (consumedPayload) => {
-        KafkaMessageHandler.init(consumedPayload, "ekart");
+        const courierName = consumedPayload.topic === "ekart_pull" ? "ekart_pull" : "ekart";
+        KafkaMessageHandler.init(consumedPayload, courierName);
       },
     });
   } catch (error) {
