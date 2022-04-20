@@ -98,7 +98,7 @@ const prepareDtdcData = (dtdcDict) => {
     "sTrRemarks": "", 
     "trackingId" : "AWBNUMBER",
     "event" : "pull",
-    "edd" : "",
+    "edd" : "12212021",
     "receivedBy" : "",
 }
  */
