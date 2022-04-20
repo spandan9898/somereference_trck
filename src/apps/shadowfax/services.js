@@ -27,8 +27,9 @@ const getEventInfoData = ({ event, comments, statusId, remarks, isReverse }) => 
       mapperString = `${courierStatus}_${courierRemark}`;
     }
     if (mapperString in SHADOWFAX_REVERSE_MAPPER) {
-      scanType = SHADOWFAX_REVERSE_MAPPER[mapperString].scan_type;
-      pickrrSubStatusCode = SHADOWFAX_REVERSE_MAPPER[mapperString].pickrr_sub_status_code;
+      scanType = SHADOWFAX_REVERSE_MAPPER[mapperString.lowerCase()].scan_type;
+      pickrrSubStatusCode =
+        SHADOWFAX_REVERSE_MAPPER[mapperString.lowerCase()].pickrr_sub_status_code;
       return { scanType, pickrrSubStatusCode, mapperString };
     }
     return {};
