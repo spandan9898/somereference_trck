@@ -161,7 +161,7 @@ const prepareDtdcPulledData = (dtdcDict) => {
     if (scanType === "DL") {
       received = receivedBy;
     }
-    let eddDate = moment(`${edd} 000059999`, "DDMMYYYY hhms.SSS");
+    let eddDate = moment(`${edd} 000000000`, "DDMMYYYY hhms.SSS");
     eddDate = eddDate.isValid() ? eddDate.format("YYYY-MM-DD HH:mm:ss.SSS") : "";
     const trackLocation = strDestination || strOrigin;
     pickrrDtdcDict.scan_datetime = statusDate;
