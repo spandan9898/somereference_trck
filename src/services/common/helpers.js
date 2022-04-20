@@ -23,7 +23,6 @@ const { DELHIVERY_REVERSE_MAPPER } = require("../../apps/delhivery/constant");
 const { XBS_REVERSE_MAPPER } = require("../../apps/xpressbees/constant");
 const { getObject } = require("../../utils");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { SHADOWFAX_REVERSE_MAPPER } = require("../../apps/shadowfax/constant");
 
 /**
  * sorring status array desc -> The last scan time will be in the top
@@ -43,9 +42,6 @@ const getCourierReverseStatusMap = (courierUsed) => {
   }
   if (courierUsed.includes("xpressbees")) {
     return XBS_REVERSE_MAPPER;
-  }
-  if (courierUsed.includes("shadowfax")) {
-    return SHADOWFAX_REVERSE_MAPPER;
   }
   return null;
 };
