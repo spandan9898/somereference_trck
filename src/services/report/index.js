@@ -29,7 +29,9 @@ const updateStatusOnReport = async (trackObj, logger, elkClient) => {
   );
   result.last_updated_date = moment().toDate();
   result.last_update_from_kafka = result.last_updated_date;
-  sendReportsDataToELK(result, elkClient);
+  if (process.env.IS_CONSUME_ALL !== "false") {
+    sendReportsDataToELK(result, elkClient);
+  }
   const opsReportColInstance = await reportMongoCol();
   try {
     const response = await opsReportColInstance.findOneAndUpdate(

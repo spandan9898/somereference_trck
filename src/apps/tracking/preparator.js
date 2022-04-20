@@ -16,6 +16,8 @@ const {
 } = require("./constant");
 const { checkShowClientDetails } = require("./helpers");
 
+moment.suppressDeprecationWarnings = true;
+
 /**
  * cleanes tracking response data
  * @param {*} trackModel

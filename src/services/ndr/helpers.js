@@ -30,7 +30,7 @@ const checkIfTriggerNDREb = async (currentStatusType, awb) => {
     if (!awb) {
       return false;
     }
-    const { isNDR = false } = (await getObject(awb)) || {};
+    const { is_ndr: isNDR = false } = (await getObject(awb)) || {};
 
     if (["NDR", "UD"].includes(currentStatusType) || isNDR) {
       return true;
@@ -50,7 +50,7 @@ const checkIfTriggerNDREb = async (currentStatusType, awb) => {
 const updateIsNDRinCache = async (awb) => {
   try {
     const cacheData = (await getObject(awb)) || {};
-    cacheData.isNDR = true;
+    cacheData.is_ndr = true;
     await setObject(awb, cacheData);
   } catch (error) {
     logger.error("updateIsNDRinCache", error);
