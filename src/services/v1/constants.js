@@ -28,6 +28,6 @@ const PP_PROXY_LIST = [
   "DM",
 ];
 
-const TOPIC_NAME = "tracking_data";
+const TOPIC_NAME = "track_v1";
 
 module.exports = { NEW_STATUS_TO_OLD_MAPPING, PP_PROXY_LIST, TOPIC_NAME };
