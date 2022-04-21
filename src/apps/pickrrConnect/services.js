@@ -114,7 +114,8 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
     };
 
     await sendDataToElk({
-      indexName: "track-pickrr-connect",
+      indexName:
+        process.env.NODE_ENV === "production" ? "track-pickrr-connect" : "track-pickrr-connect-dev",
       body,
       elkClient,
     });
