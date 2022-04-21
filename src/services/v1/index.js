@@ -27,7 +27,9 @@ const sendTrackDataToV1 = async (trackData) => {
   const messages = [
     {
       key: trackDict.awb,
-      value: JSON.stringify(trackDict),
+      value: JSON.stringify({
+        request: trackDict,
+      }),
     },
   ];
 
