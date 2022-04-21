@@ -100,6 +100,7 @@ const EKART_STATUS_MAPPER = {
     scan_type: "DL",
     pickrr_sub_status_code: "",
   },
+  received_at_dh: { scan_type: "RAD", pickrr_sub_status_code: "" },
 };
 
 const PARTITION_COUNT = 10;
