@@ -1,8 +1,8 @@
 const DTDC_PARTITION_COUNT = 10;
-const DTDC_TOPIC_NAME = "dtdc_push";
-const DTDC_GROUP_ID = "dtdc-push-group";
+const PUSH_TOPIC_NAME = "dtdc_push";
+const PUSH_GROUP_NAME = "dtdc-push-group";
 const PULL_CONSUMER_TOPIC_NAME = "dtdc_pull";
-const PULL_CONSUMER_GROUP_NAME = "dtdc-pull-group";
+const PULL_GROUP_NAME = "dtdc-pull-group";
 const PULL_CONSUMER_PARTITION_COUNT = 10;
 const DTDC_CODE_MAPPER = {
   bkd: {
@@ -354,9 +354,9 @@ const DTDC_CODE_MAPPER = {
 module.exports = {
   DTDC_CODE_MAPPER,
   DTDC_PARTITION_COUNT,
-  DTDC_GROUP_ID,
-  DTDC_TOPIC_NAME,
-  PULL_CONSUMER_GROUP_NAME,
+  PUSH_GROUP_NAME,
+  PUSH_TOPIC_NAME,
+  PULL_GROUP_NAME,
   PULL_CONSUMER_TOPIC_NAME,
   PULL_CONSUMER_PARTITION_COUNT,
 };

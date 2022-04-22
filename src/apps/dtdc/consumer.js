@@ -1,30 +1,33 @@
 /* eslint-disable consistent-return */
 const {
-  DTDC_GROUP_ID,
-  DTDC_TOPIC_NAME,
-  PULL_CONSUMER_GROUP_NAME,
+  PUSH_GROUP_NAME,
+  PUSH_TOPIC_NAME,
+  PULL_GROUP_NAME,
   PULL_CONSUMER_TOPIC_NAME,
 } = require("./constant");
 
-const kafka = require("../../connector/kafka");
+const kafkaInstance = require("../../connector/kafka");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
+const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 
 /**
- * initialize consumers for pidge payload
+ * initialize consumers for dtdc payload
  */
 const initialize = async () => {
-  const pullConsumer = kafka.consumer({ groupId: PULL_CONSUMER_GROUP_NAME });
+  const kafka = kafkaInstance.getInstance(KAFKA_INSTANCE_CONFIG.PROD.name);
+
+  const pullConsumer = kafka.consumer({ groupId: PULL_GROUP_NAME });
+  const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
+
   await pullConsumer.connect();
   await pullConsumer.subscribe({
     topic: PULL_CONSUMER_TOPIC_NAME,
     fromBeginning: false,
   });
 
-  const pushConsumer = kafka.consumer({ groupId: DTDC_GROUP_ID });
   await pushConsumer.connect();
-  await pushConsumer.subscribe({ topic: DTDC_TOPIC_NAME, fromBeginning: false });
-
+  await pushConsumer.subscribe({ topic: PUSH_TOPIC_NAME, fromBeginning: false });
   return {
     pushConsumer,
     pullConsumer,

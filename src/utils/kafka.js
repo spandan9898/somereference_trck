@@ -28,6 +28,7 @@ const produceData = async ({ topic, producer, messages }) => {
       topic,
       messages,
     });
+
     return true;
   } catch (error) {
     logger.error("produceData error", error.message);
