@@ -38,7 +38,10 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
     }
 
     const cacheData = (await getObject(awb)) || {};
-    const { trackMap, isNDR } = prepareTrackArrCacheData(response.track_arr);
+    const { trackMap, isNdr } = prepareTrackArrCacheData(response.track_arr);
+    let { is_ndr: isNDR } = response;
+
+    isNDR = isNDR || isNdr;
 
     const updatedCacheData = { ...trackMap };
     updatedCacheData.track_model = cacheData.track_model || {};

@@ -13,10 +13,11 @@ const logger = require("../logger");
 
 const initDB = require("../src/connector/db");
 const initELK = require("../src/connector/elkConnection");
+const kafka = require("../src/connector/kafka");
 const updateStatusOnReport = require("../src/services/report");
 const sendTrackDataToV1 = require("../src/services/v1");
 const { getDbCollectionInstance } = require("../src/utils");
-const { HOST_NAMES, ELK_INSTANCE_NAMES } = require("../src/utils/constants");
+const { HOST_NAMES, ELK_INSTANCE_NAMES, KAFKA_INSTANCE_CONFIG } = require("../src/utils/constants");
 const { convertDate } = require("./helper");
 const { updateStatusELK } = require("../src/services/common/services");
 
@@ -214,24 +215,34 @@ const fetchDataFromDB = async ({
   type,
   prodElkClient,
   dateFilter,
+  trackingIdList = [],
 }) => {
   try {
     const filters = {
       $and: [],
     };
-    const dateFilterOn = dateFilter === "order_created_at" ? "order_created_at" : "updated_at";
-    if (authToken) {
+
+    if (trackingIdList.length) {
       filters.$and.push({
-        auth_token: authToken,
+        tracking_id: {
+          $in: trackingIdList,
+        },
+      });
+    } else {
+      const dateFilterOn = dateFilter === "order_created_at" ? "order_created_at" : "updated_at";
+      if (authToken) {
+        filters.$and.push({
+          auth_token: authToken,
+        });
+      }
+
+      filters.$and.push({
+        [dateFilterOn]: {
+          $gt: convertDate(startDate, "start"),
+          $lt: convertDate(endDate),
+        },
       });
     }
-
-    filters.$and.push({
-      [dateFilterOn]: {
-        $gt: convertDate(startDate, "start"),
-        $lt: convertDate(endDate),
-      },
-    });
 
     const projection = { audit: 0, mandatory_status_map: 0 };
 
@@ -301,6 +312,7 @@ const startProcess = async ({
   dateFilter,
   filePath,
   timestamp,
+  trackingIdList = [],
 }) => {
   if (!timestamp) {
     await initDB.connectDb(HOST_NAMES.PULL_DB, MONGO_DB_PROD_SERVER_HOST);
@@ -308,6 +320,8 @@ const startProcess = async ({
 
     await initELK.connectELK(ELK_INSTANCE_NAMES.TRACKING.name, ELK_INSTANCE_NAMES.TRACKING.config);
     await initELK.connectELK(ELK_INSTANCE_NAMES.PROD.name, ELK_INSTANCE_NAMES.PROD.config);
+
+    await kafka.connect(KAFKA_INSTANCE_CONFIG.PROD.name, KAFKA_INSTANCE_CONFIG.PROD.config);
   }
 
   const collection = await getDbCollectionInstance();
@@ -341,6 +355,7 @@ const startProcess = async ({
       type,
       prodElkClient,
       dateFilter,
+      trackingIdList,
     });
   }
 };

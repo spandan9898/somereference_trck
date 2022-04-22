@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-const kafka = require("../../connector/kafka");
+const kafkaInstance = require("../../connector/kafka");
 const {
   PUSH_GROUP_NAME,
   PUSH_TOPIC_NAME,
@@ -8,11 +8,14 @@ const {
 } = require("./constant");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
+const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 
 /**
  * Initialize consumer and subscribe to topics
  */
 const initialize = async () => {
+  const kafka = kafkaInstance.getInstance(KAFKA_INSTANCE_CONFIG.PROD.name);
+
   const pullConsumer = kafka.consumer({ groupId: PULL_GROUP_NAME });
   const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
 
