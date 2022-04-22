@@ -13,10 +13,11 @@ const logger = require("../logger");
 
 const initDB = require("../src/connector/db");
 const initELK = require("../src/connector/elkConnection");
+const kafka = require("../src/connector/kafka");
 const updateStatusOnReport = require("../src/services/report");
 const sendTrackDataToV1 = require("../src/services/v1");
 const { getDbCollectionInstance } = require("../src/utils");
-const { HOST_NAMES, ELK_INSTANCE_NAMES } = require("../src/utils/constants");
+const { HOST_NAMES, ELK_INSTANCE_NAMES, KAFKA_INSTANCE_CONFIG } = require("../src/utils/constants");
 const { convertDate } = require("./helper");
 const { updateStatusELK } = require("../src/services/common/services");
 
@@ -319,6 +320,8 @@ const startProcess = async ({
 
     await initELK.connectELK(ELK_INSTANCE_NAMES.TRACKING.name, ELK_INSTANCE_NAMES.TRACKING.config);
     await initELK.connectELK(ELK_INSTANCE_NAMES.PROD.name, ELK_INSTANCE_NAMES.PROD.config);
+
+    await kafka.connect(KAFKA_INSTANCE_CONFIG.PROD.name, KAFKA_INSTANCE_CONFIG.PROD.config);
   }
 
   const collection = await getDbCollectionInstance();
