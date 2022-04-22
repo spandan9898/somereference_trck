@@ -74,7 +74,7 @@ const updateTrackingProcessingCount = async ({ awb }, type = "add") => {
  *
  * @param {*} trackingObj -> DB Tracking Document
  */
-const commonTrackingDataProducer = async (trackingObj) => {
+const commonTrackingDataProducer = async (trackingObj, isFromPulled) => {
   try {
     const trackingItemList = [
       "is_cod",
@@ -128,6 +128,8 @@ const commonTrackingDataProducer = async (trackingObj) => {
         payload[item] = defaultValue[item];
       }
     });
+
+    payload.is_from_pull = isFromPulled;
 
     const producerInstance = await producerConnection.connect(KAFKA_INSTANCE_CONFIG.PROD.name);
 

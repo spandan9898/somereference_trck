@@ -103,7 +103,7 @@ class KafkaMessageHandler {
         elkClient: trackingElkClient,
         result,
       });
-      commonTrackingDataProducer(result);
+      commonTrackingDataProducer(result, isFromPulled);
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }
