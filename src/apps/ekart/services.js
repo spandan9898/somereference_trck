@@ -140,10 +140,10 @@ const preparePulledEkartData = (ekartDict) => {
       pickrrEkartDict.scan_type = "RTO";
     }
     pickrrEkartDict.EDD = moment(ekartEDD).isValid()
-      ? moment(ekartEDD).format("YYYY-MM-DD HH:MM:SS")
+      ? moment(ekartEDD).format("YYYY-MM-DD HH:mm:ss")
       : "";
     pickrrEkartDict.scan_datetime = moment(ekartEventDate).isValid()
-      ? moment(ekartEventDate).format("YYYY-MM-DD HH:MM:SS")
+      ? moment(ekartEventDate).format("YYYY-MM-DD HH:mm:ss")
       : "";
     pickrrEkartDict.track_location = ekartDict?.city || "";
     if (pickrrEkartDict.scan_type === "PP") {
