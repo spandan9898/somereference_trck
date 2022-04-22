@@ -19,6 +19,12 @@ module.exports = async (fastify) => {
     method: "POST",
     url: "backfill",
     handler: backfillHandler,
+    config: {
+      rateLimit: {
+        max: 10,
+        timeWindow: "1 minute",
+      },
+    },
   });
   fastify.route({
     method: "POST",
