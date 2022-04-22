@@ -16,6 +16,7 @@ const {
   updateStatusELK,
   getTrackingIdProcessingCount,
   updateTrackingProcessingCount,
+  commonTrackingDataProducer,
 } = require("./services");
 const { getElkClients } = require("../../utils");
 const logger = require("../../../logger");
@@ -102,6 +103,7 @@ class KafkaMessageHandler {
         elkClient: trackingElkClient,
         result,
       });
+      commonTrackingDataProducer(result);
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }
