@@ -376,7 +376,7 @@ const preparePickrrBluedartPulledData = (bluedartDict) => {
     pickrrBluedartDict.awb = trackingId;
     pickrrBluedartDict.EDD = eddDate;
     pickrrBluedartDict.courier_status_code = mapperString;
-    pickrrBluedartDict.track_info = Scan || {};
+    pickrrBluedartDict.track_info = Scan || "";
     pickrrBluedartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrBluedartDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
 
