@@ -123,7 +123,7 @@ const preparePulledXBSData = (xbsDict) => {
   };
 
   const mapperString = `${JSON.stringify(xbsDict.Status)}-${JSON.stringify(xbsDict.StatusCode)}`;
-  const pickrrStatusInfo = XBS_PULL_MAPPER[mapperString];
+  const pickrrStatusInfo = XBS_PULL_MAPPER[mapperString.toLowerCase()];
   if (!pickrrStatusInfo.scan_type) {
     return {
       err: "No Pickrr Status Mapped to the current xbs Status",
@@ -165,6 +165,7 @@ const preparePulledXBSData = (xbsDict) => {
   pickrrXbsDict.EDD = moment(formattedEdd).isValid()
     ? moment(formattedEdd).format("YYYY-MM-DD HH:mm:ss")
     : "";
+
   return pickrrXbsDict;
 };
 
