@@ -197,6 +197,7 @@ const PUSH_TOPIC_NAME = "xbs_push";
 const PULL_GROUP_NAME = "xbs-pull-group";
 const PULL_TOPIC_NAME = "xbs_pull";
 const PUSH_PARTITION_COUNT = 10;
+const PULL_PARTITION_COUNT = 10;
 module.exports = {
   XBS_STATUS_MAPPER,
   PULL_GROUP_NAME,
@@ -205,6 +206,7 @@ module.exports = {
   XBS_NDR_MAPPER,
   XBS_REVERSE_MAPPER,
   PUSH_PARTITION_COUNT,
+  PULL_PARTITION_COUNT,
   PUSH_GROUP_NAME,
   PUSH_TOPIC_NAME,
 };
