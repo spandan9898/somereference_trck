@@ -1,5 +1,4 @@
 /* eslint-disable consistent-return */
-const avro = require("avro-js");
 const get = require("lodash/get");
 
 const kafkaInstance = require("../../connector/kafka");
@@ -12,8 +11,6 @@ const {
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
 const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
-
-const avroType = avro.parse(`${__dirname}/type.avsc`);
 
 /**
  * initialize consumer for shadowfax payload
@@ -42,12 +39,13 @@ const listener = async (consumer, partitionCount) => {
       autoCommitInterval: 60000,
       partitionsConsumedConcurrently: partitionCount,
       eachMessage: (consumedPayload) => {
-        try {
-          const payload = avroType.fromBuffer(consumedPayload.message.value);
+        const { message } = consumedPayload;
+        const consumedData = JSON.parse(message.value.toString());
+        if (consumedData.event?.includes("pull")) {
           const courierName =
-            get(payload, "event") === "pull" ? "shadowfax_pull" : "shadowfax_pull_reverse";
-          KafkaMessageHandler.init(payload, courierName);
-        } catch {
+            get(consumedData, "event") === "pull" ? "shadowfax_pull" : "shadowfax_pull_reverse";
+          KafkaMessageHandler.init(consumedPayload, courierName);
+        } else {
           KafkaMessageHandler.init(consumedPayload, "shadowfax");
         }
       },
