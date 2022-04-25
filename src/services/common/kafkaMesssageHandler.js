@@ -35,7 +35,6 @@ class KafkaMessageHandler {
    * 5. after DB update decrease "processCount" value by 1, handle negative case
    */
   static async init(consumedPayload, courierName) {
-    console.log("inside init function");
     const prepareFunc = getPrepareFunction(courierName);
     if (!prepareFunc) {
       throw new Error(`${courierName} is not a valid courier`);
