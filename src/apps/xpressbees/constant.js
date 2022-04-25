@@ -136,12 +136,219 @@ const XBS_REVERSE_MAPPER = {
   "ud-21": { scan_type: "UD", pickrr_sub_status_code: "OPDEL" },
   "dlvd-": { scan_type: "DL", pickrr_sub_status_code: "" },
 };
+const XBS_PULL_MAPPER = {
+  "Data Received-DRC": {
+    scan_type: "OP",
+    pickrr_sub_status_code: "",
+  },
+  "Pickup Created-PUC": {
+    scan_type: "OM",
+    pickrr_sub_status_code: "",
+  },
+  "Out for Pickup-OFP": {
+    scan_type: "OFP",
+    pickrr_sub_status_code: "",
+  },
+  "PickDone-PUD": {
+    scan_type: "PP",
+    pickrr_sub_status_code: "",
+  },
+  "Pickup not attempted-PND": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NA",
+  },
+  "Force majeure-PND": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NSL",
+  },
+  "Pickup cancelled-PND": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
+  },
+  "Long distance pincode-PND": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NSL",
+  },
+  "Concerned person not available-PND": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SU",
+  },
+  "Pickup not ready with vendor-PND": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SNR",
+  },
+  "Entry Not Permitted-PND": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NSL",
+  },
+  "Shop Closed-PND": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SC",
+  },
+  "Vendor shifted from given address-PND": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "AI",
+  },
+  "Address incomplete / Address not found & mobile not reachable-PND": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "AI",
+  },
+  "Order got cancelled-PND": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
+  },
+  "Picked-PKD": {
+    scan_type: "SHP",
+    pickrr_sub_status_code: "",
+  },
+  "InTransit-IT": {
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  "Reached at Destination-RAD": {
+    scan_type: "RAD",
+    pickrr_sub_status_code: "",
+  },
+  "Out for Delivery-OFD": {
+    scan_type: "OO",
+    pickrr_sub_status_code: "",
+  },
+  "COD Amount Not Ready-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNR",
+  },
+  "Customer Wants Open Delivery-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "OPDEL",
+  },
+  "DeliveredDispute-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "OTH",
+  },
+  "NonDeliveredDispute-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "OTH",
+  },
+  "Wrong Pincode-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "AI",
+  },
+  "Self Collect-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "ODA",
+  },
+  "Customer Refused To Accept-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CR",
+  },
+  "Address incomplete-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "AI",
+  },
+  "Long Pincode-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "ODA",
+  },
+  "Force majeure situation-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "OTH",
+  },
+  "Customer not available-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  "Customer wants future delivery-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CD",
+  },
+  "Customer wants evening delivery-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CD",
+  },
+  "Door step delivery not attempted-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  "Payment could not be completed-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNR",
+  },
+  "Entry not permitted due to regulations-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "REST",
+  },
+  "Delivered-DLVD": {
+    scan_type: "DL",
+    pickrr_sub_status_code: "",
+  },
+  "Lost-LOST": {
+    scan_type: "LT",
+    pickrr_sub_status_code: "",
+  },
+  "RTO Notified-RTON": {
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
+  },
+  "Return to Origin-RTO": {
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
+  },
+  "Return to Origin Intransit-RTO-IT": {
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  "Reached at Origin-RAO": {
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  "Return to Origin Out for Delivery-RTO-OFD": {
+    scan_type: "RTO-OO",
+    pickrr_sub_status_code: "",
+  },
+  "Return Delivered-RTD": {
+    scan_type: "RTD",
+    pickrr_sub_status_code: "",
+  },
+  "Return Undelivered-RTU": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "",
+  },
+  "ShipmentTransit damage-STD": {
+    scan_type: "DM",
+    pickrr_sub_status_code: "",
+  },
+  "Shortage-STG": {
+    scan_type: "LT",
+    pickrr_sub_status_code: "",
+  },
+  "Return To Origin Shortage-RTO-STG": {
+    scan_type: "LT",
+    pickrr_sub_status_code: "",
+  },
+  "ODA (Out of Delivery Area)-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "ODA",
+  },
+  "Pickup Not Done-PND": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NA",
+  },
+  "Customer denied OTP based delivery-UD": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "OTPF",
+  },
+};
 
 const PUSH_GROUP_NAME = "xbs-push-group";
 const PUSH_TOPIC_NAME = "xbs_push";
+const PULL_GROUP_NAME = "xbs-pull-group";
+const PULL_TOPIC_NAME = "xbs_pull";
 const PUSH_PARTITION_COUNT = 10;
 module.exports = {
   XBS_STATUS_MAPPER,
+  PULL_GROUP_NAME,
+  XBS_PULL_MAPPER,
+  PULL_TOPIC_NAME,
   XBS_NDR_MAPPER,
   XBS_REVERSE_MAPPER,
   PUSH_PARTITION_COUNT,

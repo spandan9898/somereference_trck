@@ -1,7 +1,14 @@
+const _ = require("lodash");
+
 const moment = require("moment");
 
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { XBS_STATUS_MAPPER, XBS_NDR_MAPPER, XBS_REVERSE_MAPPER } = require("./constant");
+const {
+  XBS_STATUS_MAPPER,
+  XBS_NDR_MAPPER,
+  XBS_REVERSE_MAPPER,
+  XBS_PULL_MAPPER,
+} = require("./constant");
 
 /*
   :param xbs_dict: {
@@ -95,4 +102,70 @@ const prepareXbsData = (xbsDict) => {
     return pickrrXbsDict;
   }
 };
-module.exports = { prepareXbsData };
+
+/**
+ *
+ * prepares Pulled Xbs Data
+ */
+const preparePulledXBSData = (xbsDict) => {
+  const pickrrXbsDict = {
+    awb: "",
+    scan_type: "",
+    scan_datetime: "",
+    track_info: "",
+    track_location: "",
+    received_by: "",
+    pickup_datetime: "",
+    EDD: "",
+    pickrr_status: "",
+    pickrr_sub_status_code: "",
+    courier_status_code: "",
+  };
+
+  const mapperString = `${JSON.stringify(xbsDict.Status)}-${JSON.stringify(xbsDict.StatusCode)}`;
+  const pickrrStatusInfo = XBS_PULL_MAPPER[mapperString];
+  if (!pickrrStatusInfo.scan_type) {
+    return {
+      err: "No Pickrr Status Mapped to the current xbs Status",
+    };
+  }
+  const xbsPickupScanTime =
+    `${xbsDict.PickupTime.slice(0, 2)}:${xbsDict.PickupTime.slice(2, 4)}` || "";
+  const xbsPickupDatetime = `${xbsDict.PickUpDate} ${xbsPickupScanTime}`;
+  const xbsStatusTime = `${xbsDict.StatusTime.slice(0, 2)}:${xbsDict.StatusTime.slice(2, 4)}` || "";
+  const xbsStatusDatetime = `${xbsDict.StatusDate} ${xbsStatusTime}`;
+
+  // edd -->"4/10/2022 4:40:56 PM"
+  /* splittedDate-- > ["4", "10", "2022 4:40:56 PM"];
+    yearTimeSplit --- >  ["2022","4:40:56","PM"]
+    yearmonthday ---> ["4","10","2022"]
+    hourminutesec ---> ["4","40","56"]
+  */
+  const xbsEdd = xbsDict.ExpectedDeliveryDate;
+  const spliteddate = xbsEdd.split("/");
+  const yearTimeSplit = spliteddate[2].split(" ");
+
+  const yearmonthday = [...spliteddate.slice(0, 2), ...yearTimeSplit.slice(0, 1)];
+  const hourminutesec = yearTimeSplit[1].split(":");
+  if (yearTimeSplit[2] === "PM") {
+    hourminutesec[0] = JSON.stringify(parseInt(hourminutesec[0], 10) + 12);
+  }
+  const formattedEdd = `${_.reverse(yearmonthday).join("-")}T${hourminutesec.join(":")}`;
+
+  pickrrXbsDict.awb = xbsDict.awbNumber;
+  pickrrXbsDict.scan_type = pickrrStatusInfo.scan_type;
+  pickrrXbsDict.track_location = xbsDict.Location;
+  pickrrXbsDict.pickup_datetime = moment(xbsPickupDatetime).isValid()
+    ? moment(xbsPickupDatetime).format("YYYY-MM-DD HH:mm:ss")
+    : "";
+  pickrrXbsDict.scan_datetime = moment(xbsStatusDatetime).isValid()
+    ? moment(xbsStatusTime).format("YYYY-MM-DD HH:mm:ss")
+    : "";
+  pickrrXbsDict.pickrr_sub_status_code = pickrrStatusInfo.pickrr_sub_status_code || "";
+  pickrrXbsDict.EDD = moment(formattedEdd).isValid()
+    ? moment(formattedEdd).format("YYYY-MM-DD HH:mm:ss")
+    : "";
+  return pickrrXbsDict;
+};
+
+module.exports = { prepareXbsData, preparePulledXBSData };
