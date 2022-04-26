@@ -106,6 +106,24 @@ const prepareXbsData = (xbsDict) => {
 /**
  *
  * prepares Pulled Xbs Data
+ * @payload {
+        PickUpDate: '12-04-2022',
+        PickUpTime: '1333',
+        OriginLocation: 'BLR/FC1',
+        DestinationLocation: 'MAA/MVL-TML',
+        Weight: '0',
+        ExpectedDeliveryDate: '4/14/2022 12:33:16 AM',
+        Status: 'Delivered',
+        StatusCode: 'DLVD',
+        StatusDate: '19-04-2022',
+        StatusTime: '1943',
+        Location: 'MAA/MVL-TML, Chennai, TAMIL NADU',
+        Comment: 'Shipment Delivered by SR: Prabhakaran A, MobileNo: 9841784763, DeliveryDate: 2022-04-19 19:43:01, Receiver Name: edelweiss rajesh ',
+        LocationPinCode: '600095',
+        trackingId: '13329222456247',
+        isReverse: false,
+        event: 'pull'
+      }
  */
 const preparePulledXBSData = (xbsDict) => {
   const pickrrXbsDict = {
@@ -122,50 +140,48 @@ const preparePulledXBSData = (xbsDict) => {
     courier_status_code: "",
   };
   try {
-    const mapperString = `${JSON.stringify(xbsDict.Status)}-${JSON.stringify(xbsDict.StatusCode)}`;
+    const {
+      PickUpDate,
+      PickUpTime,
+      ExpectedDeliveryDate,
+      Status,
+      StatusCode,
+      StatusDate,
+      StatusTime,
+      Location,
+      Comment,
+      trackingId,
+    } = xbsDict;
+    const mapperString = `${Status}-${StatusCode}`;
     const pickrrStatusInfo = XBS_PULL_MAPPER[mapperString.toLowerCase()];
     if (!pickrrStatusInfo.scan_type) {
       return {
         err: "No Pickrr Status Mapped to the current xbs Status",
       };
     }
-    const xbsPickupScanTime =
-      `${xbsDict.PickupTime.slice(0, 2)}:${xbsDict.PickupTime.slice(2, 4)}` || "";
-    const xbsPickupDatetime = `${xbsDict.PickUpDate} ${xbsPickupScanTime}`;
-    const xbsStatusTime =
-      `${xbsDict.StatusTime.slice(0, 2)}:${xbsDict.StatusTime.slice(2, 4)}` || "";
-    const xbsStatusDatetime = `${xbsDict.StatusDate} ${xbsStatusTime}`;
 
-    // edd -->"4/10/2022 4:40:56 PM"
-    /* splittedDate-- > ["4", "10", "2022 4:40:56 PM"];
-    yearTimeSplit --- >  ["2022","4:40:56","PM"]
-    yearmonthday ---> ["4","10","2022"]
-    hourminutesec ---> ["4","40","56"]
-  */
-    const xbsEdd = xbsDict.ExpectedDeliveryDate;
-    const spliteddate = xbsEdd.split("/");
-    const yearTimeSplit = spliteddate[2].split(" ");
+    let xbsPickupScanTime = `${PickUpDate} ${PickUpTime}` || "";
+    xbsPickupScanTime = moment(xbsPickupScanTime, "DD-MM-YYYY hhm");
 
-    const yearmonthday = [...spliteddate.slice(0, 2), ...yearTimeSplit.slice(0, 1)];
-    const hourminutesec = yearTimeSplit[1].split(":");
-    if (yearTimeSplit[2] === "PM") {
-      hourminutesec[0] = JSON.stringify(parseInt(hourminutesec[0], 10) + 12);
+    let xbsStatusTime = `${StatusDate} ${StatusTime}`;
+    xbsStatusTime = moment(xbsStatusTime, "DD-MM-YYYY hhm");
+
+    let xbsEdd;
+    if (ExpectedDeliveryDate) {
+      xbsEdd = moment(ExpectedDeliveryDate, "MM/DD/YYYY HH:mm:ss a p");
+      xbsEdd = xbsEdd.isValid() ? xbsEdd.toDate() : null;
     }
-    const formattedEdd = `${_.reverse(yearmonthday).join("-")}T${hourminutesec.join(":")}`;
 
-    pickrrXbsDict.awb = xbsDict.awbNumber;
+    pickrrXbsDict.awb = trackingId;
     pickrrXbsDict.scan_type = pickrrStatusInfo.scan_type;
-    pickrrXbsDict.track_location = xbsDict.Location;
-    pickrrXbsDict.pickup_datetime = moment(xbsPickupDatetime).isValid()
-      ? moment(xbsPickupDatetime).format("YYYY-MM-DD HH:mm:ss")
-      : "";
-    pickrrXbsDict.scan_datetime = moment(xbsStatusDatetime).isValid()
-      ? moment(xbsStatusTime).format("YYYY-MM-DD HH:mm:ss")
-      : "";
+    pickrrXbsDict.track_location = Location;
+    pickrrXbsDict.pickup_datetime = xbsPickupScanTime.isValid() ? xbsPickupScanTime.toDate() : null;
+    pickrrXbsDict.scan_datetime = xbsStatusTime.isValid() ? xbsStatusTime.toDate() : null;
     pickrrXbsDict.pickrr_sub_status_code = pickrrStatusInfo.pickrr_sub_status_code || "";
-    pickrrXbsDict.EDD = moment(formattedEdd).isValid()
-      ? moment(formattedEdd).format("YYYY-MM-DD HH:mm:ss")
-      : "";
+    pickrrXbsDict.EDD = xbsEdd;
+    pickrrXbsDict.track_info = Comment;
+    pickrrXbsDict.courier_status_code = mapperString;
+    pickrrXbsDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[pickrrStatusInfo.scan_type];
 
     return pickrrXbsDict;
   } catch (error) {
