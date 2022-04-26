@@ -135,7 +135,7 @@ const commonTrackingDataProducer = async (trackingObj) => {
       {
         key: payload.tracking_id,
         value: JSON.stringify({
-          request: payload,
+          payload,
         }),
       },
     ];
