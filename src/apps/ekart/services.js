@@ -133,12 +133,12 @@ const preparePulledEkartData = (ekartDict) => {
         err: "Unknown status code",
       };
     }
-    if (statusMappedData) {
-      const { pickrr_code: pickrrCode, pickrr_sub_status_code: pickrrSubStatusCode } =
-        statusMappedData;
-      pickrrEkartDict.scan_type = pickrrCode;
-      pickrrEkartDict.pickrr_sub_status_code = pickrrSubStatusCode;
-    }
+
+    const { pickrr_code: pickrrCode, pickrr_sub_status_code: pickrrSubStatusCode } =
+      statusMappedData;
+    pickrrEkartDict.scan_type = pickrrCode;
+    pickrrEkartDict.pickrr_sub_status_code = pickrrSubStatusCode;
+
     if (
       ekartStatus === "delivered" &&
       (ekartDict.cs_notes || "").toLowerCase() === "marked_as_rto"
