@@ -16,6 +16,7 @@ const {
   updateStatusELK,
   getTrackingIdProcessingCount,
   updateTrackingProcessingCount,
+  commonTrackingDataProducer,
 } = require("./services");
 const { getElkClients } = require("../../utils");
 const logger = require("../../../logger");
@@ -44,7 +45,8 @@ class KafkaMessageHandler {
       try {
         const { message } = consumedPayload;
         const consumedData = JSON.parse(message.value.toString());
-        if (consumedData?.event === "pull") {
+
+        if (consumedData?.event.includes("pull")) {
           isFromPulled = true;
           res = prepareFunc(consumedData);
         } else {
@@ -54,6 +56,7 @@ class KafkaMessageHandler {
         res = prepareFunc(consumedPayload);
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
+
       if (!res.awb) return;
 
       const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
@@ -102,6 +105,7 @@ class KafkaMessageHandler {
         elkClient: trackingElkClient,
         result,
       });
+      commonTrackingDataProducer(result);
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
     }

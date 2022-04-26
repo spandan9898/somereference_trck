@@ -5,9 +5,9 @@ const { PP_PROXY_LIST } = require("./constants");
  * @param {*} trackData
  */
 const findPickupDate = (trackData) => {
-  if (trackData?.pickup_datetime) {
-    return trackData?.pickup_datetime;
-  }
+  // if (trackData?.pickup_datetime) {
+  //   return trackData?.pickup_datetime;
+  // }
 
   let pickupDatetime = "";
   const trackArr = trackData?.track_arr || [];

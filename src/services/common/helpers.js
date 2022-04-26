@@ -7,7 +7,7 @@ const {
   prepareDelhiveryPulledData,
 } = require("../../apps/delhivery/services");
 const { prepareEcommData } = require("../../apps/ecomm/services");
-const { prepareEkartData } = require("../../apps/ekart/services");
+const { prepareEkartData, preparePulledEkartData } = require("../../apps/ekart/services");
 const { prepareParceldoData } = require("../../apps/parceldo/services");
 const {
   prepareShadowfaxData,
@@ -16,7 +16,7 @@ const {
 const { prepareUdaanData } = require("../../apps/udaan/services");
 const { prepareXbsData, preparePulledXBSData } = require("../../apps/xpressbees/services");
 const { preparePidgeData } = require("../../apps/pidge/services");
-const { prepareDtdcData } = require("../../apps/dtdc/services");
+const { prepareDtdcData, prepareDtdcPulledData } = require("../../apps/dtdc/services");
 
 const logger = require("../../../logger");
 const { DELHIVERY_REVERSE_MAPPER } = require("../../apps/delhivery/constant");
@@ -143,6 +143,7 @@ const getPrepareFunction = (courierName) => {
     delhivery_pull: prepareDelhiveryPulledData,
     ecomm: prepareEcommData,
     ekart: prepareEkartData,
+    ekart_pull: preparePulledEkartData,
     parceldo: prepareParceldoData,
     shadowfax: prepareShadowfaxData,
     shadowfax_pull: preparePulledShadowfaxData,
@@ -151,6 +152,7 @@ const getPrepareFunction = (courierName) => {
     xpressbees_pull: preparePulledXBSData,
     pidge: preparePidgeData,
     dtdc: prepareDtdcData,
+    dtdc_pull: prepareDtdcPulledData,
   };
   return courierPrepareMapFunctions[courierName];
 };

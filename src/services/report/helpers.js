@@ -160,6 +160,7 @@ const sendReportsDataToELK = async (data, elkClient) => {
     await sendDataToElk({
       body,
       elkClient,
+      indexName: process.env.NODE_ENV === "production" ? "track-reports" : "track-reports-dev",
     });
   } catch (error) {
     logger.error("sendReportsDataToELK", { data });
