@@ -125,7 +125,7 @@ const commonTrackingDataProducer = async (trackingObj) => {
     trackingItemList.forEach((item) => {
       payload[item] = trackingObj[item];
       if (item in defaultValue) {
-        payload[item] = defaultValue[item];
+        payload[item] = payload[item] || defaultValue[item];
       }
     });
 
