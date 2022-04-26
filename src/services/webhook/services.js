@@ -153,7 +153,7 @@ const sendWebhookDataToELK = async (data, elkClient) => {
       time: new Date(),
     };
     await sendDataToElk({
-      indexName: "track_webhook",
+      indexName: process.env.NODE_ENV === "production" ? "track_webhook" : "track_webhook_dev",
       body,
       elkClient,
     });
