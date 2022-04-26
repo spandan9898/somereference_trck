@@ -3,6 +3,7 @@ const moment = require("moment");
 
 const { BLUEDART_CODE_MAPPER_V2 } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
+const { mapReverseScanType } = require("../../services/common");
 
 /*
 Courier Request Payload
@@ -347,13 +348,7 @@ const preparePickrrBluedartPulledData = (bluedartDict) => {
       return { err: "Unknown status code" };
     }
     if (returnWaybill) {
-      if (scanType === "DL") {
-        scanType = "RTD";
-      } else if (scanType === "OO") {
-        scanType = "RTO-OO";
-      } else {
-        scanType = "RTO-OT";
-      }
+      scanType = mapReverseScanType(scanType);
     }
     const statusDatetime = `${ScanDate} ${ScanTime}`;
     let statusDate = moment(statusDatetime, "DD-MMM-YYYY HH:mm");
@@ -368,7 +363,7 @@ const preparePickrrBluedartPulledData = (bluedartDict) => {
       received = receivedBy;
     }
     pickrrBluedartDict.received_by = received;
-    let eddDate = moment(`${edd}`, "DD MMMM YYYY");
+    let eddDate = moment(edd, "DD MMMM YYYY");
     eddDate = eddDate.isValid() ? eddDate.format("YYYY-MM-DD HH:mm:ss.SSS") : "";
     pickrrBluedartDict.scan_datetime = statusDate;
     pickrrBluedartDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
@@ -377,7 +372,7 @@ const preparePickrrBluedartPulledData = (bluedartDict) => {
     pickrrBluedartDict.EDD = eddDate;
     pickrrBluedartDict.courier_status_code = mapperString;
     pickrrBluedartDict.track_info = Scan || "";
-    pickrrBluedartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
+    pickrrBluedartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type] || "";
     pickrrBluedartDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
 
     return pickrrBluedartDict;
