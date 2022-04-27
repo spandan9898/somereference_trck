@@ -3,14 +3,13 @@ const moment = require("moment");
 const { prepareDataForReportMongo } = require("./preparator");
 
 const { reportMongoCol } = require("./model");
-const { sendReportsDataToELK } = require("./helpers");
 
 /**
  *
  * @param {*} trackObj
  * @param {*} logger
  */
-const updateStatusOnReport = async (trackObj, logger, elkClient) => {
+const updateStatusOnReport = async (trackObj, logger) => {
   const latestScanType = _.get(trackObj, "track_arr[0].scan_type", null);
   if (!latestScanType) {
     logger.info("no scan type found", latestScanType);
@@ -29,9 +28,7 @@ const updateStatusOnReport = async (trackObj, logger, elkClient) => {
   );
   result.last_updated_date = moment().toDate();
   result.last_update_from_kafka = result.last_updated_date;
-  if (process.env.IS_CONSUME_ALL !== "false") {
-    sendReportsDataToELK(result, elkClient);
-  }
+
   const opsReportColInstance = await reportMongoCol();
   try {
     const response = await opsReportColInstance.findOneAndUpdate(
