@@ -183,8 +183,6 @@ const prepareTrackingRes = async (trackingObj) => {
           responseList[i].web_address = "";
           try {
             responseList[i].info.to_phone_number = "";
-            responseList[i].info.to_address = "";
-            responseList[i].info.invoice_value = "";
             responseList[i].info.to_email = "";
             responseList[i].info.to_name = "";
           } catch {
@@ -249,8 +247,6 @@ const prepareTrackingRes = async (trackingObj) => {
       }
       try {
         tracking.info.to_phone_number = "";
-        tracking.info.to_address = "";
-        tracking.info.invoice_value = "";
         tracking.info.to_email = "";
         tracking.info.to_name = "";
       } catch {
