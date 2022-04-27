@@ -3,7 +3,6 @@ const omit = require("lodash/omit");
 
 const logger = require("../../../logger");
 const { callLambdaFunction } = require("../../connector/lambda");
-const { sendDataToElk } = require("../../services/common/elk");
 const { updateStatusELK } = require("../../services/common/services");
 const {
   fetchTrackingModelAndUpdateCache,
@@ -64,7 +63,6 @@ const getTrackingObj = async ({ trackingId, isFromPull, result, fetchFromCache =
  */
 const preparePickrrConnectLambdaPayloadAndCall = async ({
   trackingId,
-  elkClient,
   isFromPull = false,
   result,
   fetchFromCache = false,
@@ -103,22 +101,6 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
       ],
     };
     await callLambdaFunction(payload, lambdaFunctionName);
-
-    //   Update Data in ELK
-
-    const body = {
-      awb: trackingId,
-      isFromPull,
-      payload: JSON.stringify(payload),
-      time: new Date(),
-    };
-
-    await sendDataToElk({
-      indexName:
-        process.env.NODE_ENV === "production" ? "track-pickrr-connect" : "track-pickrr-connect-dev",
-      body,
-      elkClient,
-    });
     return true;
   } catch (error) {
     logger.error("preparePickrrConnectLambdaPayloadAndCall error", error.message);
