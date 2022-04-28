@@ -127,12 +127,18 @@ const preparePulledEkartData = (ekartDict) => {
     const ekartStatus = ekartDict.status ? ekartDict.status.toString().toUpperCase() : "";
     const ekartEDD = ekartDict.edd;
     const ekartEventDate = ekartDict.event_date;
-    if (EKART_PULL_MAPPER[ekartStatus]) {
-      const { pickrr_code: pickrrCode, pickrr_sub_status_code: pickrrSubStatusCode } =
-        EKART_PULL_MAPPER[ekartStatus];
-      pickrrEkartDict.scan_type = pickrrCode;
-      pickrrEkartDict.pickrr_sub_status_code = pickrrSubStatusCode;
+    const statusMappedData = EKART_PULL_MAPPER[ekartStatus];
+    if (!statusMappedData) {
+      return {
+        err: "Unknown status code",
+      };
     }
+
+    const { pickrr_code: pickrrCode, pickrr_sub_status_code: pickrrSubStatusCode } =
+      statusMappedData;
+    pickrrEkartDict.scan_type = pickrrCode;
+    pickrrEkartDict.pickrr_sub_status_code = pickrrSubStatusCode;
+
     if (
       ekartStatus === "delivered" &&
       (ekartDict.cs_notes || "").toLowerCase() === "marked_as_rto"
