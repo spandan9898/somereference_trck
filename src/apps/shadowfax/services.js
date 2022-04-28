@@ -156,9 +156,14 @@ const preparePulledShadowfaxData = (pulledData) => {
       status_id: statusId,
       received_by: receivedBy = "",
       edd = "",
+      isReverse,
     } = pulledData;
 
-    const { scanType, mapperString, pickrrSubStatusCode } = getEventInfoData({ statusId, remarks });
+    const { scanType, mapperString, pickrrSubStatusCode } = getEventInfoData({
+      statusId,
+      remarks,
+      isReverse,
+    });
     if (!scanType) {
       return { err: "Scan type not found" };
     }

@@ -143,6 +143,7 @@ const SHADOWFAX_PULL_CODE_MAPPER_2 = {
   rts_in_process: { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
   rts_d: { scan_type: "RTD", pickrr_sub_status_code: "" },
   rts_nd: { scan_type: "RTO UD", pickrr_sub_status_code: "" },
+  rts: { scan_type: "RTO", pickrr_sub_status_code: "" },
   lost: { scan_type: "LT", pickrr_sub_status_code: "" },
   delivered: { scan_type: "DL", pickrr_sub_status_code: "" },
   item_delivered_at: { scan_type: "DL", pickrr_sub_status_code: "" },
