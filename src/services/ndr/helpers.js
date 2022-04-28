@@ -1,5 +1,5 @@
 const logger = require("../../../logger");
-const { getObject, setObject } = require("../../utils/redis");
+const { getObject, storeInCache } = require("../../utils/redis");
 const { PP_PROXY_LIST } = require("../v1/constants");
 
 /**
@@ -51,7 +51,7 @@ const updateIsNDRinCache = async (awb) => {
   try {
     const cacheData = (await getObject(awb)) || {};
     cacheData.is_ndr = true;
-    await setObject(awb, cacheData);
+    await storeInCache(awb, cacheData);
   } catch (error) {
     logger.error("updateIsNDRinCache", error);
   }

@@ -1,4 +1,4 @@
-const { createLogger, format, addColors } = require("winston");
+const { createLogger, format, addColors, transports } = require("winston");
 
 const { combine, splat, timestamp } = format;
 const { customFormat, loggerTransports } = require("./helper");
@@ -16,5 +16,12 @@ const logger = createLogger({
   format: combine(splat(), timestamp({ format: "MMM-DD-YYYY hh:mm:ss" }), customFormat),
   transports: loggerTransports,
 });
+const fileLogger = createLogger({
+  level: "debug",
+  format: format.json(),
+  transports: [new transports.File({ filename: "unhandled_rejection.log" })],
+});
 
 module.exports = logger;
+exports = module.exports;
+exports.fileLogger = fileLogger;
