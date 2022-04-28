@@ -4,6 +4,7 @@ require("dotenv").config();
 const server = require("./server");
 
 const logger = require("./logger");
+const { fileLogger } = require("./logger");
 const { redisClient } = require("./src/utils");
 const initDB = require("./src/connector/db");
 const initELK = require("./src/connector/elkConnection");
@@ -64,3 +65,7 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST, MONGO_DB_STAGING
 })();
 
 server.createServer(logger);
+
+process.on("unhandledRejection", (error) => {
+  fileLogger.error("unhandledRejection", error);
+});
