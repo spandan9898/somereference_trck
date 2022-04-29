@@ -20,6 +20,7 @@ const {
 } = require("./services");
 const { getElkClients } = require("../../utils");
 const logger = require("../../../logger");
+const { sendDataToElk } = require("./elk");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -44,6 +45,8 @@ class KafkaMessageHandler {
     try {
       let res;
       let isFromPulled = false;
+      const { prodElkClient, trackingElkClient } = getElkClients();
+
       try {
         const { message } = consumedPayload;
         const consumedData = JSON.parse(message.value.toString());
@@ -51,6 +54,15 @@ class KafkaMessageHandler {
         if (consumedData?.event.includes("pull")) {
           isFromPulled = true;
           res = prepareFunc(consumedData);
+          sendDataToElk({
+            body: {
+              courier_name: courierName,
+              payload: JSON.stringify(consumedData),
+              time: new Date(),
+            },
+            elkClient: trackingElkClient,
+            indexName: "track_courier_pull",
+          });
         } else {
           res = prepareFunc(Object.values(consumedData)[0]);
         }
@@ -81,8 +93,6 @@ class KafkaMessageHandler {
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return {};
       }
-
-      const { prodElkClient, trackingElkClient } = getElkClients();
 
       const result = await updateTrackDataToPullMongo({
         trackObj: updatedTrackData,
