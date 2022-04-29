@@ -9,6 +9,5 @@ const { PULL_PARTITION_COUNT, PUSH_PARTITION_COUNT } = require("./constant");
     listener(pushConsumer, PUSH_PARTITION_COUNT);
   } catch (error) {
     logger.error("Ekart Consumer Error", error);
-    throw new Error(error);
   }
 })();

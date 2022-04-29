@@ -37,7 +37,9 @@ class KafkaMessageHandler {
   static async init(consumedPayload, courierName) {
     const prepareFunc = getPrepareFunction(courierName);
     if (!prepareFunc) {
-      throw new Error(`${courierName} is not a valid courier`);
+      return {
+        error: `${courierName} is not a valid courier`,
+      };
     }
     try {
       let res;
@@ -57,7 +59,7 @@ class KafkaMessageHandler {
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
 
-      if (!res.awb) return;
+      if (!res.awb) return {};
 
       const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
 
@@ -70,14 +72,14 @@ class KafkaMessageHandler {
       if (!trackData) {
         logger.info(`data already exists or not found in DB! ${res.awb}`);
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
-        return;
+        return {};
       }
 
       const updatedTrackData = await updatePrepareDict(trackData);
       if (_.isEmpty(updatedTrackData)) {
         logger.error("Xpresbees reverse map not found", trackData);
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
-        return;
+        return {};
       }
 
       const { prodElkClient, trackingElkClient } = getElkClients();
@@ -88,11 +90,11 @@ class KafkaMessageHandler {
         isFromPulled,
       });
       if (!result) {
-        return;
+        return {};
       }
 
       if (process.env.IS_OTHERS_CALL === "false") {
-        return;
+        return {};
       }
 
       sendDataToNdr(result);
@@ -106,8 +108,10 @@ class KafkaMessageHandler {
         result,
       });
       commonTrackingDataProducer(result);
+      return {};
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
+      return {};
     }
   }
 }

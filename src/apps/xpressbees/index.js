@@ -8,6 +8,5 @@ const { PUSH_PARTITION_COUNT } = require("./constant");
     listener(pushConsumer, PUSH_PARTITION_COUNT);
   } catch (error) {
     logger.error("XBS Consumer Error", error);
-    throw new Error(error);
   }
 })();
