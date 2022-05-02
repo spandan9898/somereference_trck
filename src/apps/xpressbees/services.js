@@ -104,6 +104,77 @@ const prepareXbsData = (xbsDict) => {
 };
 
 /**
+ * 
+ * @payload xbsDict
+ *  {
+        Status: 'RAD',
+        StatusCode: 'ReachedAtDestination',
+        StatusDateTime: '24-04-2022 15:37:28',
+        Remarks: 'Shipment reached at destination',
+        ReasonCode: null,
+        OriginLocation: 'Tenali',
+        DestinationLocation: 'HYD/NSG',
+        Location: 'HYD/NSG',
+        trackingId: '2329220602783370',
+        isReverse: true,
+        courierName: 'xpressbees_reverse',
+        event: 'pull_reverse'
+      }
+ */
+const prepareReversePulledXBSData = (xbsDict) => {
+  const pickrrXbsDict = {
+    awb: "",
+    scan_type: "",
+    scan_datetime: "",
+    track_info: "",
+    track_location: "",
+    received_by: "",
+    pickup_datetime: "",
+    EDD: "",
+    pickrr_status: "",
+    pickrr_sub_status_code: "",
+    courier_status_code: "",
+  };
+  try {
+    const { Status, StatusDateTime, Remarks, ReasonCode, Location, trackingId } = xbsDict;
+
+    let mapperString;
+    if (ReasonCode) {
+      mapperString = `${Status}-${ReasonCode}`.toLowerCase();
+    } else {
+      mapperString = `${Status}-`.toLowerCase();
+    }
+    const mapping = XBS_REVERSE_MAPPER[mapperString];
+
+    if (!mapping) {
+      return {
+        error: "Mapping not found",
+      };
+    }
+    const statusType = mapping.scan_type;
+
+    pickrrXbsDict.awb = trackingId;
+    pickrrXbsDict.scan_type = statusType === "UD" ? "NDR" : statusType;
+    pickrrXbsDict.pickrr_sub_status_code = mapping.pickrr_sub_status_code;
+    pickrrXbsDict.courier_status_code = mapperString;
+
+    pickrrXbsDict.scan_datetime = moment(StatusDateTime, "DD-MM-YYYY HH:mm:ss").toDate();
+    pickrrXbsDict.track_location = Location;
+    pickrrXbsDict.track_info = Remarks;
+    pickrrXbsDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
+
+    if (statusType === "PP") {
+      pickrrXbsDict.pickup_datetime = pickrrXbsDict.scan_datetime;
+    }
+
+    return pickrrXbsDict;
+  } catch (error) {
+    pickrrXbsDict.err = error.message;
+    return pickrrXbsDict;
+  }
+};
+
+/**
  *
  * prepares Pulled Xbs Data
  * @payload {
@@ -126,6 +197,9 @@ const prepareXbsData = (xbsDict) => {
       }
  */
 const preparePulledXBSData = (xbsDict) => {
+  if (xbsDict.isReverse) {
+    return prepareReversePulledXBSData(xbsDict);
+  }
   const pickrrXbsDict = {
     awb: "",
     scan_type: "",
@@ -171,9 +245,10 @@ const preparePulledXBSData = (xbsDict) => {
       xbsEdd = moment(ExpectedDeliveryDate, "MM/DD/YYYY HH:mm:ss a p");
       xbsEdd = xbsEdd.isValid() ? xbsEdd.toDate() : null;
     }
+    const statusType = pickrrStatusInfo.scan_type;
 
     pickrrXbsDict.awb = trackingId;
-    pickrrXbsDict.scan_type = pickrrStatusInfo.scan_type;
+    pickrrXbsDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrXbsDict.track_location = Location;
     pickrrXbsDict.pickup_datetime = xbsPickupScanTime.isValid() ? xbsPickupScanTime.toDate() : null;
     pickrrXbsDict.scan_datetime = xbsStatusTime.isValid() ? xbsStatusTime.toDate() : null;
@@ -181,7 +256,11 @@ const preparePulledXBSData = (xbsDict) => {
     pickrrXbsDict.EDD = xbsEdd;
     pickrrXbsDict.track_info = Comment;
     pickrrXbsDict.courier_status_code = mapperString;
-    pickrrXbsDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[pickrrStatusInfo.scan_type];
+    pickrrXbsDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
+
+    if (statusType === "PP") {
+      pickrrXbsDict.pickup_datetime = pickrrXbsDict.scan_datetime;
+    }
 
     return pickrrXbsDict;
   } catch (error) {
