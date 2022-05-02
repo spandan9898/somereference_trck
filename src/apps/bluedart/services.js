@@ -3,7 +3,7 @@ const moment = require("moment");
 
 const { BLUEDART_CODE_MAPPER_V2 } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { mapReverseScanType } = require("../../services/common");
+const { mapReverseScanType } = require("../../utils/helpers");
 
 /*
 Courier Request Payload
