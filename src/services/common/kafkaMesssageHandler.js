@@ -54,15 +54,17 @@ class KafkaMessageHandler {
         if (consumedData?.event.includes("pull")) {
           isFromPulled = true;
           res = prepareFunc(consumedData);
-          sendDataToElk({
-            body: {
-              courier_name: courierName,
-              payload: JSON.stringify(consumedData),
-              time: new Date(),
-            },
-            elkClient: trackingElkClient,
-            indexName: "track_courier_pull",
-          });
+          if (courierName.includes("shadowfax_pull")) {
+            sendDataToElk({
+              body: {
+                courier_name: courierName,
+                payload: JSON.stringify(consumedData),
+                time: new Date(),
+              },
+              elkClient: trackingElkClient,
+              indexName: "track_courier_pull",
+            });
+          }
         } else {
           res = prepareFunc(Object.values(consumedData)[0]);
         }
