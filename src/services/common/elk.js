@@ -43,7 +43,8 @@ const elkDataUpdate = async ({
     });
     return response;
   } catch (error) {
-    throw new Error(error);
+    logger.error("elkDataUpdate Error", error);
+    return "";
   }
 };
 

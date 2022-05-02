@@ -20,6 +20,7 @@ const {
 } = require("./services");
 const { getElkClients } = require("../../utils");
 const logger = require("../../../logger");
+const { sendDataToElk } = require("./elk");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -37,11 +38,15 @@ class KafkaMessageHandler {
   static async init(consumedPayload, courierName) {
     const prepareFunc = getPrepareFunction(courierName);
     if (!prepareFunc) {
-      throw new Error(`${courierName} is not a valid courier`);
+      return {
+        error: `${courierName} is not a valid courier`,
+      };
     }
     try {
       let res;
       let isFromPulled = false;
+      const { prodElkClient, trackingElkClient } = getElkClients();
+
       try {
         const { message } = consumedPayload;
         const consumedData = JSON.parse(message.value.toString());
@@ -49,6 +54,17 @@ class KafkaMessageHandler {
         if (consumedData?.event.includes("pull")) {
           isFromPulled = true;
           res = prepareFunc(consumedData);
+          if (courierName.includes("shadowfax_pull")) {
+            sendDataToElk({
+              body: {
+                courier_name: courierName,
+                payload: JSON.stringify(consumedData),
+                time: new Date(),
+              },
+              elkClient: trackingElkClient,
+              indexName: "track_courier_pull",
+            });
+          }
         } else {
           res = prepareFunc(Object.values(consumedData)[0]);
         }
@@ -57,7 +73,7 @@ class KafkaMessageHandler {
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
 
-      if (!res.awb) return;
+      if (!res.awb) return {};
 
       const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
 
@@ -70,17 +86,15 @@ class KafkaMessageHandler {
       if (!trackData) {
         logger.info(`data already exists or not found in DB! ${res.awb}`);
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
-        return;
+        return {};
       }
 
       const updatedTrackData = await updatePrepareDict(trackData);
       if (_.isEmpty(updatedTrackData)) {
         logger.error("Xpresbees reverse map not found", trackData);
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
-        return;
+        return {};
       }
-
-      const { prodElkClient, trackingElkClient } = getElkClients();
 
       const result = await updateTrackDataToPullMongo({
         trackObj: updatedTrackData,
@@ -88,11 +102,11 @@ class KafkaMessageHandler {
         isFromPulled,
       });
       if (!result) {
-        return;
+        return {};
       }
 
       if (process.env.IS_OTHERS_CALL === "false") {
-        return;
+        return {};
       }
 
       sendDataToNdr(result);
@@ -106,8 +120,10 @@ class KafkaMessageHandler {
         result,
       });
       commonTrackingDataProducer(result);
+      return {};
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
+      return {};
     }
   }
 }

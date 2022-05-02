@@ -8,6 +8,5 @@ const { listener, initialize } = require("./consumer");
     listener(pushConsumer, PUSH_PARTITION_COUNT);
   } catch (error) {
     logger.error("Parceldo Consumer Error", error);
-    throw new Error(error);
   }
 })();

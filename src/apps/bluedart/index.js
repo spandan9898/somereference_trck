@@ -9,6 +9,5 @@ const { PUSH_PARTITION_COUNT, PULL_PARTITION_COUNT } = require("./constant");
     listener(pullConsumer, PULL_PARTITION_COUNT);
   } catch (error) {
     logger.error("Bluedart Consumer Error", error);
-    throw new Error(error);
   }
 })();
