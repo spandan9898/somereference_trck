@@ -1,7 +1,10 @@
 const { orderBy, isEmpty, get, cloneDeep } = require("lodash");
 
 const { prepareAmazeData } = require("../../apps/amaze/services");
-const { preparePickrrBluedartDict } = require("../../apps/bluedart/services");
+const {
+  preparePickrrBluedartDict,
+  preparePickrrBluedartPulledData,
+} = require("../../apps/bluedart/services");
 const {
   prepareDelhiveryData,
   prepareDelhiveryPulledData,
@@ -153,12 +156,31 @@ const getPrepareFunction = (courierName) => {
     pidge: preparePidgeData,
     dtdc: prepareDtdcData,
     dtdc_pull: prepareDtdcPulledData,
+    bluedart_pull: preparePickrrBluedartPulledData,
   };
   return courierPrepareMapFunctions[courierName];
 };
+
+/**
+ *
+ * @param {*} scanType
+ */
+const mapReverseScanType = (scanType) => {
+  let mappedScanType = "";
+  if (scanType === "DL") {
+    mappedScanType = "RTD";
+  } else if (scanType === "OO") {
+    mappedScanType = "RTO-OO";
+  } else {
+    mappedScanType = "RTO-OT";
+  }
+  return mappedScanType;
+};
+
 module.exports = {
   sortStatusArray,
   updatePrepareDict,
   getOrderType,
   getPrepareFunction,
+  mapReverseScanType,
 };
