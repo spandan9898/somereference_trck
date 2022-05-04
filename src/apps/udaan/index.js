@@ -8,6 +8,5 @@ const { PUSH_PARTITION_COUNT } = require("./constant");
     await listener(pushConsumer, PUSH_PARTITION_COUNT);
   } catch (error) {
     logger.error("Udaan Consumer Error", error);
-    throw new Error(error);
   }
 })();

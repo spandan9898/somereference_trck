@@ -5,7 +5,7 @@ const moment = require("moment");
 const axios = require("axios");
 const size = require("lodash/size");
 
-const { setObject } = require("./redis");
+const { storeInCache } = require("./redis");
 const { prepareTrackArrCacheData } = require("../services/pull/helpers");
 const commonTrackingInfoCol = require("../services/pull/model");
 
@@ -45,7 +45,7 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
 
     const updatedCacheData = { ...trackMap };
     updatedCacheData.track_model = cacheData.track_model || {};
-    await setObject(awb, updatedCacheData);
+    await storeInCache(awb, updatedCacheData);
     await updateCacheTrackArray({
       trackArray: response.track_arr,
       currentTrackObj: trackObj,
