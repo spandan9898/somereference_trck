@@ -70,9 +70,11 @@ class KafkaMessageHandler {
           }
         } else {
           const consumedPayloadData = Object.values(consumedData)[0];
-          trackingLogger.info(courierName, {
-            data: consumedPayloadData,
-          });
+          if (process.env.IS_PAYLOAD_LOGGING === "true") {
+            trackingLogger.info(courierName, {
+              data: consumedPayloadData,
+            });
+          }
           res = prepareFunc(consumedPayloadData);
         }
       } catch (error) {
