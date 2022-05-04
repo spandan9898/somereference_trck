@@ -39,7 +39,6 @@ const prepareBellavitaWebhookData = (trackObj) => {
     elements: [],
   };
   try {
-    preparedWebhookData.customer_id = trackObj?.info?.to_email || "";
     const { status } = trackObj;
     const { info } = trackObj;
     const customerInfo = {
@@ -58,7 +57,7 @@ const prepareBellavitaWebhookData = (trackObj) => {
         {
           action: status.current_status_type,
           current_time: moment(status?.current_status_time).isValid()
-            ? `${moment(status?.current_status_time).format("YYYY-MM-DDTHH:MM:SS")}Z`
+            ? `${moment(status?.current_status_time).format("YYYY-MM-DDTHH:mm:ss.SSS")}Z`
             : "",
           user_timezone_offset: 19800,
         },
