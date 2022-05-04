@@ -41,13 +41,14 @@ const prepareBellavitaWebhookData = (trackObj) => {
   try {
     const { status } = trackObj;
     const { info } = trackObj;
+    const mobile = (info?.to_phone_number || "").toString().slice(-10) || "";
     const customerInfo = {
       type: "customer",
       customer_id: info?.to_email || "",
       attributes: {
-        name: info?.to_name,
-        mobile: info?.to_phone_number,
-        email: info?.to_email,
+        name: info?.to_name || "",
+        mobile,
+        email: info?.to_email || "",
       },
     };
     const eventInfo = {
