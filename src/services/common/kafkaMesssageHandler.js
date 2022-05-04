@@ -20,7 +20,10 @@ const {
 } = require("./services");
 const { getElkClients } = require("../../utils");
 const logger = require("../../../logger");
+const { TrackingLogger } = require("../../../logger");
 const { sendDataToElk } = require("./elk");
+
+const trackingLogger = TrackingLogger("tracking/payloads");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -51,7 +54,7 @@ class KafkaMessageHandler {
         const { message } = consumedPayload;
         const consumedData = JSON.parse(message.value.toString());
 
-        if (consumedData?.event.includes("pull")) {
+        if (consumedData?.event?.includes("pull")) {
           isFromPulled = true;
           res = prepareFunc(consumedData);
           if (courierName.includes("shadowfax_pull")) {
@@ -66,9 +69,13 @@ class KafkaMessageHandler {
             });
           }
         } else {
-          res = prepareFunc(Object.values(consumedData)[0]);
+          const consumedPayloadData = Object.values(consumedData)[0];
+          trackingLogger.info(courierName, {
+            data: consumedPayloadData,
+          });
+          res = prepareFunc(consumedPayloadData);
         }
-      } catch {
+      } catch (error) {
         res = prepareFunc(consumedPayload);
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
