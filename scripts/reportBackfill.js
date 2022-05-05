@@ -42,7 +42,7 @@ const processBackfilling = async (data, collection, elkClient, type, prodElkClie
       sendTrackDataToV1(response);
     }
     if (type.includes("report")) {
-      if (!["OP"].includes(response?.status?.current_status_type)) {
+      if (!["OP", "OM", "OFP", "PPF"].includes(response?.status?.current_status_type)) {
         updateStatusOnReport(response, logger, elkClient);
       }
     }
@@ -186,7 +186,7 @@ const processForDbData = async ({ batchData: trackingData, type, elkClient, prod
           sendTrackDataToV1(trackingItem);
         }
         if (type.includes("report")) {
-          if (!["OP"].includes(trackingItem?.status?.current_status_type)) {
+          if (!["OP", "OM", "OFP", "PPF"].includes(trackingItem?.status?.current_status_type)) {
             updateStatusOnReport(trackingItem, logger, elkClient);
           }
         }
