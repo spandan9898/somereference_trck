@@ -2,7 +2,7 @@ const _ = require("lodash");
 
 const logger = require("../../../logger");
 const { sendDataToElk } = require("../common/elk");
-const { NEW_STATUS_TO_OLD_MAPPING } = require("../v1/constants");
+const { NEW_STATUS_TO_OLD_MAPPING } = require("./constants");
 const { REPORT_STATUS_CODE_MAPPING, REPORT_STATUS_TYPE_MAPPING } = require("./constants");
 
 /**
