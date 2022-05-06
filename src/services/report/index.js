@@ -22,6 +22,12 @@ const updateStatusOnReport = async (trackObj, logger) => {
     logger.info("scan type is CC", latestScanType);
     return false;
   }
+
+  if (latestScanType === "OP") {
+    logger.info("OP status isn't sent from trackingPushConsumer to reportDB");
+    return false;
+  }
+
   const result = _.pickBy(
     prepareDataForReportMongo(trackObj),
     (val) => val !== null && val !== undefined && val !== ""
