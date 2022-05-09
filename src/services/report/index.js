@@ -11,6 +11,9 @@ const { reportMongoCol } = require("./model");
  */
 const updateStatusOnReport = async (trackObj, logger) => {
   const latestScanType = _.get(trackObj, "track_arr[0].scan_type", null);
+  if (["OFP", "PPF"].includes(latestScanType)) {
+    return false;
+  }
   if (!latestScanType) {
     logger.info("no scan type found", latestScanType);
     return false;
