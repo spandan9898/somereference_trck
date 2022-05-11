@@ -6,7 +6,7 @@ const { PULL_MAPPER, STATION_MAPPER } = require("./constant");
  *
  * prepare Smartr Pulled Data
  */
-const preparePulledSmartrPulledData = (smartrDict) => {
+const preparePulledSmartrData = (smartrDict) => {
   const pickrrSmartrDict = {
     awb: "",
     scan_type: "",
@@ -64,5 +64,5 @@ const preparePulledSmartrPulledData = (smartrDict) => {
 };
 
 module.exports = {
-  preparePulledSmartrPulledData,
+  preparePulledSmartrData,
 };

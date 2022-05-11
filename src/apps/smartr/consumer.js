@@ -29,7 +29,7 @@ const listener = async (consumer, partitionCount) => {
       autoCommitInterval: 60000,
       partitionsConsumedConcurrently: partitionCount,
       eachMessage: (consumedPayload) => {
-        KafkaMessageHandler.init(consumedPayload, "Smartr");
+        KafkaMessageHandler.init(consumedPayload, "smartr_pull");
       },
     });
   } catch (error) {
