@@ -17,7 +17,7 @@ const sendTrackDataToV1 = async (trackData) => {
   try {
     if (
       ["OFP", "PPF"].includes(trackData?.status?.current_status_type) ||
-      trackData?.status?.current_status_body === "pickup_cancelled"
+      (trackData?.status?.current_status_body || "").toLowerCase() === "pickup_cancelled"
     ) {
       return false;
     }
