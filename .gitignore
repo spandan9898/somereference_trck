@@ -53,3 +53,6 @@ package-lock.json
 .vscode/launch.json
 
 mapper/
+
+scripts/*.csv
+scripts/*.json
