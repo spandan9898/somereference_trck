@@ -15,7 +15,10 @@ const { V1_EVENT_BRIDGE_SOURCE, V1_EVENT_BRIDGE_DETAIL_TYPE, V1_EVENT_BRIDGE_BUS
  */
 const sendTrackDataToV1 = async (trackData) => {
   try {
-    if (["OFP", "PPF"].includes(trackData?.status?.current_status_type)) {
+    if (
+      ["OFP", "PPF"].includes(trackData?.status?.current_status_type) ||
+      trackData?.status?.current_status_body === "pickup_cancelled"
+    ) {
       return false;
     }
     const trackDict = prepareTrackDictForV1(trackData);
