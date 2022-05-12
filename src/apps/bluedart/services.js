@@ -348,18 +348,18 @@ const preparePickrrBluedartPulledData = (bluedartDict) => {
       return { err: "Unknown status code" };
     }
     if (returnWaybill) {
-      scanType = mapReverseScanType(scanType);
+      scanType.scan_type = mapReverseScanType(scanType?.scan_type);
     }
     const statusDatetime = `${ScanDate} ${ScanTime}`;
     let statusDate = moment(statusDatetime, "DD-MMM-YYYY HH:mm");
     statusDate = statusDate.isValid()
       ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
       : moment().format("YYYY-MM-DD HH:mm:ss.SSS");
-    if (scanType === "PP") {
+    if (scanType?.scan_type === "PP") {
       pickrrBluedartDict.pickup_datetime = moment(statusDate).toDate();
     }
     let received = "";
-    if (scanType === "DL") {
+    if (scanType?.scan_type === "DL") {
       received = receivedBy;
     }
     pickrrBluedartDict.received_by = received;
