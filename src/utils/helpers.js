@@ -122,7 +122,7 @@ const checkAwbInCache = async ({ trackObj, updateCacheTrackArray, isFromPulled }
   const cachedData = await getObject(trackObj.awb);
   const newScanTime = moment(trackObj.scan_datetime).unix();
 
-  if (!cachedData || !(size(cachedData) >= 2)) {
+  if (!cachedData || !(size(cachedData) >= 2) || !cachedData?.track_model) {
     const res = await fetchTrackingDataAndStoreInCache(trackObj, updateCacheTrackArray);
     if (!res) {
       return false;
