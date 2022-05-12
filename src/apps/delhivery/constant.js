@@ -3707,11 +3707,6 @@ const DELHIVERY_MAPPER = {
     scan_type: "OTPF",
     pickrr_sub_status_code: "OTH",
   },
-  "eod-138_ud": {
-    courier_remark: "OTP not available",
-    scan_type: "OTPF",
-    pickrr_sub_status_code: "OTH",
-  },
   "lt-100_lt": { courier_remark: "Shipment Lost", scan_type: "LT", pickrr_sub_status_code: "" },
   "dlydg-119_pu": {
     courier_remark: "Shipment Damaged",
