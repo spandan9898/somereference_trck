@@ -13,7 +13,7 @@ const updateStatusOnReport = async (trackObj, logger) => {
   const latestScanType = _.get(trackObj, "track_arr[0].scan_type", null);
   const latestScanStatus = _.get(trackObj, "track_arr[0].scan_status", "") || "";
   if (
-    ["OFP", "PPF"].includes(latestScanType) ||
+    ["OFP", "PPF", "OP"].includes(latestScanType) ||
     latestScanStatus.toLowerCase() === "pickup_cancelled"
   ) {
     return false;
