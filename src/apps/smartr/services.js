@@ -21,7 +21,7 @@ const preparePulledSmartrData = (smartrDict) => {
     courier_status_code: "",
   };
   try {
-    pickrrSmartrDict.awb = smartrDict.AwbNumber;
+    pickrrSmartrDict.awb = smartrDict.AWBNumber;
     let mapperString = smartrDict.Milestone;
     const { DeliveryAttemptDetails, isRto, Station, eventdatetime } = smartrDict;
     if (mapperString.toLowerCase() === "delivery attempt" && smartrDict?.DeliveryAttemptDetails) {
@@ -33,7 +33,7 @@ const preparePulledSmartrData = (smartrDict) => {
         err: "No Scan Type Found",
       };
     }
-    const { scanType } = statusMappedData;
+    const { scan_type: scanType } = statusMappedData;
     pickrrSmartrDict.scan_type = scanType;
 
     if (isRto) {
@@ -50,7 +50,7 @@ const preparePulledSmartrData = (smartrDict) => {
     if (Station && stationMappedData) {
       pickrrSmartrDict.track_location = stationMappedData;
     }
-    let scanTime = moment(eventdatetime, "DD/MM/YYYYT hh:mm").toDate();
+    let scanTime = moment(eventdatetime, "DD/MM/YYYYT hh:mm");
     scanTime = scanTime.format("YYYY-MM-DDTHH:mm");
     if (scanType === "PP") {
       pickrrSmartrDict.pickup_datetime = scanTime;
