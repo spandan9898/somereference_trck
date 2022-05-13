@@ -315,6 +315,22 @@ const ofdCount = (trackArr, scanType) => {
 
   return finalOfdCount;
 };
+
+/**
+ *
+ * @param {*} scanType
+ */
+const mapReverseScanType = (scanType) => {
+  let mappedScanType = "";
+  if (scanType === "DL") {
+    mappedScanType = "RTD";
+  } else if (scanType === "OO") {
+    mappedScanType = "RTO-OO";
+  } else {
+    mappedScanType = "RTO-OT";
+  }
+  return mappedScanType;
+};
 module.exports = {
   checkAwbInCache,
   convertDatetimeFormat,
@@ -325,4 +341,5 @@ module.exports = {
   getMaxDate,
   getElkClients,
   ofdCount,
+  mapReverseScanType,
 };
