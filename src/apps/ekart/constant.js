@@ -1,7 +1,7 @@
 const EKART_STATUS_MAPPER = {
   shipment_created: { scan_type: "OP", pickrr_sub_status_code: "" },
   shipment_pickup_complete: { scan_type: "PP", pickrr_sub_status_code: "" },
-  pickup_cancelled: { scan_type: "OC", pickrr_sub_status_code: "" },
+  pickup_cancelled: { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
   shipment_received: { scan_type: "SHP", pickrr_sub_status_code: "" },
   shipment_in_transit: { scan_type: "OT", pickrr_sub_status_code: "" },
   shipment_out_for_delivery: { scan_type: "OO", pickrr_sub_status_code: "" },
