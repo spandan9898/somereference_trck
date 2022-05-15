@@ -50,8 +50,8 @@ const preparePulledSmartrData = (smartrDict) => {
     if (Station && stationMappedData) {
       pickrrSmartrDict.track_location = stationMappedData;
     }
-    let scanTime = moment(eventdatetime, "DD/MM/YYYYT hh:mm");
-    scanTime = scanTime.format("YYYY-MM-DDTHH:mm");
+    let scanTime = eventdatetime ? moment(eventdatetime, "DD/MM/YYYYT hh:mm") : "";
+    scanTime = moment(scanTime).isValid ? scanTime.format("YYYY-MM-DDTHH:mm") : "";
     if (scanType === "PP") {
       pickrrSmartrDict.pickup_datetime = scanTime;
     }
