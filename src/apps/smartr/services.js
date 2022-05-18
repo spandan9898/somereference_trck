@@ -5,6 +5,25 @@ const { PULL_MAPPER, STATION_MAPPER } = require("./constant");
 /**
  *
  * prepare Smartr Pulled Data
+ * Sample Payload : {
+  AWBNumber: 'XSE-13107835',
+  Station: 'HSRL',
+  Milestone: 'Booked',
+  Pieces: 1,
+  PiecesWeight: '0.30 Kgs',
+  UOM: 'K',
+  FlightNo: ' 13/05/2022 ',
+  FlightDate: '13/05/2022 14:55',
+  Origin: 'HSRL',
+  OriginAirportName: 'HSR LAYOUT BANGALORE',
+  Destination: 'BLRH',
+  DestAirportName: 'BENGALURU HUB',
+  ULDNO: '',
+  OrderBy: 1,
+  eventdatetime: '13/05/2022 14:55',
+  isRto: false,
+  event: 'pull'
+}
  */
 const preparePulledSmartrData = (smartrDict) => {
   const pickrrSmartrDict = {
