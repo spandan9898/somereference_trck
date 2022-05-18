@@ -33,7 +33,12 @@ const processBackfilling = async (data, collection, elkClient, type, prodElkClie
   const courierTrackingIds = data.map((awb) => `${awb}`);
 
   const responses = await collection
-    .find({ tracking_id: { $in: courierTrackingIds } })
+    .find({
+      $or: [
+        { tracking_id: { $in: courierTrackingIds } },
+        { courier_tracking_id: { $in: courierTrackingIds } },
+      ],
+    })
     .project({ audit: 0, mandatory_status_map: 0, _id: 0 })
     .toArray();
 
@@ -254,7 +259,10 @@ const fetchDataFromDB = async ({
     if (limit && limit < 4999) {
       const batchData = [];
 
-      const aggCursor = await collection.find(filters, { projection }).limit(limit);
+      const aggCursor = await collection
+        .find(filters, { projection })
+        .batchSize(limit)
+        .limit(limit);
 
       for await (const doc of aggCursor) {
         batchData.push(doc);
@@ -282,7 +290,10 @@ const fetchDataFromDB = async ({
 
         const batchData = [];
 
-        const aggCursor = await collection.find(filters, { projection }).limit(LIMIT);
+        const aggCursor = await collection
+          .find(filters, { projection })
+          .batchSize(LIMIT)
+          .limit(LIMIT);
 
         for await (const doc of aggCursor) {
           batchData.push(doc);
