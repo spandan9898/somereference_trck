@@ -79,6 +79,10 @@ const PrepareTrackModelFilters = async (trackingAwb) => {
     audit: 0,
     pickup_address_pk: 0,
     mandatory_status_map: 0,
+    kam: 0,
+    sales_poc: 0,
+    wh_id: 0,
+    status_pk: 0,
   };
 
   return { query, projection };
