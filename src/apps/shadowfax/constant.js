@@ -105,8 +105,8 @@ const SHADOWFAX_PULL_CODE_MAPPER_1 = {
   "recd_at_fwd_dc_received at rts dc": { scan_type: "RTO", pickrr_sub_status_code: "" },
   "cancelled_by_customer_cancelled by customer": { scan_type: "UD", pickrr_sub_status_code: "CR" },
   "cancelled_by_customer_cancelled as per client's request": {
-    scan_type: "OC",
-    pickrr_sub_status_code: "",
+    scan_type: "UD",
+    pickrr_sub_status_code: "OTH",
   },
   "cancelled_by_customer_third successful attempt": { scan_type: "OC", pickrr_sub_status_code: "" },
   "cancelled_by_customer_cancelled by client": { scan_type: "OC", pickrr_sub_status_code: "" },
@@ -153,6 +153,7 @@ const SHADOWFAX_PULL_CODE_MAPPER_2 = {
   bag_in_transit: { scan_type: "OT", pickrr_sub_status_code: "" },
   bag_received_at_via: { scan_type: "OT", pickrr_sub_status_code: "" },
   assigned_for_seller_pickup: { scan_type: "OM", pickrr_sub_status_code: "" },
+  cancelled_by_seller: { scan_type: "PPF", pickrr_sub_status_code: "CANC" }
 };
 
 const SHADOWFAX_REVERSE_MAPPER = {
