@@ -70,7 +70,7 @@ const prepareLoadshareData = (loadshareDict) => {
   pickrrLoadshareDict.track_info = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
   pickrrLoadshareDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
   pickrrLoadshareDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
-  pickrrLoadshareDict.track_location = loadshareDict?.locationCity.toString();
+  pickrrLoadshareDict.track_location = loadshareDict?.locationCity?.toString();
   return pickrrLoadshareDict;
 };
 module.exports = {

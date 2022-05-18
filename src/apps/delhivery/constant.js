@@ -1761,7 +1761,7 @@ const DELHIVERY_REVERSE_MAPPER = {
   },
   "rt-111_dl": {
     courier_remark: "DTO due to poor packaging",
-    scan_type: "OC",
+    scan_type: "DM",
     pickrr_sub_status_code: "",
   },
   "cl-102_pp": {

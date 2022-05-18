@@ -38,7 +38,13 @@ const filterTrackingParamsForTracker = async (trackDict) => {
   }
   trackObj.auth_token = "";
 
-  _.set(trackObj, "info.to_phone_number", "");
+  if (
+    !["5967ba6e84528b2dad61df7b94de1106213782", "bcccdd5bae06f93eaf21f4866febf943173741"].includes(
+      authToken
+    )
+  ) {
+    _.set(trackObj, "info.to_phone_number", "");
+  }
   _.set(trackObj, "info.to_address", "");
   _.set(trackObj, "info.to_address", "");
   _.set(trackObj, "info.invoice_value", "");
