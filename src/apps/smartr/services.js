@@ -43,7 +43,7 @@ const preparePulledSmartrData = (smartrDict) => {
     pickrrSmartrDict.awb = smartrDict.AWBNumber;
     let mapperString = smartrDict.Milestone;
     const { DeliveryAttemptDetails, isRto, Station, eventdatetime } = smartrDict;
-    if (mapperString.toLowerCase() === "delivery attempt" && smartrDict?.DeliveryAttemptDetails) {
+    if (mapperString.toLowerCase() === "delivery attempt" && DeliveryAttemptDetails) {
       mapperString = `${mapperString}_${DeliveryAttemptDetails}`;
     }
     const statusMappedData = PULL_MAPPER[mapperString.toLowerCase()];
