@@ -1,5 +1,6 @@
 const moment = require("moment");
 const logger = require("../../../logger");
+const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { PULL_MAPPER, STATION_MAPPER } = require("./constant");
 
 /**
@@ -75,6 +76,7 @@ const preparePulledSmartrData = (smartrDict) => {
       pickrrSmartrDict.pickup_datetime = scanTime;
     }
     pickrrSmartrDict.scan_datetime = scanTime;
+    pickrrSmartrDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[pickrrSmartrDict.scan_type];
     return pickrrSmartrDict;
   } catch (error) {
     logger.error("Failed While preparing Pickrr Dict for Smartr", error.message);
