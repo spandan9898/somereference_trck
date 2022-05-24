@@ -72,7 +72,7 @@ const checkStatus = async (csvData, pullDbInstance) => {
       return false;
     }
     return (
-      ["DL", "RTO", "RTD"].includes(rowData.status) &&
+      ["DL", "RTO", "RTD", "OC"].includes(rowData.status) &&
       rowData.status !== trackingObj[rowData.tracking_id]
     );
   });
