@@ -1,6 +1,10 @@
+/* eslint-disable require-jsdoc */
 const RequestIp = require("@supercharge/request-ip");
 const moment = require("moment");
+const Papa = require("papaparse");
+
 const startProcess = require("../../../../scripts/reportBackfill");
+const { updateStatusFromCSV } = require("../../../services/common/updateStatusFromCsv");
 
 module.exports.returnHeaders = async (req, reply) => {
   const IP = RequestIp.getClientIp(req);
@@ -25,4 +29,57 @@ module.exports.reportBackfilling = async (req, reply) => {
     dateFilter,
   });
   return reply.code(200).send(body);
+};
+
+module.exports.updateStatus = async function updateStatus(req, reply) {
+  try {
+    if (!req.isMultipart()) {
+      return reply.code(400).send({
+        message: "Please send proper file",
+      });
+    }
+    const options = { limits: { fileSize: 1000000 } };
+    const data = await req.file(options);
+    const body = data.fields;
+
+    const authToken = body?.auth_token?.value || "";
+
+    if (authToken !== process.env.UPDATE_STATUS_AUTH_TOKEN) {
+      return reply.code(401).send({
+        message: "Invalid Auth Token",
+      });
+    }
+
+    const csvData = [];
+
+    Papa.parse(data.file, {
+      worker: true,
+      header: true,
+      step(results) {
+        const header = Object.keys(results.data).join(" ");
+        if (header !== "tracking_id date status") {
+          throw new Error("Please provide valid header");
+        }
+        if (results.data) {
+          csvData.push(results.data);
+        }
+      },
+      complete() {
+        updateStatusFromCSV(csvData);
+      },
+    });
+
+    return reply.code(200).send({
+      success: true,
+    });
+  } catch (error) {
+    if (error.code === "FST_REQ_FILE_TOO_LARGE") {
+      return reply.code(400).send({
+        message: "File is too large. We're allowing only 1 MB",
+      });
+    }
+    return reply.code(400).send({
+      message: error.message,
+    });
+  }
 };
