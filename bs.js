@@ -2,7 +2,7 @@
 const yargs = require("yargs/yargs");
 const { hideBin } = require("yargs/helpers");
 const moment = require("moment");
-const startProcess = require("./scripts/reportBackfill");
+const { startProcess } = require("./scripts/reportBackfill");
 const reportToPullBackfilling = require("./scripts/reportToPullBackfilling");
 
 const { argv } = yargs(hideBin(process.argv));

@@ -1,9 +1,13 @@
+/* eslint-disable no-promise-executor-return */
 /* eslint-disable no-restricted-syntax */
-const { isEmpty } = require("lodash");
+const { isEmpty, chunk } = require("lodash");
 const moment = require("moment");
-const { getDbCollectionInstance } = require("../../utils");
 
+const { processBackfilling } = require("../../../scripts/reportBackfill");
+const { getDbCollectionInstance } = require("../../utils");
+const initELK = require("../../connector/elkConnection");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
+const { ELK_INSTANCE_NAMES } = require("../../utils/constants");
 
 /**
  * 
@@ -21,6 +25,8 @@ const prepareStatusObj = ({ status, date, tracking_id: trackingId }) => {
     scan_status: PICKRR_STATUS_CODE_MAPPING[status] || status,
     scan_location: "",
     scan_type: status,
+    update_source: "manual",
+    system_updated_at: moment().toDate(),
   };
 
   const statusObj = {
@@ -34,7 +40,7 @@ const prepareStatusObj = ({ status, date, tracking_id: trackingId }) => {
     from: "manual",
     current_status_type: status,
     current_status_time: trackArrStatus.scan_datetime,
-    pulled_at: moment().subtract(330, "minutes").toDate(),
+    pulled_at: moment().toDate(),
   };
 
   return {
@@ -73,6 +79,24 @@ const checkStatus = async (csvData, pullDbInstance) => {
 };
 
 /**
+ *
+ * @param {*} filteredCsvData
+ */
+const updateOtherSources = async (filteredCsvData, collection) => {
+  const trackingIds = filteredCsvData.map((data) => data.tracking_id);
+
+  const elkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.TRACKING.name);
+  const prodElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.PROD.name);
+
+  const chunkedData = chunk(trackingIds, 1000);
+
+  for (const data of chunkedData) {
+    processBackfilling(data, collection, elkClient, ["report", "v1", "elk"], prodElkClient);
+    await new Promise((done) => setTimeout(() => done(), 100));
+  }
+};
+
+/**
  * 
  * @param {[{}]} csvData 
    [{
@@ -89,6 +113,9 @@ const updateStatusFromCSV = async (csvData) => {
   const pullDbInstance = await getDbCollectionInstance();
   const filteredCsvData = await checkStatus(csvData, pullDbInstance);
 
+  if (isEmpty(filteredCsvData)) {
+    return false;
+  }
   const trackData = filteredCsvData.map(prepareStatusObj);
 
   const response = await pullDbInstance.bulkWrite(
@@ -99,6 +126,8 @@ const updateStatusFromCSV = async (csvData) => {
           update: {
             $set: {
               status: tackItem.statusObj,
+              updated_at: moment().toDate(),
+              last_update_from: "manual",
             },
             $push: {
               audit: tackItem.auditObj,
@@ -116,7 +145,10 @@ const updateStatusFromCSV = async (csvData) => {
       }
     )
   );
+
   console.log("response", response);
+
+  await updateOtherSources(filteredCsvData, pullDbInstance);
   return true;
 };
 

@@ -375,4 +375,4 @@ const startProcess = async ({
   }
 };
 
-module.exports = startProcess;
+module.exports = { startProcess, processBackfilling };

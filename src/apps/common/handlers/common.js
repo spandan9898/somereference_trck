@@ -3,7 +3,7 @@ const RequestIp = require("@supercharge/request-ip");
 const moment = require("moment");
 const Papa = require("papaparse");
 
-const startProcess = require("../../../../scripts/reportBackfill");
+const { startProcess } = require("../../../../scripts/reportBackfill");
 const { updateStatusFromCSV } = require("../../../services/common/updateStatusFromCsv");
 
 module.exports.returnHeaders = async (req, reply) => {
