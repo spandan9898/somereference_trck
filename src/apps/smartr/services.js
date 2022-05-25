@@ -74,12 +74,10 @@ const prepareSmartrData = (smartrDict) => {
   pickrrSmartrDict.scan_datetime = statusDate;
   pickrrSmartrDict.courier_status_code = mapperString;
   pickrrSmartrDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
-  pickrrSmartrDict.track_info = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
+  pickrrSmartrDict.track_info =
+    smartrDict?.remarks || PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
   pickrrSmartrDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
   pickrrSmartrDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
-
-  // pickrrSmartrDict.track_location = smartrDict?.locationCity?.toString();
-
   pickrrSmartrDict.track_location = STATION_MAPPER[smartrDict?.location?.toString()] || "";
 
   return pickrrSmartrDict;
