@@ -23,7 +23,7 @@ const fetchAndUpdateAuditLogsData = async ({ courierTrackingId, updatedObj, isFr
     if (process.env.NODE_ENV === "staging") {
       auditStagingColInstance = await commonTrackingInfoCol({
         hostName: HOST_NAMES.PULL_STATING_DB,
-        collectionName: "MONGO_DB_STAGING__AUDIT_COLLECTION_NAME",
+        collectionName: "MONGO_DB_STAGING_AUDIT_COLLECTION_NAME",
       });
     }
     const auditProdColInstance = await commonTrackingInfoCol({
