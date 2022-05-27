@@ -90,7 +90,7 @@ const checkStatus = async (csvData, pullDbInstance) => {
  *
  * @param {*} filteredCsvData
  */
-const updateOtherSources = async (filteredCsvData, collection) => {
+const updateOtherSources = async (filteredCsvData, collection, platformNames) => {
   const trackingIds = filteredCsvData.map((data) => data.tracking_id);
 
   const elkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.TRACKING.name);
@@ -99,13 +99,7 @@ const updateOtherSources = async (filteredCsvData, collection) => {
   const chunkedData = chunk(trackingIds, 1000);
 
   for (const data of chunkedData) {
-    processBackfilling(
-      data,
-      collection,
-      elkClient,
-      ["report", "v1", "elk", "webhook"],
-      prodElkClient
-    );
+    processBackfilling(data, collection, elkClient, platformNames, prodElkClient);
     await new Promise((done) => setTimeout(() => done(), 100));
   }
 };
@@ -119,7 +113,7 @@ const updateOtherSources = async (filteredCsvData, collection) => {
         status: 'RTO'
     }],
  */
-const updateStatusFromCSV = async (csvData) => {
+const updateStatusFromCSV = async (csvData, platformNames) => {
   if (isEmpty(csvData)) {
     return false;
   }
@@ -163,7 +157,7 @@ const updateStatusFromCSV = async (csvData) => {
 
   console.log("response", response);
   if (process.env.NODE_ENV === "production") {
-    await updateOtherSources(filteredCsvData, pullDbInstance);
+    await updateOtherSources(filteredCsvData, pullDbInstance, platformNames);
   }
   return true;
 };
