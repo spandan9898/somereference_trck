@@ -11,13 +11,17 @@ const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
 const { HOST_NAMES } = require("../../utils/constants");
 const { findOneDocumentFromMongo } = require("../../utils");
-const logger = require("../../../logger");
 
 /**
  *
  * Updates Audit Logs in track_audit collection in pullMongoDB
  */
-const fetchAndUpdateAuditLogsData = async ({ courierTrackingId, updatedObj, isFromPulled }) => {
+const fetchAndUpdateAuditLogsData = async ({
+  courierTrackingId,
+  updatedObj,
+  isFromPulled,
+  logger,
+}) => {
   try {
     let auditStagingColInstance;
     if (process.env.NODE_ENV === "staging") {
