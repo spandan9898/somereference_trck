@@ -4,7 +4,7 @@ const util = require("util");
 const moment = require("moment");
 
 const pump = util.promisify(pipeline);
-const startProcess = require("./reportBackfill");
+const { startProcess } = require("./reportBackfill");
 
 /**
  *

@@ -45,7 +45,7 @@ const updateStatusOnReport = async (trackObj, logger) => {
   const opsReportColInstance = await reportMongoCol();
   try {
     const response = await opsReportColInstance.findOneAndUpdate(
-      { pickrr_tracking_id: trackObj.tracking_id },
+      { pickrr_tracking_id: trackObj.tracking_id, courier_used: { $nin: ["", null] } },
       {
         $set: result,
       },

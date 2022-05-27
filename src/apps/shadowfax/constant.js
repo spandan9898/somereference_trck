@@ -153,7 +153,7 @@ const SHADOWFAX_PULL_CODE_MAPPER_2 = {
   bag_in_transit: { scan_type: "OT", pickrr_sub_status_code: "" },
   bag_received_at_via: { scan_type: "OT", pickrr_sub_status_code: "" },
   assigned_for_seller_pickup: { scan_type: "OM", pickrr_sub_status_code: "" },
-  cancelled_by_seller: { scan_type: "PPF", pickrr_sub_status_code: "CANC" }
+  cancelled_by_seller: { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
 };
 
 const SHADOWFAX_REVERSE_MAPPER = {

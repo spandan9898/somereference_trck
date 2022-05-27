@@ -1,3 +1,4 @@
+/* eslint-disable no-constant-condition */
 const { format, transports } = require("winston");
 const { logLevel } = require("kafkajs");
 const isEmpty = require("lodash/isEmpty");
@@ -51,7 +52,7 @@ const loggerTransports = [
   }),
 ];
 
-if (["production", "staging"].includes(process.env.NODE_ENV)) {
+if (["production", "staging"].includes(process.env.NODE_ENV) && false) {
   loggerTransports.push(
     new SlackHook({
       webhookUrl: process.env.SLACK_TRACKING_ERROR_WEBHOOK_URL,
