@@ -106,7 +106,7 @@ const updateOtherSources = async (filteredCsvData, collection, platformNames) =>
   const chunkedData = chunk(trackingIds, 1000);
 
   for (const data of chunkedData) {
-    processBackfilling(data, collection, elkClient, platformNames, prodElkClient);
+    processBackfilling(data, collection, elkClient, platformNames, prodElkClient, true);
     await new Promise((done) => setTimeout(() => done(), 100));
   }
 };
