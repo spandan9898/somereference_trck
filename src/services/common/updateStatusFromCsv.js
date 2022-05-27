@@ -26,8 +26,15 @@ const prepareStatusObj = ({
   status_text: statusText = "",
 }) => {
   const allowedDateFormats = ["MM/DD/YYYY HH:mm:ss", "YYYY-MM-DD HH:mm:ss"];
+  let scanDateTime = moment(date, allowedDateFormats);
+  scanDateTime = scanDateTime.isValid()
+    ? scanDateTime.subtract(330, "minutes").toDate()
+    : moment().subtract(330, "minutes").toDate();
+  if (!date) {
+    scanDateTime = moment().subtract(330, "minutes").toDate();
+  }
   const trackArrStatus = {
-    scan_datetime: moment(date, allowedDateFormats).subtract(330, "minutes").toDate(),
+    scan_datetime: scanDateTime,
     scan_status: statusText || PICKRR_STATUS_CODE_MAPPING[status] || status,
     pickrr_sub_status_code: subStatusCode,
     scan_location: "",
