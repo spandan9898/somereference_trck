@@ -64,7 +64,7 @@ const checkStatus = async (csvData, pullDbInstance) => {
 
   const trackingObj = {};
   for await (const doc of aggCursor) {
-    trackingObj[doc.tracking_id] = doc.status["status.current_status_type"];
+    trackingObj[doc.tracking_id] = doc.status.current_status_type || doc.status.courier_status_code;
   }
 
   return csvData.filter((rowData) => {
@@ -128,6 +128,7 @@ const updateStatusFromCSV = async (csvData) => {
               status: tackItem.statusObj,
               updated_at: moment().toDate(),
               last_update_from: "manual",
+              is_manual_update: true,
             },
             $push: {
               audit: tackItem.auditObj,
@@ -147,8 +148,9 @@ const updateStatusFromCSV = async (csvData) => {
   );
 
   console.log("response", response);
-
-  await updateOtherSources(filteredCsvData, pullDbInstance);
+  if (process.env.NODE_ENV === "production") {
+    await updateOtherSources(filteredCsvData, pullDbInstance);
+  }
   return true;
 };
 

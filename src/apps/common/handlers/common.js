@@ -4,7 +4,9 @@ const moment = require("moment");
 const Papa = require("papaparse");
 
 const { startProcess } = require("../../../../scripts/reportBackfill");
+const { sendDataToElk } = require("../../../services/common/elk");
 const { updateStatusFromCSV } = require("../../../services/common/updateStatusFromCsv");
+const { getElkClients } = require("../../../utils");
 
 module.exports.returnHeaders = async (req, reply) => {
   const IP = RequestIp.getClientIp(req);
@@ -33,6 +35,13 @@ module.exports.reportBackfilling = async (req, reply) => {
 
 module.exports.updateStatus = async function updateStatus(req, reply) {
   try {
+    const headersField = ["headers", "ip", "ips", "hostname"];
+    const headersObj = {};
+
+    headersField.forEach((header) => {
+      headersObj[header] = req[header];
+    });
+
     if (!req.isMultipart()) {
       return reply.code(400).send({
         message: "Please send proper file",
@@ -43,12 +52,29 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
     const body = data.fields;
 
     const authToken = body?.auth_token?.value || "";
+    const email = body?.email?.value || "";
 
     if (authToken !== process.env.UPDATE_STATUS_AUTH_TOKEN) {
       return reply.code(401).send({
         message: "Invalid Auth Token",
       });
     }
+    if (!email || !email.endsWith("@pickrr.com")) {
+      return reply.code(404).send({
+        message: "Please provide a valid email address",
+      });
+    }
+    const { trackingElkClient } = getElkClients();
+
+    sendDataToElk({
+      body: {
+        email,
+        payload: JSON.stringify(headersObj),
+        time: new Date(),
+      },
+      elkClient: trackingElkClient,
+      indexName: "track_manual_update",
+    });
 
     const csvData = [];
 
