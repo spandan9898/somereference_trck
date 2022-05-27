@@ -40,10 +40,8 @@ const fetchAndUpdateAuditLogsData = async ({ courierTrackingId, updatedObj, isFr
       projectionObj: { audit: 1 },
       collectionName: process.env.MONGO_DB_PROD_SERVER_AUDIT_COLLECTION_NAME,
     });
-    const auditKeyStatusTime = moment(updatedObj["status.current_status_time"]).format(
-      "YYYY-MM-DD HH:mm:ss"
-    );
-    const auditObjKey = `${updatedObj["status.current_status_type"]}_${auditKeyStatusTime}`;
+    const auditKeyTime = moment().format("YYYY-MM-DD HH:mm:ss");
+    const auditObjKey = `${updatedObj["status.current_status_type"]}_${auditKeyTime}`;
     const auditObjValue = {
       source: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
       scantime: updatedObj["status.current_status_time"],
