@@ -18,11 +18,18 @@ const { ELK_INSTANCE_NAMES } = require("../../utils/constants");
         status: 'RTO'
     }
  */
-const prepareStatusObj = ({ status, date, tracking_id: trackingId }) => {
+const prepareStatusObj = ({
+  status,
+  date,
+  tracking_id: trackingId,
+  sub_status_code: subStatusCode = "",
+  status_text: statusText = "",
+}) => {
   const allowedDateFormats = ["MM/DD/YYYY HH:mm:ss", "YYYY-MM-DD HH:mm:ss"];
   const trackArrStatus = {
     scan_datetime: moment(date, allowedDateFormats).subtract(330, "minutes").toDate(),
-    scan_status: PICKRR_STATUS_CODE_MAPPING[status] || status,
+    scan_status: statusText || PICKRR_STATUS_CODE_MAPPING[status] || status,
+    pickrr_sub_status_code: subStatusCode,
     scan_location: "",
     scan_type: status,
     update_source: "manual",
@@ -35,6 +42,7 @@ const prepareStatusObj = ({ status, date, tracking_id: trackingId }) => {
     current_status_location: "",
     current_status_time: trackArrStatus.scan_datetime,
     current_status_type: status,
+    pickrr_sub_status_code: trackArrStatus.pickrr_sub_status_code,
   };
   const auditObj = {
     from: "manual",
