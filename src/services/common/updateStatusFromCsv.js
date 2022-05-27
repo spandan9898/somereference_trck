@@ -29,9 +29,9 @@ const prepareStatusObj = ({
   let scanDateTime = moment(date, allowedDateFormats);
   scanDateTime = scanDateTime.isValid()
     ? scanDateTime.subtract(330, "minutes").toDate()
-    : moment().subtract(330, "minutes").toDate();
+    : moment().toDate();
   if (!date) {
-    scanDateTime = moment().subtract(330, "minutes").toDate();
+    scanDateTime = moment().toDate();
   }
   const trackArrStatus = {
     scan_datetime: scanDateTime,
