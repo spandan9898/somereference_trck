@@ -1560,13 +1560,13 @@ const DELHIVERY_REVERSE_MAPPER = {
   "x-lm1p_pp": { courier_remark: "Out for Pickup", scan_type: "OFP", pickrr_sub_status_code: "" },
   "eod-21_cn": {
     courier_remark: "Cancelled the pickup request",
-    scan_type: "OC",
-    pickrr_sub_status_code: "",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
   },
   "eod-84_cn": {
     courier_remark: "Product description mismatch",
-    scan_type: "OC",
-    pickrr_sub_status_code: "",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
   },
   "eod-131_cn": {
     courier_remark: "Brand Mismatch",
@@ -1590,8 +1590,8 @@ const DELHIVERY_REVERSE_MAPPER = {
   },
   "eod-108_cn": {
     courier_remark: "Product count mismatch",
-    scan_type: "OC",
-    pickrr_sub_status_code: "",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
   },
   "eod-73_pp": {
     courier_remark: "Bad/Incomplete address",
@@ -1621,13 +1621,13 @@ const DELHIVERY_REVERSE_MAPPER = {
   },
   "st-109_cn": {
     courier_remark: "Out of service area",
-    scan_type: "OC",
-    pickrr_sub_status_code: "",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
   },
   "st-112_cn": {
     courier_remark: "Return Center is NSZ",
-    scan_type: "OC",
-    pickrr_sub_status_code: "",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
   },
   "x-prc_pu": { courier_remark: "Package Recieved", scan_type: "OT", pickrr_sub_status_code: "" },
   "x-dld1r_pu": { courier_remark: "Added to IST", scan_type: "OT", pickrr_sub_status_code: "" },
@@ -1766,13 +1766,13 @@ const DELHIVERY_REVERSE_MAPPER = {
   },
   "cl-102_pp": {
     courier_remark: "As per client's instructions",
-    scan_type: "OC",
-    pickrr_sub_status_code: "",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
   },
   "cl-103_pp": {
     courier_remark: "As per client's instructions",
-    scan_type: "OC",
-    pickrr_sub_status_code: "",
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
   },
   "rd-ac_dl": { courier_remark: "RETURN Accepted", scan_type: "DL", pickrr_sub_status_code: "" },
   "dlyrg-125_pu": {
@@ -1920,8 +1920,8 @@ const DELHIVERY_REVERSE_MAPPER = {
   },
   "rd-pd22_pu": {
     courier_remark: "Client Reject",
-    scan_type: "PPF",
-    pickrr_sub_status_code: "CANC",
+    scan_type: "UD",
+    pickrr_sub_status_code: "OTH",
   },
   "dlyrg-148_pu": {
     courier_remark: "Handed for Customs Clearance",
