@@ -30,7 +30,14 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
  *
  * @param {*} records
  */
-const processBackfilling = async (data, collection, elkClient, type, prodElkClient) => {
+const processBackfilling = async (
+  data,
+  collection,
+  elkClient,
+  type,
+  prodElkClient,
+  isManualUpdate = false
+) => {
   const courierTrackingIds = data.map((awb) => `${awb}`);
 
   const responses = await collection
@@ -49,7 +56,7 @@ const processBackfilling = async (data, collection, elkClient, type, prodElkClie
     }
     if (type.includes("report")) {
       if (!["OP", "OM", "OFP", "PPF"].includes(response?.status?.current_status_type)) {
-        updateStatusOnReport(response, logger, elkClient);
+        updateStatusOnReport(response, logger, elkClient, isManualUpdate);
       }
     }
     if (type.includes("elk")) {

@@ -9,12 +9,13 @@ const { reportMongoCol } = require("./model");
  * @param {*} trackObj
  * @param {*} logger
  */
-const updateStatusOnReport = async (trackObj, logger) => {
+const updateStatusOnReport = async (trackObj, logger, elkClient, isManualUpdate = false) => {
   const latestScanType = _.get(trackObj, "track_arr[0].scan_type", null);
   const latestScanStatus = _.get(trackObj, "track_arr[0].scan_status", "") || "";
   if (
-    ["OFP", "PPF", "OP", "OM", "OC"].includes(latestScanType) ||
-    latestScanStatus.toLowerCase() === "pickup_cancelled"
+    (["OFP", "PPF", "OP", "OM", "OC"].includes(latestScanType) ||
+      latestScanStatus.toLowerCase() === "pickup_cancelled") &&
+    !isManualUpdate
   ) {
     return false;
   }
