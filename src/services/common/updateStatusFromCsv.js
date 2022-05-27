@@ -91,7 +91,13 @@ const updateOtherSources = async (filteredCsvData, collection) => {
   const chunkedData = chunk(trackingIds, 1000);
 
   for (const data of chunkedData) {
-    processBackfilling(data, collection, elkClient, ["report", "v1", "elk"], prodElkClient);
+    processBackfilling(
+      data,
+      collection,
+      elkClient,
+      ["report", "v1", "elk", "webhook"],
+      prodElkClient
+    );
     await new Promise((done) => setTimeout(() => done(), 100));
   }
 };

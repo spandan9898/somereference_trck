@@ -20,6 +20,7 @@ const { getDbCollectionInstance } = require("../src/utils");
 const { HOST_NAMES, ELK_INSTANCE_NAMES, KAFKA_INSTANCE_CONFIG } = require("../src/utils/constants");
 const { convertDate } = require("./helper");
 const { updateStatusELK } = require("../src/services/common/services");
+const triggerWebhook = require("../src/services/webhook");
 
 // const sendDataToNdr = require("../src/services/ndr");
 
@@ -53,6 +54,10 @@ const processBackfilling = async (data, collection, elkClient, type, prodElkClie
     }
     if (type.includes("elk")) {
       updateStatusELK(response, prodElkClient);
+    }
+
+    if (type.includes("webhook")) {
+      triggerWebhook(response, elkClient);
     }
 
     // if (type.includes("ndr")) {
