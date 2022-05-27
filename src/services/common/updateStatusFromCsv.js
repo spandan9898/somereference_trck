@@ -26,8 +26,15 @@ const prepareStatusObj = ({
   status_text: statusText = "",
 }) => {
   const allowedDateFormats = ["MM/DD/YYYY HH:mm:ss", "YYYY-MM-DD HH:mm:ss"];
+  let scanDateTime = moment(date, allowedDateFormats);
+  scanDateTime = scanDateTime.isValid()
+    ? scanDateTime.subtract(330, "minutes").toDate()
+    : moment().subtract(330, "minutes").toDate();
+  if (!date) {
+    scanDateTime = moment().subtract(330, "minutes").toDate();
+  }
   const trackArrStatus = {
-    scan_datetime: moment(date, allowedDateFormats).subtract(330, "minutes").toDate(),
+    scan_datetime: scanDateTime,
     scan_status: statusText || PICKRR_STATUS_CODE_MAPPING[status] || status,
     pickrr_sub_status_code: subStatusCode,
     scan_location: "",
@@ -90,7 +97,7 @@ const checkStatus = async (csvData, pullDbInstance) => {
  *
  * @param {*} filteredCsvData
  */
-const updateOtherSources = async (filteredCsvData, collection) => {
+const updateOtherSources = async (filteredCsvData, collection, platformNames) => {
   const trackingIds = filteredCsvData.map((data) => data.tracking_id);
 
   const elkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.TRACKING.name);
@@ -99,13 +106,7 @@ const updateOtherSources = async (filteredCsvData, collection) => {
   const chunkedData = chunk(trackingIds, 1000);
 
   for (const data of chunkedData) {
-    processBackfilling(
-      data,
-      collection,
-      elkClient,
-      ["report", "v1", "elk", "webhook"],
-      prodElkClient
-    );
+    processBackfilling(data, collection, elkClient, platformNames, prodElkClient);
     await new Promise((done) => setTimeout(() => done(), 100));
   }
 };
@@ -119,7 +120,7 @@ const updateOtherSources = async (filteredCsvData, collection) => {
         status: 'RTO'
     }],
  */
-const updateStatusFromCSV = async (csvData) => {
+const updateStatusFromCSV = async (csvData, platformNames) => {
   if (isEmpty(csvData)) {
     return false;
   }
@@ -163,7 +164,7 @@ const updateStatusFromCSV = async (csvData) => {
 
   console.log("response", response);
   if (process.env.NODE_ENV === "production") {
-    await updateOtherSources(filteredCsvData, pullDbInstance);
+    await updateOtherSources(filteredCsvData, pullDbInstance, platformNames);
   }
   return true;
 };

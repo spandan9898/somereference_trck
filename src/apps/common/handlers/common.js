@@ -53,6 +53,13 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
 
     const authToken = body?.auth_token?.value || "";
     const email = body?.email?.value || "";
+    let platformNames = body?.platform_names?.value || "";
+    if (!platformNames) {
+      return reply.code(401).send({
+        message: "Please provide a valid platform names",
+      });
+    }
+    platformNames = platformNames.split(",");
 
     if (authToken !== process.env.UPDATE_STATUS_AUTH_TOKEN) {
       return reply.code(401).send({
@@ -91,7 +98,7 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
         }
       },
       complete() {
-        updateStatusFromCSV(csvData);
+        updateStatusFromCSV(csvData, platformNames);
       },
     });
 
