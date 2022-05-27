@@ -134,20 +134,20 @@ const updateStatusFromCSV = async (csvData) => {
 
   const response = await pullDbInstance.bulkWrite(
     trackData.map(
-      (tackItem) => ({
+      (trackItem) => ({
         updateOne: {
-          filter: { tracking_id: tackItem.trackingId },
+          filter: { tracking_id: trackItem.trackingId },
           update: {
             $set: {
-              status: tackItem.statusObj,
+              status: trackItem.statusObj,
               updated_at: moment().toDate(),
               last_update_from: "manual",
               is_manual_update: true,
             },
             $push: {
-              audit: tackItem.auditObj,
+              audit: trackItem.auditObj,
               track_arr: {
-                $each: [tackItem.trackArrStatus],
+                $each: [trackItem.trackArrStatus],
                 $position: 0,
               },
             },
