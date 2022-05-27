@@ -11,57 +11,62 @@ const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
 const { HOST_NAMES } = require("../../utils/constants");
 const { findOneDocumentFromMongo } = require("../../utils");
+const logger = require("../../../logger");
 
 /**
  *
  * Updates Audit Logs in track_audit collection in pullMongoDB
  */
 const fetchAndUpdateAuditLogsData = async ({ courierTrackingId, updatedObj, isFromPulled }) => {
-  let auditStagingCollectionInstance;
-  if (process.env.NODE_ENV === "staging") {
-    auditStagingCollectionInstance = await commonTrackingInfoCol({
-      hostName: HOST_NAMES.PULL_STATING_DB,
-      collectionName: "MONGO_DB_STAGING__AUDIT_COLLECTION_NAME",
+  try {
+    let auditStagingColInstance;
+    if (process.env.NODE_ENV === "staging") {
+      auditStagingColInstance = await commonTrackingInfoCol({
+        hostName: HOST_NAMES.PULL_STATING_DB,
+        collectionName: "MONGO_DB_STAGING__AUDIT_COLLECTION_NAME",
+      });
+    }
+    const auditProdColInstance = await commonTrackingInfoCol({
+      collectionName: process.env.MONGO_DB_PROD_SERVER_AUDIT_COLLECTION_NAME,
     });
+
+    const auditInstance =
+      process.env.NODE_ENV === "staging" ? auditStagingColInstance : auditProdColInstance;
+
+    const queryObj = { courier_tracking_id: courierTrackingId };
+
+    const doc = await findOneDocumentFromMongo({
+      queryObj,
+      projectionObj: { audit: 1 },
+      collectionName: process.env.MONGO_DB_PROD_SERVER_AUDIT_COLLECTION_NAME,
+    });
+    const auditKeyStatusTime = moment(updatedObj["status.current_status_time"]).format(
+      "YYYY-MM-DD HH:mm:ss"
+    );
+    const auditObjKey = `${updatedObj["status.current_status_type"]}_${auditKeyStatusTime}`;
+    const auditObjValue = {
+      source: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
+      scantime: updatedObj["status.current_status_time"],
+      pulled_at: moment().toDate(),
+    };
+    let auditData = { [auditObjKey]: auditObjValue };
+
+    const lastAuditResponse = doc?.audit;
+    if (lastAuditResponse) {
+      auditData = { ...lastAuditResponse, ...auditData };
+    }
+    await auditInstance.findOneAndUpdate(
+      queryObj,
+      {
+        $set: { audit: auditData },
+      },
+      { upsert: true }
+    );
+  } catch (error) {
+    logger.error(
+      `Updating Audit Logs Failed for trackingId  --> ${courierTrackingId} for status ${updatedObj["status.current_status_type"]} at scanTime ${updatedObj["status.current_status_time"]}`
+    );
   }
-  const auditProdCollectionInstance = await commonTrackingInfoCol({
-    collectionName: process.env.MONGO_DB_PROD_SERVER_AUDIT_COLLECTION_NAME,
-  });
-
-  const auditInstance =
-    process.env.NODE_ENV === "staging"
-      ? auditStagingCollectionInstance
-      : auditProdCollectionInstance;
-
-  const queryObj = { courier_tracking_id: courierTrackingId };
-
-  const doc = findOneDocumentFromMongo({
-    queryObj,
-    projectionObj: { audit: 1 },
-    collectionName: auditInstance,
-  });
-  const auditKeyStatusTime = moment(updatedObj["status.current_status_time"]).format(
-    "YYYY-MM-DD HH:mm:ss"
-  );
-  const auditObjKey = `${updatedObj["status.current_status_type"]}_${auditKeyStatusTime}`;
-  const auditObjValue = {
-    source: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
-    scantime: updatedObj["status.current_status_time"],
-    pulled_at: moment().toDate(),
-  };
-  let auditData = { [auditObjKey]: auditObjValue };
-
-  const lastAuditResponse = doc.audit;
-  if (lastAuditResponse) {
-    auditData = { ...lastAuditResponse, auditData };
-  }
-  await auditInstance.findOneAndUpdate(
-    queryObj,
-    {
-      $set: { audit: auditData },
-    },
-    { upsert: true }
-  );
 };
 
 /**
