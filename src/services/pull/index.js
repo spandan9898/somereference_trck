@@ -10,6 +10,59 @@ const { checkTriggerForPulledEvent } = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
 const { HOST_NAMES } = require("../../utils/constants");
+const { findOneDocumentFromMongo } = require("../../utils");
+
+/**
+ *
+ * Updates Audit Logs in track_audit collection in pullMongoDB
+ */
+const fetchAndUpdateAuditLogsData = async ({ courierTrackingId, updatedObj, isFromPulled }) => {
+  let auditStagingCollectionInstance;
+  if (process.env.NODE_ENV === "staging") {
+    auditStagingCollectionInstance = await commonTrackingInfoCol({
+      hostName: HOST_NAMES.PULL_STATING_DB,
+      collectionName: "MONGO_DB_STAGING__AUDIT_COLLECTION_NAME",
+    });
+  }
+  const auditProdCollectionInstance = await commonTrackingInfoCol({
+    collectionName: process.env.MONGO_DB_PROD_SERVER_AUDIT_COLLECTION_NAME,
+  });
+
+  const auditInstance =
+    process.env.NODE_ENV === "staging"
+      ? auditStagingCollectionInstance
+      : auditProdCollectionInstance;
+
+  const queryObj = { courier_tracking_id: courierTrackingId };
+
+  const doc = findOneDocumentFromMongo({
+    queryObj,
+    projectionObj: { audit: 1 },
+    collectionName: auditInstance,
+  });
+  const auditKeyStatusTime = moment(updatedObj["status.current_status_time"]).format(
+    "YYYY-MM-DD HH:mm:ss"
+  );
+  const auditObjKey = `${updatedObj["status.current_status_type"]}_${auditKeyStatusTime}`;
+  const auditObjValue = {
+    source: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
+    scantime: updatedObj["status.current_status_time"],
+    pulled_at: moment().toDate(),
+  };
+  let auditData = { [auditObjKey]: auditObjValue };
+
+  const lastAuditResponse = doc.audit;
+  if (lastAuditResponse) {
+    auditData = { ...lastAuditResponse, auditData };
+  }
+  await auditInstance.findOneAndUpdate(
+    queryObj,
+    {
+      $set: { audit: auditData },
+    },
+    { upsert: true }
+  );
+};
 
 /**
  *
@@ -38,19 +91,15 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
   }
   try {
     const pullProdCollectionInstance = await commonTrackingInfoCol();
+
     let pullStagingCollectionInstance;
+
     if (process.env.NODE_ENV === "staging") {
       pullStagingCollectionInstance = await commonTrackingInfoCol({
         hostName: HOST_NAMES.PULL_STATING_DB,
       });
     }
     const trackArr = updatedObj.track_arr;
-    const auditObj = {
-      from: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
-      current_status_type: updatedObj["status.current_status_type"],
-      current_status_time: updatedObj["status.current_status_time"],
-      pulled_at: moment().toDate(),
-    };
 
     delete updatedObj.track_arr;
 
@@ -145,13 +194,13 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
         ? pullStagingCollectionInstance
         : pullProdCollectionInstance;
 
+    // audit Logs is Updated Over here
+
+    await fetchAndUpdateAuditLogsData({ courierTrackingId: trackObj.awb, updatedObj });
     const response = await pullInstance.findOneAndUpdate(
       { tracking_id: trackObj.awb },
       {
         $set: updatedObj,
-        $push: {
-          audit: auditObj,
-        },
       },
       {
         returnNewDocument: true,
