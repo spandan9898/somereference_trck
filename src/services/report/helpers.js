@@ -29,11 +29,11 @@ const findFirstNdrDate = (trackDict) => {
   }
   const trackArr = _.get(trackDict, "track_arr");
   let firstNdrDate;
-  for (let i = 0; i < trackArr.length; i += 1) {
-    if (trackArr[i].scan_type === "NDR") {
-      firstNdrDate = trackArr[i].scan_datetime;
+  trackArr.forEach((trackArrObj) => {
+    if (trackArrObj.scan_type === "NDR") {
+      firstNdrDate = trackArrObj.scan_datetime;
     }
-  }
+  });
   return firstNdrDate;
 };
 
