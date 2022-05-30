@@ -297,23 +297,19 @@ const getElkClients = () => {
  *
  * @param {*} track_arr
  */
-const ofdCount = (trackArr, scanType) => {
+const ofdCount = (trackArr) => {
   let ofdCountNum = 0;
-  let ndrCountNum = 0;
+  let dlCountNum = 0;
 
   trackArr.forEach((trackArrObj) => {
     if (trackArrObj?.scan_type === "OO") {
       ofdCountNum += 1;
-    } else if (trackArrObj?.scan_type === "NDR") {
-      ndrCountNum += 1;
+    } else if (trackArrObj?.scan_type === "DL") {
+      dlCountNum += 1;
     }
   });
-  let finalOfdCount = 0;
-  if (["UD", "NDR", "DL", "RTO", "RTO-OO", "RTO UD", "RTD", "OO"].includes(scanType)) {
-    finalOfdCount = Math.max(1, ofdCountNum, ndrCountNum);
-  } else finalOfdCount = ofdCountNum;
 
-  return finalOfdCount;
+  return Math.max(1, ofdCountNum, dlCountNum);
 };
 module.exports = {
   checkAwbInCache,
