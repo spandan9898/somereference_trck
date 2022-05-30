@@ -37,7 +37,7 @@ const updateStatusOnReport = async (trackObj, logger, elkClient, isManualUpdate 
   }
 
   const result = _.pickBy(
-    prepareDataForReportMongo(trackObj),
+    prepareDataForReportMongo(trackObj, isManualUpdate),
     (val) => val !== null && val !== undefined && val !== ""
   );
   result.last_updated_date = moment().toDate();
