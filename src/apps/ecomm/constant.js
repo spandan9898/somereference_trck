@@ -149,10 +149,17 @@ const PUSH_PARTITION_COUNT = 10;
 const PUSH_GROUP_NAME = "ecomm-push-group";
 const PUSH_TOPIC_NAME = "ecomm_push";
 
+const PULL_PARTITION_COUNT = 10;
+const PULL_GROUP_NAME = "ecomm-pull-group";
+const PULL_TOPIC_NAME = "ecomm_pull";
+
 module.exports = {
   ECOMM_CODE_MAPPER,
   ECOMM_CHILD_CODE_MAPPER,
   PUSH_PARTITION_COUNT,
   PUSH_GROUP_NAME,
   PUSH_TOPIC_NAME,
+  PULL_PARTITION_COUNT,
+  PULL_GROUP_NAME,
+  PULL_TOPIC_NAME,
 };

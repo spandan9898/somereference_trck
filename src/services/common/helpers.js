@@ -1,12 +1,15 @@
 const { orderBy, isEmpty, get, cloneDeep } = require("lodash");
 
 const { prepareAmazeData } = require("../../apps/amaze/services");
-const { preparePickrrBluedartDict } = require("../../apps/bluedart/services");
+const {
+  preparePickrrBluedartDict,
+  preparePickrrBluedartPulledData,
+} = require("../../apps/bluedart/services");
 const {
   prepareDelhiveryData,
   prepareDelhiveryPulledData,
 } = require("../../apps/delhivery/services");
-const { prepareEcommData } = require("../../apps/ecomm/services");
+const { prepareEcommData, prepareEcommPulledData } = require("../../apps/ecomm/services");
 const { prepareEkartData, preparePulledEkartData } = require("../../apps/ekart/services");
 const { prepareParceldoData } = require("../../apps/parceldo/services");
 const {
@@ -14,7 +17,7 @@ const {
   preparePulledShadowfaxData,
 } = require("../../apps/shadowfax/services");
 const { prepareUdaanData } = require("../../apps/udaan/services");
-const { prepareXbsData } = require("../../apps/xpressbees/services");
+const { prepareXbsData, preparePulledXBSData } = require("../../apps/xpressbees/services");
 const { preparePidgeData } = require("../../apps/pidge/services");
 const { prepareDtdcData, prepareDtdcPulledData } = require("../../apps/dtdc/services");
 const { prepareLoadshareData } = require("../../apps/loadshare/services");
@@ -143,6 +146,7 @@ const getPrepareFunction = (courierName) => {
     delhivery: prepareDelhiveryData,
     delhivery_pull: prepareDelhiveryPulledData,
     ecomm: prepareEcommData,
+    ecomm_pull: prepareEcommPulledData,
     ekart: prepareEkartData,
     ekart_pull: preparePulledEkartData,
     parceldo: prepareParceldoData,
@@ -150,13 +154,16 @@ const getPrepareFunction = (courierName) => {
     shadowfax_pull: preparePulledShadowfaxData,
     udaan: prepareUdaanData,
     xpressbees: prepareXbsData,
+    xpressbees_pull: preparePulledXBSData,
     pidge: preparePidgeData,
     dtdc: prepareDtdcData,
     dtdc_pull: prepareDtdcPulledData,
     loadshare: prepareLoadshareData,
+    bluedart_pull: preparePickrrBluedartPulledData
   };
   return courierPrepareMapFunctions[courierName];
 };
+
 module.exports = {
   sortStatusArray,
   updatePrepareDict,
