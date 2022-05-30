@@ -11,6 +11,7 @@ const {
   findLatestNDRDetails,
   findDeliveryDate,
   findRTODate,
+  findFirstNdrDate,
 } = require("./helpers");
 
 /**
@@ -25,18 +26,17 @@ const prepareDataForReportMongo = (trackData) => {
   if (pickupDate) {
     pickupDate = pickupDate instanceof Date ? pickupDate : moment(pickupDate).toDate();
   }
-  const scanType = trackData?.status?.current_status_type;
-
   const data = {
     pickup_date: pickupDate,
     received_by: trackData?.status?.received_by || null,
     current_status: trackingStatus.status_type || "NA",
     current_status_update: trackingStatus.status,
     current_status_datetime: trackingStatus.status_datetime,
-    out_for_delivery_count: ofdCount(trackData?.track_arr || [], scanType),
+    out_for_delivery_count: ofdCount(trackData?.track_arr || []),
     edd_date: trackData?.edd_stamp,
     latest_track_info: findLatestTrackingInfo(trackData),
     latest_location: findLatestLocation(trackData),
+    firstNdrDate: findFirstNdrDate(trackData),
 
     // current logic --> track/webhook_services.py(182), see NDR status scan_datetime
 

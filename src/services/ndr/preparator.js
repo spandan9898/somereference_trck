@@ -25,7 +25,7 @@ const prepareTrackingEventDictForNDR = (trackData) => {
     scan_type: trackData?.status?.current_status_type || "",
     track_info: trackData?.status?.current_status_body || "",
     track_location: trackData?.status?.current_status_location || "",
-    ofd_count: ofdCount(trackData?.track_arr || [], scanType) || "",
+    ofd_count: ofdCount(trackData?.track_arr || []) || "",
     courier_name: trackData?.courier_used || "",
   };
   return trackingEventDict;
