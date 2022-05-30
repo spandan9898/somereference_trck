@@ -1,11 +1,14 @@
 /* eslint-disable require-jsdoc */
 const RequestIp = require("@supercharge/request-ip");
 const moment = require("moment");
-const Papa = require("papaparse");
+const PapaParse = require("papaparse");
 
 const { startProcess } = require("../../../../scripts/reportBackfill");
 const { sendDataToElk } = require("../../../services/common/elk");
-const { updateStatusFromCSV } = require("../../../services/common/updateStatusFromCsv");
+const {
+  updateStatusFromCSV,
+  toggleManualStatus,
+} = require("../../../services/common/updateStatusFromCsv");
 const { getElkClients } = require("../../../utils");
 
 module.exports.returnHeaders = async (req, reply) => {
@@ -85,7 +88,7 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
 
     const csvData = [];
 
-    Papa.parse(data.file, {
+    PapaParse.parse(data.file, {
       worker: true,
       header: true,
       step(results) {
@@ -111,6 +114,58 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
         message: "File is too large. We're allowing only 1 MB",
       });
     }
+    return reply.code(400).send({
+      message: error.message,
+    });
+  }
+};
+
+module.exports.toggleManualStatusUpdate = async function toggleManualStatusUpdate(req, reply) {
+  try {
+    if (!req.isMultipart()) {
+      return reply.code(400).send({
+        message: "Please send proper file",
+      });
+    }
+
+    const { auth_token: authToken, email } = req.query || {};
+    if (authToken !== process.env.UPDATE_STATUS_AUTH_TOKEN) {
+      return reply.code(401).send({
+        message: "Invalid Auth Token",
+      });
+    }
+    if (!email || !email.endsWith("@pickrr.com")) {
+      return reply.code(404).send({
+        message: "Please provide a valid email address",
+      });
+    }
+
+    const options = { limits: { fileSize: 1000000 } };
+    const data = await req.file(options);
+
+    const csvData = [];
+
+    PapaParse.parse(data.file, {
+      worker: true,
+      header: true,
+      step(results) {
+        const header = Object.keys(results.data).join(" ");
+        if (header !== "tracking_id") {
+          throw new Error("Please provide valid header");
+        }
+        if (results.data) {
+          csvData.push(results.data);
+        }
+      },
+      complete() {
+        toggleManualStatus(csvData);
+      },
+    });
+
+    return reply.code(200).send({
+      success: true,
+    });
+  } catch (error) {
     return reply.code(400).send({
       message: error.message,
     });

@@ -8,6 +8,7 @@ const { getDbCollectionInstance } = require("../../utils");
 const initELK = require("../../connector/elkConnection");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { ELK_INSTANCE_NAMES } = require("../../utils/constants");
+const logger = require("../../../logger");
 
 /**
  * 
@@ -169,6 +170,46 @@ const updateStatusFromCSV = async (csvData, platformNames) => {
   return true;
 };
 
+/**
+ *
+ * @param {*} csvData
+ * @returns toggle  is_manual_update
+ */
+const toggleManualStatus = async (csvData) => {
+  try {
+    if (isEmpty(csvData)) {
+      return false;
+    }
+    const pullDbInstance = await getDbCollectionInstance();
+    const trackingIds = csvData.map((row) => row.tracking_id);
+
+    const res = await pullDbInstance.updateMany(
+      {
+        tracking_id: {
+          $in: trackingIds,
+        },
+      },
+      [
+        {
+          $set: {
+            is_manual_update: {
+              $not: "$is_manual_update",
+            },
+            last_update_from: "manual_toggle",
+            updated_at: moment().toDate(),
+          },
+        },
+      ]
+    );
+    console.log("res", res);
+    return true;
+  } catch (error) {
+    logger.error("toggleManualStatus", error);
+    return false;
+  }
+};
+
 module.exports = {
   updateStatusFromCSV,
+  toggleManualStatus,
 };
