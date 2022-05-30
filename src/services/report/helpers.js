@@ -20,6 +20,25 @@ const findLatestTrackingInfo = (trackDict) => {
 
 /**
  *
+ * @param {Complete TrackObj for trackingID in PULLDB} trackDict
+ * @returns
+ */
+const findFirstNdrDate = (trackDict) => {
+  if (!trackDict) {
+    return "";
+  }
+  const trackArr = _.get(trackDict, "track_arr");
+  let firstNdrDate;
+  for (let i = 0; i < trackArr.length; i += 1) {
+    if (trackArr[i].scan_type === "NDR") {
+      firstNdrDate = trackArr[i].scan_datetime;
+    }
+  }
+  return firstNdrDate;
+};
+
+/**
+ *
  * @param {*} trackDict
  * @returns
  */
@@ -176,4 +195,5 @@ module.exports = {
   findDeliveryDate,
   findRTODate,
   sendReportsDataToELK,
+  findFirstNdrDate,
 };
