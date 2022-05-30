@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable require-jsdoc */
 const RequestIp = require("@supercharge/request-ip");
 const moment = require("moment");
@@ -38,6 +39,24 @@ module.exports.reportBackfilling = async (req, reply) => {
 
 module.exports.updateStatus = async function updateStatus(req, reply) {
   try {
+    let { auth_token: authToken, email, platform_names: platformNames } = req.query || {};
+
+    if (!platformNames) {
+      return reply.code(401).send({
+        message: "Please provide a valid platform names",
+      });
+    }
+    if (authToken !== process.env.UPDATE_STATUS_AUTH_TOKEN) {
+      return reply.code(401).send({
+        message: "Invalid Auth Token",
+      });
+    }
+    if (!email || !email.endsWith("@pickrr.com")) {
+      return reply.code(404).send({
+        message: "Please provide a valid email address",
+      });
+    }
+
     const headersField = ["headers", "ip", "ips", "hostname"];
     const headersObj = {};
 
@@ -52,28 +71,9 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
     }
     const options = { limits: { fileSize: 1000000 } };
     const data = await req.file(options);
-    const body = data.fields;
 
-    const authToken = body?.auth_token?.value || "";
-    const email = body?.email?.value || "";
-    let platformNames = body?.platform_names?.value || "";
-    if (!platformNames) {
-      return reply.code(401).send({
-        message: "Please provide a valid platform names",
-      });
-    }
     platformNames = platformNames.split(",");
 
-    if (authToken !== process.env.UPDATE_STATUS_AUTH_TOKEN) {
-      return reply.code(401).send({
-        message: "Invalid Auth Token",
-      });
-    }
-    if (!email || !email.endsWith("@pickrr.com")) {
-      return reply.code(404).send({
-        message: "Please provide a valid email address",
-      });
-    }
     const { trackingElkClient } = getElkClients();
 
     sendDataToElk({
@@ -139,8 +139,30 @@ module.exports.toggleManualStatusUpdate = async function toggleManualStatusUpdat
         message: "Please provide a valid email address",
       });
     }
-
     const options = { limits: { fileSize: 1000000 } };
+
+    const headersField = ["headers", "ip", "ips", "hostname"];
+    const headersObj = {};
+
+    headersField.forEach((header) => {
+      headersObj[header] = req[header];
+    });
+
+    const { trackingElkClient } = getElkClients();
+
+    sendDataToElk({
+      body: {
+        email,
+        payload: JSON.stringify({
+          ...headersObj,
+          update_for: "manual_status_update_toggle",
+        }),
+        time: new Date(),
+      },
+      elkClient: trackingElkClient,
+      indexName: "track_manual_update",
+    });
+
     const data = await req.file(options);
 
     const csvData = [];
@@ -166,6 +188,11 @@ module.exports.toggleManualStatusUpdate = async function toggleManualStatusUpdat
       success: true,
     });
   } catch (error) {
+    if (error.code === "FST_REQ_FILE_TOO_LARGE") {
+      return reply.code(400).send({
+        message: "File is too large. We're allowing only 1 MB",
+      });
+    }
     return reply.code(400).send({
       message: error.message,
     });
