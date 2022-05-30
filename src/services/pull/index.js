@@ -10,7 +10,6 @@ const { checkTriggerForPulledEvent } = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
 const { HOST_NAMES } = require("../../utils/constants");
-const { findOneDocumentFromMongo } = require("../../utils");
 
 /**
  *
@@ -38,12 +37,6 @@ const fetchAndUpdateAuditLogsData = async ({
       process.env.NODE_ENV === "staging" ? auditStagingColInstance : auditProdColInstance;
 
     const queryObj = { courier_tracking_id: courierTrackingId };
-
-    const doc = await findOneDocumentFromMongo({
-      queryObj,
-      projectionObj: { audit: 1 },
-      collectionName: process.env.MONGO_DB_PROD_SERVER_AUDIT_COLLECTION_NAME,
-    });
     const auditKeyTime = moment().format("YYYY-MM-DD HH:mm:ss");
     const auditObjKey = `${updatedObj["status.current_status_type"]}_${auditKeyTime}`;
     const auditObjValue = {
@@ -51,16 +44,10 @@ const fetchAndUpdateAuditLogsData = async ({
       scantime: updatedObj["status.current_status_time"],
       pulled_at: moment().toDate(),
     };
-    let auditData = { [auditObjKey]: auditObjValue };
-
-    const lastAuditResponse = doc?.audit;
-    if (lastAuditResponse) {
-      auditData = { ...lastAuditResponse, ...auditData };
-    }
     await auditInstance.findOneAndUpdate(
       queryObj,
       {
-        $set: { audit: auditData },
+        $set: { [`audit.${auditObjKey}`]: auditObjValue },
       },
       { upsert: true }
     );
@@ -107,6 +94,12 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
       });
     }
     const trackArr = updatedObj.track_arr;
+    const auditObj = {
+      from: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
+      current_status_type: updatedObj["status.current_status_type"],
+      current_status_time: updatedObj["status.current_status_time"],
+      pulled_at: moment().toDate(),
+    };
 
     delete updatedObj.track_arr;
 
@@ -208,6 +201,9 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
       { tracking_id: trackObj.awb },
       {
         $set: updatedObj,
+        $push: {
+          audit: auditObj,
+        },
       },
       {
         returnNewDocument: true,
