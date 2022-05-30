@@ -94,12 +94,6 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
       });
     }
     const trackArr = updatedObj.track_arr;
-    const auditObj = {
-      from: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
-      current_status_type: updatedObj["status.current_status_type"],
-      current_status_time: updatedObj["status.current_status_time"],
-      pulled_at: moment().toDate(),
-    };
 
     delete updatedObj.track_arr;
 
@@ -194,16 +188,10 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
         ? pullStagingCollectionInstance
         : pullProdCollectionInstance;
 
-    // audit Logs is Updated Over here
-
-    await fetchAndUpdateAuditLogsData({ courierTrackingId: trackObj.awb, updatedObj });
     const response = await pullInstance.findOneAndUpdate(
       { tracking_id: trackObj.awb },
       {
         $set: updatedObj,
-        $push: {
-          audit: auditObj,
-        },
       },
       {
         returnNewDocument: true,
@@ -211,6 +199,10 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
         upsert: process.env.NODE_ENV === "staging",
       }
     );
+
+    // audit Logs is Updated Over here
+
+    await fetchAndUpdateAuditLogsData({ courierTrackingId: trackObj.awb, updatedObj });
     await storeDataInCache(result);
     await updateTrackingProcessingCount(trackObj, "remove");
     updateCacheTrackArray({
