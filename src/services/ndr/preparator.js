@@ -11,7 +11,6 @@ const prepareTrackingEventDictForNDR = (trackData) => {
   const pickupDatetime = findPickupDate(trackData);
   const scanDatetime = trackData?.status?.current_status_time || "";
   const EDDTimestamp = trackData?.edd_stamp || "";
-  const scanType = trackData?.status?.current_status_type;
   const trackingEventDict = {
     awb: trackData?.tracking_id,
     EDD: convertDatetimeFormat(EDDTimestamp),
