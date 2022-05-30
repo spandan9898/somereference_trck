@@ -57,6 +57,11 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     let sortedTrackArray;
 
     const res = await pullProdCollectionInstance.findOne({ tracking_id: result.awb });
+
+    if (res.is_manual_update) {
+      return false;
+    }
+
     const zone = res?.billing_zone;
     const eddStampInDb = res?.edd_stamp;
     if (isFromPulled) {
