@@ -30,7 +30,7 @@ const sendTrackDataToV1 = async (trackData) => {
       eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
     });
 
-    if (!["6c96b95bb99c767660312f5fd97c558732735"].includes(trackData.auth_token)) {
+    if (!["36f5aa0d4e3e93718937d7909f63ab8d805916"].includes(trackData.auth_token)) {
       return false;
     }
 
