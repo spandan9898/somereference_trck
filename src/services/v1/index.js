@@ -23,7 +23,7 @@ const sendTrackDataToV1 = async (trackData) => {
     }
     const trackDict = prepareTrackDictForV1(trackData);
 
-    if (!["36f5aa0d4e3e93718937d7909f63ab8d805916"].includes(trackData.auth_token)) {
+    if (!["5a5e8b5ff28c89a0ebb352e5370e60e9805975"].includes(trackData.auth_token)) {
       sendDataToEventBridge({
         source: V1_EVENT_BRIDGE_SOURCE,
         detailType: V1_EVENT_BRIDGE_DETAIL_TYPE,
@@ -32,7 +32,7 @@ const sendTrackDataToV1 = async (trackData) => {
       });
     }
 
-    if (!["36f5aa0d4e3e93718937d7909f63ab8d805916"].includes(trackData.auth_token)) {
+    if (!["5a5e8b5ff28c89a0ebb352e5370e60e9805975"].includes(trackData.auth_token)) {
       return false;
     }
 
