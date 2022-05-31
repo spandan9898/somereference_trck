@@ -23,12 +23,14 @@ const sendTrackDataToV1 = async (trackData) => {
     }
     const trackDict = prepareTrackDictForV1(trackData);
 
-    sendDataToEventBridge({
-      source: V1_EVENT_BRIDGE_SOURCE,
-      detailType: V1_EVENT_BRIDGE_DETAIL_TYPE,
-      data: trackDict,
-      eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
-    });
+    if (!["36f5aa0d4e3e93718937d7909f63ab8d805916"].includes(trackData.auth_token)) {
+      sendDataToEventBridge({
+        source: V1_EVENT_BRIDGE_SOURCE,
+        detailType: V1_EVENT_BRIDGE_DETAIL_TYPE,
+        data: trackDict,
+        eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
+      });
+    }
 
     if (!["36f5aa0d4e3e93718937d7909f63ab8d805916"].includes(trackData.auth_token)) {
       return false;
