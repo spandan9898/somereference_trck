@@ -309,7 +309,7 @@ const ofdCount = (trackArr) => {
     }
   });
 
-  return Math.max(1, ofdCountNum, dlCountNum);
+  return Math.max(ofdCountNum, Math.min(dlCountNum, 1));
 };
 module.exports = {
   checkAwbInCache,
