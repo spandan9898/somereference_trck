@@ -36,7 +36,7 @@ const prepareDataForReportMongo = (trackData) => {
     edd_date: trackData?.edd_stamp,
     latest_track_info: findLatestTrackingInfo(trackData),
     latest_location: findLatestLocation(trackData),
-    firstNdrDate: findFirstNdrDate(trackData),
+    first_ndr_date: findFirstNdrDate(trackData),
 
     // current logic --> track/webhook_services.py(182), see NDR status scan_datetime
 
