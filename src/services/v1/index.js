@@ -18,6 +18,7 @@ const sendTrackDataToV1 = async (trackData) => {
     const authTokens = [
       "5a5e8b5ff28c89a0ebb352e5370e60e9805975",
       "b766873b44921425344e1b929a5337da136087",
+      "a1c9aa149093d7198572aaac6c1e3837164229"
     ];
 
     if (
