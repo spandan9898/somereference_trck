@@ -17,7 +17,7 @@ const {
  *
  * @param {*} trackObj
  */
-const prepareDataForReportMongo = (trackData) => {
+const prepareDataForReportMongo = (trackData, isManualUpdate) => {
   const trackingStatus = prepareTrackingStatus(trackData);
   const NDRObject = findLatestNDRDetails(trackData?.track_arr || {});
 
@@ -31,7 +31,9 @@ const prepareDataForReportMongo = (trackData) => {
     pickup_date: pickupDate,
     received_by: trackData?.status?.received_by || null,
     current_status: trackingStatus.status_type || "NA",
-    current_status_update: trackingStatus.status,
+    current_status_update: isManualUpdate
+      ? trackData?.status?.current_status_body || trackingStatus.status
+      : trackingStatus.status,
     current_status_datetime: trackingStatus.status_datetime,
     out_for_delivery_count: ofdCount(trackData?.track_arr || [], scanType),
     edd_date: trackData?.edd_stamp,

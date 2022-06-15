@@ -20,6 +20,7 @@ const { getDbCollectionInstance } = require("../src/utils");
 const { HOST_NAMES, ELK_INSTANCE_NAMES, KAFKA_INSTANCE_CONFIG } = require("../src/utils/constants");
 const { convertDate } = require("./helper");
 const { updateStatusELK } = require("../src/services/common/services");
+const triggerWebhook = require("../src/services/webhook");
 
 // const sendDataToNdr = require("../src/services/ndr");
 
@@ -29,11 +30,23 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST } = process.env;
  *
  * @param {*} records
  */
-const processBackfilling = async (data, collection, elkClient, type, prodElkClient) => {
+const processBackfilling = async (
+  data,
+  collection,
+  elkClient,
+  type,
+  prodElkClient,
+  isManualUpdate = false
+) => {
   const courierTrackingIds = data.map((awb) => `${awb}`);
 
   const responses = await collection
-    .find({ tracking_id: { $in: courierTrackingIds } })
+    .find({
+      $or: [
+        { tracking_id: { $in: courierTrackingIds } },
+        { courier_tracking_id: { $in: courierTrackingIds } },
+      ],
+    })
     .project({ audit: 0, mandatory_status_map: 0, _id: 0 })
     .toArray();
 
@@ -43,11 +56,15 @@ const processBackfilling = async (data, collection, elkClient, type, prodElkClie
     }
     if (type.includes("report")) {
       if (!["OP", "OM", "OFP", "PPF"].includes(response?.status?.current_status_type)) {
-        updateStatusOnReport(response, logger, elkClient);
+        updateStatusOnReport(response, logger, elkClient, isManualUpdate);
       }
     }
     if (type.includes("elk")) {
       updateStatusELK(response, prodElkClient);
+    }
+
+    if (type.includes("webhook")) {
+      triggerWebhook(response, elkClient);
     }
 
     // if (type.includes("ndr")) {
@@ -254,7 +271,10 @@ const fetchDataFromDB = async ({
     if (limit && limit < 4999) {
       const batchData = [];
 
-      const aggCursor = await collection.find(filters, { projection }).limit(limit);
+      const aggCursor = await collection
+        .find(filters, { projection })
+        .batchSize(limit)
+        .limit(limit);
 
       for await (const doc of aggCursor) {
         batchData.push(doc);
@@ -282,7 +302,10 @@ const fetchDataFromDB = async ({
 
         const batchData = [];
 
-        const aggCursor = await collection.find(filters, { projection }).limit(LIMIT);
+        const aggCursor = await collection
+          .find(filters, { projection })
+          .batchSize(LIMIT)
+          .limit(LIMIT);
 
         for await (const doc of aggCursor) {
           batchData.push(doc);
@@ -364,4 +387,4 @@ const startProcess = async ({
   }
 };
 
-module.exports = startProcess;
+module.exports = { startProcess, processBackfilling };
