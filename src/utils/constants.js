@@ -28,6 +28,19 @@ const HOST_NAMES = {
   PULL_STATING_DB: "PULL_STATING_DB",
 };
 
+const REDIS_CONFIG = {
+  sentinels: [
+    { host: "redis-0.prod.internal", port: 26379 },
+    { host: "redis-1.prod.internal", port: 26379 },
+    { host: "redis-2.prod.internal", port: 26379 },
+  ],
+  name: process.env.MASTER_NAME,
+  username: process.env.REDIS_USERNAME,
+  password: process.env.REDIS_PASSWORD,
+  sentinelPassword: process.env.SENTINEL_PASSWORD,
+  db: process.env.DB_NUMBER,
+};
+
 const ELK_INSTANCE_NAMES = {
   PROD: {
     name: "PROD",
@@ -90,4 +103,5 @@ module.exports = {
   ELK_INSTANCE_NAMES,
   DEFAULT_REQUESTS_TIMEOUT,
   KAFKA_INSTANCE_CONFIG,
+  REDIS_CONFIG,
 };
