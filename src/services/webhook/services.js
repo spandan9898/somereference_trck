@@ -255,16 +255,6 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
         update_from: "kafka-consumer",
       },
     };
-
-    lambdaPayload.data.url = webhookUserData.track_url || "";
-    const currentStatus = trackingObj?.status?.current_status_type;
-
-    const statusWebhookEnabled = hasCurrentStatusWebhookEnabled(webhookUserData, currentStatus);
-
-    if (!statusWebhookEnabled) {
-      return false;
-    }
-
     if (
       [...SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS, ...SMART_SHIP_AUTH_TOKENS].includes(
         trackingObj.auth_token
@@ -277,20 +267,33 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
       lambdaPayload.data.shopclues_access_token = shopcluesToken;
     }
 
-    sendWebhookDataToELK(lambdaPayload.data, elkClient);
+    const currentStatus = trackingObj?.status?.current_status_type;
+    for (const eachWebhookUserData of webhookUserData) {
+      const statusWebhookEnabled = hasCurrentStatusWebhookEnabled(
+        eachWebhookUserData,
+        currentStatus
+      );
 
-    // if (
-    //   ![
-    //     ...NAAPTOL_AUTH_TOKEN,
-    //     ...SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
-    //     ...SMART_SHIP_AUTH_TOKENS,
-    //   ].includes(trackingObj?.auth_token)
-    // ) {
-    //   callLambdaFunction(lambdaPayload);
-    //   return false;
-    // }
+      if (!statusWebhookEnabled) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      lambdaPayload.data.url = eachWebhookUserData.url;
+      sendWebhookDataToELK(lambdaPayload.data, elkClient);
 
-    callLambdaFunction(lambdaPayload);
+      // if (
+      //   ![
+      //     ...NAAPTOL_AUTH_TOKEN,
+      //     ...SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
+      //     ...SMART_SHIP_AUTH_TOKENS,
+      //   ].includes(trackingObj?.auth_token)
+      // ) {
+      //   callLambdaFunction(lambdaPayload);
+      //   return false;
+      // }
+
+      callLambdaFunction(lambdaPayload);
+    }
 
     return true;
   } catch (error) {
