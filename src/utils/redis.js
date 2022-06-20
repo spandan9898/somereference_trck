@@ -70,9 +70,7 @@ const storeInCache = async (key, value, expiryTime) => {
     const redisKey = typeof key === "string" ? key : JSON.stringify(key);
     const redisValue = typeof value === "string" ? value : JSON.stringify(value);
     const redisExpiryTime = expiryTime || 1 * 24 * 60 * 60;
-    await redisClient.set(redisKey, redisValue, {
-      EX: redisExpiryTime,
-    });
+    await redisClient.set(redisKey, redisValue, "EX", redisExpiryTime);
   } catch (error) {
     logger.error("storeInCache", error);
   }
