@@ -278,7 +278,7 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
         // eslint-disable-next-line no-continue
         continue;
       }
-      lambdaPayload.data.url = eachWebhookUserData.url;
+      lambdaPayload.data.url = eachWebhookUserData.track_url || "";
       sendWebhookDataToELK(lambdaPayload.data, elkClient);
 
       // if (
