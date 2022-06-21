@@ -313,7 +313,8 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
         preparedData = await webhookClient.getPreparedData();
       }
       if (_.isEmpty(preparedData)) {
-        return false;
+        // eslint-disable-next-line no-continue
+        continue;
       }
       lambdaPayload.data.url = eachWebhookUserData.track_url || "";
       lambdaPayload.data.prepared_data = preparedData;
