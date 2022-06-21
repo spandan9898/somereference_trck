@@ -304,8 +304,8 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
       }
       let preparedData;
       if (
-        eachWebhookUserData?.preparator_type &&
-        eachWebhookUserData.preparator_type.toLowerCase() === "common"
+        eachWebhookUserData?.explicit_preparator_type &&
+        eachWebhookUserData.explicit_preparator_type.toLowerCase() === "common"
       ) {
         preparedData = CommonServices.init(trackingObj);
       } else {
