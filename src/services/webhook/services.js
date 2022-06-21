@@ -266,30 +266,30 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
 
     /*
       webhookUserData format-> {
-        "user_auth_token" : <str>,
-        "config": [
-          "track_url":"",
-          "token":"",
-          "has_webhook_enabled":<bool>,
-          "shop_platform":null,
-          is_active:<bool>,
-          other_fields:Object,
-          created_at:<datetimeObject>,
-          email:"",
-        ],
-        [
-          "track_url":"",
-          "token":"",
-          "has_webhook_enabled":<bool>,
-          "shop_platform":null,
-          is_active:<bool>,
-          other_fields:Object,
-          created_at:<datetimeObject>,
-          email:"",
-          preparator_type:"common"
-        ],
-        ...
-      }
+              "user_auth_token" : <str>,
+              "config":[{
+                  "track_url":"",
+                  "token":"",
+                  "has_webhook_enabled":<bool>,
+                  "shop_platform":null,
+                  "is_active":<bool>,
+                  "other_fields":Object,
+                  "created_at":<datetimeObject>,
+                  "email":"",
+                },
+                {
+                  "track_url":"",
+                  "token":"",
+                  "has_webhook_enabled":<bool>,
+                  "shop_platform":null,
+                  is_active:<bool>,
+                  other_fields:Object,
+                  created_at:<datetimeObject>,
+                  email:"",
+                  preparator_type:"common"
+                },{...}
+              ]
+            }
      */
     const { config } = webhookUserData;
     for (const eachWebhookUserData of config) {
