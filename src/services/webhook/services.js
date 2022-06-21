@@ -26,8 +26,11 @@ const {
   isWebhookUserDataUpdateable,
 } = require("./helpers");
 const WebhookClient = require("../../apps/webhookClients");
+
 const { callLambdaFunction } = require("../../connector/lambda");
+
 const { WEBHOOK_USER_CACHE_KEY_NAME } = require("../../utils/constants");
+const CommonServices = require("../../apps/webhookClients/common/services");
 
 // const { NAAPTOL_AUTH_TOKEN } = require("../../apps/webhookClients/constants");
 
@@ -85,7 +88,7 @@ const getWebhookUserDataFromCache = async (authToken) => {
     }
 
     return {
-      ...res[authToken],
+      config: res[authToken],
       user_auth_token: authToken,
     };
   } catch (error) {
@@ -239,17 +242,9 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
       return false;
     }
 
-    const webhookClient = new WebhookClient(trackingObj);
-    const preparedData = await webhookClient.getPreparedData();
-
-    if (_.isEmpty(preparedData)) {
-      return false;
-    }
-
     const lambdaPayload = {
       data: {
         tracking_info_doc: _.omit(trackingObj, ["audit", "_id"]),
-        prepared_data: preparedData,
         url: "",
         shopclues_access_token: "random_token",
         update_from: "kafka-consumer",
@@ -268,7 +263,8 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
     }
 
     const currentStatus = trackingObj?.status?.current_status_type;
-    for (const eachWebhookUserData of webhookUserData) {
+    const { config } = webhookUserData;
+    for (const eachWebhookUserData of config) {
       const statusWebhookEnabled = hasCurrentStatusWebhookEnabled(
         eachWebhookUserData,
         currentStatus
@@ -278,7 +274,23 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
         // eslint-disable-next-line no-continue
         continue;
       }
-      lambdaPayload.data.url = eachWebhookUserData.track_url || "";
+      let preparedData;
+      if (
+        eachWebhookUserData?.preparator_type &&
+        eachWebhookUserData.preparator_type.toLowerCase() === "common"
+      ) {
+        lambdaPayload.data.url = eachWebhookUserData.track_url || "";
+        preparedData = CommonServices.init(trackingObj);
+      } else {
+        const webhookClient = new WebhookClient(trackingObj);
+        preparedData = await webhookClient.getPreparedData();
+      }
+      if (_.isEmpty(preparedData)) {
+        return false;
+      }
+
+      lambdaPayload.data.prepared_data = preparedData;
+
       sendWebhookDataToELK(lambdaPayload.data, elkClient);
 
       // if (
