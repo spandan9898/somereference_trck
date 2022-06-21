@@ -93,6 +93,10 @@ const EKART_STATUS_MAPPER = {
     scan_type: "RTO",
     pickrr_sub_status_code: "",
   },
+  shipment_rto_created: {
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
+  },
   shipment_rto_confirmed: { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
   shipment_rto_in_transit: { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
   shipment_rto_completed: { scan_type: "RTD", pickrr_sub_status_code: "" },

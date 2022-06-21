@@ -61,7 +61,12 @@ const prepareEkartData = (ekartDict) => {
     const trackData = { ...ekartDict };
     const { meta_data: metaData } = trackData;
     const { sub_reasons: subReasons = [], event = "" } = trackData;
-    const statusScanType = subReasons.length ? `${event}_${subReasons[0]}` : event;
+    let statusScanType = "";
+    if (event === "shipment_rto_created") {
+      statusScanType = event;
+    } else {
+      statusScanType = subReasons.length ? `${event}_${subReasons[0]}` : event;
+    }
     let statusType = statusScanType;
     const statusDateTime = trackData?.event_date;
     const statusDate = statusDateTime
