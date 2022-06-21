@@ -279,7 +279,6 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
         eachWebhookUserData?.preparator_type &&
         eachWebhookUserData.preparator_type.toLowerCase() === "common"
       ) {
-        lambdaPayload.data.url = eachWebhookUserData.track_url || "";
         preparedData = CommonServices.init(trackingObj);
       } else {
         const webhookClient = new WebhookClient(trackingObj);
@@ -288,7 +287,7 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
       if (_.isEmpty(preparedData)) {
         return false;
       }
-
+      lambdaPayload.data.url = eachWebhookUserData.track_url || "";
       lambdaPayload.data.prepared_data = preparedData;
 
       sendWebhookDataToELK(lambdaPayload.data, elkClient);
