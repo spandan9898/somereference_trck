@@ -26,11 +26,8 @@ const {
   isWebhookUserDataUpdateable,
 } = require("./helpers");
 const WebhookClient = require("../../apps/webhookClients");
-
 const { callLambdaFunction } = require("../../connector/lambda");
-
 const { WEBHOOK_USER_CACHE_KEY_NAME } = require("../../utils/constants");
-const CommonServices = require("../../apps/webhookClients/common/services");
 
 // const { NAAPTOL_AUTH_TOKEN } = require("../../apps/webhookClients/constants");
 
@@ -56,10 +53,7 @@ const updateAllEnabledWebhookUserDataInCache = async () => {
     }
     const webhookUserCachePayload = res.reduce((obj, webhookUser) => {
       webhookUser.events_enabled = webhookUser.events_enabled || {};
-      if (!obj[webhookUser?.user_auth_token]) {
-        obj[webhookUser.user_auth_token] = [];
-      }
-      obj[webhookUser.user_auth_token].push(omit(webhookUser, "user_auth_token"));
+      obj[webhookUser.user_auth_token] = omit(webhookUser, "user_auth_token");
       return obj;
     }, {});
     await storeInCache(WEBHOOK_USER_CACHE_KEY_NAME, webhookUserCachePayload);
@@ -88,7 +82,7 @@ const getWebhookUserDataFromCache = async (authToken) => {
     }
 
     return {
-      config: res[authToken],
+      ...res[authToken],
       user_auth_token: authToken,
     };
   } catch (error) {
@@ -225,61 +219,6 @@ const checkIfCompulsoryEventAlreadySent = (trackingObj) => {
   }
 };
 
-/*
-      webhookUserData  format-> {
-              "user_auth_token" : <str>,
-              "config":[{
-                  "track_url":"",
-                  "token":"",
-                  "has_webhook_enabled":<bool>,
-                  "shop_platform":null,
-                  "is_active":<bool>,
-                  "other_fields":Object,
-                  "created_at":<datetimeObject>,
-                  "email":"",
-                },
-                {
-                  "track_url":"",
-                  "token":"",
-                  "has_webhook_enabled":<bool>,
-                  "shop_platform":null,
-                  is_active:<bool>,
-                  other_fields:Object,
-                  created_at:<datetimeObject>,
-                  email:"",
-                  preparator_type:"common"
-                },{...}
-              ]
-            }
-     */
-/**
- *
- * @param {prepares Webhook User Data} webhookUserData
- * @returns
- */
-const prepareWebhookDataV2 = async (eachWebhookUserConfig, trackingObj) => {
-  const currentStatus = trackingObj?.status?.current_status_type;
-  const statusWebhookEnabled = hasCurrentStatusWebhookEnabled(eachWebhookUserConfig, currentStatus);
-  if (!statusWebhookEnabled) {
-    return {};
-  }
-  let preparedData;
-  if (
-    eachWebhookUserConfig?.explicit_preparator_type &&
-    eachWebhookUserConfig.explicit_preparator_type.toLowerCase() === "common"
-  ) {
-    preparedData = CommonServices.init(trackingObj);
-  } else {
-    const webhookClient = new WebhookClient(trackingObj);
-    preparedData = await webhookClient.getPreparedData();
-  }
-  if (_.isEmpty(preparedData)) {
-    // eslint-disable-next-line no-continue
-    return {};
-  }
-  return preparedData;
-};
-
 /**
  *
  * @desc prepare tracking info document and call webhook lambda
@@ -297,14 +236,32 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
       return false;
     }
 
+    const webhookClient = new WebhookClient(trackingObj);
+    const preparedData = await webhookClient.getPreparedData();
+
+    if (_.isEmpty(preparedData)) {
+      return false;
+    }
+
     const lambdaPayload = {
       data: {
         tracking_info_doc: _.omit(trackingObj, ["audit", "_id"]),
+        prepared_data: preparedData,
         url: "",
         shopclues_access_token: "random_token",
         update_from: "kafka-consumer",
       },
     };
+
+    lambdaPayload.data.url = webhookUserData.track_url || "";
+    const currentStatus = trackingObj?.status?.current_status_type;
+
+    const statusWebhookEnabled = hasCurrentStatusWebhookEnabled(webhookUserData, currentStatus);
+
+    if (!statusWebhookEnabled) {
+      return false;
+    }
+
     if (
       [...SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS, ...SMART_SHIP_AUTH_TOKENS].includes(
         trackingObj.auth_token
@@ -317,18 +274,20 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
       lambdaPayload.data.shopclues_access_token = shopcluesToken;
     }
 
-    const { config } = webhookUserData;
-    for (const eachWebhookUserConfig of config) {
-      const preparedData = prepareWebhookDataV2(eachWebhookUserConfig, trackingObj);
-      if (_.isEmpty(preparedData)) {
-        // eslint-disable-next-line no-continue
-        continue;
-      }
-      lambdaPayload.data.url = eachWebhookUserConfig.track_url || "";
-      lambdaPayload.data.prepared_data = preparedData;
-      sendWebhookDataToELK(lambdaPayload.data, elkClient);
-      callLambdaFunction(lambdaPayload);
-    }
+    sendWebhookDataToELK(lambdaPayload.data, elkClient);
+
+    // if (
+    //   ![
+    //     ...NAAPTOL_AUTH_TOKEN,
+    //     ...SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
+    //     ...SMART_SHIP_AUTH_TOKENS,
+    //   ].includes(trackingObj?.auth_token)
+    // ) {
+    //   callLambdaFunction(lambdaPayload);
+    //   return false;
+    // }
+
+    callLambdaFunction(lambdaPayload);
 
     return true;
   } catch (error) {
