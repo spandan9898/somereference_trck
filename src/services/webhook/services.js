@@ -225,6 +225,61 @@ const checkIfCompulsoryEventAlreadySent = (trackingObj) => {
   }
 };
 
+/*
+      webhookUserData  format-> {
+              "user_auth_token" : <str>,
+              "config":[{
+                  "track_url":"",
+                  "token":"",
+                  "has_webhook_enabled":<bool>,
+                  "shop_platform":null,
+                  "is_active":<bool>,
+                  "other_fields":Object,
+                  "created_at":<datetimeObject>,
+                  "email":"",
+                },
+                {
+                  "track_url":"",
+                  "token":"",
+                  "has_webhook_enabled":<bool>,
+                  "shop_platform":null,
+                  is_active:<bool>,
+                  other_fields:Object,
+                  created_at:<datetimeObject>,
+                  email:"",
+                  preparator_type:"common"
+                },{...}
+              ]
+            }
+     */
+/**
+ *
+ * @param {prepares Webhook User Data} webhookUserData
+ * @returns
+ */
+const prepareWebhookDataV2 = async (eachWebhookUserConfig, trackingObj) => {
+  const currentStatus = trackingObj?.status?.current_status_type;
+  const statusWebhookEnabled = hasCurrentStatusWebhookEnabled(eachWebhookUserConfig, currentStatus);
+  if (!statusWebhookEnabled) {
+    return {};
+  }
+  let preparedData;
+  if (
+    eachWebhookUserConfig?.explicit_preparator_type &&
+    eachWebhookUserConfig.explicit_preparator_type.toLowerCase() === "common"
+  ) {
+    preparedData = CommonServices.init(trackingObj);
+  } else {
+    const webhookClient = new WebhookClient(trackingObj);
+    preparedData = await webhookClient.getPreparedData();
+  }
+  if (_.isEmpty(preparedData)) {
+    // eslint-disable-next-line no-continue
+    return {};
+  }
+  return preparedData;
+};
+
 /**
  *
  * @desc prepare tracking info document and call webhook lambda
@@ -262,63 +317,15 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
       lambdaPayload.data.shopclues_access_token = shopcluesToken;
     }
 
-    const currentStatus = trackingObj?.status?.current_status_type;
-
-    /*
-      webhookUserData format-> {
-              "user_auth_token" : <str>,
-              "config":[{
-                  "track_url":"",
-                  "token":"",
-                  "has_webhook_enabled":<bool>,
-                  "shop_platform":null,
-                  "is_active":<bool>,
-                  "other_fields":Object,
-                  "created_at":<datetimeObject>,
-                  "email":"",
-                },
-                {
-                  "track_url":"",
-                  "token":"",
-                  "has_webhook_enabled":<bool>,
-                  "shop_platform":null,
-                  is_active:<bool>,
-                  other_fields:Object,
-                  created_at:<datetimeObject>,
-                  email:"",
-                  preparator_type:"common"
-                },{...}
-              ]
-            }
-     */
     const { config } = webhookUserData;
-    for (const eachWebhookUserData of config) {
-      const statusWebhookEnabled = hasCurrentStatusWebhookEnabled(
-        eachWebhookUserData,
-        currentStatus
-      );
-
-      if (!statusWebhookEnabled) {
-        // eslint-disable-next-line no-continue
-        continue;
-      }
-      let preparedData;
-      if (
-        eachWebhookUserData?.explicit_preparator_type &&
-        eachWebhookUserData.explicit_preparator_type.toLowerCase() === "common"
-      ) {
-        preparedData = CommonServices.init(trackingObj);
-      } else {
-        const webhookClient = new WebhookClient(trackingObj);
-        preparedData = await webhookClient.getPreparedData();
-      }
+    for (const eachWebhookUserConfig of config) {
+      const preparedData = prepareWebhookDataV2(eachWebhookUserConfig, trackingObj);
       if (_.isEmpty(preparedData)) {
         // eslint-disable-next-line no-continue
         continue;
       }
-      lambdaPayload.data.url = eachWebhookUserData.track_url || "";
+      lambdaPayload.data.url = eachWebhookUserConfig.track_url || "";
       lambdaPayload.data.prepared_data = preparedData;
-
       sendWebhookDataToELK(lambdaPayload.data, elkClient);
       callLambdaFunction(lambdaPayload);
     }
