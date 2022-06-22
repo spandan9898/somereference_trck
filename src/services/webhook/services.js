@@ -53,7 +53,10 @@ const updateAllEnabledWebhookUserDataInCache = async () => {
     }
     const webhookUserCachePayload = res.reduce((obj, webhookUser) => {
       webhookUser.events_enabled = webhookUser.events_enabled || {};
-      obj[webhookUser.user_auth_token] = omit(webhookUser, "user_auth_token");
+      if (!obj[webhookUser?.user_auth_token]) {
+        obj[webhookUser.user_auth_token] = [];
+      }
+      obj[webhookUser.user_auth_token].push(omit(webhookUser, "user_auth_token"));
       return obj;
     }, {});
     await storeInCache(WEBHOOK_USER_CACHE_KEY_NAME, webhookUserCachePayload);
