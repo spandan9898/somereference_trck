@@ -320,18 +320,6 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
       lambdaPayload.data.prepared_data = preparedData;
 
       sendWebhookDataToELK(lambdaPayload.data, elkClient);
-
-      // if (
-      //   ![
-      //     ...NAAPTOL_AUTH_TOKEN,
-      //     ...SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
-      //     ...SMART_SHIP_AUTH_TOKENS,
-      //   ].includes(trackingObj?.auth_token)
-      // ) {
-      //   callLambdaFunction(lambdaPayload);
-      //   return false;
-      // }
-
       callLambdaFunction(lambdaPayload);
     }
 
