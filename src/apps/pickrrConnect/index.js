@@ -4,7 +4,7 @@ const { listener, initialize } = require("./consumer");
 (async () => {
   try {
     const pickrrConnectConsumers = await initialize();
-    if (process.env.CONSUME_PICKRR_CONNECT_DATA) {
+    if (process.env.CONSUME_PICKRR_CONNECT_DATA === "true") {
       listener(pickrrConnectConsumers);
     }
   } catch (error) {
