@@ -30,13 +30,6 @@ const sendTrackDataToV1 = async (trackData) => {
     }
     const trackDict = prepareTrackDictForV1(trackData);
 
-    sendDataToEventBridge({
-      source: V1_EVENT_BRIDGE_SOURCE,
-      detailType: V1_EVENT_BRIDGE_DETAIL_TYPE,
-      data: trackDict,
-      eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
-    });
-
     if (!authTokens.includes(trackData.auth_token)) {
       sendDataToEventBridge({
         source: V1_EVENT_BRIDGE_SOURCE,
