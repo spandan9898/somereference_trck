@@ -58,7 +58,7 @@ const prepareBellavitaWebhookData = (trackObj) => {
         {
           action: status.current_status_type,
           attributes: {
-            tracking_id: trackObj.courier_tracking_id,
+            tracking_id: trackObj.tracking_id || trackObj.courier_tracking_id,
           },
           current_time: moment(status?.current_status_time).isValid()
             ? `${moment(status?.current_status_time).format("YYYY-MM-DDTHH:mm:ss.SSS")}Z`
