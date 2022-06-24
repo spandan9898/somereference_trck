@@ -90,8 +90,8 @@ const EKART_STATUS_MAPPER = {
     pickrr_sub_status_code: "CR",
   },
   shipment_rto_created_rejected_by_customer_postobd: {
-    scan_type: "UD",
-    pickrr_sub_status_code: "CR",
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
   },
   shipment_rto_created: {
     scan_type: "RTO",
