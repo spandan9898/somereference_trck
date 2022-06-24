@@ -1,7 +1,12 @@
-const { createClient } = require("redis");
+const Redis = require("ioredis");
 const logger = require("../../logger");
+const { REDIS_CONFIG } = require("./constants");
 
-const redisClient = createClient();
+let redisConf = null;
+if (process.env.NODE_ENV === "production") {
+  redisConf = REDIS_CONFIG;
+}
+const redisClient = new Redis(redisConf);
 
 redisClient.on("error", (error) => {
   logger.error("Redis Connection Error", error);
@@ -65,9 +70,7 @@ const storeInCache = async (key, value, expiryTime) => {
     const redisKey = typeof key === "string" ? key : JSON.stringify(key);
     const redisValue = typeof value === "string" ? value : JSON.stringify(value);
     const redisExpiryTime = expiryTime || 1 * 24 * 60 * 60;
-    await redisClient.set(redisKey, redisValue, {
-      EX: redisExpiryTime,
-    });
+    await redisClient.set(redisKey, redisValue, "EX", redisExpiryTime);
   } catch (error) {
     logger.error("storeInCache", error);
   }

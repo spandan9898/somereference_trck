@@ -57,39 +57,43 @@ const EKART_STATUS_MAPPER = {
   },
   shipment_undelivered_attempted_rejected: { scan_type: "UD", pickrr_sub_status_code: "CR" },
   shipment_misrouted: { scan_type: "OT", pickrr_sub_status_code: "" },
-  shipment_rto_created_damaged_shipment: { scan_type: "DM", pickrr_sub_status_code: "" },
+  shipment_rto_created_damaged_shipment: { scan_type: "RTO", pickrr_sub_status_code: "" },
   shipment_rto_created_rejected_by_customer: {
-    scan_type: "UD",
-    pickrr_sub_status_code: "CR",
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
   },
-  shipment_rto_created_non_serviceable: { scan_type: "UD", pickrr_sub_status_code: "ODA" },
-  "shipment_rto_created_did not place order": { scan_type: "UD", pickrr_sub_status_code: "CR" },
+  shipment_rto_created_non_serviceable: { scan_type: "RTO", pickrr_sub_status_code: "" },
+  "shipment_rto_created_did not place order": { scan_type: "RTO", pickrr_sub_status_code: "" },
   "shipment_rto_created_do not want the product": {
-    scan_type: "UD",
-    pickrr_sub_status_code: "CR",
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
   },
   shipment_rto_created_customer_cancellation: {
-    scan_type: "UD",
-    pickrr_sub_status_code: "CR",
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
   },
-  "shipment_rto_created_client-cancellation": { scan_type: "UD", pickrr_sub_status_code: "CR" },
-  shipment_rto_created_attempts_exhausted: { scan_type: "UD", pickrr_sub_status_code: "CI" },
+  "shipment_rto_created_client-cancellation": { scan_type: "RTO", pickrr_sub_status_code: "" },
+  shipment_rto_created_attempts_exhausted: { scan_type: "RTO", pickrr_sub_status_code: "" },
   shipment_rto_created_shipmentintransitbyondlimit: {
-    scan_type: "UD",
-    pickrr_sub_status_code: "ODA",
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
   },
-  shipment_rto_created_order_cancelled: { scan_type: "UD", pickrr_sub_status_code: "CI" },
-  shipment_rto_created_incomplete_address: { scan_type: "UD", pickrr_sub_status_code: "AI" },
-  shipment_rto_created_rfrpromisebreached: { scan_type: "UD", pickrr_sub_status_code: "SD" },
+  shipment_rto_created_order_cancelled: { scan_type: "RTO", pickrr_sub_status_code: "" },
+  shipment_rto_created_incomplete_address: { scan_type: "RTO", pickrr_sub_status_code: "" },
+  shipment_rto_created_rfrpromisebreached: { scan_type: "RTO", pickrr_sub_status_code: "" },
   "shipment_rto_created_unavailable at delivery address": {
-    scan_type: "UD",
-    pickrr_sub_status_code: "ODA",
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
   },
   "shipment_rto_created_purchased by mistake": {
     scan_type: "UD",
     pickrr_sub_status_code: "CR",
   },
   shipment_rto_created_rejected_by_customer_postobd: {
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
+  },
+  shipment_rto_created: {
     scan_type: "RTO",
     pickrr_sub_status_code: "",
   },
@@ -101,6 +105,14 @@ const EKART_STATUS_MAPPER = {
     pickrr_sub_status_code: "",
   },
   received_at_dh: { scan_type: "RAD", pickrr_sub_status_code: "" },
+  shipment_rto_created_other_city_misroute: {
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
+  },
+  shipment_rto_undelivered_pickup_time_elapsed: {
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
+  },
 };
 const EKART_PULL_MAPPER = {
   SHIPMENT_CREATED: {
