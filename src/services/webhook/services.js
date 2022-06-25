@@ -85,7 +85,7 @@ const getWebhookUserDataFromCache = async (authToken) => {
     }
 
     return {
-      ...res[authToken],
+      config: res[authToken],
       user_auth_token: authToken,
     };
   } catch (error) {
@@ -271,13 +271,14 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
         continue;
       }
       const webhookClient = new WebhookClient(trackingObj, eachWebhookUser);
-      const preparedData = webhookClient.getPreparedData();
+      const preparedData = await webhookClient.getPreparedData();
       if (_.isEmpty(preparedData)) {
         // eslint-disable-next-line no-continue
         continue;
       }
-      lambdaPayload.data.url = webhookUserData.track_url || "";
+      lambdaPayload.data.url = eachWebhookUser.track_url || "";
       lambdaPayload.data.prepared_data = preparedData;
+
       sendWebhookDataToELK(lambdaPayload.data, elkClient);
       callLambdaFunction(lambdaPayload);
     }
