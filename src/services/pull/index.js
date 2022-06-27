@@ -80,6 +80,9 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     edd_stamp: result.eddStamp ? result.eddStamp : "",
     updated_at: moment().toDate(),
   };
+  if (result.eventObj?.otp) {
+    updatedObj.latest_otp = result.eventObj.otp;
+  }
   if (!updatedObj.edd_stamp) {
     delete updatedObj.edd_stamp;
   }
