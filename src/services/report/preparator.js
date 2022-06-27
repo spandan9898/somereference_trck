@@ -39,6 +39,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     latest_track_info: findLatestTrackingInfo(trackData),
     latest_location: findLatestLocation(trackData),
     first_ndr_date: findFirstNdrDate(trackData),
+    latest_otp: trackData?.latest_otp,
 
     // current logic --> track/webhook_services.py(182), see NDR status scan_datetime
 
