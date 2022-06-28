@@ -29,7 +29,7 @@ const listener = async (consumer, partitionCount) => {
       autoCommitInterval: 60000,
       partitionsConsumedConcurrently: partitionCount,
       eachMessage: (consumedPayload) => {
-        KafkaMessageHandler.init(consumedPayload, "ecomm");
+        //KafkaMessageHandler.init(consumedPayload, "ecomm");
       },
     });
   } catch (error) {
