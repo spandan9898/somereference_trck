@@ -123,7 +123,7 @@ const checkTriggerForPulledEvent = (preparedDict, dbResponse) => {
 const updateFlagForOtpDeliveredShipments = (trackArr) => {
   let isOtpDelivered = false;
   trackArr.forEach((eachTrackObj) => {
-    if (eachTrackObj?.otp_remarks) {
+    if (eachTrackObj?.otp_remarks || eachTrackObj?.otp) {
       isOtpDelivered = true;
     }
   });
