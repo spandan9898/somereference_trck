@@ -100,7 +100,7 @@ const prepareEkartData = (ekartDict) => {
     pickrrEkartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrEkartDict.pickrr_sub_status_code = reasonDict?.pickrr_sub_status_code || "";
     pickrrEkartDict.courier_status_code = statusScanType;
-    pickrrEkartDict.otp = metaData?.attempt_details?.otp || "";
+    pickrrEkartDict.otp_remarks = metaData?.attempt_details?.otp || "";
 
     return pickrrEkartDict;
   } catch (error) {

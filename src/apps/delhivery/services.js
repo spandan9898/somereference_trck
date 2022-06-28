@@ -218,6 +218,7 @@ const prepareDelhiveryPulledData = (delhiveryDict) => {
   pickrrDelhiveryDict.awb = trackingId;
   pickrrDelhiveryDict.courier_status_code = mapperString;
   pickrrDelhiveryDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];
+  pickrrDelhiveryDict.otp_remarks = delhiveryDict?.DeliveryOTP || "";
 
   return pickrrDelhiveryDict;
 };
