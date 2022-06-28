@@ -18,14 +18,21 @@ const logger = require("../../../logger");
  * Return prepared data based on auth token
  */
 class WebhookClient {
-  constructor(trackingObj) {
+  constructor(trackingObj, webhookUserData) {
     this.authToken = trackingObj.auth_token;
     this.trackingObj = trackingObj;
+    this.webhookUserData = webhookUserData;
   }
 
   async getPreparedData() {
     if (!this.authToken) {
       logger.error("getPreparedData - auth token not found");
+    }
+    if (
+      this.webhookUserData?.explicit_preparator_type &&
+      this.webhookUserData.explicit_preparator_type === "common"
+    ) {
+      return CommonServices.init(this.trackingObj);
     }
     if (SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS.includes(this.authToken)) {
       return ShopcluesServices.init(this.trackingObj);
