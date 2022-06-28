@@ -54,8 +54,8 @@ const prepareTrackDataToUpdateInPullDb = (trackObj, isFromPulled) => {
   eventObj.update_source = isFromPulled ? "kafka_pull" : "kafka";
   eventObj.update_time = moment().toDate();
   eventObj.system_updated_at = moment().toDate();
-  if (trackData?.otp_remarks) {
-    eventObj.otp_remarks = trackData.otp_remarks;
+  if (trackData?.otp) {
+    eventObj.latest_otp = trackData.otp;
   }
   if (pickupDatetime) {
     eventObj.pickup_datetime = moment(pickupDatetime).subtract(330, "m").toDate();
