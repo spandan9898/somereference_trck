@@ -229,6 +229,7 @@ const EKART_PULL_MAPPER = {
     pickrr_sub_status:
       "Customer Not Available/Office/Residence Closed/Consignee phone not reachable",
   },
+
   UNDELIVERED_DUE_TO_CASH_UNAVAILABILITY: {
     courier_remarks: "Shipment undelivered as COD not ready",
     courier_status: "undelivered_due_to_cash_unavailability",
@@ -237,6 +238,15 @@ const EKART_PULL_MAPPER = {
     pickrr_sub_status_code: "CNR",
     pickrr_status: "Failed Attempt at Delivery",
     pickrr_sub_status: "Cash Not Ready",
+  },
+  UNDELIVERED_DUE_TO_REQUEST_FOR_RESCHEDULE: {
+    courier_remarks: "Undelivered. (Rescheduled to: __dd-mm-yy__)",
+    courier_status: "undelivered_due_to_request_for_reschedule",
+    courier_status_type: "undelivered_due_to_request_for_reschedule",
+    pickrr_code: "UD",
+    pickrr_sub_status_code: "CD",
+    pickrr_status: "Failed Attempt at Delivery",
+    pickrr_sub_status: "Customer Delay/Future Delivery",
   },
   UNSUCCESSFUL_DELIVERY_ATTEMPT_DUE_TO_SERVICEABILITY_ISSUES: {
     courier_remarks: "Shipment undelivered due to non serviceable pincode",
