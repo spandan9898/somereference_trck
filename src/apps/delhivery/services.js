@@ -116,6 +116,7 @@ const prepareDelhiveryData = (delhiveryDict) => {
     pickrrDelhiveryDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrDelhiveryDict.pickrr_sub_status_code = reasonDict?.pickrr_sub_status_code || "";
     pickrrDelhiveryDict.courier_status_code = delhiveryMapperKey;
+    pickrrDelhiveryDict.otp = trackData?.DeliveryOTP || "";
 
     return pickrrDelhiveryDict;
   } catch (error) {
