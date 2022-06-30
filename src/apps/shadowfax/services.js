@@ -121,7 +121,7 @@ const prepareShadowfaxData = (shadowfaxDict) => {
     pickrrShadowfaxDict.track_location = eventLocation;
     pickrrShadowfaxDict.courier_status_code = mapperString;
     pickrrShadowfaxDict.pickrr_sub_status_code = pickrrSubStatusCode;
-    if (Remarks.toLowerCase().includes("otp verified delivered")) {
+    if (Remarks.toLowerCase().includes("otp verified item delivered")) {
       pickrrShadowfaxDict.otp_remarks = Remarks;
     }
     return pickrrShadowfaxDict;
