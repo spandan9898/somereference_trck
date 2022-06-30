@@ -75,6 +75,9 @@ const prepareDtdcData = (dtdcDict) => {
     pickrrDtdcDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrDtdcDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
     pickrrDtdcDict.track_location = _.get(dtdcDict, "shipmentStatus.strOrigin", "");
+    if (pickrrDtdcDict.otp_remarks) {
+      pickrrDtdcDict.otp_remarks = dtdcDict.shipmentStatus?.strActionDesc || "";
+    }
     return pickrrDtdcDict;
   } catch (error) {
     pickrrDtdcDict.err = error.message;
