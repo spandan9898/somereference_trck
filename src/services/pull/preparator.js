@@ -57,6 +57,9 @@ const prepareTrackDataToUpdateInPullDb = (trackObj, isFromPulled) => {
   if (trackData?.otp) {
     eventObj.otp = trackData.otp;
   }
+  if (trackData?.otp_remarks) {
+    eventObj.otp_remarks = trackData.otp_remarks;
+  }
   if (pickupDatetime) {
     eventObj.pickup_datetime = moment(pickupDatetime).subtract(330, "m").toDate();
   }
