@@ -219,6 +219,9 @@ const prepareDelhiveryPulledData = (delhiveryDict) => {
   pickrrDelhiveryDict.awb = trackingId;
   pickrrDelhiveryDict.courier_status_code = mapperString;
   pickrrDelhiveryDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];
+  if ((Instructions || "").toLowerCase().includes("otp verified delivery")) {
+    pickrrDelhiveryDict.otp_remarks = Instructions;
+  }
   pickrrDelhiveryDict.otp = delhiveryDict?.DeliveryOTP || "";
 
   return pickrrDelhiveryDict;
