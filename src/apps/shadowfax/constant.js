@@ -236,6 +236,21 @@ const SHADOWFAX_REVERSE_MAPPER = {
   "cancelled_seller cancelled the pickup": { pickrr_sub_status_code: "", scan_type: "OC" },
   nc: { pickrr_sub_status_code: "CNA", scan_type: "PPF" },
   na: { pickrr_sub_status_code: "SD", scan_type: "PPF" },
+
+  // push code mappings for reverse
+
+  assigned_for_pickup: { pickrr_sub_status_code: "", scan_type: "OFP" },
+  ofp: { pickrr_sub_status_code: "", scan_type: "OFP" },
+  recd_at_rev_hub: { pickrr_sub_status_code: "", scan_type: "SHP" },
+  recd_at_dc: { pickrr_sub_status_code: "", scan_type: "OT" },
+  cancelled_by_customer: { pickrr_sub_status_code: "CANC", scan_type: "PPF" },
+  qc_failed: { pickrr_sub_status_code: "", scan_type: "QCF" },
+  on_hold: { pickrr_sub_status_code: "", scan_type: "" },
+  rto_d: { pickrr_sub_status_code: "", scan_type: "DL" },
+  rts_d: { pickrr_sub_status_code: "", scan_type: "DL" },
+  rto_nd: { pickrr_sub_status_code: "", scan_type: "UD" },
+  rts_nd: { pickrr_sub_status_code: "", scan_type: "UD" },
+  rts_in_process: { pickrr_sub_status_code: "", scan_type: "OT" },
 };
 
 const PUSH_PARTITION_COUNT = 10;
