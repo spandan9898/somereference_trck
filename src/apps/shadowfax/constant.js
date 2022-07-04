@@ -231,8 +231,10 @@ const SHADOWFAX_REVERSE_MAPPER = {
   "pickup_on_hold_doorstep qc used item": { pickrr_sub_status_code: "DM", scan_type: "QCF" },
   "pickup_on_hold_pincode address mismatch": { pickrr_sub_status_code: "AI", scan_type: "PPF" },
   picked: { pickrr_sub_status_code: "", scan_type: "PP" },
-  cancelled: { pickrr_sub_status_code: "", scan_type: "OC" },
-  nc: { pickrr_sub_status_code: "SNA", scan_type: "PPF" },
+  "cancelled_customer cancelled the pickup": { pickrr_sub_status_code: "", scan_type: "OC" },
+  "cancelled_cancelled by Client": { pickrr_sub_status_code: "", scan_type: "NDR" },
+  "cancelled_seller cancelled the pickup": { pickrr_sub_status_code: "", scan_type: "OC" },
+  nc: { pickrr_sub_status_code: "CNA", scan_type: "PPF" },
   na: { pickrr_sub_status_code: "SD", scan_type: "PPF" },
 };
 
