@@ -167,8 +167,6 @@ const SHADOWFAX_REVERSE_MAPPER = {
     scan_type: "PPF",
   },
 
-  // "qc failed": { pickrr_sub_status_code: "CI", scan_type: "PPF" },
-
   "qc failed": { pickrr_sub_status_code: "OTH", scan_type: "QCF" },
   "pickup_on_hold_customer want pick-up from non-serviceable area": {
     pickrr_sub_status_code: "NSL",
