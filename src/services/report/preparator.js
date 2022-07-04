@@ -12,6 +12,7 @@ const {
   findDeliveryDate,
   findRTODate,
   findFirstNdrDate,
+  findQCFailureReason,
 } = require("./helpers");
 
 /**
@@ -54,6 +55,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     delivery_date: findDeliveryDate(trackData?.track_arr || {}),
     rto_date: findRTODate(trackData?.track_arr || {}),
     pickrr_tracking_id: trackData.tracking_id,
+    qc_rejection_reason: findQCFailureReason(trackData?.track_arr || {}),
   };
   if (trackData.promise_edd) {
     data.promise_edd = trackData.promise_edd;
