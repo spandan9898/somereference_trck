@@ -23,7 +23,7 @@ const getEventInfoData = ({ event, comments, statusId, remarks, isReverse }) => 
 
   if (isReverse) {
     mapperString = courierStatus;
-    if (["pickup_on_hold"].includes(courierStatus.toLowerCase())) {
+    if (["pickup_on_hold", "cancelled"].includes(courierStatus.toLowerCase())) {
       mapperString = `${courierStatus}_${courierRemark}`;
     }
     if (mapperString.toLowerCase() in SHADOWFAX_REVERSE_MAPPER) {
