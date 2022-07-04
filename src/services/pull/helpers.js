@@ -115,10 +115,25 @@ const checkTriggerForPulledEvent = (preparedDict, dbResponse) => {
   return true;
 };
 
+/**
+ *
+ *Finds Otp Flag in Track Arrays for Delivered Shipment
+ *
+ */
+const updateFlagForOtpDeliveredShipments = (trackArr) => {
+  let isOtpDelivered = false;
+  trackArr.forEach((eachTrackObj) => {
+    if (eachTrackObj?.otp_remarks || eachTrackObj?.otp) {
+      isOtpDelivered = true;
+    }
+  });
+  return isOtpDelivered;
+};
 module.exports = {
   mapStatusToEvent,
   prepareTrackArrCacheData,
   checkCancelStatusInTrackArr,
   updateTrackModel,
   checkTriggerForPulledEvent,
+  updateFlagForOtpDeliveredShipments,
 };
