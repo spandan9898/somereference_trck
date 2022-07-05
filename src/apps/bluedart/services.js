@@ -175,9 +175,10 @@ const preparePickrrObjData = (trackObj) => {
   pickrrBluedartDict.track_info = trackInfo;
   pickrrBluedartDict.awb = awb;
   pickrrBluedartDict.track_location = scanLocation;
-  if (trackObj.otp_remarks.toLowerCase() === "y") {
-    pickrrBluedartDict.otp_remarks = trackObj.otp_remarks;
-  }
+
+  // if (trackObj.otp_remarks.toLowerCase() === "y") {
+  //   pickrrBluedartDict.otp_remarks = trackObj.otp_remarks;
+  // }
 
   if (trackObj.EDD) pickrrBluedartDict.EDD = trackObj.EDD;
   if (trackObj.Receivedby) pickrrBluedartDict.received_by = trackObj.Receivedby;
@@ -233,11 +234,12 @@ const getBluedartTrackingList = (trackObj) => {
         trackDict.Receivedby = _.get(shipmentData, "Scans.DeliveryDetails.ReceivedBy");
         const singatureData = _.get(shipmentData, "Scans.DeliveryDetails.ReceivedBy.Signature", []);
         if (singatureData.length) trackDict.Signature = singatureData;
-        trackDict.otp_remarks = _.get(
-          shipmentData,
-          "Scans.DeliveryDetails.SecurityCodeDelivery",
-          ""
-        );
+
+        // trackDict.otp_remarks = _.get(
+        //   shipmentData,
+        //   "Scans.DeliveryDetails.SecurityCodeDelivery",
+        //   ""
+        // );
       }
 
       if (shipmentData.ExpectedDeliveryDate) {
