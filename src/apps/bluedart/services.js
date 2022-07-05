@@ -233,11 +233,12 @@ const getBluedartTrackingList = (trackObj) => {
         trackDict.Receivedby = _.get(shipmentData, "Scans.DeliveryDetails.ReceivedBy");
         const singatureData = _.get(shipmentData, "Scans.DeliveryDetails.ReceivedBy.Signature", []);
         if (singatureData.length) trackDict.Signature = singatureData;
-        trackDict.otp_remarks = _.get(
-          shipmentData,
-          "Scans.DeliveryDetails.SecurityCodeDelivery",
-          ""
-        );
+
+        // trackDict.otp_remarks = _.get(
+        //   shipmentData,
+        //   "Scans.DeliveryDetails.SecurityCodeDelivery",
+        //   ""
+        // );
       }
 
       if (shipmentData.ExpectedDeliveryDate) {
