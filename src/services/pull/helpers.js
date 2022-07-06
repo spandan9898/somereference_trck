@@ -4,6 +4,7 @@ const moment = require("moment");
 const _ = require("lodash");
 
 const logger = require("../../../logger");
+const { TRACKING_PAGE_OTP_MESSAGE } = require("../common/constants");
 
 /**
  *
@@ -19,6 +20,13 @@ const mapStatusToEvent = (statusObj) => {
   };
 
   return eventObj;
+};
+
+/** */
+const updateScanStatus = (document, sortedTrackArray, isOtpDelivered) => {
+  if (!((document?.courier_used || "") === "delhivery") && isOtpDelivered) {
+    sortedTrackArray[0].scan_status += `${TRACKING_PAGE_OTP_MESSAGE}`;
+  }
 };
 
 /**
@@ -131,6 +139,7 @@ const updateFlagForOtpDeliveredShipments = (trackArr) => {
 };
 module.exports = {
   mapStatusToEvent,
+  updateScanStatus,
   prepareTrackArrCacheData,
   checkCancelStatusInTrackArr,
   updateTrackModel,

@@ -102,9 +102,6 @@ const prepareEkartData = (ekartDict) => {
     pickrrEkartDict.pickrr_sub_status_code = reasonDict?.pickrr_sub_status_code || "";
     pickrrEkartDict.courier_status_code = statusScanType;
     pickrrEkartDict.otp = metaData?.attempt_details?.otp || "";
-    if (pickrrEkartDict.otp) {
-      pickrrEkartDict.track_info += `${TRACKING_PAGE_OTP_MESSAGE}`;
-    }
 
     return pickrrEkartDict;
   } catch (error) {
