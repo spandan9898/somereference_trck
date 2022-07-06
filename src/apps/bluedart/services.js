@@ -175,7 +175,7 @@ const preparePickrrObjData = (trackObj) => {
   pickrrBluedartDict.track_info = trackInfo;
   pickrrBluedartDict.awb = awb;
   pickrrBluedartDict.track_location = scanLocation;
-  if (trackObj?.otp_remarks.toLowerCase() === "y") {
+  if ((trackObj?.otp_remarks || "").toLowerCase() === "y") {
     pickrrBluedartDict.otp_remarks = trackObj.otp_remarks;
   }
 
