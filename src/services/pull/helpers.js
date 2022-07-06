@@ -24,8 +24,12 @@ const mapStatusToEvent = (statusObj) => {
 
 /** */
 const updateScanStatus = (document, sortedTrackArray, isOtpDelivered) => {
-  if (!(document?.courier_used || "").includes("delhivery") && isOtpDelivered) {
-    sortedTrackArray[0].scan_status += `${TRACKING_PAGE_OTP_MESSAGE}`;
+  try {
+    if (!(document?.courier_used || "").includes("delhivery") && isOtpDelivered) {
+      sortedTrackArray[0].scan_status += `${TRACKING_PAGE_OTP_MESSAGE}`;
+    }
+  } catch (error) {
+    logger.error("Failed Updating Scan Status for Otp Shipments", error);
   }
 };
 
