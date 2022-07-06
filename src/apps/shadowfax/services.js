@@ -117,7 +117,7 @@ const prepareShadowfaxData = (shadowfaxDict) => {
     }
     pickrrShadowfaxDict.scan_type = scanType === "UD" ? "NDR" : scanType;
     pickrrShadowfaxDict.scan_datetime = moment(eventTimeStamp).format("YYYY-MM-DD HH:mm:ss");
-    pickrrShadowfaxDict.track_info = comments;
+    pickrrShadowfaxDict.track_info = comments || "";
     pickrrShadowfaxDict.track_location = eventLocation;
     pickrrShadowfaxDict.courier_status_code = mapperString;
     pickrrShadowfaxDict.pickrr_sub_status_code = pickrrSubStatusCode;

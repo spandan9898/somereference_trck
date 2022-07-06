@@ -71,7 +71,7 @@ const prepareDtdcData = (dtdcDict) => {
     pickrrDtdcDict.scan_datetime = statusDate;
     pickrrDtdcDict.courier_status_code = statusString;
     pickrrDtdcDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
-    pickrrDtdcDict.track_info = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
+    pickrrDtdcDict.track_info = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type] || "";
     pickrrDtdcDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrDtdcDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
     pickrrDtdcDict.track_location = _.get(dtdcDict, "shipmentStatus.strOrigin", "");
