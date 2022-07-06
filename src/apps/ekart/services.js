@@ -3,7 +3,6 @@ const moment = require("moment");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { EKART_STATUS_MAPPER, EKART_PULL_MAPPER } = require("./constant");
 const logger = require("../../../logger");
-const { TRACKING_PAGE_OTP_MESSAGE } = require("../../services/common/constants");
 
 /*
   :param ekart_dict: {
