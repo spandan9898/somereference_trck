@@ -3,6 +3,7 @@ const moment = require("moment");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { EKART_STATUS_MAPPER, EKART_PULL_MAPPER } = require("./constant");
 const logger = require("../../../logger");
+const { TRACKING_PAGE_OTP_MESSAGE } = require("../../services/common/constants");
 
 /*
   :param ekart_dict: {
@@ -94,13 +95,16 @@ const prepareEkartData = (ekartDict) => {
 
     pickrrEkartDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrEkartDict.scan_datetime = statusDate;
-    pickrrEkartDict.track_info = trackData.event.toString();
+    pickrrEkartDict.track_info = trackData.event.toString() || "";
     pickrrEkartDict.awb = trackData.vendor_tracking_id.toString();
     pickrrEkartDict.track_location = trackData.location.toString();
     pickrrEkartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrEkartDict.pickrr_sub_status_code = reasonDict?.pickrr_sub_status_code || "";
     pickrrEkartDict.courier_status_code = statusScanType;
     pickrrEkartDict.otp = metaData?.attempt_details?.otp || "";
+    if (pickrrEkartDict.otp) {
+      pickrrEkartDict.track_info += `${TRACKING_PAGE_OTP_MESSAGE}`;
+    }
 
     return pickrrEkartDict;
   } catch (error) {
