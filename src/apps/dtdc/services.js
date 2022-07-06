@@ -2,7 +2,6 @@ const _ = require("lodash");
 const moment = require("moment");
 const { DTDC_CODE_MAPPER } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { TRACKING_PAGE_OTP_MESSAGE } = require("../../services/common/constants");
 
 /**
  * 
@@ -79,7 +78,6 @@ const prepareDtdcData = (dtdcDict) => {
     const otpDesc = (dtdcDict?.shipmentStatus?.strActionDesc || "").toLowerCase();
     if (otpDesc.includes("otp based delivered")) {
       pickrrDtdcDict.otp_remarks = otpDesc;
-      pickrrDtdcDict.track_info += `{${TRACKING_PAGE_OTP_MESSAGE}}`;
     }
     return pickrrDtdcDict;
   } catch (error) {
