@@ -24,7 +24,7 @@ const mapStatusToEvent = (statusObj) => {
 
 /** */
 const updateScanStatus = (document, sortedTrackArray, isOtpDelivered) => {
-  if (!((document?.courier_used || "") === "delhivery") && isOtpDelivered) {
+  if (!(document?.courier_used || "").includes("delhivery") && isOtpDelivered) {
     sortedTrackArray[0].scan_status += `${TRACKING_PAGE_OTP_MESSAGE}`;
   }
 };
