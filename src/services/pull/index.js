@@ -167,7 +167,7 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     if (firstTrackObjOfTrackArr?.scan_type === "DL") {
       const isOtpDelivered = updateFlagForOtpDeliveredShipments(sortedTrackArray);
       updatedObj.is_otp_delivered = isOtpDelivered;
-      updateScanStatus(res, firstTrackObjOfTrackArr, isOtpDelivered);
+      updateScanStatus(res, sortedTrackArray, isOtpDelivered);
     }
     const promiseEdd = res?.promise_edd;
     if (!promiseEdd && latestCourierEDD) {
