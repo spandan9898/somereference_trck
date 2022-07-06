@@ -1,4 +1,5 @@
 const moment = require("moment");
+const { TRACKING_PAGE_OTP_MESSAGE } = require("../../services/common/constants");
 
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const {
@@ -111,7 +112,7 @@ const prepareDelhiveryData = (delhiveryDict) => {
 
     pickrrDelhiveryDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrDelhiveryDict.scan_datetime = statusDate;
-    pickrrDelhiveryDict.track_info = trackData.Status.Instructions.toString();
+    pickrrDelhiveryDict.track_info = trackData.Status.Instructions.toString() || "";
     pickrrDelhiveryDict.awb = trackData.AWB.toString();
     pickrrDelhiveryDict.track_location = trackData.Status.StatusLocation.toString();
     pickrrDelhiveryDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
@@ -119,6 +120,7 @@ const prepareDelhiveryData = (delhiveryDict) => {
     pickrrDelhiveryDict.courier_status_code = delhiveryMapperKey;
     if (pickrrDelhiveryDict.track_info.toLowerCase().includes("otp verified delivery")) {
       pickrrDelhiveryDict.otp_remarks = Instructions;
+      pickrrDelhiveryDict.track_info += `${TRACKING_PAGE_OTP_MESSAGE}`;
     }
     pickrrDelhiveryDict.otp = trackData?.DeliveryOTP || "";
 

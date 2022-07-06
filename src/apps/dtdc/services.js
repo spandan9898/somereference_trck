@@ -2,6 +2,7 @@ const _ = require("lodash");
 const moment = require("moment");
 const { DTDC_CODE_MAPPER } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
+const { TRACKING_PAGE_OTP_MESSAGE } = require("../../services/common/constants");
 
 /**
  * 
@@ -71,13 +72,14 @@ const prepareDtdcData = (dtdcDict) => {
     pickrrDtdcDict.scan_datetime = statusDate;
     pickrrDtdcDict.courier_status_code = statusString;
     pickrrDtdcDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
-    pickrrDtdcDict.track_info = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
+    pickrrDtdcDict.track_info = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type] || "";
     pickrrDtdcDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrDtdcDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
     pickrrDtdcDict.track_location = _.get(dtdcDict, "shipmentStatus.strOrigin", "");
     const otpDesc = (dtdcDict?.shipmentStatus?.strActionDesc || "").toLowerCase();
     if (otpDesc.includes("otp based delivered")) {
       pickrrDtdcDict.otp_remarks = otpDesc;
+      pickrrDtdcDict.track_info += `{${TRACKING_PAGE_OTP_MESSAGE}}`;
     }
     return pickrrDtdcDict;
   } catch (error) {
