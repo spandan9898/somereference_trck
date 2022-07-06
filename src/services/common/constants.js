@@ -23,7 +23,7 @@ const PICKRR_EDD_MATRIX = {
 
 const ZONE_REQUIRED_STATUS_SET = ["OP", "OM", "PPF", "OFP", "PP", "SHP", "OT", "RAD"];
 const COMMON_TRACKING_TOPIC_NAME = "tracking_data";
-const TRACKING_PAGE_OTP_MESSAGE = "OTP VERIFIED";
+const TRACKING_PAGE_OTP_MESSAGE = " OTP VERIFIED";
 
 module.exports = {
   PICKRR_EDD_MATRIX,
