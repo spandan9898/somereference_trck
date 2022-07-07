@@ -42,9 +42,24 @@ const preparePikNDelData = (payload) => {
   };
 
   try {
-    const { AWB, OrderStatus, Message, Time, ExpectedDeliveryDate } = payload;
+    const {
+      AWB,
+      OrderStatus: orderStatus,
+      Message: message,
+      Time,
+      ExpectedDeliveryDate,
+      ReasonCode: reasonCode,
+      Reason: reason,
+    } = payload;
     pickrrDict.awb = AWB;
-    const scanType = PIKNDEL_STATUS_MAPPER[OrderStatus.toLowerCase()];
+    let mapperString = null;
+    if (orderStatus === "PEN" || orderStatus === "CAN") {
+      mapperString = `${orderStatus}_${reasonCode}`;
+    } else {
+      mapperString = `${orderStatus}`;
+    }
+
+    const scanType = PIKNDEL_STATUS_MAPPER[mapperString.toLowerCase()] || "";
     if (!scanType) {
       return { err: "Unknown status code" };
     }
@@ -62,9 +77,9 @@ const preparePikNDelData = (payload) => {
     }
 
     pickrrDict.scan_datetime = scanDatetime;
-    pickrrDict.courier_status_code = OrderStatus;
+    pickrrDict.courier_status_code = mapperString;
     pickrrDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
-    pickrrDict.track_info = Message;
+    pickrrDict.track_info = reason ? `${message} - ${reason}` : `${message}`;
     pickrrDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
     if (scanType.scan_type === "PP") {
