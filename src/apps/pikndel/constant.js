@@ -93,7 +93,7 @@ const PIKNDEL_STATUS_MAPPER = {
   cpa3d: { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   ccrth: { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   ccroc: { scan_type: "PPF", pickrr_sub_status_code: "SC" },
-  ctafc: { scan_type: "PPF", pickrr_sub_status_code: "canC" },
+  ctafc: { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
   clsv: { scan_type: "PPF", pickrr_sub_status_code: "SC" },
   cctz: { scan_type: "PPF", pickrr_sub_status_code: "NSL" },
   cqcf: { scan_type: "PPF", pickrr_sub_status_code: "OTH" },
