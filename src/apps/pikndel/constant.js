@@ -14,7 +14,9 @@ const PIKNDEL_STATUS_MAPPER = {
   rah: { scan_type: "SHP", pickrr_sub_status_code: "" },
   itr: { scan_type: "OT", pickrr_sub_status_code: "" },
   rad: { scan_type: "RAD", pickrr_sub_status_code: "" },
-  ard: { scan_type: "RAD", pickrr_sub_status_code: "" },
+
+  // ard: { scan_type: "RAD", pickrr_sub_status_code: "" },
+
   ofd: { scan_type: "OO", pickrr_sub_status_code: "" },
   rch: { scan_type: "OO", pickrr_sub_status_code: "" },
   dld: { scan_type: "DL", pickrr_sub_status_code: "" },
@@ -107,6 +109,226 @@ const PIKNDEL_STATUS_MAPPER = {
   pawc: { scan_type: "UD", pickrr_sub_status_code: "OTH" },
   lfv: { scan_type: "UD", pickrr_sub_status_code: "CNA" },
   pfl: { scan_type: "UD", pickrr_sub_status_code: "REST" },
+  can_ant: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "AI",
+  },
+  can_clj: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  can_cna: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  can_er: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "REST",
+  },
+  can_idr: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "OTH",
+  },
+  can_iwa: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "AI",
+  },
+  can_loc: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  can_lpi: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "OTH",
+  },
+  can_nsp: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  can_nsa: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "ODA",
+  },
+  can_pnm: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  can_rta: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CR",
+  },
+  can_shi: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  can_pos: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  can_croc: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  can_tafc: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CI",
+  },
+  can_lsv: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  can_ctz: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "REST",
+  },
+  can_cov: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "REST",
+  },
+  can_cld: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "REST",
+  },
+  can_gdl: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  can_wfh: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  can_cnr: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNR",
+  },
+  pen_pant: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "AI",
+  },
+  pen_pcna: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  pen_ph: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  pen_pl: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  pen_pna: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  pen_pm: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  pen_cnc: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  pen_r3d: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CD",
+  },
+  pen_pawc: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "OTH",
+  },
+  pen_lfv: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  pen_pfl: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  can_cant: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "AI",
+  },
+  can_cer: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NSL",
+  },
+  can_cidr: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  can_ciwa: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "AI",
+  },
+  can_cloc: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SC",
+  },
+  can_cnsp: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SU",
+  },
+  can_cnsa: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NSL",
+  },
+  can_cpnm: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SU",
+  },
+  can_cshi: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "AI",
+  },
+  can_cpos: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SU",
+  },
+  can_cpdoc: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "HO",
+  },
+  can_csnpp: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "DAM",
+  },
+  can_ccnap: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SNR",
+  },
+  can_cpa3d: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SNR",
+  },
+  can_ccrth: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SNR",
+  },
+  can_ccroc: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SC",
+  },
+  can_ctafc: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "canC",
+  },
+  can_clsv: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SC",
+  },
+  can_cctz: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NSL",
+  },
+  can_cqcf: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  can_ccld: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NSL",
+  },
 };
 
 module.exports = {
