@@ -94,7 +94,7 @@ const prepareEkartData = (ekartDict) => {
 
     pickrrEkartDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrEkartDict.scan_datetime = statusDate;
-    pickrrEkartDict.track_info = trackData.event.toString() || "";
+    pickrrEkartDict.track_info = statusScanType;
     pickrrEkartDict.awb = trackData.vendor_tracking_id.toString();
     pickrrEkartDict.track_location = trackData.location.toString();
     pickrrEkartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
