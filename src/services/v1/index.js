@@ -25,7 +25,7 @@ const sendTrackDataToV1 = async (trackData) => {
       "4b7b5eb16221972bc132b429ebff9845789063",
       "39d7fe8174829ff6e05c6019757fc2c9123065",
       "7c1e98bd9c06ae0b75b4d2442c23d1ef193845",
-      "64a61f6d3c302d2c478adc888aa20d58791587"	    
+      "64a61f6d3c302d2c478adc888aa20d58791587",
     ];
 
     if (

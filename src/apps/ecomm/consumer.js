@@ -1,5 +1,6 @@
 /* eslint-disable consistent-return */
 const kafkaInstance = require("../../connector/kafka");
+// eslint-disable-next-line no-unused-vars
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
 const { PUSH_GROUP_NAME, PUSH_TOPIC_NAME } = require("./constant");
@@ -28,8 +29,9 @@ const listener = async (consumer, partitionCount) => {
     await consumer.run({
       autoCommitInterval: 60000,
       partitionsConsumedConcurrently: partitionCount,
+      // eslint-disable-next-line no-unused-vars
       eachMessage: (consumedPayload) => {
-        //KafkaMessageHandler.init(consumedPayload, "ecomm");
+        // KafkaMessageHandler.init(consumedPayload, "ecomm");
       },
     });
   } catch (error) {
