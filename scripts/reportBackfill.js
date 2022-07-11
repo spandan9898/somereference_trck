@@ -204,7 +204,7 @@ const processForDbData = async ({ batchData: trackingData, type, elkClient, prod
         }
         if (type.includes("report")) {
           if (!["OP", "OM", "OFP", "PPF"].includes(trackingItem?.status?.current_status_type)) {
-            updateStatusOnReport(trackingItem, logger, elkClient);
+            updateStatusOnReport(trackingItem, logger, elkClient, true);
           }
         }
         if (type.includes("elk")) {
