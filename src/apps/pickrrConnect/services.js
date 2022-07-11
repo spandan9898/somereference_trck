@@ -1,5 +1,6 @@
 const isEmpty = require("lodash/isEmpty");
 const omit = require("lodash/omit");
+const _ = require("lodash");
 
 const logger = require("../../../logger");
 const { callLambdaFunction } = require("../../connector/lambda");
@@ -77,6 +78,10 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
       });
     }
 
+    const currentStatus = _.get(trackObj, "status.current_status_type", "");
+    if (["UD", "NDR"].includes(currentStatus)) {
+      return false;
+    }
     trackObj = omit(trackObj, UNUSED_FIELDS_FROM_TRACKING_OBJ);
 
     const email = trackObj.user_email;
