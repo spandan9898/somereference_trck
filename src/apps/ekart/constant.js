@@ -185,11 +185,6 @@ const EKART_STATUS_MAPPER = {
     scan_type: "LT",
     pickrr_sub_status_code: ""
   }
-
-
-
-
-
 };
 const EKART_PULL_MAPPER = {
   SHIPMENT_CREATED: {
