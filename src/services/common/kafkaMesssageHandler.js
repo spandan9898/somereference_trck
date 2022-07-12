@@ -127,11 +127,15 @@ class KafkaMessageHandler {
       triggerWebhook(result, trackingElkClient);
       updateStatusOnReport(result, logger, trackingElkClient);
       updateStatusELK(result, prodElkClient);
-      preparePickrrConnectLambdaPayloadAndCall({
-        trackingId: result.tracking_id,
-        elkClient: trackingElkClient,
-        result,
-      });
+
+      // blocking events to lambda (new pickrr connect service)
+
+      // preparePickrrConnectLambdaPayloadAndCall({
+      //   trackingId: result.tracking_id,
+      //   elkClient: trackingElkClient,
+      //   result,
+      // });
+
       commonTrackingDataProducer(result);
       return {};
     } catch (error) {
