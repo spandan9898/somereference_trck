@@ -93,6 +93,25 @@ const updateTrackModel = (cacheTrakModel, trackingDocument) => {
 
 /**
  *
+ * @param {trackArr}
+ * returns scanTime of Latest Prepickup Events
+ */
+const findLatestPrepickupScanTime = (trackArr) => {
+  const reversedTrackArr = trackArr.reverse();
+  let scanTime;
+  reversedTrackArr.forEach((trackEvent) => {
+    if (
+      ["PPF", "OP", "OM", "OFP"].includes(trackEvent?.scan_type) &&
+      moment(trackEvent?.scan_datetime).isValid()
+    ) {
+      scanTime = trackEvent?.scan_datetime;
+    }
+  });
+  return scanTime;
+};
+
+/**
+ *
  * @param {*} preparedDict
  * @param {*} dbResponse
  * @desc https://drive.google.com/file/d/1U-Kh18Yfj1-iJDD9Rd8d887PxM7hZ8AK/view?usp=sharing
@@ -168,6 +187,7 @@ module.exports = {
   prepareTrackArrCacheData,
   checkCancelStatusInTrackArr,
   updateTrackModel,
+  findLatestPrepickupScanTime,
   checkTriggerForPulledEvent,
   updateFlagForOtpDeliveredShipments,
 };
