@@ -146,7 +146,7 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     updatedObj.courier_edd = latestCourierEDD;
 
     let pickupDateTime = null;
-    const placedData = res?.order_created_date;
+    const placedData = res?.order_created_at;
     if (res?.pickup_datetime && statusType !== "PP") {
       pickupDateTime = res?.pickup_datetime;
     } else {
