@@ -2,7 +2,7 @@ const _ = require("lodash");
 
 const logger = require("../../../logger");
 const { sendDataToElk } = require("../common/elk");
-const { NEW_STATUS_TO_OLD_MAPPING } = require("./constants");
+const { NEW_STATUS_TO_OLD_MAPPING, VALID_FAD_NDR_SUBSTATUS_CODE } = require("./constants");
 const { REPORT_STATUS_CODE_MAPPING, REPORT_STATUS_TYPE_MAPPING } = require("./constants");
 
 /**
@@ -72,7 +72,11 @@ const findLatestStatusDatetime = (trackDict) => {
 const findFirstAttemptedDate = (trackArr) => {
   let firstAttemptDate = null;
   trackArr.forEach(({ scan_type: scanType, scan_datetime: scanDateTime }) => {
-    if (["OO", "NDR", "DL"].includes(scanType)) {
+    if (
+      ["OO", "DL"].includes(scanType) ||
+      (["NDR"].includes(scanType) &&
+        VALID_FAD_NDR_SUBSTATUS_CODE.includes(trackArr?.pickrr_sub_status_code || ""))
+    ) {
       firstAttemptDate = scanDateTime;
     }
   });
