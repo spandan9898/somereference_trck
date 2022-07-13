@@ -10,6 +10,7 @@ const {
   checkTriggerForPulledEvent,
   updateFlagForOtpDeliveredShipments,
   updateScanStatus,
+  checkIsAfter,
 } = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
@@ -150,7 +151,7 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
       pickupDateTime = res?.pickup_datetime;
     } else {
       sortedTrackArray.forEach((trackEvent) => {
-        const isAfter = moment(trackEvent?.scan_datetime).isAfter(moment(placedDate));
+        const isAfter = checkIsAfter(trackEvent?.scan_datetime, placedDate);
         if (PP_PROXY_LIST.includes(trackEvent?.scan_type) && isAfter) {
           pickupDateTime = trackEvent?.scan_datetime;
         }
