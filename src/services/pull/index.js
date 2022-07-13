@@ -11,7 +11,6 @@ const {
   updateFlagForOtpDeliveredShipments,
   updateScanStatus,
   checkIsAfter,
-  findLatestPrepickupScanTime,
 } = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
