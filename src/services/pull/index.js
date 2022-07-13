@@ -145,12 +145,13 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     updatedObj.courier_edd = latestCourierEDD;
 
     let pickupDateTime = null;
-
+    const placedDate = res?.order_created_date;
     if (res?.pickup_datetime && statusType !== "PP") {
       pickupDateTime = res?.pickup_datetime;
     } else {
       sortedTrackArray.forEach((trackEvent) => {
-        if (PP_PROXY_LIST.includes(trackEvent?.scan_type)) {
+        const isAfter = moment(trackEvent?.scan_datetime).isAfter(moment(placedDate));
+        if (PP_PROXY_LIST.includes(trackEvent?.scan_type) && isAfter) {
           pickupDateTime = trackEvent?.scan_datetime;
         }
       });
