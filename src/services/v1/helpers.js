@@ -12,7 +12,7 @@ const findPickupDate = (trackData) => {
 
   let pickupDatetime = "";
   const trackArr = trackData?.track_arr || [];
-  const placedDate = trackData?.order_created_date;
+  const placedDate = trackData?.order_created_at;
   for (let i = 0; i < trackArr.length; i += 1) {
     const isAfter = checkIsAfter(trackArr[i]?.scan_datetime, placedDate);
     if (PP_PROXY_LIST.includes(trackArr[i]?.scan_type) && isAfter) {
