@@ -1,4 +1,4 @@
-const moment = require("moment");
+const { checkIsAfter } = require("../pull/helpers");
 const { PP_PROXY_LIST } = require("./constants");
 
 /**
@@ -14,7 +14,7 @@ const findPickupDate = (trackData) => {
   const trackArr = trackData?.track_arr || [];
   const placedDate = trackData?.order_created_date;
   for (let i = 0; i < trackArr.length; i += 1) {
-    const isAfter = moment(trackArr?.scan_datetime).isAfter(moment(placedDate));
+    const isAfter = checkIsAfter(trackArr[i]?.scan_datetime, placedDate);
     if (PP_PROXY_LIST.includes(trackArr[i]?.scan_type) && isAfter) {
       pickupDatetime = trackArr[i]?.scan_datetime;
     }
