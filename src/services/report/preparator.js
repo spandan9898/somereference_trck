@@ -44,10 +44,10 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     latest_location: findLatestLocation(trackData),
 
     first_ndr_date: findFirstNdrDate(trackData),
-    first_ndr_subreason: ndrDataSize > 0 ? ndrTrackInfos[1]?.scan_status : "",
-    first_ndr_status_code: ndrDataSize > 0 ? ndrTrackInfos[1]?.pickrr_sub_status_code : "",
+    first_ndr_subreason: ndrDataSize > 0 ? ndrTrackInfos[0]?.scan_status : "",
+    first_ndr_status_code: ndrDataSize > 0 ? ndrTrackInfos[0]?.pickrr_sub_status_code : "",
     first_ndr_reason:
-      ndrDataSize > 0 ? NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos[1]?.scan_status] || "Other" : "",
+      ndrDataSize > 0 ? NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos[0]?.scan_status] || "Other" : "",
 
     second_ndr_date: ndrDataSize > 1 ? ndrTrackInfos[1]?.scan_datetime : "",
     second_ndr_subreason: ndrDataSize > 1 ? ndrTrackInfos[1]?.scan_status : "",
@@ -69,7 +69,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     first_attempt_date: findFirstAttemptedDate(trackData?.track_arr || {}),
     latest_ndr_remark: NDRObject.latest_ndr_remark,
     latest_ndr_date: NDRObject.latest_ndr_date,
-    latest_ndr_reason: NDR_SUBSTATUS_PICKRR_MAPPING[NDRObject.latest_ndr_remark],
+    latest_ndr_reason: NDR_SUBSTATUS_PICKRR_MAPPING[NDRObject.latest_ndr_remark] || "Other",
 
     // rto_waybill isn't handled on PULL
 
