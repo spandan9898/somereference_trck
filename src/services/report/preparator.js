@@ -1,5 +1,6 @@
 const moment = require("moment");
 const { ofdCount } = require("../../utils");
+const { NDR_SUBSTATUS_PICKRR_MAPPING } = require("../../utils/constants");
 
 const { findPickupDate } = require("../v1/helpers");
 
@@ -12,6 +13,7 @@ const {
   findDeliveryDate,
   findRTODate,
   findFirstNdrDate,
+  findNDRTrackInfos,
 } = require("./helpers");
 
 /**
@@ -21,6 +23,37 @@ const {
 const prepareDataForReportMongo = (trackData, isManualUpdate) => {
   const trackingStatus = prepareTrackingStatus(trackData);
   const NDRObject = findLatestNDRDetails(trackData?.track_arr || {});
+  const ndrTrackInfos = findNDRTrackInfos(trackData?.track_arr || {});
+  const ndrDataSize = ndrTrackInfos.length();
+
+  // const firstNDrInfo =
+  //   ndrTrackInfos.length() > 2
+  //     ? {
+  //         scan_datetime: ndrTrackInfos[1]?.scan_datetime || "",
+  //         scan_sub_reason: ndrTrackInfos[1]?.scan_status || "",
+  //         status_code: ndrTrackInfos[1]?.pickrr_substatus_code || "",
+  //         reason: NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos.pickrr_substatus_code],
+  //       }
+  //     : "";
+  // const secondNdrInfo =
+  //   ndrTrackInfos.length() > 2
+  //     ? {
+  //         scan_datetime: ndrTrackInfos[1]?.scan_datetime || "",
+  //         scan_sub_reason: ndrTrackInfos[1]?.scan_status || "",
+  //         status_code: ndrTrackInfos[1]?.pickrr_substatus_code || "",
+  //         reason: NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos.pickrr_substatus_code],
+  //       }
+  //     : "";
+
+  // const thirdNdrInfo =
+  //   ndrTrackInfos.length() > 3
+  //     ? {
+  //         scan_datetime: ndrTrackInfos[1]?.scan_datetime || "",
+  //         scan_sub_reason: ndrTrackInfos[1]?.scan_status || "",
+  //         status_code: ndrTrackInfos[1]?.pickrr_substatus_code || "",
+  //         reason: NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos.pickrr_substatus_code],
+  //       }
+  //     : "";
 
   let pickupDate = findPickupDate(trackData);
   if (pickupDate) {
@@ -38,7 +71,25 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     edd_date: trackData?.edd_stamp,
     latest_track_info: findLatestTrackingInfo(trackData),
     latest_location: findLatestLocation(trackData),
+
     first_ndr_date: findFirstNdrDate(trackData),
+    first_ndr_subreason: ndrDataSize > 1 ? ndrTrackInfos[1]?.scan_status : "",
+    first_ndr_status_code: ndrDataSize > 1 ? ndrTrackInfos[1]?.pickrr_sub_status_code : "",
+    first_ndr_reason:
+      ndrDataSize > 1 ? NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos[1]?.scan_status] : "Other",
+
+    second_ndr_date: ndrDataSize > 2 ? ndrTrackInfos[1]?.scan_datetime : "",
+    second_ndr_subreason: ndrDataSize > 2 ? ndrTrackInfos[1]?.scan_status : "",
+    second_ndr_status_code: ndrDataSize > 2 ? ndrTrackInfos[1]?.pickrr_sub_status_code : "",
+    second_ndr_reason:
+      ndrDataSize > 2 ? NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos[1]?.scan_status] : "Other",
+
+    third_ndr_date: ndrDataSize > 3 ? ndrTrackInfos[2]?.scan_datetime : "",
+    third_ndr_subreason: ndrDataSize > 3 ? ndrTrackInfos[2]?.scan_status : "",
+    third_ndr_status_code: ndrDataSize > 3 ? ndrTrackInfos[2]?.pickrr_sub_status_code : "",
+    third_ndr_reason:
+      ndrDataSize > 2 ? NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos[2]?.scan_status] : "Other",
+
     is_otp_delivered: trackData?.is_otp_delivered || "",
     latest_otp: trackData?.latest_otp || "",
 
@@ -55,6 +106,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     rto_date: findRTODate(trackData?.track_arr || {}),
     pickrr_tracking_id: trackData.tracking_id,
   };
+
   if (trackData.promise_edd) {
     data.promise_edd = trackData.promise_edd;
   }
