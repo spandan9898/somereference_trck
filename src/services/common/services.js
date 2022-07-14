@@ -115,6 +115,7 @@ const commonTrackingDataProducer = async (trackingObj) => {
       "promise_edd",
       "sync_count",
       "is_ndr",
+      "latest_otp",
     ];
 
     const defaultValue = {
