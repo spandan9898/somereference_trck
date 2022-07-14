@@ -26,35 +26,6 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
   const ndrTrackInfos = findNDRTrackInfos(trackData?.track_arr || {});
   const ndrDataSize = ndrTrackInfos.length();
 
-  // const firstNDrInfo =
-  //   ndrTrackInfos.length() > 2
-  //     ? {
-  //         scan_datetime: ndrTrackInfos[1]?.scan_datetime || "",
-  //         scan_sub_reason: ndrTrackInfos[1]?.scan_status || "",
-  //         status_code: ndrTrackInfos[1]?.pickrr_substatus_code || "",
-  //         reason: NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos.pickrr_substatus_code],
-  //       }
-  //     : "";
-  // const secondNdrInfo =
-  //   ndrTrackInfos.length() > 2
-  //     ? {
-  //         scan_datetime: ndrTrackInfos[1]?.scan_datetime || "",
-  //         scan_sub_reason: ndrTrackInfos[1]?.scan_status || "",
-  //         status_code: ndrTrackInfos[1]?.pickrr_substatus_code || "",
-  //         reason: NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos.pickrr_substatus_code],
-  //       }
-  //     : "";
-
-  // const thirdNdrInfo =
-  //   ndrTrackInfos.length() > 3
-  //     ? {
-  //         scan_datetime: ndrTrackInfos[1]?.scan_datetime || "",
-  //         scan_sub_reason: ndrTrackInfos[1]?.scan_status || "",
-  //         status_code: ndrTrackInfos[1]?.pickrr_substatus_code || "",
-  //         reason: NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos.pickrr_substatus_code],
-  //       }
-  //     : "";
-
   let pickupDate = findPickupDate(trackData);
   if (pickupDate) {
     pickupDate = pickupDate instanceof Date ? pickupDate : moment(pickupDate).toDate();
@@ -73,20 +44,20 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     latest_location: findLatestLocation(trackData),
 
     first_ndr_date: findFirstNdrDate(trackData),
-    first_ndr_subreason: ndrDataSize > 1 ? ndrTrackInfos[1]?.scan_status : "",
-    first_ndr_status_code: ndrDataSize > 1 ? ndrTrackInfos[1]?.pickrr_sub_status_code : "",
+    first_ndr_subreason: ndrDataSize > 0 ? ndrTrackInfos[1]?.scan_status : "",
+    first_ndr_status_code: ndrDataSize > 0 ? ndrTrackInfos[1]?.pickrr_sub_status_code : "",
     first_ndr_reason:
-      ndrDataSize > 1 ? NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos[1]?.scan_status] : "Other",
+      ndrDataSize > 0 ? NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos[1]?.scan_status] : "Other",
 
-    second_ndr_date: ndrDataSize > 2 ? ndrTrackInfos[1]?.scan_datetime : "",
-    second_ndr_subreason: ndrDataSize > 2 ? ndrTrackInfos[1]?.scan_status : "",
-    second_ndr_status_code: ndrDataSize > 2 ? ndrTrackInfos[1]?.pickrr_sub_status_code : "",
+    second_ndr_date: ndrDataSize > 1 ? ndrTrackInfos[1]?.scan_datetime : "",
+    second_ndr_subreason: ndrDataSize > 1 ? ndrTrackInfos[1]?.scan_status : "",
+    second_ndr_status_code: ndrDataSize > 1 ? ndrTrackInfos[1]?.pickrr_sub_status_code : "",
     second_ndr_reason:
       ndrDataSize > 2 ? NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos[1]?.scan_status] : "Other",
 
-    third_ndr_date: ndrDataSize > 3 ? ndrTrackInfos[2]?.scan_datetime : "",
-    third_ndr_subreason: ndrDataSize > 3 ? ndrTrackInfos[2]?.scan_status : "",
-    third_ndr_status_code: ndrDataSize > 3 ? ndrTrackInfos[2]?.pickrr_sub_status_code : "",
+    third_ndr_date: ndrDataSize > 2 ? ndrTrackInfos[2]?.scan_datetime : "",
+    third_ndr_subreason: ndrDataSize > 2 ? ndrTrackInfos[2]?.scan_status : "",
+    third_ndr_status_code: ndrDataSize > 2 ? ndrTrackInfos[2]?.pickrr_sub_status_code : "",
     third_ndr_reason:
       ndrDataSize > 2 ? NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos[2]?.scan_status] : "Other",
 
