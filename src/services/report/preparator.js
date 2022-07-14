@@ -59,9 +59,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     third_ndr_subreason: ndrDataSize > 2 ? ndrTrackInfos[2]?.scan_status : "",
     third_ndr_status_code: ndrDataSize > 2 ? ndrTrackInfos[2]?.pickrr_sub_status_code : "",
     third_ndr_reason:
-      ndrDataSize > 2
-        ? NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos[2]?.scan_status] || "Other"
-        : "Other",
+      ndrDataSize > 2 ? NDR_SUBSTATUS_PICKRR_MAPPING[ndrTrackInfos[2]?.scan_status] || "Other" : "",
 
     is_otp_delivered: trackData?.is_otp_delivered || "",
     latest_otp: trackData?.latest_otp || "",
