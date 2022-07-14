@@ -125,8 +125,8 @@ class KafkaMessageHandler {
       sendDataToNdr(result);
       sendTrackDataToV1(result);
       triggerWebhook(result, trackingElkClient);
-      updateStatusOnReport(result, logger, trackingElkClient);
       updateStatusELK(result, prodElkClient);
+      await updateStatusOnReport(result, logger, trackingElkClient);
 
       // blocking events to lambda (new pickrr connect service)
 
