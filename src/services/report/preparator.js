@@ -14,6 +14,7 @@ const {
   findRTODate,
   findFirstNdrDate,
   findNDRTrackInfos,
+  findLatestRtdDate,
 } = require("./helpers");
 
 /**
@@ -85,6 +86,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     delivery_date: findDeliveryDate(trackData?.track_arr || {}),
     rto_date: findRTODate(trackData?.track_arr || {}),
     pickrr_tracking_id: trackData.tracking_id,
+    rtdDate: findLatestRtdDate(trackData?.trackArr || []),
   };
 
   if (trackData.promise_edd) {
