@@ -65,7 +65,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     third_ndr_status_code: ndrDataSize >= 2 ? ndrTrackInfos[2]?.pickrr_sub_status_code : "",
     third_ndr_reason:
       ndrDataSize >= 2
-        ? NDR_STATUS_CODE_TO_REASON_MAPPER[ndrTrackInfos[1]?.pickrr_sub_status_code] || "Other"
+        ? NDR_STATUS_CODE_TO_REASON_MAPPER[ndrTrackInfos[2]?.pickrr_sub_status_code] || "Other"
         : "",
 
     is_otp_delivered: trackData?.is_otp_delivered || "",
