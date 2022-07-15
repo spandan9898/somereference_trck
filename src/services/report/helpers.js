@@ -30,13 +30,12 @@ const findNDRTrackInfos = (trackDict) => {
     return [];
   }
   const ndrsObj = [];
-  const reverseTrackArr = _.cloneDeep(trackDict).reverse();
-  reverseTrackArr.forEach((trackObj) => {
+  trackDict.forEach((trackObj) => {
     if (trackObj?.scan_type === "NDR") {
       ndrsObj.push(trackObj);
     }
   });
-  return ndrsObj;
+  return ndrsObj.reverse();
 };
 
 /**
