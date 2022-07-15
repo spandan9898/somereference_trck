@@ -52,19 +52,19 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
         ? NDR_STATUS_CODE_TO_REASON_MAPPER[ndrTrackInfos[0]?.pickrr_sub_status_code] || "Other"
         : "",
 
-    second_ndr_date: ndrDataSize >= 1 ? ndrTrackInfos[1]?.scan_datetime : "",
-    second_ndr_subreason: ndrDataSize >= 1 ? ndrTrackInfos[1]?.scan_status : "",
-    second_ndr_status_code: ndrDataSize >= 1 ? ndrTrackInfos[1]?.pickrr_sub_status_code : "",
+    second_ndr_date: ndrDataSize >= 2 ? ndrTrackInfos[1]?.scan_datetime : "",
+    second_ndr_subreason: ndrDataSize >= 2 ? ndrTrackInfos[1]?.scan_status : "",
+    second_ndr_status_code: ndrDataSize >= 2 ? ndrTrackInfos[1]?.pickrr_sub_status_code : "",
     second_ndr_reason:
-      ndrDataSize >= 1
+      ndrDataSize >= 2
         ? NDR_STATUS_CODE_TO_REASON_MAPPER[ndrTrackInfos[1]?.pickrr_sub_status_code] || "Other"
         : "",
 
-    third_ndr_date: ndrDataSize >= 2 ? ndrTrackInfos[2]?.scan_datetime : "",
-    third_ndr_subreason: ndrDataSize >= 2 ? ndrTrackInfos[2]?.scan_status : "",
-    third_ndr_status_code: ndrDataSize >= 2 ? ndrTrackInfos[2]?.pickrr_sub_status_code : "",
+    third_ndr_date: ndrDataSize >= 3 ? ndrTrackInfos[2]?.scan_datetime : "",
+    third_ndr_subreason: ndrDataSize >= 3 ? ndrTrackInfos[2]?.scan_status : "",
+    third_ndr_status_code: ndrDataSize >= 3 ? ndrTrackInfos[2]?.pickrr_sub_status_code : "",
     third_ndr_reason:
-      ndrDataSize >= 2
+      ndrDataSize >= 3
         ? NDR_STATUS_CODE_TO_REASON_MAPPER[ndrTrackInfos[2]?.pickrr_sub_status_code] || "Other"
         : "",
 
