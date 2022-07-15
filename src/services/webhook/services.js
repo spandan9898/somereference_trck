@@ -246,6 +246,7 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
         url: "",
         shopclues_access_token: "random_token",
         update_from: "kafka-consumer",
+        explicit_preparator_type: "",
       },
     };
 
