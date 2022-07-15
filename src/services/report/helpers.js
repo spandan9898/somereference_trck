@@ -125,9 +125,9 @@ const findLatestNDRDetails = (trackArr) => {
   for (let i = 0; i < trackArr.length; i += 1) {
     if (trackArr[i].scan_type === "NDR") {
       return {
-        latest_ndr_remark: trackArr[i].scan_status,
-        latest_ndr_date: trackArr[i].scan_datetime,
-        latest_ndr_status_code: trackArr[i].pickrr_sub_status_code,
+        latest_ndr_remark: trackArr[i]?.scan_status,
+        latest_ndr_date: trackArr[i]?.scan_datetime,
+        latest_ndr_status_code: trackArr[i]?.pickrr_sub_status_code,
         latest_ndr_reason:
           NDR_STATUS_CODE_TO_REASON_MAPPER[trackArr[i]?.pickrr_sub_status_code] || "Other",
       };
