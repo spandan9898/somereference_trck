@@ -278,6 +278,7 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
       }
       lambdaPayload.data.url = eachWebhookUser.track_url || "";
       lambdaPayload.data.prepared_data = preparedData;
+      lambdaPayload.data.explicit_preparator_type = eachWebhookUser?.explicit_preparator_type || "";
 
       sendWebhookDataToELK(lambdaPayload.data, elkClient);
       callLambdaFunction(lambdaPayload);
