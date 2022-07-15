@@ -113,6 +113,7 @@ const findLatestNDRDetails = (trackArr) => {
       return {
         latest_ndr_remark: trackArr[i].scan_status,
         latest_ndr_date: trackArr[i].scan_datetime,
+        latest_ndr_status_code: trackArr[i].pickrr_sub_status_code,
       };
     }
   }
