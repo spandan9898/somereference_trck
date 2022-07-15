@@ -30,7 +30,8 @@ const findNDRTrackInfos = (trackDict) => {
     return [];
   }
   const ndrsObj = [];
-  trackDict.forEach((trackObj) => {
+  const reverseTrackArr = _.cloneDeep(trackDict).reverse();
+  reverseTrackArr.forEach((trackObj) => {
     if (trackObj?.scan_type === "NDR") {
       ndrsObj.push(trackObj);
     }
@@ -66,12 +67,13 @@ const findFirstNdrDate = (trackDict) => {
     return "";
   }
   const trackArr = _.get(trackDict, "track_arr");
-  for (let i = 0; i < trackArr.length; i += 1) {
-    if (trackDict[i]?.scan_type === "NDR") {
-      return trackDict[i]?.scan_datetime;
+  let firstNdrDate;
+  trackArr.forEach((trackArrObj) => {
+    if (trackArrObj.scan_type === "NDR") {
+      firstNdrDate = trackArrObj.scan_datetime;
     }
-  }
-  return null;
+  });
+  return firstNdrDate;
 };
 
 /**
