@@ -89,6 +89,22 @@ const KAFKA_INSTANCE_CONFIG = {
   },
 };
 
+const NDR_STATUS_CODE_TO_REASON_MAPPER = {
+  CR: "Customer Refused Shipment",
+  CNA: "Customer Not Available/Office/Residence Closed/Consignee phone not reachable",
+  AI: "Address Issue",
+  CD: "Customer Delay/Future Delivery",
+  REST: "Entry Restricted Area",
+  "CR-OTP": "Customer Refused Shipment- OTP Verified",
+  ODA: "Out of Delivery area",
+  CNR: "Cash Not Ready",
+  OPDEL: "Conignee wants open delivery",
+  OTH: "Other",
+  CI: "Customer Issue",
+  SD: "Shipper Delay",
+  OTPF: "OTP Validation Failed",
+};
+
 const WEBHOOK_USER_CACHE_KEY_NAME = "webhookUser";
 
 const DEFAULT_REQUESTS_TIMEOUT = 10;
@@ -104,4 +120,5 @@ module.exports = {
   DEFAULT_REQUESTS_TIMEOUT,
   KAFKA_INSTANCE_CONFIG,
   REDIS_CONFIG,
+  NDR_STATUS_CODE_TO_REASON_MAPPER,
 };
