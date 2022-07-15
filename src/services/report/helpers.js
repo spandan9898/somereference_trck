@@ -47,14 +47,10 @@ const findNDRTrackInfos = (trackDict) => {
 const findLatestRtdDate = (trackArr) => {
   for (let i = 0; i < trackArr.length; i += 1) {
     if (trackArr[i].scan_type === "RTD") {
-      return {
-        rtdDate: trackArr?.scan_datetime,
-      };
+      return trackArr?.scan_datetime;
     }
   }
-  return {
-    rtdDate: null,
-  };
+  return null;
 };
 
 /**
