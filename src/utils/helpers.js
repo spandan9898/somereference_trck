@@ -300,16 +300,29 @@ const getElkClients = () => {
 const ofdCount = (trackArr) => {
   let ofdCountNum = 0;
   let dlCountNum = 0;
-
-  trackArr.forEach((trackArrObj) => {
-    if (trackArrObj?.scan_type === "OO") {
-      ofdCountNum += 1;
-    } else if (trackArrObj?.scan_type === "DL") {
-      dlCountNum += 1;
+  let currentOOTimestamp = null;
+  let currentDLTimestamp = null;
+  for (let i = 0; i < trackArr.length; i += 1) {
+    if (trackArr[i]?.scan_type === "OO") {
+      if (!currentOOTimestamp) {
+        currentOOTimestamp = moment(trackArr[i]?.scan_datetime);
+        ofdCountNum += 1;
+      } else if (currentOOTimestamp.diff(moment(trackArr[i]?.scan_datetime), "minutes") > 60) {
+        currentOOTimestamp = moment(trackArr[i]?.scan_datetime);
+        ofdCountNum += 1;
+      }
     }
-  });
-
-  return Math.max(ofdCountNum, Math.min(dlCountNum, 1));
+    if (trackArr[i]?.scan_type === "DL") {
+      if (!currentDLTimestamp) {
+        currentDLTimestamp = trackArr[i]?.scan_datetime;
+        dlCountNum += 1;
+      } else if (trackArr[i]?.scan_datetime !== currentDLTimestamp) {
+        currentDLTimestamp = trackArr[i]?.scan_datetime;
+        dlCountNum += 1;
+      }
+    }
+  }
+  return ofdCountNum || Math.min(1, dlCountNum);
 };
 module.exports = {
   checkAwbInCache,
