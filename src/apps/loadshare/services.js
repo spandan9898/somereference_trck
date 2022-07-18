@@ -2,7 +2,7 @@ const _ = require("lodash");
 const moment = require("moment");
 const { CODE_MAPPER } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-
+const {stringToJSON} = require('../../utils/convert.js');
 /**
  *
  * @param {*} loadshareDict
@@ -56,7 +56,16 @@ const prepareLoadshareData = (loadshareDict) => {
   if (!scanType) {
     return { err: "Unknown status code" };
   }
-
+  //return an JSON object from a string
+  let reasonDes = stringToJSON(loadshareDict?.reasonBO?.reasonDescription);
+  // if reasonDes gives undefined
+  if((typeof (reasonDes.reasondescription)) === 'undefined'){
+    reasonDes = loadshareDict?.reasonBO?.reasonDescription;
+  }
+  // reasonDes has a proper JSON object
+  else{
+    reasonDes = reasonDes?.reasondescription;
+  }
   let statusDate = moment(loadshareDict?.eventTime, "YYYY-MM-DD HH:mm:ss");
   statusDate = statusDate.isValid()
     ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
@@ -67,9 +76,9 @@ const prepareLoadshareData = (loadshareDict) => {
   pickrrLoadshareDict.scan_datetime = statusDate;
   pickrrLoadshareDict.courier_status_code = mapperString;
   pickrrLoadshareDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
-  pickrrLoadshareDict.track_info = loadshareDict?.reasonBO?.reasonDescription
+  pickrrLoadshareDict.track_info = reasonDes
     ? `${PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type]}_${
-        loadshareDict?.reasonBO?.reasonDescription
+        reasonDes
       }`
     : PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
   pickrrLoadshareDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
@@ -77,6 +86,8 @@ const prepareLoadshareData = (loadshareDict) => {
   pickrrLoadshareDict.track_location = loadshareDict?.locationCity?.toString();
   return pickrrLoadshareDict;
 };
+
+
 module.exports = {
   prepareLoadshareData,
 };
