@@ -37,8 +37,22 @@ const NEW_STATUS_TO_OLD_MAPPING = {
   "RTO UD": "RTO",
 };
 
+const VALID_FAD_NDR_SUBSTATUS_CODE = [
+  "CR",
+  "CNA",
+  "AI",
+  "CD",
+  "REST",
+  "CR",
+  "OTP",
+  "CNR",
+  "OPDEL",
+  "CI",
+  "OTPF",
+];
 module.exports = {
   REPORT_STATUS_CODE_MAPPING,
   REPORT_STATUS_TYPE_MAPPING,
   NEW_STATUS_TO_OLD_MAPPING,
+  VALID_FAD_NDR_SUBSTATUS_CODE,
 };

@@ -42,7 +42,9 @@ const updateStatusOnReport = async (trackObj, logger, elkClient, isManualUpdate 
   );
   result.last_updated_date = moment().toDate();
   result.last_update_from_kafka = result.last_updated_date;
-  result.last_update_from_manual = result.last_updated_date;
+  if (isManualUpdate) {
+    result.last_update_from_manual = result.last_updated_date;
+  }
 
   const opsReportColInstance = await reportMongoCol();
   try {

@@ -2,7 +2,9 @@ const _ = require("lodash");
 const moment = require("moment");
 const { CODE_MAPPER } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const {stringToJSON} = require('../../utils/convert.js');
+const {parseReasonDescription} = require('../../utils/helpers.js');
+const logger = require("../../../logger");
+
 /**
  *
  * @param {*} loadshareDict
@@ -38,53 +40,62 @@ const prepareLoadshareData = (loadshareDict) => {
     pickrr_sub_status_code: "",
     courier_status_code: "",
   };
-  pickrrLoadshareDict.awb = _.get(loadshareDict, "waybillNo", "").toString();
-  let mapperString = "";
-  if (loadshareDict.eventType) {
-    mapperString = loadshareDict.eventType.toString();
-    if (
-      ["PICKUP_CANCELLED", "UNDELIVERED", "RTO_UNDELIVERED"].includes(loadshareDict.eventType) &&
-      loadshareDict?.reasonBO?.reasonCode
-    ) {
-      mapperString += `_${loadshareDict?.reasonBO?.reasonCode}`;
+  try {
+    pickrrLoadshareDict.awb = _.get(loadshareDict, "waybillNo", "").toString();
+    let mapperString = "";
+    if (loadshareDict.eventType) {
+      mapperString = loadshareDict.eventType.toString();
+      if (
+        ["PICKUP_CANCELLED", "UNDELIVERED", "RTO_UNDELIVERED"].includes(loadshareDict.eventType) &&
+        loadshareDict?.reasonBO?.reasonCode
+      ) {
+        mapperString += `_${loadshareDict?.reasonBO?.reasonCode}`;
+      }
     }
+    if (loadshareDict?.reasonBO?.isOtpVerified && mapperString === "UNDELIVERED_132") {
+      mapperString += "_otp_true";
+    }
+    if (!mapperString) {
+      return {};
+    }
+    const scanType = CODE_MAPPER[mapperString.toLowerCase()];
+    if (!scanType) {
+      return { err: "Unknown status code" };
+    }
+    //return an JSON object from a string
+    let reasonDes = parseReasonDescription(loadshareDict?.reasonBO?.reasonDescription);
+    // if reasonDes gives undefined
+    if((typeof (reasonDes.reasondescription)) === 'undefined'){
+      reasonDes = loadshareDict?.reasonBO?.reasonDescription;
+    }
+    // reasonDes has a proper JSON object
+    else{
+      reasonDes = reasonDes?.reasondescription;
+    }
+    let statusDate = moment(loadshareDict?.eventTime, "YYYY-MM-DD HH:mm:ss");
+    statusDate = statusDate.isValid()
+      ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
+      : moment().format("YYYY-MM-DD HH:mm:ss.SSS");
+    if (scanType.scan_type === "PP") {
+      pickrrLoadshareDict.pickup_datetime = statusDate;
+    }
+    pickrrLoadshareDict.scan_datetime = statusDate;
+    pickrrLoadshareDict.courier_status_code = mapperString;
+    pickrrLoadshareDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
+    pickrrLoadshareDict.track_info = reasonDes
+      ? `${PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type]}_${
+          reasonDes
+        }`
+      : PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
+    pickrrLoadshareDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
+    pickrrLoadshareDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
+    pickrrLoadshareDict.track_location = loadshareDict?.locationCity?.toString();
+    return pickrrLoadshareDict;
+  } catch (error) {
+    pickrrLoadshareDict.err = error;
+    logger.error("Loadshare Push Preparator Error ->", error);
+    return pickrrLoadshareDict;
   }
-  if (!mapperString) {
-    return {};
-  }
-  const scanType = CODE_MAPPER[mapperString.toLowerCase()];
-  if (!scanType) {
-    return { err: "Unknown status code" };
-  }
-  //return an JSON object from a string
-  let reasonDes = stringToJSON(loadshareDict?.reasonBO?.reasonDescription);
-  // if reasonDes gives undefined
-  if((typeof (reasonDes.reasondescription)) === 'undefined'){
-    reasonDes = loadshareDict?.reasonBO?.reasonDescription;
-  }
-  // reasonDes has a proper JSON object
-  else{
-    reasonDes = reasonDes?.reasondescription;
-  }
-  let statusDate = moment(loadshareDict?.eventTime, "YYYY-MM-DD HH:mm:ss");
-  statusDate = statusDate.isValid()
-    ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
-    : moment().format("YYYY-MM-DD HH:mm:ss.SSS");
-  if (scanType.scan_type === "PP") {
-    pickrrLoadshareDict.pickup_datetime = statusDate;
-  }
-  pickrrLoadshareDict.scan_datetime = statusDate;
-  pickrrLoadshareDict.courier_status_code = mapperString;
-  pickrrLoadshareDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
-  pickrrLoadshareDict.track_info = reasonDes
-    ? `${PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type]}_${
-        reasonDes
-      }`
-    : PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
-  pickrrLoadshareDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
-  pickrrLoadshareDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
-  pickrrLoadshareDict.track_location = loadshareDict?.locationCity?.toString();
-  return pickrrLoadshareDict;
 };
 
 
