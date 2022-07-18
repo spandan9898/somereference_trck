@@ -314,10 +314,10 @@ const ofdCount = (trackArr) => {
     }
     if (trackArr[i]?.scan_type === "DL") {
       if (!currentDLTimestamp) {
-        currentDLTimestamp = trackArr[i]?.scan_datetime;
+        currentDLTimestamp = moment(trackArr[i]?.scan_datetime);
         dlCountNum += 1;
-      } else if (trackArr[i]?.scan_datetime !== currentDLTimestamp) {
-        currentDLTimestamp = trackArr[i]?.scan_datetime;
+      } else if (currentDLTimestamp.diff(moment(trackArr[i]?.scan_datetime), "minutes") > 60) {
+        currentDLTimestamp = moment(trackArr[i]?.scan_datetime);
         dlCountNum += 1;
       }
     }
