@@ -19,7 +19,7 @@ const sendTrackDataToV1 = require("../src/services/v1");
 const { getDbCollectionInstance } = require("../src/utils");
 const { HOST_NAMES, ELK_INSTANCE_NAMES, KAFKA_INSTANCE_CONFIG } = require("../src/utils/constants");
 const { convertDate } = require("./helper");
-const { updateStatusELK } = require("../src/services/common/services");
+const { updateStatusELK, commonTrackingDataProducer } = require("../src/services/common/services");
 const triggerWebhook = require("../src/services/webhook");
 
 // const sendDataToNdr = require("../src/services/ndr");
@@ -65,6 +65,9 @@ const processBackfilling = async (
 
     if (type.includes("webhook")) {
       triggerWebhook(response, elkClient);
+    }
+    if (type.includes("common")) {
+      commonTrackingDataProducer(response);
     }
 
     // if (type.includes("ndr")) {
