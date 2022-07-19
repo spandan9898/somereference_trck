@@ -141,8 +141,29 @@ const updateFlagForOtpDeliveredShipments = (trackArr) => {
   });
   return isOtpDelivered;
 };
+
+/**
+ *
+ * @param {iterable event statusDate} statusDate
+ * @param {order_created_date} placedDate
+ * @returns is Valid Event
+ */
+const checkIsAfter = (statusDate, placedDate) => {
+  try {
+    if (!moment(placedDate).isValid()) {
+      return true;
+    }
+    const isValid = moment(statusDate).isValid()
+      ? moment(statusDate).isAfter(moment(placedDate))
+      : false;
+    return isValid;
+  } catch (error) {
+    return false;
+  }
+};
 module.exports = {
   mapStatusToEvent,
+  checkIsAfter,
   updateScanStatus,
   prepareTrackArrCacheData,
   checkCancelStatusInTrackArr,
