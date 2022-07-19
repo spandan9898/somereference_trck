@@ -1,18 +1,16 @@
 /* eslint-disable consistent-return */
+
 const kafkaInstance = require("../../connector/kafka");
-// eslint-disable-next-line no-unused-vars
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
-const { PUSH_GROUP_NAME, PUSH_TOPIC_NAME } = require("./constant");
+const { PUSH_TOPIC_NAME, PUSH_GROUP_NAME } = require("./constant");
 const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 
 /**
- *initialize consumer for ecomm
- * @returns
+ * initialize consumers for pidge payload
  */
 const initialize = async () => {
   const kafka = kafkaInstance.getInstance(KAFKA_INSTANCE_CONFIG.PROD.name);
-
   const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
   await pushConsumer.connect();
   await pushConsumer.subscribe({ topic: PUSH_TOPIC_NAME, fromBeginning: false });
@@ -22,24 +20,24 @@ const initialize = async () => {
 };
 
 /**
- *  consumer for ecomm payload
+ *
+ * @param {*} consumer
  */
 const listener = async (consumer, partitionCount) => {
   try {
     await consumer.run({
       autoCommitInterval: 60000,
       partitionsConsumedConcurrently: partitionCount,
-      // eslint-disable-next-line no-unused-vars
       eachMessage: (consumedPayload) => {
-        // KafkaMessageHandler.init(consumedPayload, "ecomm");
+        KafkaMessageHandler.init(consumedPayload, "pikndel");
       },
     });
   } catch (error) {
-    logger.error("Ecomm listener Error", error);
+    logger.error("Pikndel Listener Error", error);
   }
 };
 
 module.exports = {
-  listener,
   initialize,
+  listener,
 };

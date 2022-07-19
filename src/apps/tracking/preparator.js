@@ -148,7 +148,8 @@ const fixStatusMapping = (trackingObj) => {
     trackObj.status.current_status_type in NEW_STATUS_TO_OLD_MAPPING
   ) {
     const currentStatusType = trackObj.status.current_status_type;
-    trackObj.status.current_status_type = NEW_STATUS_TO_OLD_MAPPING[currentStatusType];
+    trackObj.status.current_status_type =
+      NEW_STATUS_TO_OLD_MAPPING[currentStatusType] || currentStatusType;
   }
   return trackObj;
 };

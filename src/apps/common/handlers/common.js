@@ -10,7 +10,7 @@ const {
   updateStatusFromCSV,
   toggleManualStatus,
 } = require("../../../services/common/updateStatusFromCsv");
-const { getElkClients } = require("../../../utils");
+const { getElkClients, sendEmail } = require("../../../utils");
 
 module.exports.returnHeaders = async (req, reply) => {
   const IP = RequestIp.getClientIp(req);
@@ -92,12 +92,21 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
       worker: true,
       header: true,
       step(results) {
-        const header = Object.keys(results.data).join(" ");
-        if (header !== "tracking_id date status sub_status_code status_text") {
-          throw new Error("Please provide valid header");
-        }
-        if (results.data) {
-          csvData.push(results.data);
+        try {
+          const header = Object.keys(results.data).join(" ");
+          if (header !== "tracking_id date status sub_status_code status_text") {
+            throw new Error("Please provide valid header");
+          }
+          if (results.data) {
+            csvData.push(results.data);
+          }
+        } catch (error) {
+          sendEmail({
+            to: ["spandan.mishra@pickrr.com", "tarun@pickrr.com", "ankitkumar@pickrr.com"],
+            subject: `Lost Shipment Report Upload Error`,
+            text: error.message,
+          });
+          throw new Error("No More execution");
         }
       },
       complete() {

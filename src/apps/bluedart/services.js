@@ -175,7 +175,8 @@ const preparePickrrObjData = (trackObj) => {
   pickrrBluedartDict.track_info = trackInfo;
   pickrrBluedartDict.awb = awb;
   pickrrBluedartDict.track_location = scanLocation;
-  if (trackObj.otp_remarks.toLowerCase() === "y") {
+
+  if ((trackObj?.otp_remarks || "").toLowerCase() === "y") {
     pickrrBluedartDict.otp_remarks = trackObj.otp_remarks;
   }
 
@@ -233,6 +234,7 @@ const getBluedartTrackingList = (trackObj) => {
         trackDict.Receivedby = _.get(shipmentData, "Scans.DeliveryDetails.ReceivedBy");
         const singatureData = _.get(shipmentData, "Scans.DeliveryDetails.ReceivedBy.Signature", []);
         if (singatureData.length) trackDict.Signature = singatureData;
+
         trackDict.otp_remarks = _.get(
           shipmentData,
           "Scans.DeliveryDetails.SecurityCodeDelivery",
