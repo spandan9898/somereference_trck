@@ -7,8 +7,15 @@ const {
   updateStatus,
   toggleManualStatusUpdate,
 } = require("./handlers/common");
+const { healthCheckAPI } = require("../../services/healthCheck");
+
 
 module.exports = async (fastify) => {
+  fastify.route({
+    method: "GET",
+    url: "health-check-api",
+    handler: healthCheckAPI
+  })
   fastify.route({
     method: "GET",
     url: "webhook-user-cache-update",
