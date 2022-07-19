@@ -3,6 +3,7 @@ const moment = require("moment");
 const { prepareDataForReportMongo } = require("./preparator");
 
 const { reportMongoCol } = require("./model");
+const { findLostDate } = require("./helpers");
 
 /**
  *
@@ -40,6 +41,7 @@ const updateStatusOnReport = async (trackObj, logger, elkClient, isManualUpdate 
     prepareDataForReportMongo(trackObj, isManualUpdate),
     (val) => val !== null && val !== undefined && val !== ""
   );
+  result.lost_shipment_date = findLostDate(trackObj?.track_arr || [], latestScanType);
   result.last_updated_date = moment().toDate();
   result.last_update_from_kafka = result.last_updated_date;
   if (isManualUpdate) {

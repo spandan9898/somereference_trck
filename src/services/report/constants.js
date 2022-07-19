@@ -22,12 +22,12 @@ const REPORT_STATUS_TYPE_MAPPING = {
   OM: "MANIFESTED",
   OP: "PLACED",
   NDR: "UNDELIVERED",
+  LT: "LOST",
 };
 
 const NEW_STATUS_TO_OLD_MAPPING = {
   OFP: "OM",
   PPF: "OM",
-  LT: "OT",
   "RTO-OO": "RTO",
   "RTO-OT": "RTO",
   DM: "OT",
