@@ -141,11 +141,14 @@ const commonTrackingDataProducer = async (trackingObj) => {
       },
     ];
 
-    await produceData({
+    const response = await produceData({
       topic: COMMON_TRACKING_TOPIC_NAME,
       producer: producerInstance,
       messages,
     });
+    if ((trackingObj?.auth_token || "") === "c5a2a4af9f55b744473879737f6cf81a442") {
+      logger.info(`testing track data --> ${response}`);
+    }
   } catch (error) {
     logger.error("commonProducer", error);
   }
