@@ -26,7 +26,6 @@ const PICKRR_STATUS_CODE_MAPPING = {
 const NEW_STATUS_TO_OLD_MAPPING = {
   OFP: "OP",
   PPF: "OP",
-  LT: "OT",
   "RTO-OO": "RTO",
   "RTO-OT": "RTO",
   DM: "OT",

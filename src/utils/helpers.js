@@ -4,6 +4,8 @@
 const moment = require("moment");
 const axios = require("axios");
 const size = require("lodash/size");
+const isEmpty = require("lodash/isEmpty");
+const sgMail = require("@sendgrid/mail");
 
 const { storeInCache } = require("./redis");
 const { prepareTrackArrCacheData } = require("../services/pull/helpers");
@@ -14,6 +16,8 @@ const logger = require("../../logger");
 const { updateIsNDRinCache } = require("../services/ndr/helpers");
 const { DEFAULT_REQUESTS_TIMEOUT, ELK_INSTANCE_NAMES } = require("./constants");
 const initELK = require("../connector/elkConnection");
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const axiosInstance = axios.create();
 
@@ -311,6 +315,67 @@ const ofdCount = (trackArr) => {
 
   return Math.max(ofdCountNum, Math.min(dlCountNum, 1));
 };
+
+/**
+ * @param {[string]} emailList
+ * @param {string} type
+ */
+const prepareEmailList = (emailList, type = "cc") =>
+  isEmpty(emailList)
+    ? []
+    : {
+        [type]: emailList.map((email) => ({
+          email,
+        })),
+      };
+
+/**
+ * @desc send mail
+ * @msgData {object} ->{
+ *  to: string or [string] ->
+ *  from: string ->
+ *  subject: string ->
+ *  text: string ->
+ *  html?: string ->
+ *  cc?: [string] ->
+ *  bcc?: [string] ->
+ * }
+ */
+const sendEmail = async ({
+  to,
+  from = "info@pickrr.com",
+  subject,
+  text,
+  html,
+  ccList,
+  bccList,
+}) => {
+  const toEmailList = typeof to === "string" ? [to] : to;
+
+  const personalizations = [
+    {
+      ...prepareEmailList(toEmailList, "to"),
+      ...prepareEmailList(ccList),
+      ...prepareEmailList(bccList, "bcc"),
+    },
+  ];
+
+  const msg = {
+    from,
+    subject,
+    text,
+    html,
+    personalizations,
+  };
+
+  try {
+    await sgMail.send(msg);
+    logger.info("Email Sent");
+  } catch (error) {
+    logger.error("sendEmail", error);
+  }
+};
+
 module.exports = {
   checkAwbInCache,
   convertDatetimeFormat,
@@ -321,4 +386,5 @@ module.exports = {
   getMaxDate,
   getElkClients,
   ofdCount,
+  sendEmail,
 };

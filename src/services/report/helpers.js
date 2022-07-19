@@ -119,6 +119,19 @@ const findFirstAttemptedDate = (trackArr) => {
 
 /**
  *
+ * @param {trackArr in Pull Db} trackArr
+ * @param {LatesStatus in Pull Db after Event Update} latestStatus
+ * @returns Lost Date if current status is LT, else returns null
+ */
+const findLostDate = (trackArr, latestStatus) => {
+  if (latestStatus === "LT") {
+    return trackArr[0]?.scan_datetime || "";
+  }
+  return null;
+};
+
+/**
+ *
  * @param {*} trackArr
  */
 const findLatestNDRDetails = (trackArr) => {
@@ -239,6 +252,7 @@ module.exports = {
   findRTODate,
   sendReportsDataToELK,
   findFirstNdrDate,
+  findLostDate,
   findNDRTrackInfos,
   findLatestRtdDate,
 };
