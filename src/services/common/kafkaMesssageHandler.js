@@ -121,8 +121,7 @@ class KafkaMessageHandler {
       if (process.env.IS_OTHERS_CALL === "false") {
         return {};
       }
-
-      commonTrackingDataProducer(result);
+      await commonTrackingDataProducer(result);
       sendDataToNdr(result);
       sendTrackDataToV1(result);
       triggerWebhook(result, trackingElkClient);
