@@ -122,6 +122,7 @@ class KafkaMessageHandler {
         return {};
       }
 
+      commonTrackingDataProducer(result);
       sendDataToNdr(result);
       sendTrackDataToV1(result);
       triggerWebhook(result, trackingElkClient);
@@ -136,7 +137,6 @@ class KafkaMessageHandler {
       //   result,
       // });
 
-      commonTrackingDataProducer(result);
       return {};
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
