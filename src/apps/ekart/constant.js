@@ -183,8 +183,8 @@ const EKART_STATUS_MAPPER = {
   },
   return_lost: {
     scan_type: "LT",
-    pickrr_sub_status_code: ""
-  }
+    pickrr_sub_status_code: "",
+  },
 };
 const EKART_PULL_MAPPER = {
   SHIPMENT_CREATED: {
