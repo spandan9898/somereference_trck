@@ -28,6 +28,7 @@ const TRACKING_INFO_PARENT_KEYS = [
   "auth_token",
   "track_arr",
   "status",
+  "is_reverse_qc", // do we have to add qc_details also?? --> TODO: ask from Product
 ];
 
 const GET_TRACK_INFO_KEYS = [
@@ -88,6 +89,7 @@ const PICKRR_STATUS_CODE_MAPPING = {
   DM: "Shipment Damaged",
   "RTO UD": "RTO Undelivered",
   UD: "Undelivered",
+  QCF: "QC Failed",
 };
 
 const REMOVE_ELEMENT_KEYS = [

@@ -208,7 +208,7 @@ const statusCheckInHistoryMap = async (trackingObj) => {
 const checkIfCompulsoryEventAlreadySent = (trackingObj) => {
   try {
     const currentEvent = get(trackingObj, "status.current_status_type", "");
-    if (!["PP", "RTO", "RTD", "DL", "OO", "SHP", "RAD"].includes(currentEvent)) {
+    if (!["PP", "RTO", "RTD", "DL", "OO", "SHP", "RAD", "QCF"].includes(currentEvent)) {
       return false;
     }
     if (currentEvent === "OO") {
