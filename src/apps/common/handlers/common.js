@@ -96,7 +96,7 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
           const header = Object.keys(results.data).join(" ");
           if (header !== "tracking_id date status sub_status_code status_text") {
             throw new Error(
-              "Please provide valid header, tracking_id | date | status | sub_status_code | status_text"
+              "Please provide valid header -> tracking_id | date | status | sub_status_code | status_text"
             );
           }
           if (results.data) {
