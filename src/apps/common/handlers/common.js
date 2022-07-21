@@ -104,7 +104,12 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
           }
         } catch (error) {
           sendEmail({
-            to: ["spandan.mishra@pickrr.com", "tarun@pickrr.com", "ankitkumar@pickrr.com"],
+            to: [
+              "spandan.mishra@pickrr.com",
+              "tarun@pickrr.com",
+              "ankitkumar@pickrr.com",
+              "prince@pickrr.com",
+            ],
             subject: `Lost Shipment Report Upload Error`,
             text: error.message,
           });
