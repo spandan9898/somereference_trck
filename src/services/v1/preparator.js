@@ -12,7 +12,7 @@ const { NEW_STATUS_TO_OLD_MAPPING } = require("./constants");
  */
 const prepareTrackDictForV1 = (trackData) => {
   const scanType = trackData?.status?.current_status_type;
-  const pickupTime = findPickupDate(trackData?.track_arr || []);
+  const pickupTime = findPickupDate(trackData);
   const trackDict = {
     awb: trackData?.tracking_id,
     scan_type: NEW_STATUS_TO_OLD_MAPPING[scanType] || scanType,
@@ -38,7 +38,7 @@ const prepareTrackDictForV1 = (trackData) => {
       trackData?.pickrr_sub_status_code ||
       _.get(trackData, "track_arr[0].pickrr_sub_status_code", ""),
     courier_status_code: _.get(trackData, "track_arr[0].courier_status_code", ""),
-    ofd_count: trackData?.track_arr ? ofdCount(trackData?.track_arr || [], scanType) : 0,
+    ofd_count: trackData?.track_arr ? ofdCount(trackData?.track_arr || []) : 0,
     source: "node-kafka",
   };
   return trackDict;

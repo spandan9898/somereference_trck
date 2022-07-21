@@ -25,7 +25,7 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "532-t": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   "533-t": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   "534-t": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
-  "535-t": { scan_type: "OC", pickrr_sub_status_code: "" },
+  "535-t": { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
   "536-t": { scan_type: "PPF", pickrr_sub_status_code: "SC" },
   "537-t": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   "540-t": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
@@ -63,7 +63,7 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "313-rt": { scan_type: "OT", pickrr_sub_status_code: "" },
   "027-rs": { scan_type: "OT", pickrr_sub_status_code: "" },
   "222-t": { scan_type: "RAD", pickrr_sub_status_code: "" },
-  "002-rs": { scan_type: "OO", pickrr_sub_status_code: "" },
+  "002-rs": { scan_type: "RTO-OO", pickrr_sub_status_code: "" },
   "001-t": { scan_type: "UD", pickrr_sub_status_code: "CD" },
   "002-t": { scan_type: "UD", pickrr_sub_status_code: "ODA" },
   "003-t": { scan_type: "UD", pickrr_sub_status_code: "CNA" },
@@ -111,7 +111,7 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "123-t": { scan_type: "RTO", pickrr_sub_status_code: "" },
   "074-rt": { scan_type: "RTO", pickrr_sub_status_code: "" },
   "123-rt": { scan_type: "RTO", pickrr_sub_status_code: "" },
-  "503-s": { scan_type: "OC", pickrr_sub_status_code: "" },
+  "503-s": { scan_type: "UD", pickrr_sub_status_code: "OTH" },
   "034-t": { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
   "019-s": { scan_type: "RTO-OO", pickrr_sub_status_code: "" },
   "035-rt": { scan_type: "RTO-OO", pickrr_sub_status_code: "" },
@@ -149,9 +149,12 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "003-s": { scan_type: "OT", pickrr_sub_status_code: "" },
 };
 
-const TOTAL_TOPIC_COUNT = 5;
-
+const PUSH_PARTITION_COUNT = 10;
+const PUSH_GROUP_NAME = "bluedart-push-group";
+const PUSH_TOPIC_NAME = "bluedart_push";
 module.exports = {
   BLUEDART_CODE_MAPPER_V2,
-  TOTAL_TOPIC_COUNT,
+  PUSH_PARTITION_COUNT,
+  PUSH_GROUP_NAME,
+  PUSH_TOPIC_NAME,
 };

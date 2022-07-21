@@ -22,9 +22,37 @@ const REPORT_STATUS_TYPE_MAPPING = {
   OM: "MANIFESTED",
   OP: "PLACED",
   NDR: "UNDELIVERED",
+  LT: "LOST",
 };
 
+const NEW_STATUS_TO_OLD_MAPPING = {
+  OFP: "OM",
+  PPF: "OM",
+  "RTO-OO": "RTO",
+  "RTO-OT": "RTO",
+  DM: "OT",
+  RAD: "OT",
+  SHP: "OT",
+  UD: "NDR",
+  "RTO UD": "RTO",
+};
+
+const VALID_FAD_NDR_SUBSTATUS_CODE = [
+  "CR",
+  "CNA",
+  "AI",
+  "CD",
+  "REST",
+  "CR",
+  "OTP",
+  "CNR",
+  "OPDEL",
+  "CI",
+  "OTPF",
+];
 module.exports = {
   REPORT_STATUS_CODE_MAPPING,
   REPORT_STATUS_TYPE_MAPPING,
+  NEW_STATUS_TO_OLD_MAPPING,
+  VALID_FAD_NDR_SUBSTATUS_CODE,
 };

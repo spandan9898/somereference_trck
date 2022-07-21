@@ -1,23 +1,16 @@
 const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
+const { PUSH_PARTITION_COUNT } = require("./constant");
 
 /**
  *
  */
 (async () => {
   try {
-    const { consumerMapwithPartitions } = await initialize();
-    consumerMapwithPartitions.forEach((consumer) => {
-      consumer
-        .then((res) => {
-          if (res) {
-            listener(res, true);
-          }
-        })
-        .catch((error) => {
-          logger.error("Pidge Consumer Initialization Error", error);
-        });
-    });
+    const { pushConsumer } = await initialize();
+    if (process.env.CONSUME_PUSH_EVENTS.toLowerCase() === "true") {
+      listener(pushConsumer, PUSH_PARTITION_COUNT);
+    }
   } catch (error) {
     logger.error("Pidge Consumer Error", error);
   }

@@ -28,6 +28,19 @@ const HOST_NAMES = {
   PULL_STATING_DB: "PULL_STATING_DB",
 };
 
+const REDIS_CONFIG = {
+  sentinels: [
+    { host: "redis-0.prod.internal", port: 26379 },
+    { host: "redis-1.prod.internal", port: 26379 },
+    { host: "redis-2.prod.internal", port: 26379 },
+  ],
+  name: process.env.MASTER_NAME,
+  username: process.env.REDIS_USERNAME,
+  password: process.env.REDIS_PASSWORD,
+  sentinelPassword: process.env.SENTINEL_PASSWORD,
+  db: process.env.DB_NUMBER,
+};
+
 const ELK_INSTANCE_NAMES = {
   PROD: {
     name: "PROD",
@@ -55,6 +68,43 @@ const ELK_INSTANCE_NAMES = {
   },
 };
 
+const KAFKA_INSTANCE_CONFIG = {
+  PROD: {
+    name: "PROD",
+    config: {
+      brokerUrl: process.env.KAFKA_BROKER_URL,
+      username: process.env.KAFKA_USER_NAME,
+      password: process.env.KAFKA_PASSWORD,
+      clientId: process.env.KAFKA_CLIENT_ID,
+    },
+  },
+  STAGING: {
+    name: "STAGING",
+    config: {
+      brokerUrl: process.env.STAGING_KAFKA_BROKER_URL,
+      username: process.env.STAGING_KAFKA_USER_NAME,
+      password: process.env.STAGING_KAFKA_PASSWORD,
+      clientId: process.env.STAGING_KAFKA_CLIENT_ID,
+    },
+  },
+};
+
+const NDR_STATUS_CODE_TO_REASON_MAPPER = {
+  CR: "Customer Refused Shipment",
+  CNA: "Customer Not Available/Office/Residence Closed/Consignee phone not reachable",
+  AI: "Address Issue",
+  CD: "Customer Delay/Future Delivery",
+  REST: "Entry Restricted Area",
+  "CR-OTP": "Customer Refused Shipment- OTP Verified",
+  ODA: "Out of Delivery area",
+  CNR: "Cash Not Ready",
+  OPDEL: "Conignee wants open delivery",
+  OTH: "Other",
+  CI: "Customer Issue",
+  SD: "Shipper Delay",
+  OTPF: "OTP Validation Failed",
+};
+
 const WEBHOOK_USER_CACHE_KEY_NAME = "webhookUser";
 
 const DEFAULT_REQUESTS_TIMEOUT = 10;
@@ -68,4 +118,7 @@ module.exports = {
   WEBHOOK_USER_CACHE_KEY_NAME,
   ELK_INSTANCE_NAMES,
   DEFAULT_REQUESTS_TIMEOUT,
+  KAFKA_INSTANCE_CONFIG,
+  REDIS_CONFIG,
+  NDR_STATUS_CODE_TO_REASON_MAPPER,
 };

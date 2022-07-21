@@ -1,15 +1,16 @@
 const isEmpty = require("lodash/isEmpty");
 const omit = require("lodash/omit");
+const _ = require("lodash");
 
 const logger = require("../../../logger");
 const { callLambdaFunction } = require("../../connector/lambda");
-const { sendDataToElk } = require("../../services/common/elk");
-const { updateStatusELK } = require("../../services/common/services");
+const { updateStatusELK, commonTrackingDataProducer } = require("../../services/common/services");
 const {
   fetchTrackingModelAndUpdateCache,
   getTrackDocumentfromMongo,
 } = require("../../services/common/trackServices");
 const updateStatusOnReport = require("../../services/report");
+const sendTrackDataToV1 = require("../../services/v1");
 const { getObject, getElkClients } = require("../../utils");
 const { UNUSED_FIELDS_FROM_TRACKING_OBJ } = require("./constant");
 const { getUserNotification } = require("./model");
@@ -22,8 +23,10 @@ const { getUserNotification } = require("./model");
 const callSendReportDataForPulledEvent = (trackingObj) => {
   const { trackingElkClient, prodElkClient } = getElkClients();
 
+  sendTrackDataToV1(trackingObj);
   updateStatusOnReport(trackingObj, logger, trackingElkClient);
   updateStatusELK(trackingObj, prodElkClient);
+  commonTrackingDataProducer(trackingObj);
 
   return true;
 };
@@ -62,7 +65,6 @@ const getTrackingObj = async ({ trackingId, isFromPull, result, fetchFromCache =
  */
 const preparePickrrConnectLambdaPayloadAndCall = async ({
   trackingId,
-  elkClient,
   isFromPull = false,
   result,
   fetchFromCache = false,
@@ -76,6 +78,17 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
       });
     }
 
+    const currentStatus = _.get(trackObj, "status.current_status_type", "");
+    const parentCourier = trackObj?.courier_parent_name;
+    if (
+      isFromPull &&
+      ["Delhivery", "Ekart", "Ecom Express", "ShadowFax"].includes(parentCourier)
+    ) {
+      return false;
+    }
+    if (["UD", "NDR"].includes(currentStatus)) {
+      return false;
+    }
     trackObj = omit(trackObj, UNUSED_FIELDS_FROM_TRACKING_OBJ);
 
     const email = trackObj.user_email;
@@ -101,24 +114,9 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
       ],
     };
     await callLambdaFunction(payload, lambdaFunctionName);
-
-    //   Update Data in ELK
-
-    const body = {
-      awb: trackingId,
-      isFromPull,
-      payload: JSON.stringify(payload),
-      time: new Date(),
-    };
-
-    await sendDataToElk({
-      indexName: "track-pickrr-connect",
-      body,
-      elkClient,
-    });
     return true;
   } catch (error) {
-    logger.error("preparePickrrConnectLambdaPayloadAndCall error", error);
+    logger.error("preparePickrrConnectLambdaPayloadAndCall error", error.message);
     return false;
   }
 };

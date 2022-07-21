@@ -4,8 +4,10 @@
 const moment = require("moment");
 const axios = require("axios");
 const size = require("lodash/size");
+const isEmpty = require("lodash/isEmpty");
+const sgMail = require("@sendgrid/mail");
 
-const { setObject } = require("./redis");
+const { storeInCache } = require("./redis");
 const { prepareTrackArrCacheData } = require("../services/pull/helpers");
 const commonTrackingInfoCol = require("../services/pull/model");
 
@@ -14,6 +16,8 @@ const logger = require("../../logger");
 const { updateIsNDRinCache } = require("../services/ndr/helpers");
 const { DEFAULT_REQUESTS_TIMEOUT, ELK_INSTANCE_NAMES } = require("./constants");
 const initELK = require("../connector/elkConnection");
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const axiosInstance = axios.create();
 
@@ -38,11 +42,14 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
     }
 
     const cacheData = (await getObject(awb)) || {};
-    const { trackMap, isNDR } = prepareTrackArrCacheData(response.track_arr);
+    const { trackMap, isNdr } = prepareTrackArrCacheData(response.track_arr);
+    let { is_ndr: isNDR } = response;
+
+    isNDR = isNDR || isNdr;
 
     const updatedCacheData = { ...trackMap };
     updatedCacheData.track_model = cacheData.track_model || {};
-    await setObject(awb, updatedCacheData);
+    await storeInCache(awb, updatedCacheData);
     await updateCacheTrackArray({
       trackArray: response.track_arr,
       currentTrackObj: trackObj,
@@ -119,7 +126,7 @@ const checkAwbInCache = async ({ trackObj, updateCacheTrackArray, isFromPulled }
   const cachedData = await getObject(trackObj.awb);
   const newScanTime = moment(trackObj.scan_datetime).unix();
 
-  if (!cachedData || !(size(cachedData) >= 2)) {
+  if (!cachedData || !(size(cachedData) >= 2) || !cachedData?.track_model) {
     const res = await fetchTrackingDataAndStoreInCache(trackObj, updateCacheTrackArray);
     if (!res) {
       return false;
@@ -127,22 +134,31 @@ const checkAwbInCache = async ({ trackObj, updateCacheTrackArray, isFromPulled }
     if (res === "NA") {
       return true;
     }
-    if (checkCurrentStatusAWBInCache(trackObj, res) && !isFromPulled) return true;
 
     const isExists = await compareScanUnixTimeAndCheckIfExists(
       newScanTime,
       trackObj.scan_type,
       res
     );
+
+    if (isExists) {
+      return true;
+    }
+    if (checkCurrentStatusAWBInCache(trackObj, res) && !isFromPulled) return true;
+
     return isExists;
   }
-  if (checkCurrentStatusAWBInCache(trackObj, cachedData) && !isFromPulled) return true;
-
   const isExists = await compareScanUnixTimeAndCheckIfExists(
     newScanTime,
     trackObj.scan_type,
     cachedData
   );
+
+  if (isExists) {
+    return true;
+  }
+  if (checkCurrentStatusAWBInCache(trackObj, cachedData) && !isFromPulled) return true;
+
   return isExists;
 };
 
@@ -285,24 +301,94 @@ const getElkClients = () => {
  *
  * @param {*} track_arr
  */
-const ofdCount = (trackArr, scanType) => {
+const ofdCount = (trackArr) => {
   let ofdCountNum = 0;
-  let ndrCountNum = 0;
-
-  trackArr.forEach((trackArrObj) => {
-    if (trackArrObj?.scan_type === "OO") {
-      ofdCountNum += 1;
-    } else if (trackArrObj?.scan_type === "NDR") {
-      ndrCountNum += 1;
+  let dlCountNum = 0;
+  let currentOOTimestamp = null;
+  let currentDLTimestamp = null;
+  for (let i = 0; i < trackArr.length; i += 1) {
+    if (trackArr[i]?.scan_type === "OO") {
+      if (!currentOOTimestamp) {
+        currentOOTimestamp = moment(trackArr[i]?.scan_datetime);
+        ofdCountNum += 1;
+      } else if (currentOOTimestamp.diff(moment(trackArr[i]?.scan_datetime), "minutes") > 60) {
+        currentOOTimestamp = moment(trackArr[i]?.scan_datetime);
+        ofdCountNum += 1;
+      }
     }
-  });
-  let finalOfdCount = 0;
-  if (["UD", "NDR", "DL", "RTO", "RTO-OO", "RTO UD", "RTD", "OO"].includes(scanType)) {
-    finalOfdCount = Math.max(1, ofdCountNum, ndrCountNum);
-  } else finalOfdCount = ofdCountNum;
-
-  return finalOfdCount;
+    if (trackArr[i]?.scan_type === "DL") {
+      if (!currentDLTimestamp) {
+        currentDLTimestamp = moment(trackArr[i]?.scan_datetime);
+        dlCountNum += 1;
+      } else if (currentDLTimestamp.diff(moment(trackArr[i]?.scan_datetime), "minutes") > 60) {
+        currentDLTimestamp = moment(trackArr[i]?.scan_datetime);
+        dlCountNum += 1;
+      }
+    }
+  }
+  return ofdCountNum || Math.min(1, dlCountNum);
 };
+
+/**
+ * @param {[string]} emailList
+ * @param {string} type
+ */
+const prepareEmailList = (emailList, type = "cc") =>
+  isEmpty(emailList)
+    ? []
+    : {
+        [type]: emailList.map((email) => ({
+          email,
+        })),
+      };
+
+/**
+ * @desc send mail
+ * @msgData {object} ->{
+ *  to: string or [string] ->
+ *  from: string ->
+ *  subject: string ->
+ *  text: string ->
+ *  html?: string ->
+ *  cc?: [string] ->
+ *  bcc?: [string] ->
+ * }
+ */
+const sendEmail = async ({
+  to,
+  from = "info@pickrr.com",
+  subject,
+  text,
+  html,
+  ccList,
+  bccList,
+}) => {
+  const toEmailList = typeof to === "string" ? [to] : to;
+
+  const personalizations = [
+    {
+      ...prepareEmailList(toEmailList, "to"),
+      ...prepareEmailList(ccList),
+      ...prepareEmailList(bccList, "bcc"),
+    },
+  ];
+
+  const msg = {
+    from,
+    subject,
+    text,
+    html,
+    personalizations,
+  };
+
+  try {
+    await sgMail.send(msg);
+    logger.info("Email Sent");
+  } catch (error) {
+    logger.error("sendEmail", error);
+  }
+};
+
 module.exports = {
   checkAwbInCache,
   convertDatetimeFormat,
@@ -313,4 +399,5 @@ module.exports = {
   getMaxDate,
   getElkClients,
   ofdCount,
+  sendEmail,
 };

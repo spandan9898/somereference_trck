@@ -16,6 +16,8 @@ const {
 } = require("./constant");
 const { checkShowClientDetails } = require("./helpers");
 
+moment.suppressDeprecationWarnings = true;
+
 /**
  * cleanes tracking response data
  * @param {*} trackModel
@@ -146,7 +148,8 @@ const fixStatusMapping = (trackingObj) => {
     trackObj.status.current_status_type in NEW_STATUS_TO_OLD_MAPPING
   ) {
     const currentStatusType = trackObj.status.current_status_type;
-    trackObj.status.current_status_type = NEW_STATUS_TO_OLD_MAPPING[currentStatusType];
+    trackObj.status.current_status_type =
+      NEW_STATUS_TO_OLD_MAPPING[currentStatusType] || currentStatusType;
   }
   return trackObj;
 };
@@ -181,8 +184,6 @@ const prepareTrackingRes = async (trackingObj) => {
           responseList[i].web_address = "";
           try {
             responseList[i].info.to_phone_number = "";
-            responseList[i].info.to_address = "";
-            responseList[i].info.invoice_value = "";
             responseList[i].info.to_email = "";
             responseList[i].info.to_name = "";
           } catch {
@@ -247,8 +248,6 @@ const prepareTrackingRes = async (trackingObj) => {
       }
       try {
         tracking.info.to_phone_number = "";
-        tracking.info.to_address = "";
-        tracking.info.invoice_value = "";
         tracking.info.to_email = "";
         tracking.info.to_name = "";
       } catch {

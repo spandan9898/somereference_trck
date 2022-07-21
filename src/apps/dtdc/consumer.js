@@ -1,43 +1,51 @@
 /* eslint-disable consistent-return */
-const { DTDC_GROUP_ID, DTDC_PARTITION_COUNT, DTDC_TOPIC_NAME } = require("./constant");
-const kafka = require("../../connector/kafka");
+const {
+  PUSH_GROUP_NAME,
+  PUSH_TOPIC_NAME,
+  PULL_GROUP_NAME,
+  PULL_CONSUMER_TOPIC_NAME,
+} = require("./constant");
+
+const kafkaInstance = require("../../connector/kafka");
 const { KafkaMessageHandler } = require("../../services/common");
 const logger = require("../../../logger");
+const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 
 /**
- * initialize consumers for pidge payload
+ * initialize consumers for dtdc payload
  */
 const initialize = async () => {
-  const consumer = kafka.consumer({ groupId: DTDC_GROUP_ID });
-  const partitionsCount = new Array(DTDC_PARTITION_COUNT).fill(1);
-  const consumerMapwithPartitions = partitionsCount.map(async () => {
-    try {
-      await consumer.connect();
-      await consumer.subscribe({
-        topic: DTDC_TOPIC_NAME,
-        fromBeginning: false,
-      });
-      return consumer;
-    } catch (error) {
-      logger.error("DTDC Initialization Error", error);
-    }
+  const kafka = kafkaInstance.getInstance(KAFKA_INSTANCE_CONFIG.PROD.name);
+
+  const pullConsumer = kafka.consumer({ groupId: PULL_GROUP_NAME });
+  const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
+
+  await pullConsumer.connect();
+  await pullConsumer.subscribe({
+    topic: PULL_CONSUMER_TOPIC_NAME,
+    fromBeginning: false,
   });
+
+  await pushConsumer.connect();
+  await pushConsumer.subscribe({ topic: PUSH_TOPIC_NAME, fromBeginning: false });
   return {
-    consumerMapwithPartitions,
+    pushConsumer,
+    pullConsumer,
   };
 };
 
 /**
  *
- * @param {*} consumer
+ * listening kafka consumers of both push and pull
  */
-const listener = async (consumer, isPartition) => {
+const listener = async (consumer, partitionCount) => {
   try {
     await consumer.run({
       autoCommitInterval: 60000,
-      partitionsConsumedConcurrently: isPartition ? DTDC_PARTITION_COUNT : 1,
+      partitionsConsumedConcurrently: partitionCount,
       eachMessage: (consumedPayload) => {
-        KafkaMessageHandler.init(consumedPayload, "dtdc");
+        const courierName = consumedPayload.topic === "dtdc_pull" ? "dtdc_pull" : "dtdc";
+        KafkaMessageHandler.init(consumedPayload, courierName);
       },
     });
   } catch (error) {

@@ -3,6 +3,8 @@
   "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": ["error"],
+    "no-await-in-loop": [0],
+    "no-underscore-dangle": [0],
     "lines-around-comment": [
       "error",
       {

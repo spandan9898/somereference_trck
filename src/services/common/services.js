@@ -5,6 +5,10 @@ const logger = require("../../../logger");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("../../apps/webhookClients/common/constants");
 const { getObject, setObject } = require("../../utils");
 const { elkDataUpdate } = require("./elk");
+const producerConnection = require("../../utils/producerConnection");
+const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
+const { produceData } = require("../../utils/kafka");
+const { COMMON_TRACKING_TOPIC_NAME } = require("./constants");
 
 /**
  * @param trackingDoc -> tracking document(same as DB document)
@@ -66,8 +70,90 @@ const updateTrackingProcessingCount = async ({ awb }, type = "add") => {
   }
 };
 
+/**
+ *
+ * @param {*} trackingObj -> DB Tracking Document
+ */
+const commonTrackingDataProducer = async (trackingObj) => {
+  try {
+    const trackingItemList = [
+      "is_cod",
+      "item_tax_percentage",
+      "billing_zone",
+      "dispatch_mode",
+      "client_order_id",
+      "pickrr_order_id",
+      "sku",
+      "item_list",
+      "order_type",
+      "hsn_code",
+      "company_name",
+      "product_name",
+      "status",
+      "info",
+      "is_reverse",
+      "courier_used",
+      "courier_tracking_id",
+      "courier_parent_name",
+      "edd_stamp",
+      "quantity",
+      "tracking_id",
+      "order_created_at",
+      "courier_input_weight",
+      "user_email",
+      "auth_token",
+      "website",
+      "label_logo",
+      "ewaybill_number",
+      "is_mps",
+      "rto_waybill",
+      "waybill_type",
+      "pdd_date",
+      "pickup_address_pk",
+      "courier_edd",
+      "pickup_datetime",
+      "promise_edd",
+      "sync_count",
+      "is_ndr",
+      "latest_otp",
+    ];
+
+    const defaultValue = {
+      is_ndr: false,
+    };
+
+    const payload = {};
+    trackingItemList.forEach((item) => {
+      payload[item] = trackingObj[item];
+      if (item in defaultValue) {
+        payload[item] = payload[item] || defaultValue[item];
+      }
+    });
+
+    const producerInstance = await producerConnection.connect(KAFKA_INSTANCE_CONFIG.PROD.name);
+
+    const messages = [
+      {
+        key: payload.tracking_id,
+        value: JSON.stringify({
+          payload,
+        }),
+      },
+    ];
+
+    await produceData({
+      topic: COMMON_TRACKING_TOPIC_NAME,
+      producer: producerInstance,
+      messages,
+    });
+  } catch (error) {
+    logger.error("commonProducer", error);
+  }
+};
+
 module.exports = {
   updateStatusELK,
   getTrackingIdProcessingCount,
   updateTrackingProcessingCount,
+  commonTrackingDataProducer,
 };

@@ -1,23 +1,18 @@
 /* eslint-disable no-console */
 const logger = require("../../../logger");
 const { listener, initialize } = require("./consumer");
+const { PUSH_PARTITION_COUNT } = require("./constant");
 
 /**
  *
  */
 (async () => {
   try {
-    const amazeConsumers = await initialize();
-    amazeConsumers.forEach((consumer) => {
-      consumer
-        .then((response) => {
-          if (response) {
-            listener(response);
-          }
-        })
-        .catch((error) => logger.error("Amaze consumer", error));
-    });
+    const { pushConsumer } = await initialize();
+    if (process.env.CONSUME_PUSH_EVENTS.toLowerCase() === "true") {
+      listener(pushConsumer, PUSH_PARTITION_COUNT);
+    }
   } catch (error) {
-    throw new Error(error);
+    logger.error("Amaze Consumer Error", error);
   }
 })();

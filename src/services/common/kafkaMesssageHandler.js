@@ -1,87 +1,34 @@
 /* eslint-disable no-promise-executor-return */
 const _ = require("lodash");
 
-const { prepareAmazeData } = require("../../apps/amaze/services");
-const { preparePickrrBluedartDict } = require("../../apps/bluedart/services");
-const { prepareDelhiveryData } = require("../../apps/delhivery/services");
-const { prepareEcommData } = require("../../apps/ecomm/services");
-const { prepareEkartData } = require("../../apps/ekart/services");
-const { prepareParceldoData } = require("../../apps/parceldo/services");
-const {
-  prepareShadowfaxData,
-  preparePulledShadowfaxData,
-} = require("../../apps/shadowfax/services");
-const { prepareUdaanData } = require("../../apps/udaan/services");
-const { prepareXbsData } = require("../../apps/xpressbees/services");
-const { preparePidgeData } = require("../../apps/pidge/services");
-const { prepareDtdcData } = require("../../apps/dtdc/services");
-const logger = require("../../../logger");
-const initELK = require("../../connector/elkConnection");
+const { getPrepareFunction } = require("./helpers");
 
 const { updateTrackDataToPullMongo } = require("../pull");
-
 const { redisCheckAndReturnTrackData } = require("../pull/services");
-
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
 const updateStatusOnReport = require("../report");
+const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
+
 const { updatePrepareDict } = require("./helpers");
-const { ELK_INSTANCE_NAMES } = require("../../utils/constants");
 const {
   updateStatusELK,
   getTrackingIdProcessingCount,
   updateTrackingProcessingCount,
+  commonTrackingDataProducer,
 } = require("./services");
-const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
+const { getElkClients } = require("../../utils");
+const logger = require("../../../logger");
+const { TrackingLogger } = require("../../../logger");
+const { sendDataToElk } = require("./elk");
+
+const trackingLogger = TrackingLogger("tracking/payloads");
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
  */
 class KafkaMessageHandler {
-  static getPrepareFunction(courierName) {
-    const courierPrepareMapFunctions = {
-      amaze: prepareAmazeData,
-      bluedart: preparePickrrBluedartDict,
-      delhivery: prepareDelhiveryData,
-      ecomm: prepareEcommData,
-      ekart: prepareEkartData,
-      parceldo: prepareParceldoData,
-      shadowfax: prepareShadowfaxData,
-      shadowfax_pull: preparePulledShadowfaxData,
-      udaan: prepareUdaanData,
-      xpressbees: prepareXbsData,
-      pidge: preparePidgeData,
-      dtdc: prepareDtdcData,
-    };
-    return courierPrepareMapFunctions[courierName];
-  }
-
-  static getElkClients() {
-    let prodElkClient = "";
-    const stagingElkClient = "";
-    let trackingElkClient = "";
-    try {
-      prodElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.PROD.name);
-
-      // stagingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.STAGING.name);
-
-      trackingElkClient = initELK.getElkInstance(ELK_INSTANCE_NAMES.TRACKING.name);
-
-      return {
-        prodElkClient,
-        stagingElkClient,
-        trackingElkClient,
-      };
-    } catch (error) {
-      logger.error("getElkClients", error);
-      return {
-        prodElkClient,
-        stagingElkClient,
-      };
-    }
-  }
-
   /**
    *
    * @desc about processCount ->
@@ -92,21 +39,54 @@ class KafkaMessageHandler {
    * 5. after DB update decrease "processCount" value by 1, handle negative case
    */
   static async init(consumedPayload, courierName) {
-    const prepareFunc = KafkaMessageHandler.getPrepareFunction(courierName);
+    const prepareFunc = getPrepareFunction(courierName);
     if (!prepareFunc) {
-      throw new Error(`${courierName} is not a valid courier`);
+      return {
+        error: `${courierName} is not a valid courier`,
+      };
     }
     try {
       let res;
       let isFromPulled = false;
+      const { prodElkClient, trackingElkClient } = getElkClients();
+
       try {
         const { message } = consumedPayload;
-        res = prepareFunc(Object.values(JSON.parse(message.value.toString()))[0]);
-      } catch {
+        const consumedData = JSON.parse(message.value.toString());
+
+        if (consumedData?.event?.includes("pull")) {
+          isFromPulled = true;
+          res = prepareFunc(consumedData);
+          if (courierName.includes("shadowfax_pull")) {
+            sendDataToElk({
+              body: {
+                courier_name: courierName,
+                payload: JSON.stringify(consumedData),
+                time: new Date(),
+              },
+              elkClient: trackingElkClient,
+              indexName: "track_courier_pull",
+            });
+          }
+        } else {
+          const consumedPayloadData = Object.values(consumedData)[0];
+          try {
+            if (process.env.IS_PAYLOAD_LOGGING === "true") {
+              trackingLogger.info(courierName, {
+                data: consumedPayloadData,
+              });
+            }
+          } catch {
+            // pass
+          }
+          res = prepareFunc(consumedPayloadData);
+        }
+      } catch (error) {
         res = prepareFunc(consumedPayload);
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
-      if (!res.awb) return;
+
+      if (!res.awb) return {};
 
       const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
 
@@ -119,17 +99,15 @@ class KafkaMessageHandler {
       if (!trackData) {
         logger.info(`data already exists or not found in DB! ${res.awb}`);
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
-        return;
+        return {};
       }
 
       const updatedTrackData = await updatePrepareDict(trackData);
       if (_.isEmpty(updatedTrackData)) {
         logger.error("Xpresbees reverse map not found", trackData);
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
-        return;
+        return {};
       }
-
-      const { prodElkClient, trackingElkClient } = KafkaMessageHandler.getElkClients();
 
       const result = await updateTrackDataToPullMongo({
         trackObj: updatedTrackData,
@@ -137,25 +115,31 @@ class KafkaMessageHandler {
         isFromPulled,
       });
       if (!result) {
-        return;
+        return {};
       }
 
       if (process.env.IS_OTHERS_CALL === "false") {
-        return;
+        return {};
       }
-
+      await commonTrackingDataProducer(result);
+      await updateStatusOnReport(result, logger, trackingElkClient);
       sendDataToNdr(result);
       sendTrackDataToV1(result);
-      triggerWebhook(result, trackingElkClient);
-      updateStatusOnReport(result, logger, trackingElkClient);
       updateStatusELK(result, prodElkClient);
-      preparePickrrConnectLambdaPayloadAndCall({
-        trackingId: result.tracking_id,
-        elkClient: trackingElkClient,
-        result,
-      });
+      triggerWebhook(result, trackingElkClient);
+
+      // blocking events to lambda (new pickrr connect service)
+
+      // preparePickrrConnectLambdaPayloadAndCall({
+      //   trackingId: result.tracking_id,
+      //   elkClient: trackingElkClient,
+      //   result,
+      // });
+
+      return {};
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
+      return {};
     }
   }
 }

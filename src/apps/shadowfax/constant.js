@@ -103,6 +103,25 @@ const SHADOWFAX_PULL_CODE_MAPPER_1 = {
   "na_heavy rain": { scan_type: "UD", pickrr_sub_status_code: "SD" },
   "recd_at_fwd_dc_received at forward dc": { scan_type: "OT", pickrr_sub_status_code: "" },
   "recd_at_fwd_dc_received at rts dc": { scan_type: "RTO", pickrr_sub_status_code: "" },
+  "cancelled_by_customer_cancelled by customer": { scan_type: "UD", pickrr_sub_status_code: "CR" },
+  "cancelled_by_customer_cancelled as per client's request": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "OTH",
+  },
+  "cancelled_by_customer_third successful attempt": { scan_type: "OC", pickrr_sub_status_code: "" },
+  "cancelled_by_customer_cancelled by client": { scan_type: "OC", pickrr_sub_status_code: "" },
+  "nc_customer is not contactable for delivery": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  "na_customer delivery was not attempted by shadowfax rider": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  "cancelled_by_customer_delivery request has been cancelled by customer": {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CR",
+  },
 };
 
 const SHADOWFAX_PULL_CODE_MAPPER_2 = {
@@ -117,35 +136,117 @@ const SHADOWFAX_PULL_CODE_MAPPER_2 = {
   recd_at_fwd_hub: { scan_type: "RAD", pickrr_sub_status_code: "" },
   assigned_for_delivery: { scan_type: "RAD", pickrr_sub_status_code: "" },
   ofd: { scan_type: "OO", pickrr_sub_status_code: "" },
-  cancelled_by_customer: { scan_type: "OC", pickrr_sub_status_code: "" },
   seller_not_contactable: { scan_type: "PPF", pickrr_sub_status_code: "SU" },
   pickup_not_attempted: { scan_type: "PPF", pickrr_sub_status_code: "NA" },
-  reopen_ndr: { scan_type: "UD", pickrr_sub_status_code: "OTH" },
   seller_initiated_delay: { scan_type: "PPF", pickrr_sub_status_code: "" },
   cid: { scan_type: "UD", pickrr_sub_status_code: "CD" },
   rts_in_process: { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
   rts_d: { scan_type: "RTD", pickrr_sub_status_code: "" },
   rts_nd: { scan_type: "RTO UD", pickrr_sub_status_code: "" },
+  rts: { scan_type: "RTO", pickrr_sub_status_code: "" },
   lost: { scan_type: "LT", pickrr_sub_status_code: "" },
   delivered: { scan_type: "DL", pickrr_sub_status_code: "" },
   item_delivered_at: { scan_type: "DL", pickrr_sub_status_code: "" },
+  rts_ofd: { scan_type: "RTO-OO", pickrr_sub_status_code: "" },
+  in_transit_return: { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
+  item_manifested: { scan_type: "OT", pickrr_sub_status_code: "" },
+  bag_in_transit: { scan_type: "OT", pickrr_sub_status_code: "" },
+  bag_received_at_via: { scan_type: "OT", pickrr_sub_status_code: "" },
+  assigned_for_seller_pickup: { scan_type: "OM", pickrr_sub_status_code: "" },
+  cancelled_by_seller: { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
 };
 
-const SHADOWFAX_TOPICS_COUNT = 1;
-const SHADOWFAX_PARTITIONS_COUNT = 10;
-const SHADOWFAX_PULL_TOPIC_NAME = "shadowfax_pull";
-const SHADOWFAX_PUSH_TOPIC_NAME = "shadowfax_push";
-const SHADOWFAX_PULL_GROUP_NAME = "shadowfax-pull-group";
-const SHADOWFAX_PUSH_GROUP_NAME = "shadowfax-push-group";
+const SHADOWFAX_REVERSE_MAPPER = {
+  "not contactable": { pickrr_sub_status_code: "CNA", scan_type: "PPF" },
+  "pickup_on_hold_customer changed his/her mind": {
+    pickrr_sub_status_code: "SNR",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_customer wants replacement/refund first": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "qc failed": { pickrr_sub_status_code: "CI", scan_type: "PPF" },
+  "pickup_on_hold_customer want pick-up from non-serviceable area": {
+    pickrr_sub_status_code: "NSL",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_doorstep qc product damage": { pickrr_sub_status_code: "OTH", scan_type: "PPF" },
+  "not attempted": { pickrr_sub_status_code: "SD", scan_type: "PPF" },
+  new: { pickrr_sub_status_code: "", scan_type: "OP" },
+  "pickup_on_hold_address issue": { pickrr_sub_status_code: "AI", scan_type: "PPF" },
+  "pickup_on_hold_doorstep qc brandbox not available": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_shipment is not picked": { pickrr_sub_status_code: "OTH", scan_type: "PPF" },
+  "pickup_on_hold_mandatory check not available": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_customer wants pickup beyond cut off time": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_doorstep qc product mismatch": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_large shipment": { pickrr_sub_status_code: "NA", scan_type: "PPF" },
+  "pickup_on_hold_incomplete information received from client": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  undelivered: { pickrr_sub_status_code: "OTH", scan_type: "UD" },
+  "pickup_on_hold_covid restricted area": { pickrr_sub_status_code: "NSL", scan_type: "PPF" },
+  "pickup_on_hold_doorstep qc price tag missing": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  received: { pickrr_sub_status_code: "", scan_type: "OT" },
+  "pickup_on_hold_unable to pickup in given slot": {
+    pickrr_sub_status_code: "NA",
+    scan_type: "PPF",
+  },
+  "out for pickup": { pickrr_sub_status_code: "", scan_type: "OFP" },
+  lost: { pickrr_sub_status_code: "", scan_type: "LT" },
+  "pickup_on_hold_incorrect contact number": { pickrr_sub_status_code: "SU", scan_type: "PPF" },
+  "pickup_on_hold_seller wants pickup beyond cut off time": {
+    pickrr_sub_status_code: "SNR",
+    scan_type: "PPF",
+  },
+  "pickup_on_hold_non serviceable area": { pickrr_sub_status_code: "NSL", scan_type: "PPF" },
+  "pickup_on_hold_pickup already done by other dsp": {
+    pickrr_sub_status_code: "OTH",
+    scan_type: "PPF",
+  },
+  "returned to client": { pickrr_sub_status_code: "", scan_type: "DL" },
+  "assigned for customer pickup": { pickrr_sub_status_code: "", scan_type: "OM" },
+  cid: { pickrr_sub_status_code: "CI", scan_type: "PPF" },
+  "received at return dc": { pickrr_sub_status_code: "", scan_type: "OT" },
+  "pickup_on_hold_successful 3 attempts done": { pickrr_sub_status_code: "SNR", scan_type: "PPF" },
+  "pickup_on_hold_doorstep qc used item": { pickrr_sub_status_code: "OTH", scan_type: "PPF" },
+  "pickup_on_hold_pincode address mismatch": { pickrr_sub_status_code: "AI", scan_type: "PPF" },
+  picked: { pickrr_sub_status_code: "", scan_type: "PP" },
+  cancelled: { pickrr_sub_status_code: "", scan_type: "OC" },
+};
+
+const PUSH_PARTITION_COUNT = 10;
+const PULL_PARTITION_COUNT = 10;
+const PULL_TOPIC_NAME = "shadowfax_pull";
+const PUSH_TOPIC_NAME = "shadowfax_push";
+const PULL_GROUP_NAME = "shadowfax-pull-group";
+const PUSH_GROUP_NAME = "shadowfax-push-group";
 
 module.exports = {
   SHADOWFAX_CODE_MAPPER,
-  SHADOWFAX_TOPICS_COUNT,
-  SHADOWFAX_PARTITIONS_COUNT,
+  PUSH_PARTITION_COUNT,
+  PULL_PARTITION_COUNT,
   SHADOWFAX_PULL_CODE_MAPPER_1,
   SHADOWFAX_PULL_CODE_MAPPER_2,
-  SHADOWFAX_PULL_TOPIC_NAME,
-  SHADOWFAX_PUSH_TOPIC_NAME,
-  SHADOWFAX_PULL_GROUP_NAME,
-  SHADOWFAX_PUSH_GROUP_NAME,
+  PULL_TOPIC_NAME,
+  PUSH_TOPIC_NAME,
+  PULL_GROUP_NAME,
+  PUSH_GROUP_NAME,
+  SHADOWFAX_REVERSE_MAPPER,
 };

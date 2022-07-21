@@ -8,10 +8,9 @@ const { findPickupDate } = require("./helpers");
  * @returns
  */
 const prepareTrackingEventDictForNDR = (trackData) => {
-  const pickupDatetime = findPickupDate(trackData?.track_arr || []);
+  const pickupDatetime = findPickupDate(trackData);
   const scanDatetime = trackData?.status?.current_status_time || "";
   const EDDTimestamp = trackData?.edd_stamp || "";
-  const scanType = trackData?.status?.current_status_type;
   const trackingEventDict = {
     awb: trackData?.tracking_id,
     EDD: convertDatetimeFormat(EDDTimestamp),
@@ -25,7 +24,7 @@ const prepareTrackingEventDictForNDR = (trackData) => {
     scan_type: trackData?.status?.current_status_type || "",
     track_info: trackData?.status?.current_status_body || "",
     track_location: trackData?.status?.current_status_location || "",
-    ofd_count: ofdCount(trackData?.track_arr || [], scanType) || "",
+    ofd_count: ofdCount(trackData?.track_arr || []) || "",
     courier_name: trackData?.courier_used || "",
   };
   return trackingEventDict;
@@ -65,6 +64,8 @@ const prepareOtherDetailsFromTrackDataForNDR = (trackData) => {
     edd_stamp: convertDatetimeFormat(eddStamp),
     ops_profile: trackData?.ops_profile || "",
     pickrr_order_id: trackData?.pickrr_order_id || "",
+    item_list: trackData?.item_list || [],
+    user_email: trackData?.user_email || "",
   };
   return otherDetailsDict;
 };

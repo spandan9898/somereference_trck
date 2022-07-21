@@ -1,5 +1,5 @@
 /* eslint-disable consistent-return */
-const kafka = require("../../connector/kafka");
+const kafkaInstance = require("../../connector/kafka");
 const {
   PARTITON_COUNT,
   PICKRR_CONNECT_TOPIC_NAME,
@@ -7,25 +7,21 @@ const {
 } = require("./constant");
 const logger = require("../../../logger");
 const { pickrrConnectKafkaMessageHandler } = require("../../services/pickrrConnect");
+const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 
 /**
  * initialize consumer for Pickrr Connect
  */
 const initialize = async () => {
+  const kafka = kafkaInstance.getInstance(KAFKA_INSTANCE_CONFIG.PROD.name);
   const consumer = kafka.consumer({ groupId: PICKRR_CONNECT_GROUP_NAME });
   const partitionsCount = new Array(PARTITON_COUNT).fill(1);
-  return partitionsCount.map(async () => {
-    try {
-      await consumer.connect();
-      await consumer.subscribe({
-        topic: PICKRR_CONNECT_TOPIC_NAME,
-        fromBeginning: false,
-      });
-      return consumer;
-    } catch (error) {
-      logger.error("Shadowfax Initialize Error", error);
-    }
+  await consumer.connect();
+  await consumer.subscribe({
+    topic: PICKRR_CONNECT_TOPIC_NAME,
+    fromBeginning: false,
   });
+  return consumer;
 };
 
 /**

@@ -3,7 +3,7 @@ const _ = require("lodash");
 const moment = require("moment");
 
 const logger = require("../../../logger");
-const { setObject, getObject, checkAwbInCache } = require("../../utils");
+const { setObject, storeInCache, getObject, checkAwbInCache } = require("../../utils");
 const {
   prepareTrackDataForTracking,
   fetchTrackingModelAndUpdateCache,
@@ -40,7 +40,7 @@ const updateCacheTrackArray = async ({ trackArray, awb, trackingDocument }) => {
       const updatedTrackModel = updateTrackModel(cacheData.track_model, trackingDocument);
       cacheData.track_model = updatedTrackModel;
     }
-    await setObject(awb, cacheData);
+    await storeInCache(awb, cacheData);
     return true;
   } catch (error) {
     logger.error("updateCacheTrackArray", error);

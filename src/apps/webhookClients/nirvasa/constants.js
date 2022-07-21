@@ -1,0 +1,26 @@
+const NIRVASA_STATUS_MAPPER = {
+  OP: "Order Placed",
+  OM: "Order Manifested",
+  OC: "Order Cancelled",
+  PP: "Order Picked Up",
+  OD: "Order Dispatched",
+  OT: "Order in Transit",
+  OO: "Order Out for Delivery",
+  NDR: "Failed Attempt at Delivery",
+  UD: "Failed Attempt at Delivery",
+  DL: "Order Delivered",
+  RTO: "Order Returned Back",
+  "RTO-OT": "RTO in Transit",
+  "RTO-OO": "RTO Out for Delivery",
+  RTP: "RTO Reached Pickrr Warehouse",
+  RTD: "Order Returned to Seller",
+  "RTO UD": "RTO Undelivered",
+  OFP: "Out For Pickup",
+  PPF: "Pickup Failed",
+  SHP: "Shipped",
+  RAD: "Reached at Destination",
+  LT: "Shipment Lost",
+  DM: "Shipment Damaged",
+};
+
+module.exports = { NIRVASA_STATUS_MAPPER };

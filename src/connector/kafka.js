@@ -1,15 +1,7 @@
 const { Kafka, logLevel } = require("kafkajs");
+
 const logger = require("../../logger");
 const { toWinstonLogLevel } = require("../../logger/helper");
-
-const {
-  KAFKA_USER_NAME: username,
-  KAFKA_PASSWORD: password,
-  KAFKA_BROKER_URL: brokerUrl,
-  KAFKA_CLIENT_ID: clientId,
-} = process.env;
-const sasl = username && password ? { username, password, mechanism: "plain" } : null;
-const ssl = !!sasl;
 
 /**
  *
@@ -30,17 +22,60 @@ const WinstonLogCreator = (logLevelVaue) => {
   };
 };
 
-const kafka = new Kafka({
-  brokers: [brokerUrl],
-  ssl,
-  sasl,
-  clientId,
-  retry: {
-    maxRetryTime: 10,
-  },
-  authenticationTimeout: 10000,
-  logCreator: WinstonLogCreator,
-  logLevel: logLevel.DEBUG,
-});
+/**
+ * @param
+ * @desc Initialize Multiple Kafka and get instances
+ */
+class InitKafka {
+  constructor() {
+    this.instances = {};
+  }
 
-module.exports = kafka;
+  /**
+   *
+   * @param {*} config, instanceName
+   * @desc instanceName -> like PROD/STAGING/others
+   * @config { brokerUrl, username, password, clientId }
+   */
+  connect(instanceName, config) {
+    const {
+      brokerUrl = process.env.KAFKA_BROKER_URL,
+      username = process.env.KAFKA_USER_NAME,
+      password = process.env.KAFKA_PASSWORD,
+      clientId = process.env.KAFKA_CLIENT_ID,
+    } = config;
+    if (this.instances[instanceName]) {
+      return this.instances[instanceName];
+    }
+    const sasl = username && password ? { username, password, mechanism: "plain" } : null;
+    const ssl = !!sasl;
+
+    const kafkaClient = new Kafka({
+      brokers: [brokerUrl],
+      ssl,
+      sasl,
+      clientId,
+      retry: {
+        maxRetryTime: 10,
+      },
+      authenticationTimeout: 10000,
+      logCreator: WinstonLogCreator,
+      logLevel: logLevel.DEBUG,
+    });
+    if (!kafkaClient) {
+      logger.error(`${instanceName} Kafka Connection Error`);
+    }
+    this.instances[instanceName] = kafkaClient;
+    logger.info(`${instanceName} Kafka Connected`);
+    return this.instances[instanceName];
+  }
+
+  getInstance(instanceName) {
+    if (!this.instances[instanceName]) {
+      throw new Error(`${instanceName} not found. Please Connect to Kafka First`);
+    }
+    return this.instances[instanceName];
+  }
+}
+
+module.exports = new InitKafka();

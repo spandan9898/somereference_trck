@@ -1,10 +1,30 @@
 const { orderBy, isEmpty, get, cloneDeep } = require("lodash");
 
+const { prepareAmazeData } = require("../../apps/amaze/services");
+const { preparePickrrBluedartDict } = require("../../apps/bluedart/services");
+const {
+  prepareDelhiveryData,
+  prepareDelhiveryPulledData,
+} = require("../../apps/delhivery/services");
+const { prepareEcommData } = require("../../apps/ecomm/services");
+const { prepareEkartData, preparePulledEkartData } = require("../../apps/ekart/services");
+const { prepareParceldoData } = require("../../apps/parceldo/services");
+const {
+  prepareShadowfaxData,
+  preparePulledShadowfaxData,
+} = require("../../apps/shadowfax/services");
+const { prepareUdaanData } = require("../../apps/udaan/services");
+const { prepareXbsData } = require("../../apps/xpressbees/services");
+const { preparePidgeData } = require("../../apps/pidge/services");
+const { prepareDtdcData, prepareDtdcPulledData } = require("../../apps/dtdc/services");
+const { prepareLoadshareData } = require("../../apps/loadshare/services");
+
 const logger = require("../../../logger");
 const { DELHIVERY_REVERSE_MAPPER } = require("../../apps/delhivery/constant");
 const { XBS_REVERSE_MAPPER } = require("../../apps/xpressbees/constant");
 const { getObject } = require("../../utils");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
+const { preparePikNDelData } = require("../../apps/pikndel/services");
 
 /**
  * sorring status array desc -> The last scan time will be in the top
@@ -112,8 +132,36 @@ const getOrderType = (trackingObj) => {
   }
 };
 
+/**
+ *
+ * @param {*} courierName
+ * @desc return mapped prepare funcion
+ */
+const getPrepareFunction = (courierName) => {
+  const courierPrepareMapFunctions = {
+    amaze: prepareAmazeData,
+    bluedart: preparePickrrBluedartDict,
+    delhivery: prepareDelhiveryData,
+    delhivery_pull: prepareDelhiveryPulledData,
+    ecomm: prepareEcommData,
+    ekart: prepareEkartData,
+    ekart_pull: preparePulledEkartData,
+    parceldo: prepareParceldoData,
+    shadowfax: prepareShadowfaxData,
+    shadowfax_pull: preparePulledShadowfaxData,
+    udaan: prepareUdaanData,
+    xpressbees: prepareXbsData,
+    pidge: preparePidgeData,
+    dtdc: prepareDtdcData,
+    dtdc_pull: prepareDtdcPulledData,
+    loadshare: prepareLoadshareData,
+    pikndel: preparePikNDelData,
+  };
+  return courierPrepareMapFunctions[courierName];
+};
 module.exports = {
   sortStatusArray,
   updatePrepareDict,
   getOrderType,
+  getPrepareFunction,
 };

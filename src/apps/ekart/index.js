@@ -1,16 +1,17 @@
 const logger = require("../../../logger");
 const { initialize, listener } = require("./consumer");
+const { PULL_PARTITION_COUNT, PUSH_PARTITION_COUNT } = require("./constant");
 
 (async () => {
-  const ekartConsumers = await initialize();
-
-  ekartConsumers.forEach((consumer) => {
-    consumer
-      .then((res) => {
-        if (res) {
-          listener(res);
-        }
-      })
-      .catch((err) => logger.error("Ekart Consumer Error ", err));
-  });
+  try {
+    const { pullConsumer, pushConsumer } = await initialize();
+    if (process.env.CONSUME_PULL_EVENTS.toLowerCase() === "true") {
+      listener(pullConsumer, PULL_PARTITION_COUNT);
+    }
+    if (process.env.CONSUME_PUSH_EVENTS.toLowerCase() === "true") {
+      listener(pushConsumer, PUSH_PARTITION_COUNT);
+    }
+  } catch (error) {
+    logger.error("Ekart Consumer Error", error);
+  }
 })();

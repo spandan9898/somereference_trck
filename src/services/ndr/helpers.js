@@ -1,18 +1,24 @@
 const logger = require("../../../logger");
-const { getObject, setObject } = require("../../utils/redis");
+const { getObject, storeInCache } = require("../../utils/redis");
+const { PP_PROXY_LIST } = require("../v1/constants");
 
 /**
  *
- * @param {*} track_arr
+ * @param {*} trackData
  */
-const findPickupDate = (trackArr) => {
-  // eslint-disable-next-line consistent-return
-  trackArr.forEach((trackArrObj) => {
-    if (trackArrObj?.scan_type === "PP") {
-      return trackArrObj.scan_datetime;
+const findPickupDate = (trackData) => {
+  if (trackData?.pickup_datetime) {
+    return trackData?.pickup_datetime;
+  }
+
+  let pickupDatetime = "";
+  const trackArr = trackData?.track_arr || [];
+  for (let i = 0; i < trackArr.length; i += 1) {
+    if (PP_PROXY_LIST.includes(trackArr[i]?.scan_type)) {
+      pickupDatetime = trackArr[i]?.scan_datetime;
     }
-  });
-  return "";
+  }
+  return pickupDatetime;
 };
 
 /**
@@ -24,7 +30,7 @@ const checkIfTriggerNDREb = async (currentStatusType, awb) => {
     if (!awb) {
       return false;
     }
-    const { isNDR = false } = (await getObject(awb)) || {};
+    const { is_ndr: isNDR = false } = (await getObject(awb)) || {};
 
     if (["NDR", "UD"].includes(currentStatusType) || isNDR) {
       return true;
@@ -44,8 +50,8 @@ const checkIfTriggerNDREb = async (currentStatusType, awb) => {
 const updateIsNDRinCache = async (awb) => {
   try {
     const cacheData = (await getObject(awb)) || {};
-    cacheData.isNDR = true;
-    await setObject(awb, cacheData);
+    cacheData.is_ndr = true;
+    await storeInCache(awb, cacheData);
   } catch (error) {
     logger.error("updateIsNDRinCache", error);
   }
