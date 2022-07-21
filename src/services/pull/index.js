@@ -6,7 +6,12 @@ const { storeDataInCache, updateCacheTrackArray, softCancellationCheck } = requi
 const { prepareTrackDataToUpdateInPullDb } = require("./preparator");
 const commonTrackingInfoCol = require("./model");
 const { updateTrackingProcessingCount } = require("../common/services");
-const { checkTriggerForPulledEvent } = require("./helpers");
+const {
+  checkTriggerForPulledEvent,
+  updateFlagForOtpDeliveredShipments,
+  updateScanStatus,
+  checkIsAfter,
+} = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
 const { HOST_NAMES } = require("../../utils/constants");
@@ -83,6 +88,9 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
   if (!updatedObj.edd_stamp) {
     delete updatedObj.edd_stamp;
   }
+  if (result.eventObj?.otp) {
+    updatedObj.latest_otp = result.eventObj.otp;
+  }
   try {
     const pullProdCollectionInstance = await commonTrackingInfoCol();
 
@@ -138,12 +146,13 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     updatedObj.courier_edd = latestCourierEDD;
 
     let pickupDateTime = null;
-
+    const placedData = res?.order_created_at;
     if (res?.pickup_datetime && statusType !== "PP") {
       pickupDateTime = res?.pickup_datetime;
     } else {
       sortedTrackArray.forEach((trackEvent) => {
-        if (PP_PROXY_LIST.includes(trackEvent?.scan_type)) {
+        const isAfter = checkIsAfter(trackEvent?.scan_datetime, placedData);
+        if (PP_PROXY_LIST.includes(trackEvent?.scan_type) && isAfter) {
           pickupDateTime = trackEvent?.scan_datetime;
         }
       });
@@ -154,6 +163,14 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
       return false;
     }
     const firstTrackObjOfTrackArr = sortedTrackArray[0];
+
+    // Otp Delivered Shipments marking
+
+    if (firstTrackObjOfTrackArr?.scan_type === "DL") {
+      const isOtpDelivered = updateFlagForOtpDeliveredShipments(sortedTrackArray);
+      updatedObj.is_otp_delivered = isOtpDelivered;
+      updateScanStatus(res, sortedTrackArray, isOtpDelivered);
+    }
     const promiseEdd = res?.promise_edd;
     if (!promiseEdd && latestCourierEDD) {
       updatedObj.promise_edd = latestCourierEDD;

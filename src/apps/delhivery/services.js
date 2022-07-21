@@ -63,6 +63,7 @@ const prepareDelhiveryData = (delhiveryDict) => {
 
   try {
     const trackData = delhiveryDict.Shipment;
+    const { Instructions } = trackData?.Status || "";
 
     const statusScanType = trackData.Status.StatusType || "";
     let statusType = statusScanType;
@@ -110,12 +111,16 @@ const prepareDelhiveryData = (delhiveryDict) => {
 
     pickrrDelhiveryDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrDelhiveryDict.scan_datetime = statusDate;
-    pickrrDelhiveryDict.track_info = trackData.Status.Instructions.toString();
+    pickrrDelhiveryDict.track_info = trackData.Status.Instructions.toString() || "";
     pickrrDelhiveryDict.awb = trackData.AWB.toString();
     pickrrDelhiveryDict.track_location = trackData.Status.StatusLocation.toString();
     pickrrDelhiveryDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrDelhiveryDict.pickrr_sub_status_code = reasonDict?.pickrr_sub_status_code || "";
     pickrrDelhiveryDict.courier_status_code = delhiveryMapperKey;
+    if (pickrrDelhiveryDict.track_info.toLowerCase().includes("otp verified delivery")) {
+      pickrrDelhiveryDict.otp_remarks = Instructions;
+    }
+    pickrrDelhiveryDict.otp = trackData?.DeliveryOTP || "";
 
     return pickrrDelhiveryDict;
   } catch (error) {

@@ -113,6 +113,78 @@ const EKART_STATUS_MAPPER = {
     scan_type: "RTO",
     pickrr_sub_status_code: "",
   },
+  pickup_out_for_pickup: {
+    scan_type: "OFP",
+    pickrr_sub_status_code: "",
+  },
+  shipment_shipped: {
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  received: {
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  expected: {
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  return_out_for_delivery: {
+    scan_type: "RTO-OO",
+    pickrr_sub_status_code: "",
+  },
+  shipment_lost: {
+    scan_type: "LT",
+    pickrr_sub_status_code: "",
+  },
+  return_received: {
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  return_expected: {
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  return_received_at_dh: {
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  "return_undelivered_attempted_heavy load": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "SD",
+  },
+  "return_undelivered_attempted_vehicle breakdown": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "SD",
+  },
+  "return_undelivered_attempted_security instability": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "SD",
+  },
+  "return_undelivered_attempted_heavy traffic": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "SD",
+  },
+  "return_undelivered_attempted_heavy rain": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "SD",
+  },
+  return_undelivered_attempted_holiday: {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "SD",
+  },
+  return_delivered: {
+    scan_type: "RTD",
+    pickrr_sub_status_code: "",
+  },
+  "return_rejected_by_seller_ekl:force rejected by seller": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "OTH",
+  },
+  return_lost: {
+    scan_type: "LT",
+    pickrr_sub_status_code: "",
+  },
 };
 const EKART_PULL_MAPPER = {
   SHIPMENT_CREATED: {

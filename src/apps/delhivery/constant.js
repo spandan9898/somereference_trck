@@ -884,11 +884,6 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
     scan_type: "OT",
     pickrr_sub_status_code: "",
   },
-  "dlyrg-125_ud": {
-    courier_remark: "Delay due to Disturbance/Strike",
-    scan_type: "OT",
-    pickrr_sub_status_code: "",
-  },
   "dlylh-109_ud": {
     courier_remark: "Vehicle Breakdown",
     scan_type: "OT",
@@ -2372,11 +2367,6 @@ const DELHIVERY_DOCS_MAPPER = {
     scan_type: "UD",
     pickrr_sub_status_code: "ODA",
   },
-  "dlyrg-125_ud": {
-    courier_remark: "Delay due to Disturbance/Strike",
-    scan_type: "OT",
-    pickrr_sub_status_code: "",
-  },
   "dlylh-109_ud": {
     courier_remark: "Vehicle Breakdown",
     scan_type: "OT",
@@ -3580,11 +3570,6 @@ const DELHIVERY_MAPPER = {
     pickrr_sub_status_code: "CR-OTP",
   },
   "x-dbl1f_ud": { courier_remark: "Added to Bag", scan_type: "OT", pickrr_sub_status_code: "" },
-  "dlyrg-125_ud": {
-    courier_remark: "Delay due to Disturbance/Strike",
-    scan_type: "OT",
-    pickrr_sub_status_code: "",
-  },
   "dlylh-109_ud": {
     courier_remark: "Vehicle Breakdown",
     scan_type: "OT",

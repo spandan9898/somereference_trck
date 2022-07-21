@@ -56,7 +56,6 @@ const GET_TRACK_INFO_KEYS = [
 const NEW_STATUS_TO_OLD_MAPPING = {
   OFP: "OP",
   PPF: "OM",
-  LT: "OT",
   "RTO-OO": "RTO",
   "RTO-OT": "RTO",
   DM: "OT",

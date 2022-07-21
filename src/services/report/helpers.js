@@ -1,8 +1,9 @@
 const _ = require("lodash");
 
 const logger = require("../../../logger");
+const { NDR_STATUS_CODE_TO_REASON_MAPPER } = require("../../utils/constants");
 const { sendDataToElk } = require("../common/elk");
-const { NEW_STATUS_TO_OLD_MAPPING } = require("./constants");
+const { NEW_STATUS_TO_OLD_MAPPING, VALID_FAD_NDR_SUBSTATUS_CODE } = require("./constants");
 const { REPORT_STATUS_CODE_MAPPING, REPORT_STATUS_TYPE_MAPPING } = require("./constants");
 
 /**
@@ -16,6 +17,39 @@ const findLatestTrackingInfo = (trackDict) => {
   }
   const latestTrackingInfo = _.get(trackDict, "track_arr[0].scan_status", "");
   return latestTrackingInfo;
+};
+
+/**
+ *
+ * @param {track_arr} trackDict
+ * @param {*} n
+ * @returns
+ */
+const findNDRTrackInfos = (trackDict) => {
+  if (!trackDict) {
+    return [];
+  }
+  const ndrsObj = [];
+  trackDict.forEach((trackObj) => {
+    if (trackObj?.scan_type === "NDR") {
+      ndrsObj.push(trackObj);
+    }
+  });
+  return ndrsObj.reverse();
+};
+
+/**
+ *
+ * @param {track_arr} trackArr
+ * @returns Latest RTD DATE
+ */
+const findLatestRtdDate = (trackArr) => {
+  for (let i = 0; i < trackArr.length; i += 1) {
+    if (trackArr[i]?.scan_type === "RTD") {
+      return trackArr[i]?.scan_datetime;
+    }
+  }
+  return null;
 };
 
 /**
@@ -72,11 +106,28 @@ const findLatestStatusDatetime = (trackDict) => {
 const findFirstAttemptedDate = (trackArr) => {
   let firstAttemptDate = null;
   trackArr.forEach(({ scan_type: scanType, scan_datetime: scanDateTime }) => {
-    if (["OO", "NDR", "DL"].includes(scanType)) {
+    if (
+      ["OO", "DL"].includes(scanType) ||
+      (["NDR"].includes(scanType) &&
+        VALID_FAD_NDR_SUBSTATUS_CODE.includes(trackArr?.pickrr_sub_status_code || ""))
+    ) {
       firstAttemptDate = scanDateTime;
     }
   });
   return firstAttemptDate;
+};
+
+/**
+ *
+ * @param {trackArr in Pull Db} trackArr
+ * @param {LatesStatus in Pull Db after Event Update} latestStatus
+ * @returns Lost Date if current status is LT, else returns null
+ */
+const findLostDate = (trackArr, latestStatus) => {
+  if (latestStatus === "LT") {
+    return trackArr[0]?.scan_datetime || "";
+  }
+  return null;
 };
 
 /**
@@ -87,14 +138,19 @@ const findLatestNDRDetails = (trackArr) => {
   for (let i = 0; i < trackArr.length; i += 1) {
     if (trackArr[i].scan_type === "NDR") {
       return {
-        latest_ndr_remark: trackArr[i].scan_status,
-        latest_ndr_date: trackArr[i].scan_datetime,
+        latest_ndr_remark: trackArr[i]?.scan_status,
+        latest_ndr_date: trackArr[i]?.scan_datetime,
+        latest_ndr_status_code: trackArr[i]?.pickrr_sub_status_code,
+        latest_ndr_reason:
+          NDR_STATUS_CODE_TO_REASON_MAPPER[trackArr[i]?.pickrr_sub_status_code] || "Other",
       };
     }
   }
   return {
     latest_ndr_remark: null,
     latest_ndr_date: null,
+    latest_ndr_status_code: null,
+    latest_ndr_reason: null,
   };
 };
 
@@ -196,4 +252,7 @@ module.exports = {
   findRTODate,
   sendReportsDataToELK,
   findFirstNdrDate,
+  findLostDate,
+  findNDRTrackInfos,
+  findLatestRtdDate,
 };

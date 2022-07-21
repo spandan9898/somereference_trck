@@ -121,18 +121,21 @@ class KafkaMessageHandler {
       if (process.env.IS_OTHERS_CALL === "false") {
         return {};
       }
-
+      await commonTrackingDataProducer(result);
+      await updateStatusOnReport(result, logger, trackingElkClient);
       sendDataToNdr(result);
       sendTrackDataToV1(result);
-      triggerWebhook(result, trackingElkClient);
-      updateStatusOnReport(result, logger, trackingElkClient);
       updateStatusELK(result, prodElkClient);
-      preparePickrrConnectLambdaPayloadAndCall({
-        trackingId: result.tracking_id,
-        elkClient: trackingElkClient,
-        result,
-      });
-      commonTrackingDataProducer(result);
+      triggerWebhook(result, trackingElkClient);
+
+      // blocking events to lambda (new pickrr connect service)
+
+      // preparePickrrConnectLambdaPayloadAndCall({
+      //   trackingId: result.tracking_id,
+      //   elkClient: trackingElkClient,
+      //   result,
+      // });
+
       return {};
     } catch (error) {
       logger.error("KafkaMessageHandler", error);
