@@ -168,7 +168,7 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     const isValid = moment(res?.order_created_at).isValid();
     if (
       isValid &&
-      moment(res.order_created_at).isBefore(moment(thresholdDate)) &&
+      moment(res?.order_created_at).isBefore(moment(thresholdDate)) &&
       firstTrackObjOfTrackArr?.scan_type === "LT"
     ) {
       firstTrackObjOfTrackArr.scan_type = "OT";
