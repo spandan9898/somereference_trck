@@ -48,7 +48,8 @@ const sendTrackDataToV1 = async (trackData) => {
         eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
       });
     }
-    if ((!authTokens.includes(trackData.auth_token)) || (!shopPlatforms.includes(trackData.shop_platform))){
+    
+    if (!(authTokens.includes(trackData.auth_token) || shopPlatforms.includes(trackData.shop_platform))){
       return false;
     }
     const producerInstance = await producerConnection.connect(KAFKA_INSTANCE_CONFIG.PROD.name);
