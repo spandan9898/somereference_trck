@@ -28,6 +28,10 @@ const sendTrackDataToV1 = async (trackData) => {
       "64a61f6d3c302d2c478adc888aa20d58791587",
     ];
 
+    const shopPlatforms = [
+      "shopify"
+    ];
+
     if (
       ["OFP", "PPF", "OP", "OM", "OC"].includes(trackData?.status?.current_status_type) ||
       (trackData?.status?.current_status_body || "").toLowerCase() === "pickup_cancelled"
@@ -44,7 +48,8 @@ const sendTrackDataToV1 = async (trackData) => {
         eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
       });
     }
-    if (!authTokens.includes(trackData.auth_token)) {
+    
+    if (!(authTokens.includes(trackData.auth_token) || shopPlatforms.includes(trackData.shop_platform))){
       return false;
     }
     const producerInstance = await producerConnection.connect(KAFKA_INSTANCE_CONFIG.PROD.name);
