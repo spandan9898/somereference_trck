@@ -31,7 +31,6 @@ const sendTrackDataToV1 = async (trackData) => {
       "7c1e98bd9c06ae0b75b4d2442c23d1ef193845",
       "64a61f6d3c302d2c478adc888aa20d58791587",
     ];
-    let forPickupService = false;
     const trackDict = prepareTrackDictForV1(trackData);
 
     // For Pickup Service
@@ -40,7 +39,6 @@ const sendTrackDataToV1 = async (trackData) => {
       ["OFP", "PPF", "OP", "OM", "OC"].includes(trackData?.status?.current_status_type) ||
       (trackData?.status?.current_status_body || "").toLowerCase() === "pickup_cancelled"
     ) {
-      forPickupService = true;
       sendDataToEventBridge({
         source: V1_EVENT_BRIDGE_SOURCE,
         detailType: V1_NEW_EVENT_BRIDGE_DETAIL_TYPE,
@@ -58,7 +56,7 @@ const sendTrackDataToV1 = async (trackData) => {
 
     // For Pickup Service
 
-    if (!authTokens.includes(trackData.auth_token) && !forPickupService) {
+    if (!authTokens.includes(trackData.auth_token)) {
       sendDataToEventBridge({
         source: V1_EVENT_BRIDGE_SOURCE,
         detailType: V1_EVENT_BRIDGE_DETAIL_TYPE,
@@ -78,13 +76,12 @@ const sendTrackDataToV1 = async (trackData) => {
         }),
       },
     ];
-    if (!forPickupService) {
-      await produceData({
-        topic: TOPIC_NAME,
-        producer: producerInstance,
-        messages,
-      });
-    }
+    await produceData({
+      topic: TOPIC_NAME,
+      producer: producerInstance,
+      messages,
+    });
+
     return true;
   } catch (error) {
     return false;
