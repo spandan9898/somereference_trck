@@ -15,6 +15,7 @@ const {
 const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
 const { HOST_NAMES } = require("../../utils/constants");
+const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 
 /**
  *
@@ -163,6 +164,17 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
       return false;
     }
     const firstTrackObjOfTrackArr = sortedTrackArray[0];
+    const thresholdDate = "2022-07-20";
+    const isValid = moment(res?.order_created_at).isValid();
+    if (
+      isValid &&
+      moment(res?.order_created_at).isBefore(moment(thresholdDate)) &&
+      firstTrackObjOfTrackArr?.scan_type === "LT"
+    ) {
+      firstTrackObjOfTrackArr.scan_type = "OT";
+      firstTrackObjOfTrackArr.scan_status =
+        PICKRR_STATUS_CODE_MAPPING[firstTrackObjOfTrackArr.scan_type];
+    }
 
     // Otp Delivered Shipments marking
 
