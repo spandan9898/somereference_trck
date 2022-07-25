@@ -26,7 +26,7 @@ const prepareStatusObj = ({
   sub_status_code: subStatusCode = "",
   status_text: statusText = "",
 }) => {
-  const allowedDateFormats = ["MM/DD/YYYY HH:mm:ss", "YYYY-MM-DD HH:mm:ss"];
+  const allowedDateFormats = ["MM/DD/YYYY HH:mm:ss", "YYYY-MM-DD HH:mm:ss", "YYYYMMDD HH:mm:ss"];
   let scanDateTime = moment(date, allowedDateFormats);
   scanDateTime = scanDateTime.isValid()
     ? scanDateTime.subtract(330, "minutes").toDate()
@@ -83,15 +83,11 @@ const checkStatus = async (csvData, pullDbInstance) => {
     trackingObj[doc.tracking_id] = doc.status.current_status_type || doc.status.courier_status_code;
   }
 
-  return csvData.filter((rowData) => {
-    if (trackingObj[rowData.tracking_id] === "RTD") {
-      return false;
-    }
-    return (
-      ["DL", "RTO", "RTD", "OC"].includes(rowData.status) &&
+  return csvData.filter(
+    (rowData) =>
+      !["OP", "OM", "PPF", "OFP"].includes(rowData.status) &&
       rowData.status !== trackingObj[rowData.tracking_id]
-    );
-  });
+  );
 };
 
 /**

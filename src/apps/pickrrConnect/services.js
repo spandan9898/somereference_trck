@@ -82,7 +82,7 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
     const parentCourier = trackObj?.courier_parent_name;
     if (
       isFromPull &&
-      ["Delhivery", "Ekart", "Ecom Express", "DTDC", "ShadowFax"].includes(parentCourier)
+      ["Delhivery", "Ekart", "Ecom Express", "ShadowFax"].includes(parentCourier)
     ) {
       return false;
     }

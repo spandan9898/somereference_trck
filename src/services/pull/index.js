@@ -10,10 +10,12 @@ const {
   checkTriggerForPulledEvent,
   updateFlagForOtpDeliveredShipments,
   updateScanStatus,
+  checkIsAfter,
 } = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
 const { HOST_NAMES } = require("../../utils/constants");
+const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 
 /**
  *
@@ -145,12 +147,13 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     updatedObj.courier_edd = latestCourierEDD;
 
     let pickupDateTime = null;
-
+    const placedData = res?.order_created_at;
     if (res?.pickup_datetime && statusType !== "PP") {
       pickupDateTime = res?.pickup_datetime;
     } else {
       sortedTrackArray.forEach((trackEvent) => {
-        if (PP_PROXY_LIST.includes(trackEvent?.scan_type)) {
+        const isAfter = checkIsAfter(trackEvent?.scan_datetime, placedData);
+        if (PP_PROXY_LIST.includes(trackEvent?.scan_type) && isAfter) {
           pickupDateTime = trackEvent?.scan_datetime;
         }
       });
@@ -161,6 +164,17 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
       return false;
     }
     const firstTrackObjOfTrackArr = sortedTrackArray[0];
+    const thresholdDate = "2022-07-20";
+    const isValid = moment(res?.order_created_at).isValid();
+    if (
+      isValid &&
+      moment(res?.order_created_at).isBefore(moment(thresholdDate)) &&
+      firstTrackObjOfTrackArr?.scan_type === "LT"
+    ) {
+      firstTrackObjOfTrackArr.scan_type = "OT";
+      firstTrackObjOfTrackArr.scan_status =
+        PICKRR_STATUS_CODE_MAPPING[firstTrackObjOfTrackArr.scan_type];
+    }
 
     // Otp Delivered Shipments marking
 
