@@ -54,8 +54,6 @@ const sendTrackDataToV1 = async (trackData) => {
       eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
     });
 
-    // For Pickup Service
-
     if (!authTokens.includes(trackData.auth_token)) {
       sendDataToEventBridge({
         source: V1_EVENT_BRIDGE_SOURCE,
