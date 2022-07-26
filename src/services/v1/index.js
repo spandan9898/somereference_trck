@@ -32,21 +32,6 @@ const sendTrackDataToV1 = async (trackData) => {
       "64a61f6d3c302d2c478adc888aa20d58791587",
     ];
     const trackDict = prepareTrackDictForV1(trackData);
-
-    // For Pickup Service
-
-    if (
-      ["OFP", "PPF", "OP", "OM", "OC"].includes(trackData?.status?.current_status_type) ||
-      (trackData?.status?.current_status_body || "").toLowerCase() === "pickup_cancelled"
-    ) {
-      sendDataToEventBridge({
-        source: V1_EVENT_BRIDGE_SOURCE,
-        detailType: V1_NEW_EVENT_BRIDGE_DETAIL_TYPE,
-        data: trackDict,
-        eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
-      });
-      return {};
-    }
     sendDataToEventBridge({
       source: V1_EVENT_BRIDGE_SOURCE,
       detailType: V1_NEW_EVENT_BRIDGE_DETAIL_TYPE,
@@ -54,6 +39,14 @@ const sendTrackDataToV1 = async (trackData) => {
       eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
     });
 
+    // For Pickup Service
+
+    if (
+      ["OFP", "PPF", "OP", "OM", "OC"].includes(trackData?.status?.current_status_type) ||
+      (trackData?.status?.current_status_body || "").toLowerCase() === "pickup_cancelled"
+    ) {
+      return false;
+    }
     if (!authTokens.includes(trackData.auth_token)) {
       sendDataToEventBridge({
         source: V1_EVENT_BRIDGE_SOURCE,
