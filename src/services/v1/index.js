@@ -6,8 +6,12 @@ const { produceData } = require("../../utils/kafka");
 const { TOPIC_NAME } = require("./constants");
 const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 
-const { V1_EVENT_BRIDGE_SOURCE, V1_EVENT_BRIDGE_DETAIL_TYPE, V1_EVENT_BRIDGE_BUS_NAME } =
-  process.env;
+const {
+  V1_EVENT_BRIDGE_SOURCE,
+  V1_EVENT_BRIDGE_DETAIL_TYPE,
+  V1_EVENT_BRIDGE_BUS_NAME,
+  V1_NEW_EVENT_BRIDGE_DETAIL_TYPE,
+} = process.env;
 
 /**
  * @param {*} trackData
@@ -32,6 +36,16 @@ const sendTrackDataToV1 = async (trackData) => {
     const shopPlatforms = [
       "shopify"
     ];
+    const trackDict = prepareTrackDictForV1(trackData);
+
+    // For Pickup Service
+
+    sendDataToEventBridge({
+      source: V1_EVENT_BRIDGE_SOURCE,
+      detailType: V1_NEW_EVENT_BRIDGE_DETAIL_TYPE,
+      data: trackDict,
+      eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
+    });
 
     if (
       ["OFP", "PPF", "OP", "OM", "OC"].includes(trackData?.status?.current_status_type) ||
@@ -39,8 +53,6 @@ const sendTrackDataToV1 = async (trackData) => {
     ) {
       return false;
     }
-    const trackDict = prepareTrackDictForV1(trackData);
-
     if (!authTokens.includes(trackData.auth_token)) {
       sendDataToEventBridge({
         source: V1_EVENT_BRIDGE_SOURCE,
@@ -62,7 +74,6 @@ const sendTrackDataToV1 = async (trackData) => {
         }),
       },
     ];
-
     await produceData({
       topic: TOPIC_NAME,
       producer: producerInstance,
