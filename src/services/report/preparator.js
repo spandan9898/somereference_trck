@@ -80,6 +80,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     latest_ndr_status_code: NDRObject.latest_ndr_status_code,
     latest_ndr_reason: NDRObject.latest_ndr_reason,
     rto_waybill: trackData?.rto_waybill || "",
+    rto_reason: trackData?.rto_reason || "",
 
     // rto_waybill isn't handled on PULL
 
