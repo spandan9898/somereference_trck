@@ -31,6 +31,7 @@ const sendTrackDataToV1 = async (trackData) => {
       "7c1e98bd9c06ae0b75b4d2442c23d1ef193845",
       "64a61f6d3c302d2c478adc888aa20d58791587",
       "c5a2a4af9f55b744473879737f6cf81a442",
+      "8c56657e0eb47d78dec2acdb49e7ea80135854",
     ];
 
     const shopPlatforms = [
