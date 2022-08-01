@@ -153,10 +153,10 @@ const preparePulledEkartData = (ekartDict) => {
       pickrrEkartDict.scan_type = "RTO";
     }
     pickrrEkartDict.EDD = moment(ekartEDD).isValid()
-      ? moment(ekartEDD).format("YYYY-MM-DD HH:mm:ss").add(330, "minutes")
+      ? moment(ekartEDD).add(330, "minutes").format("YYYY-MM-DD HH:mm:ss")
       : "";
     pickrrEkartDict.scan_datetime = moment(ekartEventDate).isValid()
-      ? moment(ekartEventDate).format("YYYY-MM-DD HH:mm:ss").add(330, "minutes")
+      ? moment(ekartEventDate).add(330, "minutes").format("YYYY-MM-DD HH:mm:ss")
       : "";
     pickrrEkartDict.track_location = ekartDict?.city || "";
     if (pickrrEkartDict.scan_type === "PP") {
@@ -170,4 +170,20 @@ const preparePulledEkartData = (ekartDict) => {
     return pickrrEkartDict;
   }
 };
+
+const requestPayload = {
+  status: "undelivered_due_to_rejection_by_customer",
+  city: "RAIGARH",
+  description: null,
+  awbNumber: "WSPC1055262432",
+  pickupTime: "2022-07-28T14:49:33+0530",
+  edd: "2022-08-02 23:59:59",
+  event: "pull",
+  event_date: "2022-08-01T17:56:41+0530",
+  event_date_iso8601: "2022-08-01T17:56:41.000+05:30",
+  public_description: "Delivery attempt failed(Customer rejected)",
+  cs_notes: "",
+};
+
+console.log(preparePulledEkartData(requestPayload));
 module.exports = { prepareEkartData, preparePulledEkartData };
