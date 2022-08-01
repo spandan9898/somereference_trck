@@ -171,19 +171,4 @@ const preparePulledEkartData = (ekartDict) => {
   }
 };
 
-const requestPayload = {
-  status: "undelivered_due_to_rejection_by_customer",
-  city: "RAIGARH",
-  description: null,
-  awbNumber: "WSPC1055262432",
-  pickupTime: "2022-07-28T14:49:33+0530",
-  edd: "2022-08-02 23:59:59",
-  event: "pull",
-  event_date: "2022-08-01T17:56:41+0530",
-  event_date_iso8601: "2022-08-01T17:56:41.000+05:30",
-  public_description: "Delivery attempt failed(Customer rejected)",
-  cs_notes: "",
-};
-
-console.log(preparePulledEkartData(requestPayload));
 module.exports = { prepareEkartData, preparePulledEkartData };
