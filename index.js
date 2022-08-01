@@ -50,6 +50,7 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST, MONGO_DB_STAGING
     require("./src/apps/loadshare");
     require("./src/apps/pickrrConnect");
     require("./src/apps/pikndel");
+    require("./src/apps/kerryindev");
 
     return true;
   } catch (error) {
