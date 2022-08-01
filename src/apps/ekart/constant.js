@@ -57,41 +57,45 @@ const EKART_STATUS_MAPPER = {
   },
   shipment_undelivered_attempted_rejected: { scan_type: "UD", pickrr_sub_status_code: "CR" },
   shipment_misrouted: { scan_type: "OT", pickrr_sub_status_code: "" },
-  shipment_rto_created_damaged_shipment: { scan_type: "DM", pickrr_sub_status_code: "" },
+  shipment_rto_created_damaged_shipment: { scan_type: "RTO", pickrr_sub_status_code: "" },
   shipment_rto_created_rejected_by_customer: {
-    scan_type: "UD",
-    pickrr_sub_status_code: "CR",
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
   },
-  shipment_rto_created_non_serviceable: { scan_type: "UD", pickrr_sub_status_code: "ODA" },
-  "shipment_rto_created_did not place order": { scan_type: "UD", pickrr_sub_status_code: "CR" },
+  shipment_rto_created_non_serviceable: { scan_type: "RTO", pickrr_sub_status_code: "" },
+  "shipment_rto_created_did not place order": { scan_type: "RTO", pickrr_sub_status_code: "" },
   "shipment_rto_created_do not want the product": {
-    scan_type: "UD",
-    pickrr_sub_status_code: "CR",
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
   },
   shipment_rto_created_customer_cancellation: {
-    scan_type: "UD",
-    pickrr_sub_status_code: "CR",
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
   },
-  "shipment_rto_created_client-cancellation": { scan_type: "UD", pickrr_sub_status_code: "CR" },
-  shipment_rto_created_attempts_exhausted: { scan_type: "UD", pickrr_sub_status_code: "CI" },
+  "shipment_rto_created_client-cancellation": { scan_type: "RTO", pickrr_sub_status_code: "" },
+  shipment_rto_created_attempts_exhausted: { scan_type: "RTO", pickrr_sub_status_code: "" },
   shipment_rto_created_shipmentintransitbyondlimit: {
-    scan_type: "UD",
-    pickrr_sub_status_code: "ODA",
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
   },
-  shipment_rto_created_order_cancelled: { scan_type: "UD", pickrr_sub_status_code: "CI" },
-  shipment_rto_created_incomplete_address: { scan_type: "UD", pickrr_sub_status_code: "AI" },
-  shipment_rto_created_rfrpromisebreached: { scan_type: "UD", pickrr_sub_status_code: "SD" },
+  shipment_rto_created_order_cancelled: { scan_type: "RTO", pickrr_sub_status_code: "" },
+  shipment_rto_created_incomplete_address: { scan_type: "RTO", pickrr_sub_status_code: "" },
+  shipment_rto_created_rfrpromisebreached: { scan_type: "RTO", pickrr_sub_status_code: "" },
   "shipment_rto_created_unavailable at delivery address": {
-    scan_type: "UD",
-    pickrr_sub_status_code: "ODA",
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
   },
   "shipment_rto_created_purchased by mistake": {
     scan_type: "UD",
     pickrr_sub_status_code: "CR",
   },
   shipment_rto_created_rejected_by_customer_postobd: {
-    scan_type: "UD",
-    pickrr_sub_status_code: "CR",
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
+  },
+  shipment_rto_created: {
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
   },
   shipment_rto_confirmed: { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
   shipment_rto_in_transit: { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
@@ -101,6 +105,86 @@ const EKART_STATUS_MAPPER = {
     pickrr_sub_status_code: "",
   },
   received_at_dh: { scan_type: "RAD", pickrr_sub_status_code: "" },
+  shipment_rto_created_other_city_misroute: {
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
+  },
+  shipment_rto_undelivered_pickup_time_elapsed: {
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
+  },
+  pickup_out_for_pickup: {
+    scan_type: "OFP",
+    pickrr_sub_status_code: "",
+  },
+  shipment_shipped: {
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  received: {
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  expected: {
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  return_out_for_delivery: {
+    scan_type: "RTO-OO",
+    pickrr_sub_status_code: "",
+  },
+  shipment_lost: {
+    scan_type: "LT",
+    pickrr_sub_status_code: "",
+  },
+  return_received: {
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  return_expected: {
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  return_received_at_dh: {
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  "return_undelivered_attempted_heavy load": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "SD",
+  },
+  "return_undelivered_attempted_vehicle breakdown": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "SD",
+  },
+  "return_undelivered_attempted_security instability": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "SD",
+  },
+  "return_undelivered_attempted_heavy traffic": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "SD",
+  },
+  "return_undelivered_attempted_heavy rain": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "SD",
+  },
+  return_undelivered_attempted_holiday: {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "SD",
+  },
+  return_delivered: {
+    scan_type: "RTD",
+    pickrr_sub_status_code: "",
+  },
+  "return_rejected_by_seller_ekl:force rejected by seller": {
+    scan_type: "RTO UD",
+    pickrr_sub_status_code: "OTH",
+  },
+  return_lost: {
+    scan_type: "LT",
+    pickrr_sub_status_code: "",
+  },
 };
 const EKART_PULL_MAPPER = {
   SHIPMENT_CREATED: {
@@ -217,6 +301,7 @@ const EKART_PULL_MAPPER = {
     pickrr_sub_status:
       "Customer Not Available/Office/Residence Closed/Consignee phone not reachable",
   },
+
   UNDELIVERED_DUE_TO_CASH_UNAVAILABILITY: {
     courier_remarks: "Shipment undelivered as COD not ready",
     courier_status: "undelivered_due_to_cash_unavailability",
@@ -225,6 +310,15 @@ const EKART_PULL_MAPPER = {
     pickrr_sub_status_code: "CNR",
     pickrr_status: "Failed Attempt at Delivery",
     pickrr_sub_status: "Cash Not Ready",
+  },
+  UNDELIVERED_DUE_TO_REQUEST_FOR_RESCHEDULE: {
+    courier_remarks: "Undelivered. (Rescheduled to: __dd-mm-yy__)",
+    courier_status: "undelivered_due_to_request_for_reschedule",
+    courier_status_type: "undelivered_due_to_request_for_reschedule",
+    pickrr_code: "UD",
+    pickrr_sub_status_code: "CD",
+    pickrr_status: "Failed Attempt at Delivery",
+    pickrr_sub_status: "Customer Delay/Future Delivery",
   },
   UNSUCCESSFUL_DELIVERY_ATTEMPT_DUE_TO_SERVICEABILITY_ISSUES: {
     courier_remarks: "Shipment undelivered due to non serviceable pincode",

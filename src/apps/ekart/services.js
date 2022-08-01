@@ -59,8 +59,14 @@ const prepareEkartData = (ekartDict) => {
 
   try {
     const trackData = { ...ekartDict };
+    const { meta_data: metaData } = trackData;
     const { sub_reasons: subReasons = [], event = "" } = trackData;
-    const statusScanType = subReasons.length ? `${event}_${subReasons[0]}` : event;
+    let statusScanType = "";
+    if (event === "shipment_rto_created") {
+      statusScanType = event;
+    } else {
+      statusScanType = subReasons.length ? `${event}_${subReasons[0]}` : event;
+    }
     let statusType = statusScanType;
     const statusDateTime = trackData?.event_date;
     const statusDate = statusDateTime
@@ -88,12 +94,13 @@ const prepareEkartData = (ekartDict) => {
 
     pickrrEkartDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrEkartDict.scan_datetime = statusDate;
-    pickrrEkartDict.track_info = trackData.event.toString();
+    pickrrEkartDict.track_info = statusScanType;
     pickrrEkartDict.awb = trackData.vendor_tracking_id.toString();
     pickrrEkartDict.track_location = trackData.location.toString();
     pickrrEkartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrEkartDict.pickrr_sub_status_code = reasonDict?.pickrr_sub_status_code || "";
     pickrrEkartDict.courier_status_code = statusScanType;
+    pickrrEkartDict.otp = metaData?.attempt_details?.otp || "";
 
     return pickrrEkartDict;
   } catch (error) {

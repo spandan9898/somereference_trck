@@ -5,7 +5,7 @@ const server = require("./server");
 
 const logger = require("./logger");
 const { fileLogger } = require("./logger");
-const { redisClient } = require("./src/utils");
+
 const initDB = require("./src/connector/db");
 const initELK = require("./src/connector/elkConnection");
 const kafka = require("./src/connector/kafka");
@@ -14,16 +14,6 @@ const { HOST_NAMES, ELK_INSTANCE_NAMES, KAFKA_INSTANCE_CONFIG } = require("./src
 
 const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST, MONGO_DB_STAGING_SERVER_HOST } =
   process.env;
-
-(async () => {
-  try {
-    await redisClient.connect();
-    logger.info("Redis Connected");
-  } catch (error) {
-    logger.error("Redis connect error", error);
-    process.exit(1);
-  }
-})();
 
 (async () => {
   try {
@@ -60,6 +50,7 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST, MONGO_DB_STAGING
     require("./src/apps/smartr");
     require("./src/apps/loadshare");
     require("./src/apps/pickrrConnect");
+    require("./src/apps/pikndel");
 
     return true;
   } catch (error) {

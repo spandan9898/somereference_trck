@@ -1,14 +1,17 @@
 const logger = require("../../../logger");
+const { initialize, listener } = require("./consumer");
 const { PUSH_PARTITION_COUNT } = require("./constant");
-const { listener, initialize } = require("./consumer");
 
+/**
+ *
+ */
 (async () => {
   try {
     const { pushConsumer } = await initialize();
-    if (process.env.CONSUME_PUSH_EVENTS.toLowerCase() === "true") {
+    if (process.env.CONSUME_PUSH_EVENTS === "true") {
       listener(pushConsumer, PUSH_PARTITION_COUNT);
     }
   } catch (error) {
-    logger.error("Parceldo Consumer Error", error);
+    logger.error("Pikndel Consumer Error", error);
   }
 })();

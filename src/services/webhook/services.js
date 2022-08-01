@@ -53,7 +53,10 @@ const updateAllEnabledWebhookUserDataInCache = async () => {
     }
     const webhookUserCachePayload = res.reduce((obj, webhookUser) => {
       webhookUser.events_enabled = webhookUser.events_enabled || {};
-      obj[webhookUser.user_auth_token] = omit(webhookUser, "user_auth_token");
+      if (!obj[webhookUser?.user_auth_token]) {
+        obj[webhookUser.user_auth_token] = [];
+      }
+      obj[webhookUser.user_auth_token].push(omit(webhookUser, "user_auth_token"));
       return obj;
     }, {});
     await storeInCache(WEBHOOK_USER_CACHE_KEY_NAME, webhookUserCachePayload);
@@ -82,7 +85,7 @@ const getWebhookUserDataFromCache = async (authToken) => {
     }
 
     return {
-      ...res[authToken],
+      config: res[authToken],
       user_auth_token: authToken,
     };
   } catch (error) {
@@ -205,7 +208,7 @@ const statusCheckInHistoryMap = async (trackingObj) => {
 const checkIfCompulsoryEventAlreadySent = (trackingObj) => {
   try {
     const currentEvent = get(trackingObj, "status.current_status_type", "");
-    if (!["PP", "RTO", "RTD", "DL", "OO", "SHP", "RAD"].includes(currentEvent)) {
+    if (!["PP", "RTO", "RTD", "DL", "OO", "SHP", "RAD", "QCF"].includes(currentEvent)) {
       return false;
     }
     if (currentEvent === "OO") {
@@ -236,31 +239,18 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
       return false;
     }
 
-    const webhookClient = new WebhookClient(trackingObj);
-    const preparedData = await webhookClient.getPreparedData();
-
-    if (_.isEmpty(preparedData)) {
-      return false;
-    }
-
     const lambdaPayload = {
       data: {
         tracking_info_doc: _.omit(trackingObj, ["audit", "_id"]),
-        prepared_data: preparedData,
+        prepared_data: "",
         url: "",
         shopclues_access_token: "random_token",
         update_from: "kafka-consumer",
+        explicit_preparator_type: "",
       },
     };
 
-    lambdaPayload.data.url = webhookUserData.track_url || "";
     const currentStatus = trackingObj?.status?.current_status_type;
-
-    const statusWebhookEnabled = hasCurrentStatusWebhookEnabled(webhookUserData, currentStatus);
-
-    if (!statusWebhookEnabled) {
-      return false;
-    }
 
     if (
       [...SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS, ...SMART_SHIP_AUTH_TOKENS].includes(
@@ -273,22 +263,27 @@ const prepareDataAndCallLambda = async (trackingDocument, elkClient, webhookUser
       }
       lambdaPayload.data.shopclues_access_token = shopcluesToken;
     }
+    const { config } = webhookUserData;
+    for (const eachWebhookUser of config) {
+      const statusWebhookEnabled = hasCurrentStatusWebhookEnabled(webhookUserData, currentStatus);
 
-    sendWebhookDataToELK(lambdaPayload.data, elkClient);
+      if (!statusWebhookEnabled) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      const webhookClient = new WebhookClient(trackingObj, eachWebhookUser);
+      const preparedData = await webhookClient.getPreparedData();
+      if (_.isEmpty(preparedData)) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      lambdaPayload.data.url = eachWebhookUser.track_url || "";
+      lambdaPayload.data.prepared_data = preparedData;
+      lambdaPayload.data.explicit_preparator_type = eachWebhookUser?.explicit_preparator_type || "";
 
-    // if (
-    //   ![
-    //     ...NAAPTOL_AUTH_TOKEN,
-    //     ...SHOPCLUES_COURIER_PARTNERS_AUTH_TOKENS,
-    //     ...SMART_SHIP_AUTH_TOKENS,
-    //   ].includes(trackingObj?.auth_token)
-    // ) {
-    //   callLambdaFunction(lambdaPayload);
-    //   return false;
-    // }
-
-    callLambdaFunction(lambdaPayload);
-
+      sendWebhookDataToELK(lambdaPayload.data, elkClient);
+      callLambdaFunction(lambdaPayload);
+    }
     return true;
   } catch (error) {
     logger.error("prepareDataAndCallLambda", error);

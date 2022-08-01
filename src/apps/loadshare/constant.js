@@ -156,6 +156,10 @@ const CODE_MAPPER = {
     scan_type: "UD",
     pickrr_sub_status_code: "CR",
   },
+  undelivered_132_otp_true: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CR-OTP",
+  },
   undelivered_9220: {
     scan_type: "UD",
     pickrr_sub_status_code: "ODA",

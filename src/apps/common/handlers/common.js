@@ -1,12 +1,16 @@
+/* eslint-disable prefer-const */
 /* eslint-disable require-jsdoc */
 const RequestIp = require("@supercharge/request-ip");
 const moment = require("moment");
-const Papa = require("papaparse");
+const PapaParse = require("papaparse");
 
 const { startProcess } = require("../../../../scripts/reportBackfill");
 const { sendDataToElk } = require("../../../services/common/elk");
-const { updateStatusFromCSV } = require("../../../services/common/updateStatusFromCsv");
-const { getElkClients } = require("../../../utils");
+const {
+  updateStatusFromCSV,
+  toggleManualStatus,
+} = require("../../../services/common/updateStatusFromCsv");
+const { getElkClients, sendEmail } = require("../../../utils");
 
 module.exports.returnHeaders = async (req, reply) => {
   const IP = RequestIp.getClientIp(req);
@@ -35,6 +39,24 @@ module.exports.reportBackfilling = async (req, reply) => {
 
 module.exports.updateStatus = async function updateStatus(req, reply) {
   try {
+    let { auth_token: authToken, email, platform_names: platformNames } = req.query || {};
+
+    if (!platformNames) {
+      return reply.code(401).send({
+        message: "Please provide a valid platform names",
+      });
+    }
+    if (authToken !== process.env.UPDATE_STATUS_AUTH_TOKEN) {
+      return reply.code(401).send({
+        message: "Invalid Auth Token",
+      });
+    }
+    if (!email || !email.endsWith("@pickrr.com")) {
+      return reply.code(404).send({
+        message: "Please provide a valid email address",
+      });
+    }
+
     const headersField = ["headers", "ip", "ips", "hostname"];
     const headersObj = {};
 
@@ -49,28 +71,9 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
     }
     const options = { limits: { fileSize: 1000000 } };
     const data = await req.file(options);
-    const body = data.fields;
 
-    const authToken = body?.auth_token?.value || "";
-    const email = body?.email?.value || "";
-    let platformNames = body?.platform_names?.value || "";
-    if (!platformNames) {
-      return reply.code(401).send({
-        message: "Please provide a valid platform names",
-      });
-    }
     platformNames = platformNames.split(",");
 
-    if (authToken !== process.env.UPDATE_STATUS_AUTH_TOKEN) {
-      return reply.code(401).send({
-        message: "Invalid Auth Token",
-      });
-    }
-    if (!email || !email.endsWith("@pickrr.com")) {
-      return reply.code(404).send({
-        message: "Please provide a valid email address",
-      });
-    }
     const { trackingElkClient } = getElkClients();
 
     sendDataToElk({
@@ -85,12 +88,100 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
 
     const csvData = [];
 
-    Papa.parse(data.file, {
+    PapaParse.parse(data.file, {
+      worker: true,
+      header: true,
+      step(results) {
+        try {
+          const header = Object.keys(results.data).join(" ");
+          if (header !== "tracking_id date status sub_status_code status_text") {
+            throw new Error("Please provide valid header");
+          }
+          if (results.data) {
+            csvData.push(results.data);
+          }
+        } catch (error) {
+          sendEmail({
+            to: ["spandan.mishra@pickrr.com", "tarun@pickrr.com", "ankitkumar@pickrr.com"],
+            subject: `Lost Shipment Report Upload Error`,
+            text: error.message,
+          });
+          throw new Error("No More execution");
+        }
+      },
+      complete() {
+        updateStatusFromCSV(csvData, platformNames);
+      },
+    });
+
+    return reply.code(200).send({
+      success: true,
+    });
+  } catch (error) {
+    if (error.code === "FST_REQ_FILE_TOO_LARGE") {
+      return reply.code(400).send({
+        message: "File is too large. We're allowing only 1 MB",
+      });
+    }
+    return reply.code(400).send({
+      message: error.message,
+    });
+  }
+};
+
+module.exports.toggleManualStatusUpdate = async function toggleManualStatusUpdate(req, reply) {
+  try {
+    if (!req.isMultipart()) {
+      return reply.code(400).send({
+        message: "Please send proper file",
+      });
+    }
+
+    const { auth_token: authToken, email } = req.query || {};
+    if (authToken !== process.env.UPDATE_STATUS_AUTH_TOKEN) {
+      return reply.code(401).send({
+        message: "Invalid Auth Token",
+      });
+    }
+    if (!email || !email.endsWith("@pickrr.com")) {
+      return reply.code(404).send({
+        message: "Please provide a valid email address",
+      });
+    }
+    const options = { limits: { fileSize: 1000000 } };
+
+    const headersField = ["headers", "ip", "ips", "hostname"];
+    const headersObj = {};
+
+    headersField.forEach((header) => {
+      headersObj[header] = req[header];
+    });
+
+    const { trackingElkClient } = getElkClients();
+
+    sendDataToElk({
+      body: {
+        email,
+        payload: JSON.stringify({
+          ...headersObj,
+          update_for: "manual_status_update_toggle",
+        }),
+        time: new Date(),
+      },
+      elkClient: trackingElkClient,
+      indexName: "track_manual_update",
+    });
+
+    const data = await req.file(options);
+
+    const csvData = [];
+
+    PapaParse.parse(data.file, {
       worker: true,
       header: true,
       step(results) {
         const header = Object.keys(results.data).join(" ");
-        if (header !== "tracking_id date status sub_status_code status_text") {
+        if (header !== "tracking_id") {
           throw new Error("Please provide valid header");
         }
         if (results.data) {
@@ -98,7 +189,7 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
         }
       },
       complete() {
-        updateStatusFromCSV(csvData, platformNames);
+        toggleManualStatus(csvData);
       },
     });
 

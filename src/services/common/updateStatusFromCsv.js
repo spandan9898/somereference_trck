@@ -8,6 +8,7 @@ const { getDbCollectionInstance } = require("../../utils");
 const initELK = require("../../connector/elkConnection");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { ELK_INSTANCE_NAMES } = require("../../utils/constants");
+const logger = require("../../../logger");
 
 /**
  * 
@@ -25,7 +26,7 @@ const prepareStatusObj = ({
   sub_status_code: subStatusCode = "",
   status_text: statusText = "",
 }) => {
-  const allowedDateFormats = ["MM/DD/YYYY HH:mm:ss", "YYYY-MM-DD HH:mm:ss"];
+  const allowedDateFormats = ["MM/DD/YYYY HH:mm:ss", "YYYY-MM-DD HH:mm:ss", "YYYYMMDD HH:mm:ss"];
   let scanDateTime = moment(date, allowedDateFormats);
   scanDateTime = scanDateTime.isValid()
     ? scanDateTime.subtract(330, "minutes").toDate()
@@ -82,15 +83,11 @@ const checkStatus = async (csvData, pullDbInstance) => {
     trackingObj[doc.tracking_id] = doc.status.current_status_type || doc.status.courier_status_code;
   }
 
-  return csvData.filter((rowData) => {
-    if (trackingObj[rowData.tracking_id] === "RTD") {
-      return false;
-    }
-    return (
-      ["DL", "RTO", "RTD", "OC"].includes(rowData.status) &&
+  return csvData.filter(
+    (rowData) =>
+      !["OP", "OM", "PPF", "OFP"].includes(rowData.status) &&
       rowData.status !== trackingObj[rowData.tracking_id]
-    );
-  });
+  );
 };
 
 /**
@@ -163,12 +160,52 @@ const updateStatusFromCSV = async (csvData, platformNames) => {
   );
 
   console.log("response", response);
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.NODE_ENV === "production" || process.env.IS_QC_TEST === "true") {
     await updateOtherSources(filteredCsvData, pullDbInstance, platformNames);
   }
   return true;
 };
 
+/**
+ *
+ * @param {*} csvData
+ * @returns toggle  is_manual_update
+ */
+const toggleManualStatus = async (csvData) => {
+  try {
+    if (isEmpty(csvData)) {
+      return false;
+    }
+    const pullDbInstance = await getDbCollectionInstance();
+    const trackingIds = csvData.map((row) => row.tracking_id);
+
+    const res = await pullDbInstance.updateMany(
+      {
+        tracking_id: {
+          $in: trackingIds,
+        },
+      },
+      [
+        {
+          $set: {
+            is_manual_update: {
+              $not: "$is_manual_update",
+            },
+            last_update_from: "manual_toggle",
+            updated_at: moment().toDate(),
+          },
+        },
+      ]
+    );
+    console.log("res", res);
+    return true;
+  } catch (error) {
+    logger.error("toggleManualStatus", error);
+    return false;
+  }
+};
+
 module.exports = {
   updateStatusFromCSV,
+  toggleManualStatus,
 };

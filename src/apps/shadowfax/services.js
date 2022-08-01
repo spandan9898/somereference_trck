@@ -23,7 +23,7 @@ const getEventInfoData = ({ event, comments, statusId, remarks, isReverse }) => 
 
   if (isReverse) {
     mapperString = courierStatus;
-    if (["pickup_on_hold"].includes(courierStatus.toLowerCase())) {
+    if (["pickup_on_hold", "cancelled"].includes(courierStatus.toLowerCase())) {
       mapperString = `${courierStatus}_${courierRemark}`;
     }
     if (mapperString.toLowerCase() in SHADOWFAX_REVERSE_MAPPER) {
@@ -99,6 +99,7 @@ const prepareShadowfaxData = (shadowfaxDict) => {
       comments,
       event_timestamp: eventTimeStamp,
       event_location: eventLocation,
+      remarks: Remarks,
     } = shadowfaxDict || {};
 
     pickrrShadowfaxDict.awb = awb;
@@ -116,10 +117,13 @@ const prepareShadowfaxData = (shadowfaxDict) => {
     }
     pickrrShadowfaxDict.scan_type = scanType === "UD" ? "NDR" : scanType;
     pickrrShadowfaxDict.scan_datetime = moment(eventTimeStamp).format("YYYY-MM-DD HH:mm:ss");
-    pickrrShadowfaxDict.track_info = comments;
+    pickrrShadowfaxDict.track_info = comments || "";
     pickrrShadowfaxDict.track_location = eventLocation;
     pickrrShadowfaxDict.courier_status_code = mapperString;
     pickrrShadowfaxDict.pickrr_sub_status_code = pickrrSubStatusCode;
+    if ((Remarks || "").toLowerCase().includes("otp verified item delivered")) {
+      pickrrShadowfaxDict.otp_remarks = Remarks;
+    }
     return pickrrShadowfaxDict;
   } catch (error) {
     pickrrShadowfaxDict.err = error.message;

@@ -27,7 +27,7 @@ const { DELHIVERY_REVERSE_MAPPER } = require("../../apps/delhivery/constant");
 const { XBS_REVERSE_MAPPER } = require("../../apps/xpressbees/constant");
 const { getObject } = require("../../utils");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { preparePulledSmartrData } = require("../../apps/smartr/services");
+const { preparePikNDelData } = require("../../apps/pikndel/services");
 
 /**
  * sorring status array desc -> The last scan time will be in the top
@@ -159,9 +159,9 @@ const getPrepareFunction = (courierName) => {
     pidge: preparePidgeData,
     dtdc: prepareDtdcData,
     dtdc_pull: prepareDtdcPulledData,
-    smartr_pull: preparePulledSmartrData,
     bluedart_pull: preparePickrrBluedartPulledData,
     loadshare: prepareLoadshareData,
+    pikndel: preparePikNDelData,
   };
   return courierPrepareMapFunctions[courierName];
 };
