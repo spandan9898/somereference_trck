@@ -238,8 +238,8 @@ const EKART_PULL_MAPPER = {
       "Shipment pickup cancelled, can be due to cancellation, number of pickup attempts exceeded minimum value, etc.",
     courier_status: "pickup_cancelled",
     courier_status_type: "pickup_cancelled",
-    pickrr_code: "OC",
-    pickrr_sub_status_code: "",
+    pickrr_code: "PPF",
+    pickrr_sub_status_code: "CANC",
     pickrr_status: "Order Cancelled",
     pickrr_sub_status: "",
   },
@@ -301,7 +301,6 @@ const EKART_PULL_MAPPER = {
     pickrr_sub_status:
       "Customer Not Available/Office/Residence Closed/Consignee phone not reachable",
   },
-
   UNDELIVERED_DUE_TO_CASH_UNAVAILABILITY: {
     courier_remarks: "Shipment undelivered as COD not ready",
     courier_status: "undelivered_due_to_cash_unavailability",
@@ -311,15 +310,6 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Failed Attempt at Delivery",
     pickrr_sub_status: "Cash Not Ready",
   },
-  UNDELIVERED_DUE_TO_REQUEST_FOR_RESCHEDULE: {
-    courier_remarks: "Undelivered. (Rescheduled to: __dd-mm-yy__)",
-    courier_status: "undelivered_due_to_request_for_reschedule",
-    courier_status_type: "undelivered_due_to_request_for_reschedule",
-    pickrr_code: "UD",
-    pickrr_sub_status_code: "CD",
-    pickrr_status: "Failed Attempt at Delivery",
-    pickrr_sub_status: "Customer Delay/Future Delivery",
-  },
   UNSUCCESSFUL_DELIVERY_ATTEMPT_DUE_TO_SERVICEABILITY_ISSUES: {
     courier_remarks: "Shipment undelivered due to non serviceable pincode",
     courier_status: "unsuccessful_delivery_attempt_due_to_serviceability_issues",
@@ -328,6 +318,15 @@ const EKART_PULL_MAPPER = {
     pickrr_sub_status_code: "ODA",
     pickrr_status: "Failed Attempt at Delivery",
     pickrr_sub_status: "Out of Delivery area",
+  },
+  UNDELIVERED_DUE_TO_REQUEST_FOR_RESCHEDULE: {
+    courier_remarks: "Undelivered. (Rescheduled to: __dd-mm-yy__)",
+    courier_status: "undelivered_due_to_request_for_reschedule",
+    courier_status_type: "undelivered_due_to_request_for_reschedule",
+    pickrr_code: "UD",
+    pickrr_sub_status_code: "CD",
+    pickrr_status: "Failed Attempt at Delivery",
+    pickrr_sub_status: "Customer Delay/Future Delivery",
   },
   DELIVERED: {
     courier_remarks: "Shipment delivered",
