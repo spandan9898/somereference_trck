@@ -3,7 +3,6 @@ const moment = require("moment");
 
 const { BLUEDART_CODE_MAPPER_V2 } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { mapReverseScanType } = require("../../utils/helpers");
 
 /*
 Courier Request Payload
@@ -285,104 +284,6 @@ const preparePickrrBluedartDict = (requestedTrackData) => {
   return preparePickrrObjData(trackingList[0]);
 };
 
-/**
- *
- * @param {*} bluedartDict
- * {
-    "Scan": "RETURNED TO ORIGIN AT SHIPPER'S REQUEST",
-    "ScanCode": "074",
-    "ScanType": "RT",
-    "ScanGroupType": "T",
-    "ScanDate": "22-Apr-2022",
-    "ScanTime": "16:58",
-    "ScannedLocation": "MATHURA",
-    "ScannedLocationCode": "MAT"
-    "trackingId" : "AWBNUMBER",
-    "isReverse" : false,
-    "edd" : "24 April 2022",
-    "receivedBy" : "",
-    "pickupDate" : "", // not needed as logic in pull-server
-    "pickupTime" : "", // not needed as logic in pull-server
-    "event" : "pull",
-    "returnWaybill" : ""
-}
- */
-const preparePickrrBluedartPulledData = (bluedartDict) => {
-  const pickrrBluedartDict = {
-    awb: "",
-    scan_type: "",
-    scan_datetime: "",
-    track_info: "",
-    track_location: "",
-    received_by: "",
-    pickup_datetime: "",
-    EDD: "",
-    pickrr_status: "",
-    pickrr_sub_status_code: "",
-    courier_status_code: "",
-  };
-  try {
-    const {
-      edd,
-      ScanDate,
-      ScanTime,
-      trackingId,
-      ScanCode,
-      ScanGroupType,
-      returnWaybill,
-      receivedBy,
-      ScannedLocation,
-      Scan,
-    } = bluedartDict || {};
-    if (!trackingId) {
-      return {
-        err: "Tracking ID not available",
-      };
-    }
-    const mapperString = `${ScanCode || ""}-${ScanGroupType || ""}`;
-    let scanType = "";
-    if (mapperString) {
-      scanType = BLUEDART_CODE_MAPPER_V2[mapperString.toLowerCase()];
-    }
-    if (!scanType) {
-      return { err: "Unknown status code" };
-    }
-    if (returnWaybill) {
-      scanType.scan_type = mapReverseScanType(scanType?.scan_type);
-    }
-    const statusDatetime = `${ScanDate} ${ScanTime}`;
-    let statusDate = moment(statusDatetime, "DD-MMM-YYYY HH:mm");
-    statusDate = statusDate.isValid()
-      ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
-      : moment().format("YYYY-MM-DD HH:mm:ss.SSS");
-    if (scanType?.scan_type === "PP") {
-      pickrrBluedartDict.pickup_datetime = moment(statusDate).toDate();
-    }
-    let received = "";
-    if (scanType?.scan_type === "DL") {
-      received = receivedBy;
-    }
-    pickrrBluedartDict.received_by = received;
-    let eddDate = moment(edd, "DD MMMM YYYY");
-    eddDate = eddDate.isValid() ? eddDate.format("YYYY-MM-DD HH:mm:ss.SSS") : "";
-    pickrrBluedartDict.scan_datetime = statusDate;
-    pickrrBluedartDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
-    pickrrBluedartDict.track_location = ScannedLocation || "";
-    pickrrBluedartDict.awb = trackingId;
-    pickrrBluedartDict.EDD = eddDate;
-    pickrrBluedartDict.courier_status_code = mapperString;
-    pickrrBluedartDict.track_info = Scan || "";
-    pickrrBluedartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type] || "";
-    pickrrBluedartDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
-
-    return pickrrBluedartDict;
-  } catch (error) {
-    pickrrBluedartDict.err = error.message;
-    return pickrrBluedartDict;
-  }
-};
-
 module.exports = {
   preparePickrrBluedartDict,
-  preparePickrrBluedartPulledData,
 };
