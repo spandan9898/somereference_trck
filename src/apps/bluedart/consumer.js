@@ -33,8 +33,7 @@ const listener = async (consumer, partitionsCount) => {
       autoCommitInterval: 60000,
       partitionsConsumedConcurrently: partitionsCount,
       eachMessage: (consumedPayload) => {
-        const courierName =
-          consumedPayload.topic === "bluedart_pull" ? "bluedart_pull" : "bluedart";
+        const courierName = KafkaMessageHandler.init(consumedPayload, "bluedart");
         KafkaMessageHandler.init(consumedPayload, courierName);
       },
     });

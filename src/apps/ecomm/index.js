@@ -5,9 +5,6 @@ const { PUSH_PARTITION_COUNT } = require("./constant");
 (async () => {
   try {
     const { pushConsumer } = await initialize();
-
-    // disable consumption of ecomm push events
-
     if (process.env.CONSUME_PUSH_EVENTS.toLowerCase() === "true") {
       listener(pushConsumer, PUSH_PARTITION_COUNT);
     }
