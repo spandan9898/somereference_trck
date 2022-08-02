@@ -159,7 +159,6 @@ const getPrepareFunction = (courierName) => {
   };
   return courierPrepareMapFunctions[courierName];
 };
-
 module.exports = {
   sortStatusArray,
   updatePrepareDict,
