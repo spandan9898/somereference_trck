@@ -15,6 +15,7 @@ const initialize = async () => {
   const pushConsumer = kafka.consumer({ groupId: PUSH_GROUP_NAME });
   await pushConsumer.connect();
   await pushConsumer.subscribe({ topic: PUSH_TOPIC_NAME, fromBeginning: false });
+
   return {
     pushConsumer,
   };
