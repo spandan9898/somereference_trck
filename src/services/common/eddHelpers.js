@@ -132,8 +132,6 @@ class EddPrepareHelper {
       });
     } else if (["RTO", "RTO-OT", "RTO-OO", "RTO UD"].includes(statusType)) {
       pickrrEDD = this.getPickrrEDDforRTO({ latestCourierEDD });
-
-      // adding a logic that if current status if QCF, pickrrEDD is null
     } else if (["DL", "RTD", "OC", "LT", "DM"].includes(statusType)) {
       return null;
     } else {
