@@ -160,7 +160,7 @@ const updateStatusFromCSV = async (csvData, platformNames) => {
   );
 
   console.log("response", response);
-  if (process.env.NODE_ENV === "production" || process.env.IS_QC_TEST === "true") {
+  if (process.env.NODE_ENV === "production") {
     await updateOtherSources(filteredCsvData, pullDbInstance, platformNames);
   }
   return true;

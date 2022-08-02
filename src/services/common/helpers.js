@@ -6,7 +6,7 @@ const {
   prepareDelhiveryData,
   prepareDelhiveryPulledData,
 } = require("../../apps/delhivery/services");
-const { prepareEcommData, prepareEcommPulledData } = require("../../apps/ecomm/services");
+const { prepareEcommData } = require("../../apps/ecomm/services");
 const { prepareEkartData, preparePulledEkartData } = require("../../apps/ekart/services");
 const { prepareParceldoData } = require("../../apps/parceldo/services");
 const {
