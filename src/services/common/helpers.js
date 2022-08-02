@@ -15,7 +15,7 @@ const {
 } = require("../../apps/shadowfax/services");
 const { prepareUdaanData } = require("../../apps/udaan/services");
 const { prepareXbsData } = require("../../apps/xpressbees/services");
-const { preparePidgeData } = require("../../apps/pidge/services");
+const { preparePidgeData, preparePidgePulledData } = require("../../apps/pidge/services");
 const { prepareDtdcData, prepareDtdcPulledData } = require("../../apps/dtdc/services");
 const { prepareLoadshareData } = require("../../apps/loadshare/services");
 
@@ -152,6 +152,7 @@ const getPrepareFunction = (courierName) => {
     udaan: prepareUdaanData,
     xpressbees: prepareXbsData,
     pidge: preparePidgeData,
+    pidge_pull: preparePidgePulledData,
     dtdc: prepareDtdcData,
     dtdc_pull: prepareDtdcPulledData,
     loadshare: prepareLoadshareData,
