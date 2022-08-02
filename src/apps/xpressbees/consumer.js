@@ -33,7 +33,7 @@ const listener = async (consumer, partitionsCount) => {
       },
     });
   } catch (error) {
-    logger.error("Xpressbees Listener Error", error);
+    logger.error("XBS Listening Error", error);
   }
 };
 
