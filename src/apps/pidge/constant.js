@@ -3,7 +3,7 @@ const PUSH_TOPIC_NAME = "pidge_push";
 const PUSH_GROUP_NAME = "pidge-push-group";
 const PULL_TOPIC_NAME = "pidge_pull";
 const PULL_PARTITION_COUNT = 10;
-const PULL_GROUP_NAME = "pidge-pull-group";
+const PULL_GROUP_NAME = "pidge_pull_group";
 
 const PIDGE_CODE_MAPPER = {
   3: { scan_type: "OFP", pickrr_sub_status_code: "" },
