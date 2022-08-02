@@ -144,7 +144,6 @@ const getPrepareFunction = (courierName) => {
     delhivery: prepareDelhiveryData,
     delhivery_pull: prepareDelhiveryPulledData,
     ecomm: prepareEcommData,
-    ecomm_pull: prepareEcommPulledData,
     ekart: prepareEkartData,
     ekart_pull: preparePulledEkartData,
     parceldo: prepareParceldoData,
