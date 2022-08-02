@@ -152,7 +152,6 @@ const BLUEDART_CODE_MAPPER_V2 = {
 const PUSH_PARTITION_COUNT = 10;
 const PUSH_GROUP_NAME = "bluedart-push-group";
 const PUSH_TOPIC_NAME = "bluedart_push";
-
 module.exports = {
   BLUEDART_CODE_MAPPER_V2,
   PUSH_PARTITION_COUNT,
