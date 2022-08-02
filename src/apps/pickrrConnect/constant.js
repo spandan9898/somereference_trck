@@ -16,7 +16,6 @@ const UNUSED_FIELDS_FROM_TRACKING_OBJ = [
   "ops_profile",
   "hsn_code",
   "err",
-  "qc_details",
 ];
 
 module.exports = {
