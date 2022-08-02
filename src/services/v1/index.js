@@ -6,8 +6,12 @@ const { produceData } = require("../../utils/kafka");
 const { TOPIC_NAME } = require("./constants");
 const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 
-const { V1_EVENT_BRIDGE_SOURCE, V1_EVENT_BRIDGE_DETAIL_TYPE, V1_EVENT_BRIDGE_BUS_NAME } =
-  process.env;
+const {
+  V1_EVENT_BRIDGE_SOURCE,
+  V1_EVENT_BRIDGE_DETAIL_TYPE,
+  V1_EVENT_BRIDGE_BUS_NAME,
+  V1_NEW_EVENT_BRIDGE_DETAIL_TYPE,
+} = process.env;
 
 /**
  * @param {*} trackData
@@ -26,7 +30,23 @@ const sendTrackDataToV1 = async (trackData) => {
       "39d7fe8174829ff6e05c6019757fc2c9123065",
       "7c1e98bd9c06ae0b75b4d2442c23d1ef193845",
       "64a61f6d3c302d2c478adc888aa20d58791587",
+      "c5a2a4af9f55b744473879737f6cf81a442",
+      "8c56657e0eb47d78dec2acdb49e7ea80135854",
     ];
+
+    const shopPlatforms = [
+      "shopify"
+    ];
+    const trackDict = prepareTrackDictForV1(trackData);
+
+    // For Pickup Service
+
+    sendDataToEventBridge({
+      source: V1_EVENT_BRIDGE_SOURCE,
+      detailType: V1_NEW_EVENT_BRIDGE_DETAIL_TYPE,
+      data: trackDict,
+      eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
+    });
 
     if (
       ["OFP", "PPF", "OP", "OM", "OC"].includes(trackData?.status?.current_status_type) ||
@@ -34,8 +54,6 @@ const sendTrackDataToV1 = async (trackData) => {
     ) {
       return false;
     }
-    const trackDict = prepareTrackDictForV1(trackData);
-
     if (!authTokens.includes(trackData.auth_token)) {
       sendDataToEventBridge({
         source: V1_EVENT_BRIDGE_SOURCE,
@@ -44,7 +62,8 @@ const sendTrackDataToV1 = async (trackData) => {
         eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
       });
     }
-    if (!authTokens.includes(trackData.auth_token)) {
+    
+    if (!(authTokens.includes(trackData.auth_token) || shopPlatforms.includes(trackData.shop_platform))){
       return false;
     }
     const producerInstance = await producerConnection.connect(KAFKA_INSTANCE_CONFIG.PROD.name);
@@ -56,7 +75,6 @@ const sendTrackDataToV1 = async (trackData) => {
         }),
       },
     ];
-
     await produceData({
       topic: TOPIC_NAME,
       producer: producerInstance,
