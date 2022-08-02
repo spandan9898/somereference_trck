@@ -27,7 +27,7 @@ const COMPULSORY_EVENTS = {
   QCF: ["OP", "OM", "OFP", "PPF"],
 };
 
-const COMPULSORY_EVENTS_PRECEDENCE = [["PP"], ["SHP", "RAD", "OO"], ["DL", "RTO", "RTD", "QCF"]];
+const COMPULSORY_EVENTS_PRECEDENCE = [["PP"], ["SHP", "RAD", "OO"], ["DL", "RTO", "RTD"]];
 
 const STATUS_PROXY_LIST = {
   PP: [
@@ -66,7 +66,6 @@ const STATUS_PROXY_LIST = {
   RTO: ["RTO", "RTO-OT", "RTO-OO", "RTO-UD", "RTD"],
   RTD: ["RTD"],
   DL: ["DL"],
-  QCF: ["QCF"],
 };
 
 module.exports = {
