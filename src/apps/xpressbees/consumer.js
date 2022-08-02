@@ -29,8 +29,7 @@ const listener = async (consumer, partitionsCount) => {
       autoCommitInterval: 60000,
       partitionsConsumedConcurrently: partitionsCount,
       eachMessage: (consumedPayload) => {
-        const courierName = consumedPayload.topic === "xbs_pull" ? "xpressbees_pull" : "xpressbees";
-        KafkaMessageHandler.init(consumedPayload, courierName);
+        KafkaMessageHandler.init(consumedPayload, "xpressbees");
       },
     });
   } catch (error) {
