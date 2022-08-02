@@ -115,9 +115,7 @@ const commonTrackingDataProducer = async (trackingObj) => {
       "promise_edd",
       "sync_count",
       "is_ndr",
-      "is_reverse_qc", // reverse_qc key from order placing
       "latest_otp",
-      "qc_rejection_reason", // qc_rejection_reason string
     ];
 
     const defaultValue = {
