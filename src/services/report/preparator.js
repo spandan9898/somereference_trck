@@ -88,7 +88,6 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     rto_date: findRTODate(trackData?.track_arr || {}),
     pickrr_tracking_id: trackData.tracking_id,
     rtdDate: findLatestRtdDate(trackData?.trackArr || []),
-    qc_details: trackData?.qc_details,
   };
 
   if (trackData.promise_edd) {
