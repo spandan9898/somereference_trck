@@ -75,6 +75,7 @@ const preparePulledSmartrData = (smartrDict) => {
     if (scanType === "PP") {
       pickrrSmartrDict.pickup_datetime = scanTime;
     }
+    pickrrSmartrDict.track_info = PICKRR_STATUS_CODE_MAPPING[scanType] || "";
     pickrrSmartrDict.scan_datetime = scanTime;
     pickrrSmartrDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[pickrrSmartrDict.scan_type];
     return pickrrSmartrDict;
