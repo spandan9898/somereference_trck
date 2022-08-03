@@ -85,7 +85,7 @@ const findLastPrePickupTime = (trackArr) => {
     if (PRE_PICKUP_STATUS.includes(trackArr[i]?.scan_type)) {
       lastPrePickupTime = moment(trackArr[i]?.scan_datetime).isValid()
         ? trackArr[i]?.scan_datetime
-        : "";
+        : null;
     }
   }
   return lastPrePickupTime;
