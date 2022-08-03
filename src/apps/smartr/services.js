@@ -66,7 +66,7 @@ const preparePulledSmartrData = (smartrDict) => {
       }
     }
     pickrrSmartrDict.pickrr_sub_status_code = statusMappedData.pickrr_sub_status_code;
-    const stationMappedData = STATION_MAPPER[Station.toLowerCase()];
+    const stationMappedData = STATION_MAPPER[Station.toUpperCase()];
     if (Station && stationMappedData) {
       pickrrSmartrDict.track_location = stationMappedData;
     }
