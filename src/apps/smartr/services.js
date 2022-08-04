@@ -87,6 +87,7 @@ const prepareSmartrData = (smartrDict) => {
 
   return pickrrSmartrDict;
 };
+
 module.exports = {
   prepareSmartrData,
 };
