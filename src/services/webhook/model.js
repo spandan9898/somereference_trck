@@ -41,6 +41,7 @@ const fetchAllEnabledWebhookUserData = async () => {
         has_webhook_enabled: 1,
         shop_platform: 1,
         events_enabled: 1,
+        explicit_preparator_type: 1,
       },
     };
     const res = webhookUserColInstance.find(filters, options);

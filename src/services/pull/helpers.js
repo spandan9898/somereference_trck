@@ -4,6 +4,7 @@ const moment = require("moment");
 const _ = require("lodash");
 
 const logger = require("../../../logger");
+const { TRACKING_PAGE_OTP_MESSAGE } = require("../common/constants");
 
 /**
  *
@@ -19,6 +20,17 @@ const mapStatusToEvent = (statusObj) => {
   };
 
   return eventObj;
+};
+
+/** */
+const updateScanStatus = (document, sortedTrackArray, isOtpDelivered) => {
+  try {
+    if (!(document?.courier_used || "").includes("delhivery") && isOtpDelivered) {
+      sortedTrackArray[0].scan_status += `${TRACKING_PAGE_OTP_MESSAGE}`;
+    }
+  } catch (error) {
+    logger.error("Failed Updating Scan Status for Otp Shipments", error);
+  }
 };
 
 /**
@@ -115,10 +127,47 @@ const checkTriggerForPulledEvent = (preparedDict, dbResponse) => {
   return true;
 };
 
+/**
+ *
+ *Finds Otp Flag in Track Arrays for Delivered Shipment
+ *
+ */
+const updateFlagForOtpDeliveredShipments = (trackArr) => {
+  let isOtpDelivered = false;
+  trackArr.forEach((eachTrackObj) => {
+    if (eachTrackObj?.otp_remarks || eachTrackObj?.otp) {
+      isOtpDelivered = true;
+    }
+  });
+  return isOtpDelivered;
+};
+
+/**
+ *
+ * @param {iterable event statusDate} statusDate
+ * @param {order_created_date} placedDate
+ * @returns is Valid Event
+ */
+const checkIsAfter = (statusDate, placedDate) => {
+  try {
+    if (!moment(placedDate).isValid()) {
+      return true;
+    }
+    const isValid = moment(statusDate).isValid()
+      ? moment(statusDate).isAfter(moment(placedDate))
+      : false;
+    return isValid;
+  } catch (error) {
+    return false;
+  }
+};
 module.exports = {
   mapStatusToEvent,
+  checkIsAfter,
+  updateScanStatus,
   prepareTrackArrCacheData,
   checkCancelStatusInTrackArr,
   updateTrackModel,
   checkTriggerForPulledEvent,
+  updateFlagForOtpDeliveredShipments,
 };

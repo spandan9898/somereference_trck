@@ -2,14 +2,12 @@ const logger = require("../../../logger");
 const { listener, initialize } = require("./consumer");
 
 (async () => {
-  const pickrrConnectConsumers = await initialize();
-  pickrrConnectConsumers.forEach((consumer) => {
-    consumer
-      .then((response) => {
-        if (response) {
-          listener(response);
-        }
-      })
-      .catch((err) => logger.error("Pickrr Connect Consumer Error ", err));
-  });
+  try {
+    const pickrrConnectConsumers = await initialize();
+    if (process.env.CONSUME_PICKRR_CONNECT_DATA === "true") {
+      listener(pickrrConnectConsumers);
+    }
+  } catch (error) {
+    logger.error("Pickrr Connect Consumer Error ", error);
+  }
 })();

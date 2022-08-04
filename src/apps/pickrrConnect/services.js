@@ -1,9 +1,10 @@
 const isEmpty = require("lodash/isEmpty");
 const omit = require("lodash/omit");
+const _ = require("lodash");
 
 const logger = require("../../../logger");
 const { callLambdaFunction } = require("../../connector/lambda");
-const { updateStatusELK } = require("../../services/common/services");
+const { updateStatusELK, commonTrackingDataProducer } = require("../../services/common/services");
 const {
   fetchTrackingModelAndUpdateCache,
   getTrackDocumentfromMongo,
@@ -25,6 +26,7 @@ const callSendReportDataForPulledEvent = (trackingObj) => {
   sendTrackDataToV1(trackingObj);
   updateStatusOnReport(trackingObj, logger, trackingElkClient);
   updateStatusELK(trackingObj, prodElkClient);
+  commonTrackingDataProducer(trackingObj);
 
   return true;
 };
@@ -76,6 +78,17 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
       });
     }
 
+    const currentStatus = _.get(trackObj, "status.current_status_type", "");
+    const parentCourier = trackObj?.courier_parent_name;
+    if (
+      isFromPull &&
+      ["Delhivery", "Ekart", "Ecom Express", "ShadowFax"].includes(parentCourier)
+    ) {
+      return false;
+    }
+    if (["UD", "NDR"].includes(currentStatus)) {
+      return false;
+    }
     trackObj = omit(trackObj, UNUSED_FIELDS_FROM_TRACKING_OBJ);
 
     const email = trackObj.user_email;
