@@ -116,7 +116,7 @@ const commonTrackingDataProducer = async (trackingObj) => {
       "sync_count",
       "is_ndr",
       "latest_otp",
-      "order_pk", // order_pk from order microservice
+      "order_pk",
     ];
 
     const defaultValue = {
