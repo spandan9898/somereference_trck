@@ -13,9 +13,9 @@ const {
   findDeliveryDate,
   findRTODate,
   findFirstNdrDate,
+  findQCFailureReason,
   findNDRTrackInfos,
   findLatestRtdDate,
-  findQCFailureReason,
 } = require("./helpers");
 
 /**
@@ -88,8 +88,9 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     delivery_date: findDeliveryDate(trackData?.track_arr || {}),
     rto_date: findRTODate(trackData?.track_arr || {}),
     pickrr_tracking_id: trackData.tracking_id,
-    rtdDate: findLatestRtdDate(trackData?.trackArr || []),
     qc_rejection_reason: findQCFailureReason(trackData?.track_arr || {}),
+    rtdDate: findLatestRtdDate(trackData?.trackArr || []),
+    qc_details: trackData?.qc_details,
   };
 
   if (trackData.promise_edd) {

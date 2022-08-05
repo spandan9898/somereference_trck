@@ -166,12 +166,13 @@ const SHADOWFAX_REVERSE_MAPPER = {
     pickrr_sub_status_code: "OTH",
     scan_type: "PPF",
   },
+
   "qc failed": { pickrr_sub_status_code: "OTH", scan_type: "QCF" },
   "pickup_on_hold_customer want pick-up from non-serviceable area": {
     pickrr_sub_status_code: "NSL",
     scan_type: "PPF",
   },
-  "pickup_on_hold_doorstep qc product damage": { pickrr_sub_status_code: "OTH", scan_type: "PPF" },
+  "pickup_on_hold_doorstep qc product damage": { pickrr_sub_status_code: "DM", scan_type: "QCF" },
   "not attempted": { pickrr_sub_status_code: "SD", scan_type: "PPF" },
   new: { pickrr_sub_status_code: "", scan_type: "OP" },
   "pickup_on_hold_address issue": { pickrr_sub_status_code: "AI", scan_type: "PPF" },
