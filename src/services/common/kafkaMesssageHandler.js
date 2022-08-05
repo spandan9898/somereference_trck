@@ -9,7 +9,8 @@ const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
 const updateStatusOnReport = require("../report");
-const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
+
+// const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
 
 const { updatePrepareDict } = require("./helpers");
 const {
@@ -101,7 +102,10 @@ class KafkaMessageHandler {
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return {};
       }
-
+      let qcDetails = null;
+      if (courierName === "shadowfax_pull" && res?.scan_type === "QCF" && isFromPulled) {
+        qcDetails = res?.qcDetails;
+      }
       const updatedTrackData = await updatePrepareDict(trackData);
       if (_.isEmpty(updatedTrackData)) {
         logger.error("Xpresbees reverse map not found", trackData);
@@ -113,6 +117,7 @@ class KafkaMessageHandler {
         trackObj: updatedTrackData,
         logger,
         isFromPulled,
+        qcDetails,
       });
       if (!result) {
         return {};
@@ -122,7 +127,7 @@ class KafkaMessageHandler {
         return {};
       }
       await commonTrackingDataProducer(result);
-      await updateStatusOnReport(result, logger, trackingElkClient);
+      await updateStatusOnReport(result, logger, trackingElkClient, isFromPulled);
       sendDataToNdr(result);
       sendTrackDataToV1(result);
       updateStatusELK(result, prodElkClient);

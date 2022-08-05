@@ -23,7 +23,7 @@ const getEventInfoData = ({ event, comments, statusId, remarks, isReverse }) => 
 
   if (isReverse) {
     mapperString = courierStatus;
-    if (["pickup_on_hold"].includes(courierStatus.toLowerCase())) {
+    if (["pickup_on_hold", "cancelled"].includes(courierStatus.toLowerCase())) {
       mapperString = `${courierStatus}_${courierRemark}`;
     }
     if (mapperString.toLowerCase() in SHADOWFAX_REVERSE_MAPPER) {
@@ -150,6 +150,7 @@ const preparePulledShadowfaxData = (pulledData) => {
     pickrr_status: "",
     pickrr_sub_status_code: "",
     courier_status_code: "",
+    qc_details: null,
   };
   try {
     const {
@@ -161,6 +162,7 @@ const preparePulledShadowfaxData = (pulledData) => {
       received_by: receivedBy = "",
       edd = "",
       isReverse,
+      qcDetails,
     } = pulledData;
 
     const { scanType, mapperString, pickrrSubStatusCode } = getEventInfoData({
@@ -187,6 +189,7 @@ const preparePulledShadowfaxData = (pulledData) => {
     if (pickrrShadowfaxDict.scan_type === "PP") {
       pickrrShadowfaxDict.pickup_datetime = pickrrShadowfaxDict.scan_datetime;
     }
+    pickrrShadowfaxDict.qc_details = qcDetails || null;
     return pickrrShadowfaxDict;
   } catch (error) {
     pickrrShadowfaxDict.err = error.message;

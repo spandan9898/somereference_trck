@@ -2,6 +2,7 @@
 const moment = require("moment");
 const _ = require("lodash");
 
+const { update } = require("lodash");
 const { storeDataInCache, updateCacheTrackArray, softCancellationCheck } = require("./services");
 const { prepareTrackDataToUpdateInPullDb } = require("./preparator");
 const commonTrackingInfoCol = require("./model");
@@ -70,8 +71,13 @@ const fetchAndUpdateAuditLogsData = async ({
  * @desc sending tracking data to pull mongodb
  * @returns success or error
  */
-const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = false }) => {
-  const result = prepareTrackDataToUpdateInPullDb(trackObj, isFromPulled);
+const updateTrackDataToPullMongo = async ({
+  trackObj,
+  logger,
+  isFromPulled = false,
+  qcDetails = null,
+}) => {
+  const result = prepareTrackDataToUpdateInPullDb(trackObj, isFromPulled, qcDetails);
   if (!result.success) {
     throw new Error(result.err);
   }
@@ -215,7 +221,11 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     if (["NDR", "UD"].includes(firstTrackObjOfTrackArr.scan_type)) {
       updatedObj.is_ndr = true;
     }
-
+    if (res?.is_reverse_qc) {
+      if (qcDetails && isFromPulled && firstTrackObjOfTrackArr.scan_type === "QCF") {
+        updatedObj.qc_details = qcDetails;
+      }
+    }
     const pullInstance =
       process.env.NODE_ENV === "staging"
         ? pullStagingCollectionInstance
