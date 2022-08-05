@@ -50,6 +50,7 @@ class KafkaMessageHandler {
     try {
       let res;
       let isFromPulled = false;
+
       const { prodElkClient, trackingElkClient } = getElkClients();
 
       try {
@@ -128,7 +129,7 @@ class KafkaMessageHandler {
         return {};
       }
       await commonTrackingDataProducer(result);
-      await updateStatusOnReport(result, logger, trackingElkClient, isFromPulled);
+      await updateStatusOnReport(result, logger, trackingElkClient);
       sendDataToNdr(result);
       sendTrackDataToV1(result);
       updateStatusELK(result, prodElkClient);
