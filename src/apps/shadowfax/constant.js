@@ -234,6 +234,7 @@ const SHADOWFAX_REVERSE_MAPPER = {
   "cancelled_seller cancelled the pickup": { pickrr_sub_status_code: "", scan_type: "OC" },
   nc: { pickrr_sub_status_code: "CNA", scan_type: "PPF" },
   na: { pickrr_sub_status_code: "SD", scan_type: "PPF" },
+  cancelled: { pickrr_sub_status_code: "", scan_type: "OC" },
 
   // push code mappings for reverse
 
