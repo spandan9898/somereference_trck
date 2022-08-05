@@ -34,9 +34,7 @@ const sendTrackDataToV1 = async (trackData) => {
       "8c56657e0eb47d78dec2acdb49e7ea80135854",
     ];
 
-    const shopPlatforms = [
-      "shopify"
-    ];
+    const shopPlatforms = ["shopify"];
     const trackDict = prepareTrackDictForV1(trackData);
 
     // For Pickup Service
@@ -62,8 +60,12 @@ const sendTrackDataToV1 = async (trackData) => {
         eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
       });
     }
-    
-    if (!(authTokens.includes(trackData.auth_token) || shopPlatforms.includes(trackData.shop_platform))){
+
+    if (
+      !(
+        authTokens.includes(trackData.auth_token) || shopPlatforms.includes(trackData.shop_platform)
+      )
+    ) {
       return false;
     }
     const producerInstance = await producerConnection.connect(KAFKA_INSTANCE_CONFIG.PROD.name);

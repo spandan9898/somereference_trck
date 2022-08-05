@@ -2,7 +2,8 @@
 const moment = require("moment");
 const _ = require("lodash");
 
-const { update } = require("lodash");
+// const { update } = require("lodash");
+
 const { storeDataInCache, updateCacheTrackArray, softCancellationCheck } = require("./services");
 const { prepareTrackDataToUpdateInPullDb } = require("./preparator");
 const commonTrackingInfoCol = require("./model");
@@ -77,7 +78,7 @@ const updateTrackDataToPullMongo = async ({
   isFromPulled = false,
   qcDetails = null,
 }) => {
-  const result = prepareTrackDataToUpdateInPullDb(trackObj, isFromPulled, qcDetails);
+  const result = prepareTrackDataToUpdateInPullDb(trackObj, isFromPulled);
   if (!result.success) {
     throw new Error(result.err);
   }
@@ -225,7 +226,7 @@ const updateTrackDataToPullMongo = async ({
       updatedObj.is_ndr = true;
     }
     if (res?.is_reverse_qc) {
-      if (qcDetails && isFromPulled && firstTrackObjOfTrackArr.scan_type === "QCF") {
+      if (qcDetails && isFromPulled) {
         updatedObj.qc_details = qcDetails;
       }
     }

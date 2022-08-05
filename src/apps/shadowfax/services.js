@@ -162,7 +162,7 @@ const preparePulledShadowfaxData = (pulledData) => {
       received_by: receivedBy = "",
       edd = "",
       isReverse,
-      qcDetails,
+      qcDetail,
     } = pulledData;
 
     const { scanType, mapperString, pickrrSubStatusCode } = getEventInfoData({
@@ -189,7 +189,7 @@ const preparePulledShadowfaxData = (pulledData) => {
     if (pickrrShadowfaxDict.scan_type === "PP") {
       pickrrShadowfaxDict.pickup_datetime = pickrrShadowfaxDict.scan_datetime;
     }
-    pickrrShadowfaxDict.qc_details = qcDetails || null;
+    pickrrShadowfaxDict.qc_details = qcDetail || null;
     return pickrrShadowfaxDict;
   } catch (error) {
     pickrrShadowfaxDict.err = error.message;

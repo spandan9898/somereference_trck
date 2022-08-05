@@ -5,6 +5,7 @@ const { getPrepareFunction } = require("./helpers");
 
 const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
+
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
@@ -103,8 +104,8 @@ class KafkaMessageHandler {
         return {};
       }
       let qcDetails = null;
-      if (courierName === "shadowfax_pull" && res?.scan_type === "QCF" && isFromPulled) {
-        qcDetails = res?.qcDetails;
+      if (courierName === "shadowfax_pull" && isFromPulled) {
+        qcDetails = res?.qc_details;
       }
       const updatedTrackData = await updatePrepareDict(trackData);
       if (_.isEmpty(updatedTrackData)) {
