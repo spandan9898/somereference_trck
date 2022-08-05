@@ -21,6 +21,7 @@ const NIRVASA_STATUS_MAPPER = {
   RAD: "Reached at Destination",
   LT: "Shipment Lost",
   DM: "Shipment Damaged",
+  QCF: "QC Failed",
 };
 
 module.exports = { NIRVASA_STATUS_MAPPER };
