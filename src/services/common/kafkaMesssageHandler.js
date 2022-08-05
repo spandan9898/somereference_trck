@@ -9,7 +9,8 @@ const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
 const updateStatusOnReport = require("../report");
-const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
+
+// const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
 
 const { updatePrepareDict } = require("./helpers");
 const {

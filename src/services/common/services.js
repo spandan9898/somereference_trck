@@ -116,6 +116,7 @@ const commonTrackingDataProducer = async (trackingObj) => {
       "sync_count",
       "is_ndr",
       "latest_otp",
+      "order_pk",
     ];
 
     const defaultValue = {
@@ -124,7 +125,11 @@ const commonTrackingDataProducer = async (trackingObj) => {
 
     const payload = {};
     trackingItemList.forEach((item) => {
-      payload[item] = trackingObj[item];
+      if (item === "order_pk") {
+        payload[item] = trackingObj?.order_pk || null;
+      } else {
+        payload[item] = trackingObj[item];
+      }
       if (item in defaultValue) {
         payload[item] = payload[item] || defaultValue[item];
       }
