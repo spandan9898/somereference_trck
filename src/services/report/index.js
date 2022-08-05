@@ -47,6 +47,9 @@ const updateStatusOnReport = async (trackObj, logger, elkClient, isManualUpdate 
   if (isManualUpdate) {
     result.last_update_from_manual = result.last_updated_date;
   }
+  if (trackObj?.qc_details) {
+    result.qc_details = trackObj.qc_details;
+  }
 
   const opsReportColInstance = await reportMongoCol();
   try {
