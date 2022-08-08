@@ -9,6 +9,7 @@ const CODE_MAPPER = {
     pickrr_sub_status_code: "",
   },
   pkf_pf001: { scan_type: "PPF", pickrr_sub_status_code: "DAM" },
+  pkf: { scan_type: "PPF", pickrr_sub_status_code: "" },
   pkf_pf002: {
     scan_type: "PPF",
     pickrr_sub_status_code: "SNR",
@@ -115,6 +116,10 @@ const CODE_MAPPER = {
   sud_ud001: {
     scan_type: "UD",
     pickrr_sub_status_code: "CI",
+  },
+  sud: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "",
   },
   sud_ud002: {
     scan_type: "UD",

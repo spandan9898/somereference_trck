@@ -67,7 +67,7 @@ const prepareSmartrData = (smartrDict) => {
     return { err: "Unknown status code" };
   }
 
-  let statusDate = moment(smartrDict?.eventTime, "YYYY-MM-DD HH:mm:ss");
+  let statusDate = moment(smartrDict?.event_datetime, "YYYY-MM-DD HH:mm:ss");
   statusDate = statusDate.isValid()
     ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
     : moment().format("YYYY-MM-DD HH:mm:ss.SSS");
