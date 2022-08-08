@@ -110,8 +110,9 @@ const preparePidgePulledData = (pidgeDict) => {
     pickrr_sub_status_code: "",
     courier_status_code: "",
   };
+
   try {
-    const { trackingId, status, remarks = null, status_datetime: statusDatetime } = pidgeDict || {};
+    const { trackingId, status, remarks = null, status_datetime: statusDatetime } = pidgeDict;
     if (!trackingId) {
       return {
         err: "Tracking ID not available",
@@ -135,7 +136,7 @@ const preparePidgePulledData = (pidgeDict) => {
     if (!scanType) {
       return { err: "Unknown status code" };
     }
-
+    pickrrPidgeDict.awb = trackingId;
     const scanDatetime = moment(statusDatetime).add(330, "minute").format("YYYY-MM-DD HH:mm:ss");
     pickrrPidgeDict.scan_datetime = scanDatetime;
     pickrrPidgeDict.courier_status_code = statusString;
@@ -143,12 +144,29 @@ const preparePidgePulledData = (pidgeDict) => {
     pickrrPidgeDict.track_info = remarks;
     pickrrPidgeDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrPidgeDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
+    if (pickrrPidgeDict?.scan_type === "PP") {
+      pickrrPidgeDict.pickup_datetime = pickrrPidgeDict?.scan_datetime;
+    }
     return pickrrPidgeDict;
   } catch (error) {
     pickrrPidgeDict.err = error.message;
     return pickrrPidgeDict;
   }
 };
+
+const payload = {
+  trip_status: "100",
+  status_datetime: "2022-07-19T14:38:13.920Z",
+  remarks: "Rider update",
+  status: "3",
+  trip_id: "3888629",
+  attempt_type: "70",
+  trackingId: "1627378",
+  event: "pull",
+  isReverse: false,
+};
+
+console.log(preparePidgePulledData(payload));
 
 module.exports = {
   preparePidgeData,
