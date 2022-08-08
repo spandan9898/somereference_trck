@@ -15,7 +15,9 @@ const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 const initialize = async () => {
   const kafka = kafkaInstance.getInstance(KAFKA_INSTANCE_CONFIG.PROD.name);
   const consumer = kafka.consumer({ groupId: PICKRR_CONNECT_GROUP_NAME });
-  const partitionsCount = new Array(PARTITON_COUNT).fill(1);
+
+  // const partitionsCount = new Array(PARTITON_COUNT).fill(1);
+
   await consumer.connect();
   await consumer.subscribe({
     topic: PICKRR_CONNECT_TOPIC_NAME,
