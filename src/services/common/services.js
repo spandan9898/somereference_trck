@@ -115,7 +115,12 @@ const commonTrackingDataProducer = async (trackingObj) => {
       "promise_edd",
       "sync_count",
       "is_ndr",
-      "latest_otp",
+      "is_reverse_qc", // reverse_qc key from order placing
+      "latest_otp", // qc_rejection_reason string
+      "qc_rejection_reason", // qc_rejection_reason string
+      "qc_bill",
+      "qcf_bill",
+      "order_pk",
     ];
 
     const defaultValue = {
@@ -124,7 +129,11 @@ const commonTrackingDataProducer = async (trackingObj) => {
 
     const payload = {};
     trackingItemList.forEach((item) => {
-      payload[item] = trackingObj[item];
+      if (item === "order_pk") {
+        payload[item] = trackingObj?.order_pk || null;
+      } else {
+        payload[item] = trackingObj[item];
+      }
       if (item in defaultValue) {
         payload[item] = payload[item] || defaultValue[item];
       }

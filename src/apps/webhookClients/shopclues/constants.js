@@ -24,6 +24,7 @@ const SHOPCLUES_STATUS_DESCRIPTION_MAPPING = {
   OPDEL: "Delivery Attempted - Requested For Open Delivery",
   OT: "Shipped",
   NDR: "Undelivered- Other Reasons",
+  QCF: "QC Failed",
 };
 
 const SHOPCLUES_STATUS_MAPPING = {
@@ -65,6 +66,7 @@ const SHOPCLUES_STATUS_MAPPING = {
     "Customer Issue": "CI",
     "Shipper Delay": "SD",
   },
+  QCF: "QC Failed",
 };
 
 const SHOPCLUES_PUSH_URL = "http://developer.shopclues.com/api/v2/app/Pushordertrack/pushScan";
