@@ -206,6 +206,9 @@ const updateTrackDataToPullMongo = async ({
         eddStampInDb,
         statusType,
       });
+
+      // in case of QCF, edd_stamp will be what was calculated before QC Failure
+
       if (pickrrEDD) {
         updatedObj.edd_stamp = pickrrEDD;
       }
