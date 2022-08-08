@@ -5,6 +5,7 @@ const { getPrepareFunction } = require("./helpers");
 
 const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
+
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
 const triggerWebhook = require("../webhook");
@@ -49,6 +50,7 @@ class KafkaMessageHandler {
     try {
       let res;
       let isFromPulled = false;
+
       const { prodElkClient, trackingElkClient } = getElkClients();
 
       try {
@@ -102,7 +104,10 @@ class KafkaMessageHandler {
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return {};
       }
-
+      let qcDetails = null;
+      if (courierName === "shadowfax_pull" && isFromPulled) {
+        qcDetails = res?.qc_details;
+      }
       const updatedTrackData = await updatePrepareDict(trackData);
       if (_.isEmpty(updatedTrackData)) {
         logger.error("Xpresbees reverse map not found", trackData);
@@ -114,6 +119,7 @@ class KafkaMessageHandler {
         trackObj: updatedTrackData,
         logger,
         isFromPulled,
+        qcDetails,
       });
       if (!result) {
         return {};

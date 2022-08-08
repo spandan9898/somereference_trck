@@ -2,6 +2,10 @@ const PUSH_PARTITION_COUNT = 10;
 const PUSH_TOPIC_NAME = "pikndel_push";
 const PUSH_GROUP_NAME = "pikndel-push-group";
 
+const PULL_PARTITION_COUNT = 10;
+const PULL_TOPIC_NAME = "pikndel_pull";
+const PULL_GROUP_NAME = "pikndel_pull_group";
+
 const PIKNDEL_STATUS_MAPPER = {
   new: { scan_type: "OM", pickrr_sub_status_code: "" },
   rap: { scan_type: "OP", pickrr_sub_status_code: "" },
@@ -336,4 +340,7 @@ module.exports = {
   PUSH_TOPIC_NAME,
   PUSH_GROUP_NAME,
   PIKNDEL_STATUS_MAPPER,
+  PULL_GROUP_NAME,
+  PULL_PARTITION_COUNT,
+  PULL_TOPIC_NAME,
 };

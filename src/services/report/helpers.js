@@ -133,6 +133,7 @@ const findLostDate = (trackArr, latestStatus) => {
 /**
  *
  * @param {*} trackArr
+ * @returns
  */
 const findLatestNDRDetails = (trackArr) => {
   for (let i = 0; i < trackArr.length; i += 1) {
@@ -255,4 +256,5 @@ module.exports = {
   findLostDate,
   findNDRTrackInfos,
   findLatestRtdDate,
+  findQCFailureReason,
 };

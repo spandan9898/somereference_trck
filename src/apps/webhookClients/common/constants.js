@@ -28,6 +28,7 @@ const TRACKING_INFO_PARENT_KEYS = [
   "auth_token",
   "track_arr",
   "status",
+  "is_reverse_qc",
 ];
 
 const GET_TRACK_INFO_KEYS = [
