@@ -89,6 +89,7 @@ const PICKRR_STATUS_CODE_MAPPING = {
   DM: "Shipment Damaged",
   "RTO UD": "RTO Undelivered",
   UD: "Undelivered",
+  QCF: "QC Failed",
 };
 
 const REMOVE_ELEMENT_KEYS = [
