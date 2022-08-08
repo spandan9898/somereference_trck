@@ -15,7 +15,7 @@ const prepareTrackDictForV1 = (trackData) => {
   const pickupTime = findPickupDate(trackData);
   const trackDict = {
     awb: trackData?.tracking_id,
-    scan_type: NEW_STATUS_TO_OLD_MAPPING[scanType] || scanType,
+    scan_type: scanType !== "PPF" ? NEW_STATUS_TO_OLD_MAPPING[scanType] || scanType : scanType,
     scan_datetime: trackData?.status?.current_status_time
       ? moment(trackData?.status?.current_status_time)
           .add(330, "minutes")
