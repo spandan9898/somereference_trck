@@ -154,20 +154,6 @@ const preparePidgePulledData = (pidgeDict) => {
   }
 };
 
-const payload = {
-  trip_status: "100",
-  status_datetime: "2022-07-19T14:38:13.920Z",
-  remarks: "Rider update",
-  status: "3",
-  trip_id: "3888629",
-  attempt_type: "70",
-  trackingId: "1627378",
-  event: "pull",
-  isReverse: false,
-};
-
-console.log(preparePidgePulledData(payload));
-
 module.exports = {
   preparePidgeData,
   preparePidgePulledData,
