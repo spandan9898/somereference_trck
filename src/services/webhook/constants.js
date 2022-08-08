@@ -65,6 +65,7 @@ const STATUS_PROXY_LIST = {
   RTO: ["RTO", "RTO-OT", "RTO-OO", "RTO-UD", "RTD"],
   RTD: ["RTD"],
   DL: ["DL"],
+  QCF: ["QCF"],
 };
 
 module.exports = {
