@@ -80,6 +80,81 @@ const preparePidgeData = (pidgeDict) => {
   }
 };
 
+/**
+ *
+ * @param {*} pidgeDict
+   sample payload --> {
+   "trackingId" : "1204100",
+   "event" : "pull",
+   "isReverse" : false,
+   "trip_status": 170,
+   "status_datetime": "2022-04-27T03:29:38.287Z",
+   "remarks": null,
+   "status": null,
+   "trip_id": 2842856,
+   "attempt_type": 10
+ * 
+ * }
+ */
+const preparePidgePulledData = (pidgeDict) => {
+  const pickrrPidgeDict = {
+    awb: "",
+    scan_type: "",
+    scan_datetime: "",
+    track_info: "",
+    track_location: "",
+    received_by: "",
+    pickup_datetime: "",
+    EDD: "",
+    pickrr_status: "",
+    pickrr_sub_status_code: "",
+    courier_status_code: "",
+  };
+
+  try {
+    const { trackingId, status, remarks = null, status_datetime: statusDatetime } = pidgeDict;
+    if (!trackingId) {
+      return {
+        err: "Tracking ID not available",
+      };
+    }
+    let statusString = null;
+    if (status) {
+      if ([13, 12, 21].includes(status)) {
+        statusString = remarks ? `${status}_${remarks}` : status.toString();
+      } else {
+        statusString = status.toString();
+      }
+    }
+
+    if (!statusString) {
+      return {};
+    }
+
+    const scanType = PIDGE_CODE_MAPPER[statusString.toLowerCase()];
+
+    if (!scanType) {
+      return { err: "Unknown status code" };
+    }
+    pickrrPidgeDict.awb = trackingId;
+    const scanDatetime = moment(statusDatetime).add(330, "minute").format("YYYY-MM-DD HH:mm:ss");
+    pickrrPidgeDict.scan_datetime = scanDatetime;
+    pickrrPidgeDict.courier_status_code = statusString;
+    pickrrPidgeDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
+    pickrrPidgeDict.track_info = remarks;
+    pickrrPidgeDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
+    pickrrPidgeDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
+    if (pickrrPidgeDict?.scan_type === "PP") {
+      pickrrPidgeDict.pickup_datetime = pickrrPidgeDict?.scan_datetime;
+    }
+    return pickrrPidgeDict;
+  } catch (error) {
+    pickrrPidgeDict.err = error.message;
+    return pickrrPidgeDict;
+  }
+};
+
 module.exports = {
   preparePidgeData,
+  preparePidgePulledData,
 };
