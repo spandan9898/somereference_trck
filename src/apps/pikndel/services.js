@@ -1,5 +1,4 @@
 const moment = require("moment");
-const _ = require("lodash");
 
 const logger = require("../../../logger");
 
@@ -165,7 +164,7 @@ const preparePulledPikndelData = (pikndelDict) => {
     }
     pickrrDict.awb = podNo;
 
-    pickrrDict.scan_type = scanType?.scan_type;
+    pickrrDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
     pickrrDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
     let eventDateTime = reportedOn;
     eventDateTime = moment(eventDateTime).isValid
