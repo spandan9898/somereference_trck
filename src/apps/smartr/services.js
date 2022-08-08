@@ -78,6 +78,7 @@ const preparePulledSmartrData = (smartrDict) => {
     pickrrSmartrDict.track_info = PICKRR_STATUS_CODE_MAPPING[scanType] || "";
     pickrrSmartrDict.scan_datetime = scanTime;
     pickrrSmartrDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[pickrrSmartrDict.scan_type];
+    pickrrSmartrDict.courier_status_code = mapperString;
     return pickrrSmartrDict;
   } catch (error) {
     logger.error("Failed While preparing Pickrr Dict for Smartr", error.message);
