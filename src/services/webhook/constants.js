@@ -24,6 +24,7 @@ const COMPULSORY_EVENTS = {
   SHP: ["OP", "OM", "OFP", "PPF", "PP"],
   RAD: ["OP", "OM", "OFP", "PPF", "PP", "OT"],
   OO: ["OP", "OM", "OFP", "PPF", "PP", "OT", "RAD"],
+  QCF: ["OP", "OM", "OFP", "PPF"],
 };
 
 const COMPULSORY_EVENTS_PRECEDENCE = [["PP"], ["SHP", "RAD", "OO"], ["QCF", "DL", "RTO", "RTD"]];
