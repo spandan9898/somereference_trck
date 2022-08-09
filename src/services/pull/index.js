@@ -265,7 +265,6 @@ const updateTrackDataToPullMongo = async ({
   }
 };
 
-
 module.exports = {
   updateTrackDataToPullMongo,
 };

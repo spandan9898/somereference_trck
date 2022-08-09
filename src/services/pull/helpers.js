@@ -6,6 +6,7 @@ const _ = require("lodash");
 const logger = require("../../../logger");
 const { TRACKING_PAGE_OTP_MESSAGE } = require("../common/constants");
 const commonTrackingInfoCol = require("./model");
+const { HOST_NAMES } = require("../../utils/constants");
 
 /**
  *
@@ -168,7 +169,7 @@ const checkIsAfter = (statusDate, placedDate) => {
  * @desc update freshdesk webhook data in pull mongodb
  * @returns null
  */
-const updateFreshdeskWebhookToMongo = async ({ courierTrackingId, statusType, logger }) => {
+const updateFreshdeskWebhookToMongo = async ({ courierTrackingId, statusType }) => {
   try {
     let freshdeskWebhookColInstance;
     if (process.env.NODE_ENV === "staging") {
@@ -204,7 +205,6 @@ const updateFreshdeskWebhookToMongo = async ({ courierTrackingId, statusType, lo
     return null;
   }
 };
-
 
 module.exports = {
   mapStatusToEvent,

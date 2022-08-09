@@ -182,7 +182,6 @@ const updateFreshdeskTrackingTicket = async (trackData) => {
     const ticketId = await updateFreshdeskWebhookToMongo({
       courierTrackingId,
       statusType,
-      logger,
     });
     if (!ticketId) {
       return null;
