@@ -10,7 +10,7 @@ const producerConnection = require("../../utils/producerConnection");
 const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 const { produceData } = require("../../utils/kafka");
 const { COMMON_TRACKING_TOPIC_NAME } = require("./constants");
-const { updateFreshdeskWebhookToMongo } = require("../pull");
+const { updateFreshdeskWebhookToMongo } = require("../pull/helpers");
 
 /**
  * @param trackingDoc -> tracking document(same as DB document)
@@ -182,9 +182,9 @@ const updateFreshdeskTrackingTicket = async (trackData) => {
     const ticketId = await updateFreshdeskWebhookToMongo({
       courierTrackingId,
       statusType,
-      logger,
     });
     if (!ticketId) {
+      logger.info(`freshdesk ticket not found for tracking id! ${courierTrackingId}`);
       return null;
     }
     const URL = `https://pickrrsupport.freshdesk.com/api/v2/tickets/${ticketId}`;
@@ -204,6 +204,7 @@ const updateFreshdeskTrackingTicket = async (trackData) => {
       if (response.statusCode !== 200) {
         response = await makeApiCall.put();
       }
+      logger.info(`freshdesk ticket updated for tracking id! ${courierTrackingId}`);
       return response;
     } catch (error) {
       logger.error(`Updating Freshdesk Ticket API Failed for document  --> ${trackData}`);
