@@ -49,6 +49,7 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST, MONGO_DB_STAGING
     require("./src/apps/dtdc");
     require("./src/apps/smartr");
     require("./src/apps/loadshare");
+    require("./src/apps/smartr");
     require("./src/apps/pickrrConnect");
     require("./src/apps/pikndel");
 

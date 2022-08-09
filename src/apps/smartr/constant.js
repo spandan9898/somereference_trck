@@ -185,6 +185,285 @@ const PULL_MAPPER = {
   delivered: { scan_type: "DL", pickrr_sub_status_code: "" },
   "door delivered": { scan_type: "DL", pickrr_sub_status_code: "" },
   voided: { scan_type: "OC", pickrr_sub_status_code: "" },
+const PUSH_PARTITION_COUNT = 10;
+const PUSH_TOPIC_NAME = "smartr_push";
+const PUSH_GROUP_NAME = "smartr-push-group";
+const CODE_MAPPER = {
+  man: { scan_type: "OM", pickrr_sub_status_code: "" },
+  can: { scan_type: "OC", pickrr_sub_status_code: "" },
+  ofp: {
+    scan_type: "OFP",
+    pickrr_sub_status_code: "",
+  },
+  pkf_pf001: { scan_type: "PPF", pickrr_sub_status_code: "DAM" },
+  pkf: { scan_type: "PPF", pickrr_sub_status_code: "" },
+  pkf_pf002: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SNR",
+  },
+  pkf_pf003: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NA",
+  },
+  pkf_pf004: { scan_type: "PPF", pickrr_sub_status_code: "OTH" },
+  pkf_pf005: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NA",
+  },
+  pkf_pf006: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "REJ",
+  },
+  pkf_pf007: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NSL",
+  },
+  pkf_pf008: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SNR",
+  },
+  pkf_pf009: { scan_type: "PPF", pickrr_sub_status_code: "SU" },
+  pkf_pf010: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SNR",
+  },
+  pkf_pf011: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CANC",
+  },
+  pkf_pf012: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SC",
+  },
+  pkf_pf013: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SNR",
+  },
+  pkf_pf014: { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
+  pkf_pf015: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  pkf_pf016: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  pkf_pf017: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "REGU",
+  },
+  pkf_pf018: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  pkf_pf019: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  pkf_pf020: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  pkf_pf021: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  pkd: {
+    scan_type: "PP",
+    pickrr_sub_status_code: "",
+  },
+  ind: {
+    scan_type: "SHP",
+    pickrr_sub_status_code: "",
+  },
+  bgd: {
+    scan_type: "SHP",
+    pickrr_sub_status_code: "",
+  },
+  bgu: {
+    scan_type: "SHP",
+    pickrr_sub_status_code: "",
+  },
+  dpd: {
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  ard: {
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
+  rdc: {
+    scan_type: "RAD",
+    pickrr_sub_status_code: "",
+  },
+  ofd: {
+    scan_type: "OO",
+    pickrr_sub_status_code: "",
+  },
+  sud_ud001: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CI",
+  },
+  sud: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "",
+  },
+  sud_ud002: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "ODA",
+  },
+  sud_ud003: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  sud_ud004: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud005: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "AI",
+  },
+  sud_ud006: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CR",
+  },
+  sud_ud007: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  sud_ud008: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  sud_ud009: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "AI",
+  },
+  sud_ud010: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "OTH",
+  },
+  sud_ud011: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "REST",
+  },
+  sud_ud012: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  sud_ud013: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  sud_ud014: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud015: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud016: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud017: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud018: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud019: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud020: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud021: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud022: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud023: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud024: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud025: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud026: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud027: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud028: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "AI",
+  },
+  sud_ud029: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
+  sud_ud030: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNR",
+  },
+  sud_ud031: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "REST",
+  },
+  sud_ud032: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNA",
+  },
+  sud_ud033: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CI",
+  },
+  ddl: {
+    scan_type: "DL",
+    pickrr_sub_status_code: "",
+  },
+  rtl: {
+    scan_type: "RTO",
+    pickrr_sub_status_code: "",
+  },
+  rts: {
+    scan_type: "RTO-OT",
+    pickrr_sub_status_code: "",
+  },
+  rtd: {
+    scan_type: "RTD",
+    pickrr_sub_status_code: "",
+  },
+  lst: {
+    scan_type: "LT",
+    pickrr_sub_status_code: "",
+  },
+  dmg: {
+    scan_type: "DM",
+    pickrr_sub_status_code: "",
+  },
+  dsd: {
+    scan_type: "LT",
+    pickrr_sub_status_code: "",
+  },
 };
 
 const STATION_MAPPER = {
@@ -424,5 +703,9 @@ module.exports = {
   PULL_GROUP_NAME,
   PULL_TOPIC_NAME,
   PULL_MAPPER,
+  PUSH_PARTITION_COUNT,
+  CODE_MAPPER,
+  PUSH_TOPIC_NAME,
+  PUSH_GROUP_NAME,
   STATION_MAPPER,
 };
