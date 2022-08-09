@@ -63,7 +63,9 @@ const sendTrackDataToV1 = async (trackData) => {
 
     if (
       !(
-        authTokens.includes(trackData.auth_token) || shopPlatforms.includes(trackData.shop_platform)
+        authTokens.includes(trackData.auth_token) ||
+        shopPlatforms.includes(trackData.shop_platform) ||
+        trackData?.woocom_platform_obj
       )
     ) {
       return false;
