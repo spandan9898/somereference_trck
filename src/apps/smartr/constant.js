@@ -1,5 +1,5 @@
 const PULL_PARTITION_COUNT = 10;
-const PULL_GROUP_NAME = "smartr-pull-group";
+const PULL_GROUP_NAME = "smartr_pull_group";
 const PULL_TOPIC_NAME = "smartr_pull";
 
 const PULL_MAPPER = {
