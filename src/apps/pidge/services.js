@@ -120,7 +120,7 @@ const preparePidgePulledData = (pidgeDict) => {
     }
     let statusString = null;
     if (status) {
-      if ([13, 12, 21].includes(status)) {
+      if (["13", "12", "21"].includes(status)) {
         statusString = remarks ? `${status}_${remarks}` : status.toString();
       } else {
         statusString = status.toString();
@@ -141,8 +141,8 @@ const preparePidgePulledData = (pidgeDict) => {
     pickrrPidgeDict.scan_datetime = scanDatetime;
     pickrrPidgeDict.courier_status_code = statusString;
     pickrrPidgeDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
-    pickrrPidgeDict.track_info = remarks;
-    pickrrPidgeDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
+    pickrrPidgeDict.track_info = remarks || PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
+    pickrrPidgeDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type] || "";
     pickrrPidgeDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
     if (pickrrPidgeDict?.scan_type === "PP") {
       pickrrPidgeDict.pickup_datetime = pickrrPidgeDict?.scan_datetime;
