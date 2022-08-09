@@ -173,9 +173,6 @@ const preparePulledSmartrData = (smartrDict) => {
 };
 
 module.exports = {
-  preparePulledSmartrData,
-};
-
-module.exports = {
   prepareSmartrData,
+  preparePulledSmartrData,
 };
