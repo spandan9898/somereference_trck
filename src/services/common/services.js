@@ -10,7 +10,7 @@ const producerConnection = require("../../utils/producerConnection");
 const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 const { produceData } = require("../../utils/kafka");
 const { COMMON_TRACKING_TOPIC_NAME } = require("./constants");
-const { updateFreshdeskWebhookToMongo } = require("../pull");
+const { updateFreshdeskWebhookToMongo } = require("../pull/helpers");
 
 /**
  * @param trackingDoc -> tracking document(same as DB document)

@@ -5,6 +5,7 @@ const _ = require("lodash");
 
 const logger = require("../../../logger");
 const { TRACKING_PAGE_OTP_MESSAGE } = require("../common/constants");
+const commonTrackingInfoCol = require("./model");
 
 /**
  *
@@ -161,6 +162,50 @@ const checkIsAfter = (statusDate, placedDate) => {
     return false;
   }
 };
+
+/**
+ *
+ * @desc update freshdesk webhook data in pull mongodb
+ * @returns null
+ */
+const updateFreshdeskWebhookToMongo = async ({ courierTrackingId, statusType, logger }) => {
+  try {
+    let freshdeskWebhookColInstance;
+    if (process.env.NODE_ENV === "staging") {
+      freshdeskWebhookColInstance = await commonTrackingInfoCol({
+        hostName: HOST_NAMES.PULL_STATING_DB,
+        collectionName: process.env.FRESHDESK_WEBHOOK_TRACKING_COLLECTION_NAME,
+      });
+    } else {
+      freshdeskWebhookColInstance = await commonTrackingInfoCol({
+        collectionName: process.env.FRESHDESK_WEBHOOK_TRACKING_COLLECTION_NAME,
+      });
+    }
+
+    const queryObj = {
+      $and: [{ tracking_id: courierTrackingId }, { is_updated: false }],
+    };
+    const response = await freshdeskWebhookColInstance.findOneAndUpdate(
+      queryObj,
+      {
+        $set: {
+          is_updated: statusType === "Delivered" || statusType === "RTD",
+          status_sent: statusType,
+          updated_at: moment().toDate(),
+        },
+      },
+      { upsert: false }
+    );
+    return response?.value?.ticket_id;
+  } catch (error) {
+    logger.error(
+      `Updating Freshdesk Webhook Mongo Operation Failed for trackingId  --> ${courierTrackingId} for status ${statusType}`
+    );
+    return null;
+  }
+};
+
+
 module.exports = {
   mapStatusToEvent,
   checkIsAfter,
@@ -170,4 +215,5 @@ module.exports = {
   updateTrackModel,
   checkTriggerForPulledEvent,
   updateFlagForOtpDeliveredShipments,
+  updateFreshdeskWebhookToMongo,
 };

@@ -4,7 +4,7 @@ const _ = require("lodash");
 
 const logger = require("../../../logger");
 const { callLambdaFunction } = require("../../connector/lambda");
-const { updateStatusELK, commonTrackingDataProducer } = require("../../services/common/services");
+const { updateStatusELK, commonTrackingDataProducer, updateFreshdeskTrackingTicket } = require("../../services/common/services");
 const {
   fetchTrackingModelAndUpdateCache,
   getTrackDocumentfromMongo,
@@ -27,6 +27,7 @@ const callSendReportDataForPulledEvent = (trackingObj) => {
   updateStatusOnReport(trackingObj, logger, trackingElkClient,statusChangedFromPull);
   updateStatusELK(trackingObj, prodElkClient);
   commonTrackingDataProducer(trackingObj);
+  updateFreshdeskTrackingTicket(trackingObj);
 
   return true;
 };
