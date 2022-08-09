@@ -1,6 +1,9 @@
 const PULL_PARTITION_COUNT = 10;
 const PULL_GROUP_NAME = "smartr_pull_group";
 const PULL_TOPIC_NAME = "smartr_pull";
+const PUSH_PARTITION_COUNT = 10;
+const PUSH_TOPIC_NAME = "smartr_push";
+const PUSH_GROUP_NAME = "smartr-push-group";
 
 const PULL_MAPPER = {
   "pickup attempt": { scan_type: "PPF", pickrr_sub_status_code: "" },
@@ -186,9 +189,7 @@ const PULL_MAPPER = {
   "door delivered": { scan_type: "DL", pickrr_sub_status_code: "" },
   voided: { scan_type: "OC", pickrr_sub_status_code: "" },
 };
-const PUSH_PARTITION_COUNT = 10;
-const PUSH_TOPIC_NAME = "smartr_push";
-const PUSH_GROUP_NAME = "smartr-push-group";
+
 const CODE_MAPPER = {
   man: { scan_type: "OM", pickrr_sub_status_code: "" },
   can: { scan_type: "OC", pickrr_sub_status_code: "" },
