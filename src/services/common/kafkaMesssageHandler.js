@@ -19,6 +19,7 @@ const {
   getTrackingIdProcessingCount,
   updateTrackingProcessingCount,
   commonTrackingDataProducer,
+  updateFreshdeskTrackingTicket,
 } = require("./services");
 const { getElkClients } = require("../../utils");
 const logger = require("../../../logger");
@@ -134,6 +135,7 @@ class KafkaMessageHandler {
       sendTrackDataToV1(result);
       updateStatusELK(result, prodElkClient);
       triggerWebhook(result, trackingElkClient);
+      updateFreshdeskTrackingTicket(result);
 
       // blocking events to lambda (new pickrr connect service)
 
