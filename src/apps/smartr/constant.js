@@ -185,6 +185,7 @@ const PULL_MAPPER = {
   delivered: { scan_type: "DL", pickrr_sub_status_code: "" },
   "door delivered": { scan_type: "DL", pickrr_sub_status_code: "" },
   voided: { scan_type: "OC", pickrr_sub_status_code: "" },
+};
 const PUSH_PARTITION_COUNT = 10;
 const PUSH_TOPIC_NAME = "smartr_push";
 const PUSH_GROUP_NAME = "smartr-push-group";
