@@ -184,6 +184,7 @@ const updateFreshdeskTrackingTicket = async (trackData) => {
       statusType,
     });
     if (!ticketId) {
+      logger.info(`freshdesk ticket not found for tracking id! ${courierTrackingId}`);
       return null;
     }
     const URL = `https://pickrrsupport.freshdesk.com/api/v2/tickets/${ticketId}`;
@@ -203,6 +204,7 @@ const updateFreshdeskTrackingTicket = async (trackData) => {
       if (response.statusCode !== 200) {
         response = await makeApiCall.put();
       }
+      logger.info(`freshdesk ticket updated for tracking id! ${courierTrackingId}`);
       return response;
     } catch (error) {
       logger.error(`Updating Freshdesk Ticket API Failed for document  --> ${trackData}`);
