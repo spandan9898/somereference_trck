@@ -9,7 +9,6 @@ const {
 const { prepareEcommData } = require("../../apps/ecomm/services");
 const { prepareEkartData, preparePulledEkartData } = require("../../apps/ekart/services");
 const { prepareParceldoData } = require("../../apps/parceldo/services");
-const { preparePulledSmartrData } = require("../../apps/smartr/services");
 const {
   prepareShadowfaxData,
   preparePulledShadowfaxData,
@@ -19,7 +18,7 @@ const { prepareXbsData } = require("../../apps/xpressbees/services");
 const { preparePidgeData, preparePidgePulledData } = require("../../apps/pidge/services");
 const { prepareDtdcData, prepareDtdcPulledData } = require("../../apps/dtdc/services");
 const { prepareLoadshareData } = require("../../apps/loadshare/services");
-const { prepareSmartrData } = require("../../apps/smartr/services");
+const { prepareSmartrData, preparePulledSmartrData } = require("../../apps/smartr/services");
 
 const logger = require("../../../logger");
 const { DELHIVERY_REVERSE_MAPPER } = require("../../apps/delhivery/constant");
