@@ -93,7 +93,7 @@ const prepareSmartrData = (smartrDict) => {
  *
  * prepare Smartr Pulled Data
  * Sample Payload : {
-  AWBNumber: 'XSE-13107835',
+  AWBNumber: '13107835',
   Station: 'HSRL',
   Milestone: 'Booked',
   Pieces: 1,
