@@ -18,7 +18,7 @@ const { prepareXbsData } = require("../../apps/xpressbees/services");
 const { preparePidgeData, preparePidgePulledData } = require("../../apps/pidge/services");
 const { prepareDtdcData, prepareDtdcPulledData } = require("../../apps/dtdc/services");
 const { prepareLoadshareData } = require("../../apps/loadshare/services");
-const { prepareSmartrData } = require("../../apps/smartr/services");
+const { prepareSmartrData, preparePulledSmartrData } = require("../../apps/smartr/services");
 
 const logger = require("../../../logger");
 const { DELHIVERY_REVERSE_MAPPER } = require("../../apps/delhivery/constant");
@@ -157,6 +157,7 @@ const getPrepareFunction = (courierName) => {
     dtdc: prepareDtdcData,
     dtdc_pull: prepareDtdcPulledData,
     loadshare: prepareLoadshareData,
+    smartr_pull: preparePulledSmartrData,
     pikndel: preparePikNDelData,
     smartr: prepareSmartrData,
     pikndel_pull: preparePulledPikndelData,

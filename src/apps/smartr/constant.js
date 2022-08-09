@@ -1,6 +1,195 @@
+const PULL_PARTITION_COUNT = 10;
+const PULL_GROUP_NAME = "smartr_pull_group";
+const PULL_TOPIC_NAME = "smartr_pull";
 const PUSH_PARTITION_COUNT = 10;
 const PUSH_TOPIC_NAME = "smartr_push";
 const PUSH_GROUP_NAME = "smartr-push-group";
+
+const PULL_MAPPER = {
+  "pickup attempt": { scan_type: "PPF", pickrr_sub_status_code: "" },
+  "pickup attempt_pickup cancelled by shipper": { scan_type: "OC", pickrr_sub_status_code: "" },
+  "pickup attempt_shipment not ready or no shipment today": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SNR",
+  },
+  "pickup attempt_holiday- shipper closed": { scan_type: "PPF", pickrr_sub_status_code: "NA" },
+  "pickup attempt_package not travel worthy; shipment hold": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "DAM",
+  },
+  "pickup attempt_pickup not done - destination pin code not serviceable": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NSL",
+  },
+  "pickup attempt_shipment or package damaged": { scan_type: "PPF", pickrr_sub_status_code: "DAM" },
+  "pickup attempt_pickup declined-prohibited content": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "REJ",
+  },
+  "pickup attempt_shipment held-regulartory paperworks required": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "REGU",
+  },
+  "pickup attempt_pickup wrongly registered by shipper": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "DUP",
+  },
+  "pickup attempt_pickup not done - contact person not available": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "SU",
+  },
+  "pickup attempt_missed pickup- reached late": { scan_type: "PPF", pickrr_sub_status_code: "NA" },
+  "pickup attempt_disturbance or natural disaster or strike": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NSL",
+  },
+  "pickup attempt_shippers or consignee request to hold at location": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  "pickup attempt_change in product-on shippers request on fresh awb": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "DUP",
+  },
+  "pickup attempt_shipment manifested but not received by destination": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  "pickup attempt_shipment lost": { scan_type: "PPF", pickrr_sub_status_code: "LT" },
+  "pickup attempt_shipment not connected-space constraint": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "NA",
+  },
+  "pickup attempt_shipment returned back to shipper": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  "pickup attempt_canvas bag or shipment received short": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "OTH",
+  },
+  "delivery attempt_residence or office closed": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "CNA",
+  },
+  "delivery attempt_consignee refused to accept": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "CR",
+  },
+  "delivery attempt_no such consignee at given address": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "CNA",
+  },
+  "delivery attempt_consignee not available at given address": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "CNA",
+  },
+  "delivery attempt_holiday:scheduled for delivery on next working day": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_shippers or consignee request to hold at location": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "CI",
+  },
+  "delivery attempt_address incomplete or incorrect can not deliver": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "AI",
+  },
+  "delivery attempt_non serviceable area or pin code": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "ODA",
+  },
+  "delivery attempt_consignee shifted": { scan_type: "NDR", pickrr_sub_status_code: "AI" },
+  "delivery attempt_shipment manifested but not received by destination": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_tender schedule expired": { scan_type: "NDR", pickrr_sub_status_code: "SD" },
+  "delivery attempt_disturbance or natural disaster or strike": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "REST",
+  },
+  "delivery attempt_consignee not yet checked in": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "CNA",
+  },
+  "delivery attempt_consignee out of station": { scan_type: "NDR", pickrr_sub_status_code: "CNA" },
+  "delivery attempt_shipment lost": { scan_type: "NDR", pickrr_sub_status_code: "SD" },
+  "delivery attempt_shipment destroyed or abandoned": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_shipment redirected to alternate address": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_package interchanged at org or dest": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_late arrival or scheduled for next working day delivery": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_shipment held-regulartory paperworks required": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_shipment misrouted in network": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_time constraint-scheduled for next day delivery": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_return to origin as per sop": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "OTH",
+  },
+  "delivery attempt_shipment impounded by regulatory authority": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_shipment or package damaged": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_shipment partially delivered": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_attempt in secondary address": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "AI",
+  },
+  "delivery attempt_shipment received;paperwork not received": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "OTH",
+  },
+  "delivery attempt_canvas bag or shipment received short": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
+  "delivery attempt_dod or fod or cod not ready": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "CNR",
+  },
+  booked: { scan_type: "OP", pickrr_sub_status_code: "" },
+  "picked up": { scan_type: "PP", pickrr_sub_status_code: "" },
+  accepted: { scan_type: "SHP", pickrr_sub_status_code: "" },
+  "return to shipper": { scan_type: "RTO", pickrr_sub_status_code: "" },
+  "returned to shipper": { scan_type: "RTO", pickrr_sub_status_code: "" },
+  "rto initiated": { scan_type: "RTO", pickrr_sub_status_code: "" },
+  departed: { scan_type: "OT", pickrr_sub_status_code: "" },
+  arrived: { scan_type: "OT", pickrr_sub_status_code: "" },
+  "out for delivery": { scan_type: "OO", pickrr_sub_status_code: "" },
+  delivered: { scan_type: "DL", pickrr_sub_status_code: "" },
+  "door delivered": { scan_type: "DL", pickrr_sub_status_code: "" },
+  voided: { scan_type: "OC", pickrr_sub_status_code: "" },
+};
+
 const CODE_MAPPER = {
   man: { scan_type: "OM", pickrr_sub_status_code: "" },
   can: { scan_type: "OC", pickrr_sub_status_code: "" },
@@ -512,6 +701,10 @@ const STATION_MAPPER = {
 };
 
 module.exports = {
+  PULL_PARTITION_COUNT,
+  PULL_GROUP_NAME,
+  PULL_TOPIC_NAME,
+  PULL_MAPPER,
   PUSH_PARTITION_COUNT,
   CODE_MAPPER,
   PUSH_TOPIC_NAME,
