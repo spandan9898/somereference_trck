@@ -39,7 +39,7 @@ const listener = async (consumer, partitionCount) => {
       autoCommitInterval: 60000,
       partitionsConsumedConcurrently: partitionCount,
       eachMessage: (consumedPayload) => {
-        const courierName = consumedPayload.topic === "smartr" ? "smartr" : "smartr_pull";
+        const courierName = consumedPayload.topic === "smartr_push" ? "smartr_push" : "smartr_pull";
         KafkaMessageHandler.init(consumedPayload, courierName);
       },
     });
