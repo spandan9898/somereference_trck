@@ -13,6 +13,7 @@ const {
   updateFlagForOtpDeliveredShipments,
   updateScanStatus,
   checkIsAfter,
+  checkTriggerForPulledEventPidgePOC,
 } = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
@@ -123,7 +124,12 @@ const updateTrackDataToPullMongo = async ({
     const zone = res?.billing_zone;
     const eddStampInDb = res?.edd_stamp;
     if (isFromPulled) {
-      const isAllow = checkTriggerForPulledEvent(trackObj, res);
+      let isAllow = false;
+      if (res?.tracking_id === "1747388") {
+        isAllow = checkTriggerForPulledEventPidgePOC(trackObj, res);
+      } else {
+        isAllow = checkTriggerForPulledEvent(trackObj, res);
+      }
       if (!isAllow) {
         return false;
       }
@@ -134,14 +140,27 @@ const updateTrackDataToPullMongo = async ({
       // Handle duplicate Entry
 
       if (isFromPulled) {
-        for (const trackItem of res.track_arr) {
-          const isSameScanType = updatedObj["status.current_status_type"] === trackItem.scan_type;
-          const scanTimeCheck = moment(trackItem.scan_datetime).diff(
-            moment(updatedObj["status.current_status_time"]),
-            "seconds"
-          );
-          if (isSameScanType && scanTimeCheck <= 60) {
-            return false;
+        if (res?.tracking_id === "1747388") {
+          for (const trackItem of res.track_arr) {
+            const isSameScanType = updatedObj["status.current_status_type"] === trackItem.scan_type;
+            const scanTimeCheck = moment(updatedObj["status.current_status_time"]).diff(
+              trackItem.scan_datetime,
+              "seconds"
+            );
+            if (isSameScanType && scanTimeCheck <= 60) {
+              return false;
+            }
+          }
+        } else {
+          for (const trackItem of res.track_arr) {
+            const isSameScanType = updatedObj["status.current_status_type"] === trackItem.scan_type;
+            const scanTimeCheck = moment(trackItem.scan_datetime).diff(
+              moment(updatedObj["status.current_status_time"]),
+              "seconds"
+            );
+            if (isSameScanType && scanTimeCheck <= 60) {
+              return false;
+            }
           }
         }
       }
