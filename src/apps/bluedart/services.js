@@ -297,7 +297,6 @@ const preparePickrrBluedartDict = (requestedTrackData) => {
   if (_.isEmpty(trackingList)) {
     return {};
   }
-  // console.log("Tracking List: "+ trackingList[0]);
   return preparePickrrObjData(trackingList[0]);
 };
 

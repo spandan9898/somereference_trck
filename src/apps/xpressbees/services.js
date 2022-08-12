@@ -92,7 +92,6 @@ const prepareXbsData = (xbsDict) => {
     pickrrXbsDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrXbsDict.pickrr_sub_status_code = reasonDict?.pickrr_sub_status_code || "";
     pickrrXbsDict.courier_status_code = statusScanType;
-    console.log(`PickrrDict: ${JSON.stringify(pickrrXbsDict)}`)
     return pickrrXbsDict;
   } catch (error) {
     pickrrXbsDict.err = error.message;
