@@ -131,6 +131,42 @@ const checkTriggerForPulledEvent = (preparedDict, dbResponse) => {
 
 /**
  *
+ * @param {*} preparedDict
+ * @param {*} dbResponse
+ * @desc https://drive.google.com/file/d/1U-Kh18Yfj1-iJDD9Rd8d887PxM7hZ8AK/view?usp=sharing
+ */
+const checkTriggerForPulledEventPidgePOC = (preparedDict, dbResponse) => {
+  const latestCurrentStatusTimeInDB = _.get(dbResponse, "track_arr[0].scan_datetime");
+  const pulledCurrentStatusTime = _.get(preparedDict, "scan_datetime");
+
+  const currentStatusTypeInDB = _.get(dbResponse, "track_arr[0].scan_type");
+  const pulledCurrentStatusType = _.get(preparedDict, "scan_type");
+
+  if (!["DL", "RTO", "RTD", "PP"].includes(preparedDict.scan_type)) {
+    if (moment(latestCurrentStatusTimeInDB).isAfter(moment(pulledCurrentStatusTime))) {
+      return false;
+    }
+    if (
+      currentStatusTypeInDB === "DL" &&
+      !["RTO", "RTO-OO", "RTO-OT", "RTD"].includes(pulledCurrentStatusType)
+    ) {
+      return false;
+    }
+  }
+
+  if (
+    moment(pulledCurrentStatusTime).isAfter(moment(latestCurrentStatusTimeInDB)) &&
+    currentStatusTypeInDB === "DL" &&
+    pulledCurrentStatusType === "PP"
+  ) {
+    return false;
+  }
+
+  return true;
+};
+
+/**
+ *
  *Finds Otp Flag in Track Arrays for Delivered Shipment
  *
  */
@@ -216,4 +252,5 @@ module.exports = {
   checkTriggerForPulledEvent,
   updateFlagForOtpDeliveredShipments,
   updateFreshdeskWebhookToMongo,
+  checkTriggerForPulledEventPidgePOC,
 };
