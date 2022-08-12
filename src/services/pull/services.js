@@ -69,7 +69,10 @@ const updateCacheTrackArray = async ({ trackArray, awb, trackingDocument }) => {
  */
 const redisCheckAndReturnTrackData = async (preparedTrackData, isFromPulled) => {
   const trackObj = { ...preparedTrackData };
-
+  if (preparedTrackData?.awb === "1747388") {
+    logger.info("went into handling for pidge awb");
+    return trackObj;
+  }
   const isExists = await checkAwbInCache({ trackObj, updateCacheTrackArray, isFromPulled });
   if (isExists) {
     return false;
