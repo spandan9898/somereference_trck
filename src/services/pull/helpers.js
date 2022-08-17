@@ -100,7 +100,7 @@ const updateTrackModel = (cacheTrakModel, trackingDocument) => {
  * @desc https://drive.google.com/file/d/1U-Kh18Yfj1-iJDD9Rd8d887PxM7hZ8AK/view?usp=sharing
  */
 const checkTriggerForPulledEvent = (preparedDict, dbResponse) => {
-  const latestCurrentStatusTimeInDB = _.get(dbResponse, "track_arr[0].current_status_time");
+  const latestCurrentStatusTimeInDB = _.get(dbResponse, "track_arr[0].scan_datetime");
   const pulledCurrentStatusTime = _.get(preparedDict, "scan_datetime");
 
   const currentStatusTypeInDB = _.get(dbResponse, "track_arr[0].scan_type");
