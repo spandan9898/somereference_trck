@@ -144,7 +144,6 @@ const updateStatusFromCSV = async (csvData, platformNames) => {
               is_manual_update: true,
             },
             $push: {
-              audit: trackItem.auditObj,
               track_arr: {
                 $each: [trackItem.trackArrStatus],
                 $position: 0,
