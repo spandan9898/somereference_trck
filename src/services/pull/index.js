@@ -253,7 +253,7 @@ const updateTrackDataToPullMongo = async ({
         upsert: process.env.NODE_ENV === "staging",
       }
     );
-
+  
     // audit Logs is Updated Over here
 
     await fetchAndUpdateAuditLogsData({ courierTrackingId: trackObj.awb, updatedObj });
@@ -271,7 +271,24 @@ const updateTrackDataToPullMongo = async ({
     return false;
   }
 };
-
+//Handel special case for Ekart Lat-Long
+  const updateEkartLatLong = async (res) => {
+      const pullProdCollectionInstance = await commonTrackingInfoCol();
+      const pickrrEkartDict = {
+        latitude:"",
+        longitude:""
+      }
+      const {awb, longitude, latitude} = res;
+      pickrrEkartDict.latitude = latitude;
+      pickrrEkartDict.longitude = longitude;
+      const response = await pullProdCollectionInstance.findOneAndUpdate(
+        { tracking_id: awb },
+        {
+          $set: pickrrEkartDict,
+        }
+      )
+  }
 module.exports = {
   updateTrackDataToPullMongo,
+  updateEkartLatLong,
 };

@@ -5,6 +5,7 @@ const { getPrepareFunction } = require("./helpers");
 
 const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
+const { updateEkartLatLong } = require("../pull/index");
 
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
@@ -89,7 +90,17 @@ class KafkaMessageHandler {
         res = prepareFunc(consumedPayload);
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
-
+      //handel special case for Ekart to store Lat-Long
+      if(res.track_info === "delivery_attempt_metadata"){
+        if(res.latitude !== "" && res.longitude !== ""){
+          updateEkartLatLong(res);
+        }
+        else{
+          logger.error('Empty Lat-Long Filed')
+        }
+        
+        return {};
+      }
       if (!res.awb) return {};
 
       const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
