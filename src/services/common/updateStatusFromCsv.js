@@ -123,6 +123,7 @@ const updateStatusFromCSV = async (csvData, platformNames) => {
   }
 
   const pullDbInstance = await getDbCollectionInstance();
+  const auditDbInstance = await getDbCollectionInstance({ collectionName: "track_audit" });
   const filteredCsvData = await checkStatus(csvData, pullDbInstance);
 
   if (isEmpty(filteredCsvData)) {
@@ -158,11 +159,36 @@ const updateStatusFromCSV = async (csvData, platformNames) => {
       }
     )
   );
+  try {
+    await auditDbInstance.bulkWrite(
+      trackData.map((eachData) => {
+        const auditObjKey = `${eachData.statusObj.current_status_type}_${moment().format(
+          "YYYY-MM-DD HH:mm:ss"
+        )}`;
+        const auditObjValue = {
+          source: "hard_manual",
+          scantime: eachData.statusObj.current_status_time,
+          pulled_at: moment().toDate(),
+        };
+
+        return {
+          updateOne: {
+            filter: { courier_tracking_id: eachData.trackingId },
+            update: { $set: { [`audit.${auditObjKey}`]: auditObjValue } },
+          },
+        };
+      })
+    );
+  } catch (error) {
+    logger.error("Manual Update Error -->", error);
+  }
 
   console.log("response", response);
+
   if (process.env.NODE_ENV === "production") {
     await updateOtherSources(filteredCsvData, pullDbInstance, platformNames);
   }
+
   return true;
 };
 
