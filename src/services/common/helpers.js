@@ -1,7 +1,10 @@
 const { orderBy, isEmpty, get, cloneDeep } = require("lodash");
 
 const { prepareAmazeData } = require("../../apps/amaze/services");
-const { preparePickrrBluedartDict } = require("../../apps/bluedart/services");
+const {
+  preparePickrrBluedartDict,
+  preparePickrrBluedartPulledData,
+} = require("../../apps/bluedart/services");
 const {
   prepareDelhiveryData,
   prepareDelhiveryPulledData,
@@ -142,6 +145,7 @@ const getPrepareFunction = (courierName) => {
   const courierPrepareMapFunctions = {
     amaze: prepareAmazeData,
     bluedart: preparePickrrBluedartDict,
+    bluedart_pull: preparePickrrBluedartPulledData,
     delhivery: prepareDelhiveryData,
     delhivery_pull: prepareDelhiveryPulledData,
     ecomm: prepareEcommData,
