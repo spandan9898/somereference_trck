@@ -2,6 +2,8 @@
 const moment = require("moment");
 const _ = require("lodash");
 
+// const { update } = require("lodash");
+
 const { storeDataInCache, updateCacheTrackArray, softCancellationCheck } = require("./services");
 const { prepareTrackDataToUpdateInPullDb } = require("./preparator");
 const commonTrackingInfoCol = require("./model");
@@ -71,7 +73,12 @@ const fetchAndUpdateAuditLogsData = async ({
  * @desc sending tracking data to pull mongodb
  * @returns success or error
  */
-const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = false }) => {
+const updateTrackDataToPullMongo = async ({
+  trackObj,
+  logger,
+  isFromPulled = false,
+  qcDetails = null,
+}) => {
   const result = prepareTrackDataToUpdateInPullDb(trackObj, isFromPulled);
   if (!result.success) {
     throw new Error(result.err);
@@ -119,6 +126,9 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     if (isFromPulled) {
       const isAllow = checkTriggerForPulledEvent(trackObj, res);
       if (!isAllow) {
+        logger.info(
+          `trigger returned false for - ${result.awb} and status - ${updatedObj["status.current_status_type"]}`
+        );
         return false;
       }
     }
@@ -134,7 +144,13 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
             moment(updatedObj["status.current_status_time"]),
             "seconds"
           );
+
+          // const absoluteTimeCheck = Math.abs(scanTimeCheck);
+
           if (isSameScanType && scanTimeCheck <= 60) {
+            logger.info(
+              `event discarded for tracking id --> ${result.awb}, status --> ${trackItem?.scan_type}`
+            );
             return false;
           }
         }
@@ -200,6 +216,9 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
         eddStampInDb,
         statusType,
       });
+
+      // in case of QCF, edd_stamp will be what was calculated before QC Failure
+
       if (pickrrEDD) {
         updatedObj.edd_stamp = pickrrEDD;
       }
@@ -216,7 +235,11 @@ const updateTrackDataToPullMongo = async ({ trackObj, logger, isFromPulled = fal
     if (["NDR", "UD"].includes(firstTrackObjOfTrackArr.scan_type)) {
       updatedObj.is_ndr = true;
     }
-
+    if (res?.is_reverse_qc) {
+      if (qcDetails && isFromPulled) {
+        updatedObj.qc_details = qcDetails;
+      }
+    }
     const pullInstance =
       process.env.NODE_ENV === "staging"
         ? pullStagingCollectionInstance
