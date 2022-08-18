@@ -143,8 +143,10 @@ const updateTrackDataToPullMongo = async ({
             moment(updatedObj["status.current_status_time"]),
             "seconds"
           );
-          const absoluteTimeCheck = Math.abs(scanTimeCheck);
-          if (isSameScanType && absoluteTimeCheck <= 60) {
+
+          // const absoluteTimeCheck = Math.abs(scanTimeCheck);
+
+          if (isSameScanType && scanTimeCheck <= 60) {
             logger.info(
               `event discarded for tracking id --> ${result.awb}, status --> ${trackItem?.scan_type}`
             );
