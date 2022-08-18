@@ -126,7 +126,6 @@ const prepareDelhiveryData = (delhiveryDict) => {
 
     }
     pickrrDelhiveryDict.otp = trackData?.DeliveryOTP || "";
-    console.log(`pickrrDelhiveryDict: ${JSON.stringify(pickrrDelhiveryDict)}`)
     return pickrrDelhiveryDict;
   } catch (error) {
     pickrrDelhiveryDict.err = error.message;
