@@ -72,6 +72,10 @@ const prepareLoadshareData = (loadshareDict) => {
     pickrrLoadshareDict.scan_datetime = statusDate;
     pickrrLoadshareDict.courier_status_code = mapperString;
     pickrrLoadshareDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
+    if(scanType.scan_type === "DL"){
+      pickrrLoadshareDict.is_otp_delivered = loadshareDict?.reasonBO?.isOtpVerified || "" ;
+      pickrrLoadshareDict.otp = loadshareDict?.reasonBO?.otp || "";
+    }
     pickrrLoadshareDict.track_info = loadshareDict?.reasonBO?.reasonDescription
       ? `${PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type]}_${
           loadshareDict?.reasonBO?.reasonDescription
