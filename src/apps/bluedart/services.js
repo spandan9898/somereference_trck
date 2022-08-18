@@ -313,7 +313,7 @@ const preparePickrrBluedartDict = (requestedTrackData) => {
     "pickupDate" : "", // not needed as logic in pull-server
     "pickupTime" : "", // not needed as logic in pull-server
     "event" : "pull",
-    "returnWaybill" : ""
+    "isRTO" : ""
 }
  */
 const preparePickrrBluedartPulledData = (bluedartDict) => {
@@ -339,7 +339,7 @@ const preparePickrrBluedartPulledData = (bluedartDict) => {
       trackingId,
       ScanCode,
       ScanGroupType,
-      returnWaybill,
+      isRTO,
       receivedBy,
       ScannedLocation,
       Scan,
@@ -360,7 +360,7 @@ const preparePickrrBluedartPulledData = (bluedartDict) => {
       return { err: "Unknown status code" };
     }
     pickrrBluedartDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
-    if (returnWaybill) {
+    if (isRTO) {
       if (scanType?.scan_type === "DL") {
         pickrrBluedartDict.scan_type = "RTD";
       } else if (scanType?.scan_type === "OO") {
@@ -374,14 +374,12 @@ const preparePickrrBluedartPulledData = (bluedartDict) => {
     statusDate = statusDate.isValid()
       ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
       : moment().format("YYYY-MM-DD HH:mm:ss.SSS");
-    if (scanType?.scan_type === "PP") {
-      pickrrBluedartDict.pickup_datetime = moment(statusDate).toDate();
-    }
+
     let received = "";
     if (scanType?.scan_type === "DL") {
       received = receivedBy;
     }
-    pickrrBluedartDict.received_by = received;
+    pickrrBluedartDict.received_by = received || "";
     let eddDate = moment(edd, "DD MMMM YYYY");
     eddDate = eddDate.isValid() ? eddDate.format("YYYY-MM-DD HH:mm:ss.SSS") : "";
     pickrrBluedartDict.scan_datetime = statusDate;
@@ -391,8 +389,13 @@ const preparePickrrBluedartPulledData = (bluedartDict) => {
     pickrrBluedartDict.EDD = eddDate;
     pickrrBluedartDict.courier_status_code = mapperString;
     pickrrBluedartDict.track_info = Scan || "";
-    pickrrBluedartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type] || "";
+    pickrrBluedartDict.pickrr_status =
+      PICKRR_STATUS_CODE_MAPPING[pickrrBluedartDict?.scan_type] || "";
     pickrrBluedartDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
+    if (pickrrBluedartDict?.scan_type === "PP") {
+      pickrrBluedartDict.pickup_datetime = pickrrBluedartDict?.scan_datetime;
+    }
+
     return pickrrBluedartDict;
   } catch (error) {
     pickrrBluedartDict.err = error.message;
