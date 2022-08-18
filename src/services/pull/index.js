@@ -13,6 +13,7 @@ const {
   updateFlagForOtpDeliveredShipments,
   updateScanStatus,
   checkIsAfter,
+  findLastPrePickupTime,
 } = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
@@ -163,12 +164,12 @@ const updateTrackDataToPullMongo = async ({
     updatedObj.courier_edd = latestCourierEDD;
 
     let pickupDateTime = null;
-    const placedData = res?.order_created_at;
     if (res?.pickup_datetime && statusType !== "PP") {
       pickupDateTime = res?.pickup_datetime;
     } else {
+      const lastPrePickupTime = findLastPrePickupTime(sortedTrackArray);
       sortedTrackArray.forEach((trackEvent) => {
-        const isAfter = checkIsAfter(trackEvent?.scan_datetime, placedData);
+        const isAfter = checkIsAfter(trackEvent?.scan_datetime, lastPrePickupTime);
         if (PP_PROXY_LIST.includes(trackEvent?.scan_type) && isAfter) {
           pickupDateTime = trackEvent?.scan_datetime;
         }
