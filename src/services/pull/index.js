@@ -269,7 +269,7 @@ const updateTrackDataToPullMongo = async ({
 
     // audit Logs is Updated Over here
 
-    await fetchAndUpdateAuditLogsData({ courierTrackingId: trackObj.awb, updatedObj });
+    await fetchAndUpdateAuditLogsData({ courierTrackingId: trackObj.awb, updatedObj, isFromPulled, logger});
     await storeDataInCache(result);
     await updateTrackingProcessingCount(trackObj, "remove");
     updateCacheTrackArray({
