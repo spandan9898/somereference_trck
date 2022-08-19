@@ -133,6 +133,21 @@ const findLostDate = (trackArr, latestStatus) => {
 /**
  *
  * @param {*} trackArr
+ * @returns
+ */
+const findQCFailureReason = (trackArr) => {
+  for (let i = 0; i < trackArr.length; i += 1) {
+    if (trackArr[i].scan_type === "QCF") {
+      return trackArr[i].scan_status;
+    }
+  }
+
+  return null;
+};
+
+/**
+ *
+ * @param {*} trackArr
  */
 const findLatestNDRDetails = (trackArr) => {
   for (let i = 0; i < trackArr.length; i += 1) {
@@ -255,4 +270,5 @@ module.exports = {
   findLostDate,
   findNDRTrackInfos,
   findLatestRtdDate,
+  findQCFailureReason,
 };

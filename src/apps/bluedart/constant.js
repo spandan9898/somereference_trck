@@ -111,7 +111,9 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "123-t": { scan_type: "RTO", pickrr_sub_status_code: "" },
   "074-rt": { scan_type: "RTO", pickrr_sub_status_code: "" },
   "123-rt": { scan_type: "RTO", pickrr_sub_status_code: "" },
-  "503-s": { scan_type: "UD", pickrr_sub_status_code: "OTH" },
+
+  // "503-s": { scan_type: "UD", pickrr_sub_status_code: "OTH" },
+
   "034-t": { scan_type: "RTO-OT", pickrr_sub_status_code: "" },
   "019-s": { scan_type: "RTO-OO", pickrr_sub_status_code: "" },
   "035-rt": { scan_type: "RTO-OO", pickrr_sub_status_code: "" },
@@ -152,9 +154,17 @@ const BLUEDART_CODE_MAPPER_V2 = {
 const PUSH_PARTITION_COUNT = 10;
 const PUSH_GROUP_NAME = "bluedart-push-group";
 const PUSH_TOPIC_NAME = "bluedart_push";
+
+const PULL_TOPIC_NAME = "bluedart_pull";
+const PULL_PARTITION_COUNT = 10;
+const PULL_GROUP_NAME = "bluedart-pull-group";
+
 module.exports = {
   BLUEDART_CODE_MAPPER_V2,
   PUSH_PARTITION_COUNT,
   PUSH_GROUP_NAME,
   PUSH_TOPIC_NAME,
+  PULL_TOPIC_NAME,
+  PULL_GROUP_NAME,
+  PULL_PARTITION_COUNT,
 };

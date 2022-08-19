@@ -187,7 +187,7 @@ const EKART_STATUS_MAPPER = {
   },
 };
 const EKART_PULL_MAPPER = {
-  SHIPMENT_CREATED: {
+  shipment_created: {
     courier_remarks: "Shipment created successfully in system.",
     courier_status: "shipment_created",
     courier_status_type: "shipment_created",
@@ -196,7 +196,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Order Placed",
     pickrr_sub_status: "",
   },
-  PICKUP_SCHEDULED: {
+  pickup_scheduled: {
     courier_remarks:
       "Pickup from seller location scheduled and expectancy created at ekl-marketplace",
     courier_status: "pickup_scheduled",
@@ -206,7 +206,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Order Manifested",
     pickrr_sub_status: "",
   },
-  OUT_FOR_PICKUP: {
+  out_for_pickup: {
     courier_remarks: "Shipment is out for pickup.",
     courier_status: "out_for_pickup",
     courier_status_type: "out_for_pickup",
@@ -215,7 +215,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Out for pickup",
     pickrr_sub_status: "",
   },
-  PICKUP_COMPLETE: {
+  pickup_complete: {
     courier_remarks: "Shipment is picked from seller location.",
     courier_status: "pickup_complete",
     courier_status_type: "pickup_complete",
@@ -224,7 +224,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Order Picked Up",
     pickrr_sub_status: "",
   },
-  PICKUP_REATTEMPT: {
+  pickup_reattempt: {
     courier_remarks: "Shipment pickup failed, reattempt pickup again.",
     courier_status: "pickup_reattempt",
     courier_status_type: "pickup_reattempt",
@@ -233,17 +233,17 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Pickup Failed",
     pickrr_sub_status: "",
   },
-  PICKUP_CANCELLED: {
+  pickup_cancelled: {
     courier_remarks:
       "Shipment pickup cancelled, can be due to cancellation, number of pickup attempts exceeded minimum value, etc.",
     courier_status: "pickup_cancelled",
     courier_status_type: "pickup_cancelled",
-    pickrr_code: "OC",
-    pickrr_sub_status_code: "",
+    pickrr_code: "PPF",
+    pickrr_sub_status_code: "CANC",
     pickrr_status: "Order Cancelled",
     pickrr_sub_status: "",
   },
-  IN_TRANSIT: {
+  in_transit: {
     courier_remarks: "Expected/Recieved at MotherHub. Or in transit to a hub",
     courier_status: "in_transit",
     courier_status_type: "in_transit",
@@ -252,7 +252,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Order in Transit",
     pickrr_sub_status: "",
   },
-  OUT_FOR_DELIVERY: {
+  out_for_delivery: {
     courier_remarks: "Shipment is out for delivery.",
     courier_status: "out_for_delivery",
     courier_status_type: "out_for_delivery",
@@ -261,7 +261,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Order Out for Delivery",
     pickrr_sub_status: "",
   },
-  UNDELIVERED: {
+  undelivered: {
     courier_remarks:
       "Shipment was undelivered, can be due to- delivery attempted and failed, delivery not attempted, shipment got damaged, heavy load, vehivle breakdown, heavy traffic, heavy rain, door was locked, holiday, etc.",
     courier_status: "undelivered",
@@ -271,7 +271,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Failed Attempt at Delivery",
     pickrr_sub_status: "Shipper Delay",
   },
-  UNSUCCESSFUL_DELIVERY_ATTEMPT_DUE_TO_ADDRESS_ISSUES: {
+  unsuccessful_delivery_attempt_due_to_address_issues: {
     courier_remarks:
       "Shipment delivery attempt unsuccessful due to incomplete customer address or provided address not found.",
     courier_status: "unsuccessful_delivery_attempt_due_to_address_issues",
@@ -281,7 +281,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Failed Attempt at Delivery",
     pickrr_sub_status: "Address Issue",
   },
-  UNDELIVERED_DUE_TO_REJECTION_BY_CUSTOMER: {
+  undelivered_due_to_rejection_by_customer: {
     courier_remarks: "Shipment delivery failed due to customer rejection.",
     courier_status: "undelivered_due_to_rejection_by_customer",
     courier_status_type: "undelivered_due_to_rejection_by_customer",
@@ -290,7 +290,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Failed Attempt at Delivery",
     pickrr_sub_status: "Customer Refused Shipment",
   },
-  UNDELIVERED_DUE_TO_CUSTOMER_UNAVAILABILITY: {
+  undelivered_due_to_customer_unavailability: {
     courier_remarks:
       "Shipment undelivered due to customer unavailability or delivery reschedule requested by customer.",
     courier_status: "undelivered_due_to_customer_unavailability",
@@ -302,7 +302,7 @@ const EKART_PULL_MAPPER = {
       "Customer Not Available/Office/Residence Closed/Consignee phone not reachable",
   },
 
-  UNDELIVERED_DUE_TO_CASH_UNAVAILABILITY: {
+  undelivered_due_to_cash_unavailability: {
     courier_remarks: "Shipment undelivered as COD not ready",
     courier_status: "undelivered_due_to_cash_unavailability",
     courier_status_type: "undelivered_due_to_cash_unavailability",
@@ -311,16 +311,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Failed Attempt at Delivery",
     pickrr_sub_status: "Cash Not Ready",
   },
-  UNDELIVERED_DUE_TO_REQUEST_FOR_RESCHEDULE: {
-    courier_remarks: "Undelivered. (Rescheduled to: __dd-mm-yy__)",
-    courier_status: "undelivered_due_to_request_for_reschedule",
-    courier_status_type: "undelivered_due_to_request_for_reschedule",
-    pickrr_code: "UD",
-    pickrr_sub_status_code: "CD",
-    pickrr_status: "Failed Attempt at Delivery",
-    pickrr_sub_status: "Customer Delay/Future Delivery",
-  },
-  UNSUCCESSFUL_DELIVERY_ATTEMPT_DUE_TO_SERVICEABILITY_ISSUES: {
+  unsuccessful_delivery_attempt_due_to_serviceability_issues: {
     courier_remarks: "Shipment undelivered due to non serviceable pincode",
     courier_status: "unsuccessful_delivery_attempt_due_to_serviceability_issues",
     courier_status_type: "unsuccessful_delivery_attempt_due_to_serviceability_issues",
@@ -329,7 +320,16 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Failed Attempt at Delivery",
     pickrr_sub_status: "Out of Delivery area",
   },
-  DELIVERED: {
+  undelivered_due_to_request_for_reschedule: {
+    courier_remarks: "Undelivered. (Rescheduled to: __dd-mm-yy__)",
+    courier_status: "undelivered_due_to_request_for_reschedule",
+    courier_status_type: "undelivered_due_to_request_for_reschedule",
+    pickrr_code: "UD",
+    pickrr_sub_status_code: "CD",
+    pickrr_status: "Failed Attempt at Delivery",
+    pickrr_sub_status: "Customer Delay/Future Delivery",
+  },
+  delivered: {
     courier_remarks: "Shipment delivered",
     courier_status: "delivered",
     courier_status_type: "delivered",
@@ -338,7 +338,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Order Delivered",
     pickrr_sub_status: "",
   },
-  LOST: {
+  lost: {
     courier_remarks: "Shipment got lost",
     courier_status: "lost",
     courier_status_type: "lost",
@@ -347,7 +347,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Shipment Lost",
     pickrr_sub_status: "",
   },
-  UNTRACEABLE: {
+  untraceable: {
     courier_remarks: "Shipment untraceable",
     courier_status: "untraceable",
     courier_status_type: "untraceable",
@@ -356,7 +356,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Shipment Lost",
     pickrr_sub_status: "",
   },
-  RTO_CREATED: {
+  rto_created: {
     courier_remarks: "Shipment marked for Return To Origin",
     courier_status: "rto_created",
     courier_status_type: "rto_created",
@@ -365,7 +365,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Order Returned Back",
     pickrr_sub_status: "",
   },
-  RTO_IN_TRANSIT: {
+  rto_in_transit: {
     courier_remarks: "RTO shipment in transit",
     courier_status: "rto_in_transit",
     courier_status_type: "rto_in_transit",
@@ -374,7 +374,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "RTO in Transit",
     pickrr_sub_status: "",
   },
-  RTO_COMPLETED: {
+  rto_completed: {
     courier_remarks: "RTO shipment received by merchant",
     courier_status: "rto_completed",
     courier_status_type: "rto_completed",
@@ -383,7 +383,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Order Returned to Consignee",
     pickrr_sub_status: "",
   },
-  RTO_CANCELLED: {
+  rto_cancelled: {
     courier_remarks: "RTO marked cancelled",
     courier_status: "rto_cancelled",
     courier_status_type: "rto_cancelled",
@@ -392,7 +392,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "RTO Undelivered",
     pickrr_sub_status: "",
   },
-  DAMAGED: {
+  damaged: {
     courier_remarks: "Shipment damaged",
     courier_status: "damaged",
     courier_status_type: "damaged",
@@ -401,7 +401,7 @@ const EKART_PULL_MAPPER = {
     pickrr_status: "Shipment Damaged",
     pickrr_sub_status: "",
   },
-  RTO_RECEIVED: {
+  rto_received: {
     courier_remarks: "Marked_As_RTO",
     courier_status: "rto_received",
     courier_status_type: "rto_received",
