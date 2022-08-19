@@ -53,16 +53,26 @@ const fetchAndUpdateAuditLogsData = async ({
       scantime: updatedObj["status.current_status_time"],
       pulled_at: moment().toDate(),
     };
+    const eddAuditObj = {
+      from: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
+      scan_type: updatedObj["status.current_status_type"],
+      courier_edd: updatedObj?.courier_edd,
+      edd_stamp: updatedObj?.edd_stamp,
+      pickup_datetime: updatedObj?.pickup_datetime,
+    };
     await auditInstance.findOneAndUpdate(
       queryObj,
       {
         $set: { [`audit.${auditObjKey}`]: auditObjValue },
+        $push: {
+          edd_audit: eddAuditObj,
+        },
       },
       { upsert: true }
     );
   } catch (error) {
     logger.error(
-      `Updating Audit Logs Failed for trackingId  --> ${courierTrackingId} for status ${updatedObj["status.current_status_type"]} at scanTime ${updatedObj["status.current_status_time"]}`
+      `Updating Audit Logs Failed for trackingId  --> ${courierTrackingId} for status ${updatedObj["status.current_status_type"]} at scanTime ${updatedObj["status.current_status_time"]}`, error
     );
   }
 };
@@ -259,7 +269,7 @@ const updateTrackDataToPullMongo = async ({
 
     // audit Logs is Updated Over here
 
-    await fetchAndUpdateAuditLogsData({ courierTrackingId: trackObj.awb, updatedObj });
+    await fetchAndUpdateAuditLogsData({ courierTrackingId: trackObj.awb, updatedObj, isFromPulled, logger});
     await storeDataInCache(result);
     await updateTrackingProcessingCount(trackObj, "remove");
     updateCacheTrackArray({
