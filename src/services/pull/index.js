@@ -53,10 +53,20 @@ const fetchAndUpdateAuditLogsData = async ({
       scantime: updatedObj["status.current_status_time"],
       pulled_at: moment().toDate(),
     };
+    const eddAuditObj = {
+      from: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
+      scan_type: updatedObj["status.current_status_type"],
+      courier_edd: updateObj["courier_edd"],
+      edd_stamp: updateObj["edd_stamp"],
+      pickup_datetime: updateObj["pickup_datetime"]
+    };
     await auditInstance.findOneAndUpdate(
       queryObj,
       {
         $set: { [`audit.${auditObjKey}`]: auditObjValue },
+        $push: {
+          edd_audit: eddAuditObj,
+        },
       },
       { upsert: true }
     );
