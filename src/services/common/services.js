@@ -168,6 +168,9 @@ const commonTrackingDataProducer = async (trackingObj) => {
  */
 const updateFreshdeskTrackingTicket = async (trackData) => {
   try {
+    if (process.env.UPDATE_FRESHDESK_TICKET === "false") {
+      return null;
+    }
     let statusType = trackData?.status?.current_status_type;
     const courierTrackingId = trackData?.tracking_id;
     if (statusType === "DL") {
