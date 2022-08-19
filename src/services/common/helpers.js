@@ -21,6 +21,7 @@ const { prepareXbsData } = require("../../apps/xpressbees/services");
 const { preparePidgeData, preparePidgePulledData } = require("../../apps/pidge/services");
 const { prepareDtdcData, prepareDtdcPulledData } = require("../../apps/dtdc/services");
 const { prepareLoadshareData } = require("../../apps/loadshare/services");
+const { prepareKerryIndevPulledData } = require("../../apps/kerryindev/services");
 const { prepareSmartrData, preparePulledSmartrData } = require("../../apps/smartr/services");
 
 const logger = require("../../../logger");
@@ -163,6 +164,7 @@ const getPrepareFunction = (courierName) => {
     loadshare: prepareLoadshareData,
     smartr_pull: preparePulledSmartrData,
     pikndel: preparePikNDelData,
+    kerryindev_pull: prepareKerryIndevPulledData,
     smartr: prepareSmartrData,
     pikndel_pull: preparePulledPikndelData,
   };
