@@ -59,12 +59,12 @@ const prepareKerryIndevPulledData = (kerryindevDict) => {
     if (returnWaybill && pickrrKerryIndevDict?.scan_type === "RTD") {
       pickrrKerryIndevDict.scan_type = "RTO";
     }
-    if (returnWaybill) {
+    if (returnWaybill && pickrrKerryIndevDict?.scan_type !== "RTO") {
       if (pickrrKerryIndevDict.scan_type === "DL") {
         pickrrKerryIndevDict.scan_type = "RTD";
       } else if (pickrrKerryIndevDict.scan_type === "OO") {
         pickrrKerryIndevDict.scan_type = "RTO-OO";
-      } else if (pickrrKerryIndevDict.scan_type !== "RTO") {
+      } else {
         pickrrKerryIndevDict.scan_type = "RTO-OT";
       }
     }
