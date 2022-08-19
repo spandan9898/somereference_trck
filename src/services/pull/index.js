@@ -56,9 +56,9 @@ const fetchAndUpdateAuditLogsData = async ({
     const eddAuditObj = {
       from: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
       scan_type: updatedObj["status.current_status_type"],
-      courier_edd: updateObj["courier_edd"],
-      edd_stamp: updateObj["edd_stamp"],
-      pickup_datetime: updateObj["pickup_datetime"]
+      courier_edd: updateObj?.courier_edd,
+      edd_stamp: updateObj?.edd_stamp,
+      pickup_datetime: updateObj?.pickup_datetime,
     };
     await auditInstance.findOneAndUpdate(
       queryObj,
