@@ -55,40 +55,41 @@ const prepareKerryIndevPulledData = (kerryindevDict) => {
     if (!scanType) {
       return { err: "Unknown status code" };
     }
-    if (returnWaybill && scanType === "RTD") {
-      scanType.scan_type = "RTO";
+    pickrrKerryIndevDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
+    if (returnWaybill && pickrrKerryIndevDict?.scan_type === "RTD") {
+      pickrrKerryIndevDict.scan_type = "RTO";
     }
-    let reverseScan = "";
     if (returnWaybill) {
-      if (scanType?.scan_type === "DL") {
-        reverseScan = "RTD";
-      } else if (scanType?.scan_type === "OO") {
-        reverseScan = "RTO-OO";
-      } else {
-        reverseScan = "RTO-OT";
+      if (pickrrKerryIndevDict.scan_type === "DL") {
+        pickrrKerryIndevDict.scan_type = "RTD";
+      } else if (pickrrKerryIndevDict.scan_type === "OO") {
+        pickrrKerryIndevDict.scan_type = "RTO-OO";
+      } else if (pickrrKerryIndevDict.scan_type !== "RTO") {
+        pickrrKerryIndevDict.scan_type = "RTO-OT";
       }
-      scanType.scan_type = reverseScan;
     }
+
     const statusDatetime = `${Statusdate} ${Statustime}`;
     let statusDate = moment(statusDatetime, "DD-MMM-YYYY HH:mm:ss");
     statusDate = statusDate.isValid()
       ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
       : moment().format("YYYY-MM-DD HH:mm:ss.SSS");
-    if (scanType?.scan_type === "PP") {
+    if (pickrrKerryIndevDict.scan_type === "PP") {
       pickrrKerryIndevDict.pickup_datetime = moment(statusDate).toDate();
     }
 
     pickrrKerryIndevDict.scan_datetime = statusDate;
-    pickrrKerryIndevDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
+
     pickrrKerryIndevDict.track_location = Location || "";
     pickrrKerryIndevDict.awb = trackingId;
     pickrrKerryIndevDict.courier_status_code = statusString;
     pickrrKerryIndevDict.track_info = Remarks || "";
-    pickrrKerryIndevDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
+    pickrrKerryIndevDict.pickrr_status =
+      PICKRR_STATUS_CODE_MAPPING[pickrrKerryIndevDict?.scan_type];
     pickrrKerryIndevDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
     pickrrKerryIndevDict.received_by = "";
 
-    pickrrKerryIndevDict.EDD = null;
+    pickrrKerryIndevDict.EDD = "";
     return pickrrKerryIndevDict;
   } catch (error) {
     pickrrKerryIndevDict.err = error.message;
