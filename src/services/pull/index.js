@@ -224,7 +224,7 @@ const updateTrackDataToPullMongo = async ({
         latestCourierEDD,
         pickupDateTime,
         eddStampInDb,
-        statusType,
+        statusType: firstTrackObjOfTrackArr.scan_type,
       });
 
       // in case of QCF, edd_stamp will be what was calculated before QC Failure
