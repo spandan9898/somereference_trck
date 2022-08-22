@@ -198,7 +198,7 @@ const PUSH_TOPIC_NAME = "xbs_push";
 const PUSH_PARTITION_COUNT = 10;
 const PULL_PARTITION_COUNT = 10;
 
-const PULL_GROUP_NAME = "xbs-pull-group";
+const PULL_GROUP_NAME = "xbs_pull_group";
 const PULL_TOPIC_NAME = "xbs_pull";
 
 module.exports = {
