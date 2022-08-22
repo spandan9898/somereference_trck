@@ -21,12 +21,45 @@ const {
   commonTrackingDataProducer,
   updateFreshdeskTrackingTicket,
 } = require("./services");
-const { getElkClients } = require("../../utils");
+const { getElkClients, findOneDocumentFromMongo } = require("../../utils");
 const logger = require("../../../logger");
 const { TrackingLogger } = require("../../../logger");
 const { sendDataToElk } = require("./elk");
+const commonTrackingInfoCol = require("../pull/model");
 
 const trackingLogger = TrackingLogger("tracking/payloads");
+
+/**
+ *
+ * puts back otp data in trackEvent
+ */
+const putBackOtpDataInTrackEvent = async (obj) => {
+  const {
+    awb,
+    scan_type: scanType,
+    otp,
+    otp_remarks: otpRemarks,
+    scan_datetime: scanDateTime,
+  } = obj;
+  const queryObj = { $or: [{ tracking_id: awb }, { courier_tracking_id: awb }] };
+  let latestOtp;
+  const projectionObj = { track_arr: 1 };
+  const { track_arr: trackArr } = await findOneDocumentFromMongo(queryObj, projectionObj);
+  for (let i = 0; i < trackArr.length; i += 1) {
+    const { scan_type: dbScanType, scan_datetime: dbScanTime } = trackArr[i];
+    if (dbScanType === scanType && scanDateTime === dbScanTime) {
+      if (otpRemarks) {
+        trackArr[i].otp_remarks = otpRemarks;
+      }
+      if (otp) {
+        trackArr[i].otp = otp;
+        latestOtp = otp;
+      }
+    }
+  }
+  const col = await commonTrackingInfoCol();
+  await col.findOneAndUpdate(queryObj, { track_arr: trackArr, latest_otp: latestOtp });
+};
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -101,6 +134,11 @@ class KafkaMessageHandler {
       const trackData = await redisCheckAndReturnTrackData(res, isFromPulled);
 
       if (!trackData) {
+        if (!consumedPayload.topic.includes("pull")) {
+          if (res.otp || res.otp_remarks) {
+            putBackOtpDataInTrackEvent(res);
+          }
+        }
         logger.info(`data already exists or not found in DB! ${res.awb}`);
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return {};
