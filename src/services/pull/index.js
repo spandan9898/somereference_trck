@@ -72,7 +72,8 @@ const fetchAndUpdateAuditLogsData = async ({
     );
   } catch (error) {
     logger.error(
-      `Updating Audit Logs Failed for trackingId  --> ${courierTrackingId} for status ${updatedObj["status.current_status_type"]} at scanTime ${updatedObj["status.current_status_time"]}`, error
+      `Updating Audit Logs Failed for trackingId  --> ${courierTrackingId} for status ${updatedObj["status.current_status_type"]} at scanTime ${updatedObj["status.current_status_time"]}`,
+      error
     );
   }
 };
@@ -269,7 +270,12 @@ const updateTrackDataToPullMongo = async ({
 
     // audit Logs is Updated Over here
 
-    await fetchAndUpdateAuditLogsData({ courierTrackingId: trackObj.awb, updatedObj, isFromPulled, logger});
+    await fetchAndUpdateAuditLogsData({
+      courierTrackingId: trackObj.awb,
+      updatedObj,
+      isFromPulled,
+      logger,
+    });
     await storeDataInCache(result);
     await updateTrackingProcessingCount(trackObj, "remove");
     updateCacheTrackArray({
