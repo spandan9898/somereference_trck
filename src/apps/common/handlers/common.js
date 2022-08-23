@@ -95,14 +95,16 @@ module.exports.updateStatus = async function updateStatus(req, reply) {
         try {
           const header = Object.keys(results.data).join(" ");
           if (header !== "tracking_id date status sub_status_code status_text") {
-            throw new Error("Please provide valid header");
+            throw new Error(
+              "Please provide valid header -> tracking_id | date | status | sub_status_code | status_text"
+            );
           }
           if (results.data) {
             csvData.push(results.data);
           }
         } catch (error) {
           sendEmail({
-            to: ["spandan.mishra@pickrr.com", "tarun@pickrr.com", "ankitkumar@pickrr.com"],
+            to: ["spandan.mishra@pickrr.com", "tarun@pickrr.com", "ankitkumar@pickrr.com", email],
             subject: `Lost Shipment Report Upload Error`,
             text: error.message,
           });
