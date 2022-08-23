@@ -170,9 +170,16 @@ const CODE_MAPPER = {
   },
 };
 
+const PULL_PARTITION_COUNT = 6;
+const PULL_TOPIC_NAME = "loadshare_pull";
+const PULL_GROUP_NAME = "loadshare_pull_group";
+
 module.exports = {
   PUSH_PARTITION_COUNT,
   CODE_MAPPER,
   PUSH_TOPIC_NAME,
   PUSH_GROUP_NAME,
+  PULL_PARTITION_COUNT,
+  PULL_TOPIC_NAME,
+  PULL_GROUP_NAME,
 };
