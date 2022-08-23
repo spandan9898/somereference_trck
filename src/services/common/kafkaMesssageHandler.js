@@ -90,13 +90,13 @@ class KafkaMessageHandler {
         res = prepareFunc(consumedPayload);
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
-      //handel special case for Ekart to store Lat-Long
-      if(res.track_info === "delivery_attempt_metadata"){
+      //handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
+      if(courierName === "ekart" && res.track_info === "delivery_attempt_metadata"){
         if(res.latitude !== "" && res.longitude !== ""){
           updateEkartLatLong(res);
         }
         else{
-          logger.error('Empty Lat-Long Filed')
+          logger.error(`Empty Lat-Long Filed, TrackingID: ${res.awb}`);
         }
         
         return {};

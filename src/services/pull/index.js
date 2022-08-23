@@ -281,6 +281,8 @@ const updateTrackDataToPullMongo = async ({
       const {awb, longitude, latitude} = res;
       pickrrEkartDict.latitude = latitude;
       pickrrEkartDict.longitude = longitude;
+      pickrrEkartDict.updated_at = moment().toDate();
+      pickrrEkartDict.last_update_from = "kafka";
       const response = await pullProdCollectionInstance.findOneAndUpdate(
         { tracking_id: awb },
         {

@@ -68,7 +68,7 @@ const prepareEkartData = (ekartDict) => {
       statusScanType = subReasons.length ? `${event}_${subReasons[0]}` : event;
     }
     if(event === "delivery_attempt_metadata"){
-      pickrrEkartDict.awb = trackData.vendor_tracking_id;
+      pickrrEkartDict.awb = trackData?.vendor_tracking_id;
       pickrrEkartDict.track_info = event;
       pickrrEkartDict.longitude = metaData?.attempt_location?.longitude;
       pickrrEkartDict.latitude = metaData?.attempt_location?.latitude;
