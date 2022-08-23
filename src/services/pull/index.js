@@ -183,8 +183,10 @@ const updateTrackDataToPullMongo = async ({
         PICKRR_STATUS_CODE_MAPPING[firstTrackObjOfTrackArr.scan_type];
     }
     // lat-long marking and storing in trackDB
-    if(firstTrackObjOfTrackArr?.latitude && firstTrackObjOfTrackArr?.longitude){
+    if(firstTrackObjOfTrackArr?.latitude ){
       updatedObj.latitude = firstTrackObjOfTrackArr.latitude;
+    }
+    if(firstTrackObjOfTrackArr?.longitude){
       updatedObj.longitude = firstTrackObjOfTrackArr.longitude;
     }
     // Otp Delivered Shipments marking

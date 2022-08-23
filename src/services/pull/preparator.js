@@ -55,8 +55,8 @@ const prepareTrackDataToUpdateInPullDb = (trackObj, isFromPulled) => {
   eventObj.update_time = moment().toDate();
   eventObj.system_updated_at = moment().toDate();
   if(trackData?.longitude || trackData?.latitude){
-    eventObj.longitude = trackData.longitude 
-    eventObj.latitude = trackData.latitude
+    eventObj.longitude = trackData?.longitude 
+    eventObj.latitude = trackData?.latitude
   }
   if (trackData?.otp) {
     eventObj.otp = trackData.otp;

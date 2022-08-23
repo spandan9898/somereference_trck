@@ -173,8 +173,8 @@ const preparePickrrObjData = (trackObj) => {
     scanMappingItem.scan_type === "UD" ? "NDR" : scanMappingItem.scan_type;
   pickrrBluedartDict.scan_datetime = scanDatetime;
   if(scanMappingItem.scan_type === "DL"){
-    pickrrBluedartDict.longitude = trackObj.longitude;
-    pickrrBluedartDict.latitude = trackObj.latitude;
+    pickrrBluedartDict.longitude = trackObj?.longitude;
+    pickrrBluedartDict.latitude = trackObj?.latitude;
   }
   pickrrBluedartDict.track_info = trackInfo;
   pickrrBluedartDict.awb = awb;
