@@ -148,9 +148,9 @@ const prepareLoadsharePulledData = (loadshareDict) => {
 
     // let statusDate = moment(loadshareDict?.eventTime, "YYYY-MM-DD HH:mm:ss");
 
-    const statusDate = moment(parseInt(loadshareDict?.eventTime, 10)).format(
-      "YYYY-MM-DD HH:mm:ss.SSS"
-    );
+    const statusDate = moment(parseInt(loadshareDict?.eventTime, 10))
+      .add(330, "minutes")
+      .format("YYYY-MM-DD HH:mm:ss.SSS");
     if (scanType.scan_type === "PP") {
       pickrrLoadshareDict.pickup_datetime = statusDate;
     }
