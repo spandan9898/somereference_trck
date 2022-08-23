@@ -244,8 +244,8 @@ const PULL_MAPPER = {
     scan_type: "UD",
   },
 };
-const PULL_GROUP_NAME = "ekart-pull-group";
-const PULL_TOPIC_NAME = "ekart_pull";
+const PULL_GROUP_NAME = "holisol_pull_group";
+const PULL_TOPIC_NAME = "holisol_pull";
 const PULL_PARTITION_COUNT = 10;
 
 module.exports = {
