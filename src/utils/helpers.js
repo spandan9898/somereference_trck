@@ -88,6 +88,51 @@ const compareScanUnixTimeAndCheckIfExists = (newScanTime, newScanType, cachedDat
 
 /**
  *
+ * @param {*} trackingObj -> latest document to be send on common topic
+ * @desc check if latest event sent on common kafka topic is same as
+ * current status
+ * @returns true/false
+ */
+const isLatestEventSentOnCommonTopic = async (trackingObj) => {
+  try {
+    const currentStatusTime = trackingObj?.status?.current_status_time;
+    const currentStatusType = trackingObj?.status?.current_status_type;
+    const awb = trackingObj?.courier_tracking_id;
+    if (!currentStatusTime || !currentStatusType || !awb) {
+      return false;
+    }
+    const cacheData = (await getObject(awb)) || {};
+    const latestEventSent = cacheData.latestEventSentOnCommonTopic;
+    const newScanTime = moment(currentStatusTime).unix();
+    let keys = null;
+    if (latestEventSent) {
+      keys = latestEventSent.split("_");
+    }
+    if (keys && keys[0] === currentStatusType) {
+      let oldScanTime = +keys[1];
+      oldScanTime += 330 * 60;
+      const diff = (newScanTime - oldScanTime) / 60;
+      if (diff >= -1 && diff <= 1) {
+        logger.info(
+          `latest event already sent on kafka for awb: ${awb}, currentStatusType: ${currentStatusType}, currentStatusTime: ${currentStatusTime}`
+        );
+        return true;
+      }
+    }
+    cacheData.latestEventSentOnCommonTopic = `${currentStatusType}_${newScanTime}`;
+    await storeInCache(awb, cacheData);
+    logger.info(
+      `latest event not sent on kafka for awb: ${awb}, currentStatusType: ${currentStatusType}, currentStatusTime: ${currentStatusTime}`
+    );
+    return false;
+  } catch (error) {
+    logger.error("Error in checking isLatestEventSentOnCommonTopic", error);
+    return false;
+  }
+};
+
+/**
+ *
  * @param {*} trackObj
  * @param {*} cachedData
  * @returns
@@ -400,4 +445,5 @@ module.exports = {
   getElkClients,
   ofdCount,
   sendEmail,
+  isLatestEventSentOnCommonTopic,
 };
