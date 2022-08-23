@@ -3,7 +3,6 @@ const moment = require("moment");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { PULL_MAPPER } = require("./constant");
 const logger = require("../../../logger");
-const { CODE_MAPPER } = require("../loadshare/constant");
 
 /**
  *
@@ -48,23 +47,58 @@ const preparePulledHolisolData = (holisolDict) => {
     if (!mapperString) {
       return { err: "mapper String doesn't exist" };
     }
-    const scanType = CODE_MAPPER[mapperString.toLowerCase()];
+    const scanType = PULL_MAPPER[mapperString.toLowerCase()];
+    if (!scanType) {
+      logger.error(`Holisol Preparator Error --> ${mapperString}`);
+      return { err: "scanType doesn't exist!" };
+    }
     if (holisolDict?.isRto) {
       if (scanType?.scan_type === "DL") {
         scanType.scan_type = "RTD";
       } else if (scanType?.scan_type === "OO") {
-        scanType.scan_type = "RTO-00";
+        scanType.scan_type = "RTO-OO";
       } else {
         scanType.scan_type = "RTO-OT";
       }
     }
-
+    pickrrHolisolDict.scan_type = scanType?.scan_type === "UD" ? "NDR" : scanType?.scan_type;
+    pickrrHolisolDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
+    let statusDate = moment(holisolDict?.createdAt, "M/DD/YYYY LTS");
+    statusDate = statusDate.isValid()
+      ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
+      : moment().format("YYYY-MM-DD HH:mm:ss.SSS");
+    pickrrHolisolDict.scan_datetime = statusDate;
+    if (pickrrHolisolDict?.scan_type === "PP") {
+      pickrrHolisolDict.pickup_datetime = pickrrHolisolDict?.scan_datetime;
+    }
+    let eddDate = moment(holisolDict?.expectedDOD, "M/DD/YYYY LTS");
+    eddDate = eddDate.isValid() ? eddDate.format("YYYY-MM-DD HH:mm:ss") : "";
+    pickrrHolisolDict.EDD = eddDate;
+    pickrrHolisolDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[pickrrHolisolDict?.scan_type];
+    pickrrHolisolDict.track_location = holisolDict?.city;
+    pickrrHolisolDict.track_info = holisolDict?.message || pickrrHolisolDict?.pickrr_status;
     return pickrrHolisolDict;
   } catch (error) {
     pickrrHolisolDict.err = error.message;
     return pickrrHolisolDict;
   }
 };
+
+const payload = {
+  trackingId: "HL6474312806",
+  event: "pull",
+  isReverse: false,
+  isRto: true,
+  expectedDOD: "8/1/2022 10:30:59 AM",
+  awb: "HL5103093123",
+  message: "Return order received",
+  createdAt: "7/22/2022 10:45:06 PM",
+  city: "NA",
+  serialNo: "413",
+  ndrCode: "",
+};
+
+console.log(preparePulledHolisolData(payload));
 
 module.exports = {
   preparePulledHolisolData,
