@@ -170,7 +170,7 @@ const CODE_MAPPER = {
   },
 };
 
-const PULL_PARTITION_COUNT = 10;
+const PULL_PARTITION_COUNT = 6;
 const PULL_TOPIC_NAME = "loadshare_pull";
 const PULL_GROUP_NAME = "loadshare_pull_group";
 
