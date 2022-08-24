@@ -27,6 +27,7 @@ const logger = require("../../../logger");
 const { TrackingLogger } = require("../../../logger");
 const { sendDataToElk } = require("./elk");
 const commonTrackingInfoCol = require("../pull/model");
+const { updateFlagForOtpDeliveredShipments } = require("../pull/helpers");
 
 const trackingLogger = TrackingLogger("tracking/payloads");
 
@@ -62,7 +63,10 @@ const putBackOtpDataInTrackEvent = async (obj) => {
     }
   }
   const col = await commonTrackingInfoCol();
-  await col.findOneAndUpdate(queryObj, { $set: { track_arr: trackArr, latest_otp: latestOtp } });
+  const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr);
+  await col.findOneAndUpdate(queryObj, {
+    $set: { track_arr: trackArr, latest_otp: latestOtp, is_otp_delivered: isOtpDelivered },
+  });
 };
 
 /**
