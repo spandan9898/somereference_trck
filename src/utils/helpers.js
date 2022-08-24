@@ -102,15 +102,14 @@ const isLatestEventSentOnCommonTopic = async (trackingObj) => {
       return false;
     }
     const cacheData = (await getObject(awb)) || {};
-    const latestEventSent = cacheData.latestEventSentOnCommonTopic;
+    const latestEventSent = cacheData?.latest_event_sent_on_common_topic;
     const newScanTime = moment(currentStatusTime).unix();
     let keys = null;
     if (latestEventSent) {
       keys = latestEventSent.split("_");
     }
     if (keys && keys[0] === currentStatusType) {
-      let oldScanTime = +keys[1];
-      oldScanTime += 330 * 60;
+      const oldScanTime = keys[1];
       const diff = (newScanTime - oldScanTime) / 60;
       if (diff >= -1 && diff <= 1) {
         logger.info(
@@ -119,7 +118,7 @@ const isLatestEventSentOnCommonTopic = async (trackingObj) => {
         return true;
       }
     }
-    cacheData.latestEventSentOnCommonTopic = `${currentStatusType}_${newScanTime}`;
+    cacheData.latest_event_sent_on_common_topic = `${currentStatusType}_${newScanTime}`;
     await storeInCache(awb, cacheData);
     logger.info(
       `latest event not sent on kafka for awb: ${awb}, currentStatusType: ${currentStatusType}, currentStatusTime: ${currentStatusTime}`
