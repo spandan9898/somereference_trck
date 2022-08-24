@@ -1,5 +1,6 @@
 /* eslint-disable no-promise-executor-return */
 const _ = require("lodash");
+const moment = require("moment");
 
 const { getPrepareFunction } = require("./helpers");
 
@@ -41,13 +42,15 @@ const putBackOtpDataInTrackEvent = async (obj) => {
     otp_remarks: otpRemarks,
     scan_datetime: scanDateTime,
   } = obj;
-  const queryObj = { $or: [{ tracking_id: awb }, { courier_tracking_id: awb }] };
   let latestOtp;
+  const queryObj = { $or: [{ tracking_id: awb }, { courier_tracking_id: awb }] };
+  const eventScanTime = moment(scanDateTime).subtract(330, "m").toDate();
   const projectionObj = { track_arr: 1 };
-  const { track_arr: trackArr } = await findOneDocumentFromMongo(queryObj, projectionObj);
+  const { track_arr: trackArr } = await findOneDocumentFromMongo({ queryObj, projectionObj });
   for (let i = 0; i < trackArr.length; i += 1) {
     const { scan_type: dbScanType, scan_datetime: dbScanTime } = trackArr[i];
-    if (dbScanType === scanType && scanDateTime === dbScanTime) {
+    const isSame = moment(eventScanTime).isSame(moment(dbScanTime));
+    if (dbScanType === scanType && isSame) {
       if (otpRemarks) {
         trackArr[i].otp_remarks = otpRemarks;
       }
@@ -55,10 +58,11 @@ const putBackOtpDataInTrackEvent = async (obj) => {
         trackArr[i].otp = otp;
         latestOtp = otp;
       }
+      break;
     }
   }
   const col = await commonTrackingInfoCol();
-  await col.findOneAndUpdate(queryObj, { track_arr: trackArr, latest_otp: latestOtp });
+  await col.findOneAndUpdate(queryObj, { $set: { track_arr: trackArr, latest_otp: latestOtp } });
 };
 
 /**
@@ -134,7 +138,7 @@ class KafkaMessageHandler {
       const trackData = await redisCheckAndReturnTrackData(res, isFromPulled);
 
       if (!trackData) {
-        if (!consumedPayload.topic.includes("pull")) {
+        if (!courierName.includes("pull")) {
           if (res.otp || res.otp_remarks) {
             putBackOtpDataInTrackEvent(res);
           }
