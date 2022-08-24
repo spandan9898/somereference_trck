@@ -13,6 +13,7 @@ const {
   findDeliveryDate,
   findRTODate,
   findFirstNdrDate,
+  findQCFailureReason,
   findNDRTrackInfos,
   findLatestRtdDate,
 } = require("./helpers");
@@ -79,6 +80,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     latest_ndr_status_code: NDRObject.latest_ndr_status_code,
     latest_ndr_reason: NDRObject.latest_ndr_reason,
     rto_waybill: trackData?.rto_waybill || "",
+    rto_reason: trackData?.rto_reason || "",
 
     // rto_waybill isn't handled on PULL
 
@@ -86,6 +88,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     delivery_date: findDeliveryDate(trackData?.track_arr || {}),
     rto_date: findRTODate(trackData?.track_arr || {}),
     pickrr_tracking_id: trackData.tracking_id,
+    qc_rejection_reason: findQCFailureReason(trackData?.track_arr || {}),
     rtdDate: findLatestRtdDate(trackData?.trackArr || []),
   };
 

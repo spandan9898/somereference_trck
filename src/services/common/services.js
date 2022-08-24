@@ -4,11 +4,13 @@ const moment = require("moment");
 const logger = require("../../../logger");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("../../apps/webhookClients/common/constants");
 const { getObject, setObject } = require("../../utils");
+const { MakeAPICall } = require("../../utils");
 const { elkDataUpdate } = require("./elk");
 const producerConnection = require("../../utils/producerConnection");
 const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 const { produceData } = require("../../utils/kafka");
 const { COMMON_TRACKING_TOPIC_NAME } = require("./constants");
+const { updateFreshdeskWebhookToMongo } = require("../pull/helpers");
 
 /**
  * @param trackingDoc -> tracking document(same as DB document)
@@ -115,7 +117,12 @@ const commonTrackingDataProducer = async (trackingObj) => {
       "promise_edd",
       "sync_count",
       "is_ndr",
-      "latest_otp",
+      "is_reverse_qc", // reverse_qc key from order placing
+      "latest_otp", // qc_rejection_reason string
+      "qc_rejection_reason", // qc_rejection_reason string
+      "qc_bill",
+      "qcf_bill",
+      "order_pk",
     ];
 
     const defaultValue = {
@@ -124,7 +131,11 @@ const commonTrackingDataProducer = async (trackingObj) => {
 
     const payload = {};
     trackingItemList.forEach((item) => {
-      payload[item] = trackingObj[item];
+      if (item === "order_pk") {
+        payload[item] = trackingObj?.order_pk || null;
+      } else {
+        payload[item] = trackingObj[item];
+      }
       if (item in defaultValue) {
         payload[item] = payload[item] || defaultValue[item];
       }
@@ -151,9 +162,66 @@ const commonTrackingDataProducer = async (trackingObj) => {
   }
 };
 
+/**
+ *
+ * @param {*} trackingObj -> DB Tracking Document
+ */
+const updateFreshdeskTrackingTicket = async (trackData) => {
+  try {
+    if (process.env.UPDATE_FRESHDESK_TICKET === "false") {
+      return null;
+    }
+    let statusType = trackData?.status?.current_status_type;
+    const courierTrackingId = trackData?.tracking_id;
+    if (statusType === "DL") {
+      statusType = "Delivered";
+    } else if (statusType === "RTD") {
+      statusType = "RTD";
+    } else if (statusType.includes("RTO")) {
+      statusType = "RTO";
+    } else {
+      return null;
+    }
+    const ticketId = await updateFreshdeskWebhookToMongo({
+      courierTrackingId,
+      statusType,
+    });
+    if (!ticketId) {
+      logger.info(`freshdesk ticket not found for tracking id! ${courierTrackingId}`);
+      return null;
+    }
+    const URL = `https://pickrrsupport.freshdesk.com/api/v2/tickets/${ticketId}`;
+    const authToken = process.env.FRESHDESK_TICKET_UPDATE_TOKEN;
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: authToken,
+    };
+    const payload = {
+      custom_fields: {
+        cf_awb_status: statusType,
+      },
+    };
+    const makeApiCall = new MakeAPICall(URL, payload, headers, undefined, 5);
+    try {
+      let response = await makeApiCall.put();
+      if (response.statusCode !== 200) {
+        response = await makeApiCall.put();
+      }
+      logger.info(`freshdesk ticket updated for tracking id! ${courierTrackingId}`);
+      return response;
+    } catch (error) {
+      logger.error(`Updating Freshdesk Ticket API Failed for document  --> ${trackData}`);
+    }
+  } catch (error) {
+    logger.error(`Updating Freshdesk Webhook Operation Failed for document  --> ${trackData}`);
+  }
+  return null;
+};
+
 module.exports = {
   updateStatusELK,
   getTrackingIdProcessingCount,
   updateTrackingProcessingCount,
   commonTrackingDataProducer,
+  updateFreshdeskTrackingTicket,
 };

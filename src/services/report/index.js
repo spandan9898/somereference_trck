@@ -10,7 +10,13 @@ const { findLostDate } = require("./helpers");
  * @param {*} trackObj
  * @param {*} logger
  */
-const updateStatusOnReport = async (trackObj, logger, elkClient, isManualUpdate = false) => {
+const updateStatusOnReport = async (
+  trackObj,
+  logger,
+  elkClient,
+  isManualUpdate = false,
+  statusChangedFromPull = false
+) => {
   const latestScanType = _.get(trackObj, "track_arr[0].scan_type", null);
   const latestScanStatus = _.get(trackObj, "track_arr[0].scan_status", "") || "";
   if (
@@ -46,6 +52,18 @@ const updateStatusOnReport = async (trackObj, logger, elkClient, isManualUpdate 
   result.last_update_from_kafka = result.last_updated_date;
   if (isManualUpdate) {
     result.last_update_from_manual = result.last_updated_date;
+  }
+
+  // if status changed we have to add a new filed called current_status_update_time
+
+  if (statusChangedFromPull) {
+    // add new filed current_status_datetime to result object
+
+    const currentStatusUpdateTime = moment().format("YYYY-MM-DD HH:mm:ss.SSS");
+    result.current_status_update_datetime = currentStatusUpdateTime;
+  }
+  if (trackObj?.qc_details) {
+    result.qc_details = trackObj.qc_details;
   }
 
   const opsReportColInstance = await reportMongoCol();

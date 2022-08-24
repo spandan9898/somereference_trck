@@ -130,21 +130,25 @@ const preparePulledEkartData = (ekartDict) => {
     courier_status_code: "",
   };
   try {
-    pickrrEkartDict.awb = ekartDict.awbNumber;
-    const ekartStatus = ekartDict.status ? ekartDict.status.toString().toUpperCase() : "";
-    const ekartEDD = ekartDict.edd;
-    const ekartEventDate = ekartDict.event_date;
-    const statusMappedData = EKART_PULL_MAPPER[ekartStatus];
-    if (!statusMappedData) {
+    pickrrEkartDict.awb = ekartDict?.awbNumber;
+    if (!pickrrEkartDict.awb) {
+      return {};
+    }
+    const ekartStatus = ekartDict?.status ? ekartDict.status.toString().toLowerCase() : "";
+    const ekartEDD = ekartDict?.edd;
+
+    // edd comes as a string before PP event --> "Shipment yet to be dispatched"
+
+    const ekartEventDate = ekartDict?.event_date;
+    const scanType = EKART_PULL_MAPPER[ekartStatus];
+    if (!scanType) {
       return {
         err: "Unknown status code",
       };
     }
 
-    const { pickrr_code: pickrrCode, pickrr_sub_status_code: pickrrSubStatusCode } =
-      statusMappedData;
-    pickrrEkartDict.scan_type = pickrrCode;
-    pickrrEkartDict.pickrr_sub_status_code = pickrrSubStatusCode;
+    pickrrEkartDict.scan_type = scanType.pickrr_code === "UD" ? "NDR" : scanType.pickrr_code;
+    pickrrEkartDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
 
     if (
       ekartStatus === "delivered" &&
@@ -153,16 +157,22 @@ const preparePulledEkartData = (ekartDict) => {
       pickrrEkartDict.scan_type = "RTO";
     }
     pickrrEkartDict.EDD = moment(ekartEDD).isValid()
-      ? moment(ekartEDD).format("YYYY-MM-DD HH:mm:ss")
+      ? moment(ekartEDD).add(330, "minutes").format("YYYY-MM-DD HH:mm:ss")
       : "";
     pickrrEkartDict.scan_datetime = moment(ekartEventDate).isValid()
-      ? moment(ekartEventDate).format("YYYY-MM-DD HH:mm:ss")
+      ? moment(ekartEventDate).add(330, "minutes").format("YYYY-MM-DD HH:mm:ss")
       : "";
     pickrrEkartDict.track_location = ekartDict?.city || "";
     if (pickrrEkartDict.scan_type === "PP") {
       pickrrEkartDict.pickup_datetime = pickrrEkartDict?.scan_datetime;
     }
     pickrrEkartDict.courier_status_code = ekartStatus;
+    pickrrEkartDict.track_info =
+      ekartDict?.public_description || PICKRR_STATUS_CODE_MAPPING[scanType?.pickrr_code];
+    pickrrEkartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.pickrr_code];
+    if (pickrrEkartDict?.scan_type === "DL") {
+      pickrrEkartDict.received_by = ekartDict?.received_by || "SELF";
+    }
     return pickrrEkartDict;
   } catch (error) {
     logger.error("Error While Preparng Ekart Data ---->", error);
@@ -170,4 +180,5 @@ const preparePulledEkartData = (ekartDict) => {
     return pickrrEkartDict;
   }
 };
+
 module.exports = { prepareEkartData, preparePulledEkartData };
