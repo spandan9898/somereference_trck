@@ -113,7 +113,7 @@ const isLatestEventSentOnCommonTopic = async (trackingObj) => {
       const diff = (newScanTime - oldScanTime) / 60;
       if (diff >= -1 && diff <= 1) {
         logger.info(
-          `latest event already sent on kafka for awb: ${awb}, currentStatusType: ${currentStatusType}, currentStatusTime: ${currentStatusTime}`
+          `Event discarded on tracking_topic for awb: ${awb}, status: ${currentStatusType}, scan_time: ${currentStatusTime}`
         );
         return true;
       }
@@ -121,7 +121,7 @@ const isLatestEventSentOnCommonTopic = async (trackingObj) => {
     cacheData.latest_event_sent_on_common_topic = `${currentStatusType}_${newScanTime}`;
     await storeInCache(awb, cacheData);
     logger.info(
-      `latest event not sent on kafka for awb: ${awb}, currentStatusType: ${currentStatusType}, currentStatusTime: ${currentStatusTime}`
+      `Event sent on tracking_topic for awb: ${awb}, status: ${currentStatusType}, scan_time: ${currentStatusTime}`
     );
     return false;
   } catch (error) {
