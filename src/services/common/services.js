@@ -3,7 +3,7 @@ const moment = require("moment");
 
 const logger = require("../../../logger");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("../../apps/webhookClients/common/constants");
-const { getObject, setObject } = require("../../utils");
+const { getObject, setObject, isLatestEventSentOnCommonTopic } = require("../../utils");
 const { MakeAPICall } = require("../../utils");
 const { elkDataUpdate } = require("./elk");
 const producerConnection = require("../../utils/producerConnection");
@@ -77,6 +77,12 @@ const updateTrackingProcessingCount = async ({ awb }, type = "add") => {
  * @param {*} trackingObj -> DB Tracking Document
  */
 const commonTrackingDataProducer = async (trackingObj) => {
+  if (process.env.AVOID_DUPLICATES_ON_COMMON_TRACKING_TOPIC === "true") {
+    const duplicateEvent = await isLatestEventSentOnCommonTopic(trackingObj);
+    if (duplicateEvent) {
+      return null;
+    }
+  }
   try {
     const trackingItemList = [
       "is_cod",
@@ -160,6 +166,7 @@ const commonTrackingDataProducer = async (trackingObj) => {
   } catch (error) {
     logger.error("commonProducer", error);
   }
+  return null;
 };
 
 /**
