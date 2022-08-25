@@ -1,5 +1,6 @@
 /* eslint-disable no-promise-executor-return */
 const _ = require("lodash");
+const logger = require("../../../logger")
 const moment = require("moment");
 
 const { getPrepareFunction } = require("./helpers");
@@ -75,11 +76,18 @@ const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance) => {
     if (!awb || !updatedObj) {
       return {};
     }
-    const updatedTrackDocument = colInstance.findOneAndUpdate(
+    const updatedTrackDocument = await colInstance.findOneAndUpdate(
       { tracking_id: awb },
-      { $set: updatedObj }
+      { $set: updatedObj },
+      {
+        returnNewDocument: true,
+        returnDocument: "after",
+        upsert: process.env.NODE_ENV === "staging",
+      }
     );
-    await updateStatusOnReport(updatedTrackDocument);
+
+    await updateStatusOnReport(updatedTrackDocument,logger,null,null,null);
+
     return {};
   } catch (error) {
     logger.error("failed Updating Data");
@@ -178,7 +186,7 @@ class KafkaMessageHandler {
             otpObj = await putBackOtpDataInTrackEvent(res, trackDocument, colInstance);
           }
         }
-        updateDataInPullDBAndReports(otpObj, res.awb, colInstance);
+        await updateDataInPullDBAndReports(otpObj, res.awb, colInstance);
 
         // All Updates happening here in single go
 
