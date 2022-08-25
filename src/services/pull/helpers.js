@@ -175,7 +175,7 @@ const checkIsAfter = (statusDate, refDate) => {
       return true;
     }
     const isValid = moment(statusDate).isValid()
-      ? moment(statusDate).isAfter(moment(refDate))
+      ? moment(statusDate).isAfter(moment(refDate)) || moment(statusDate).isSame(moment(refDate))
       : false;
     return isValid;
   } catch (error) {
