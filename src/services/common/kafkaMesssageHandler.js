@@ -22,12 +22,15 @@ const {
   commonTrackingDataProducer,
   updateFreshdeskTrackingTicket,
 } = require("./services");
-const { getElkClients, findOneDocumentFromMongo } = require("../../utils");
+const { getElkClients } = require("../../utils");
 const logger = require("../../../logger");
 const { TrackingLogger } = require("../../../logger");
 const { sendDataToElk } = require("./elk");
 const commonTrackingInfoCol = require("../pull/model");
 const { updateFlagForOtpDeliveredShipments } = require("../pull/helpers");
+const { prepareTrackDataToUpdateInPullDb } = require("../pull/preparator");
+const { EddPrepareHelper } = require("./eddHelpers");
+const { getTrackDocumentfromMongo } = require("./trackServices");
 
 const trackingLogger = TrackingLogger("tracking/payloads");
 
@@ -35,20 +38,12 @@ const trackingLogger = TrackingLogger("tracking/payloads");
  *
  * puts back otp data in trackEvent
  */
-const putBackOtpDataInTrackEvent = async (obj) => {
-  const {
-    awb,
-    scan_type: scanType,
-    otp,
-    otp_remarks: otpRemarks,
-    scan_datetime: scanDateTime,
-  } = obj;
+const putBackOtpDataInTrackEvent = async (obj, doc) => {
+  const { scan_type: scanType, otp, otp_remarks: otpRemarks, scan_datetime: scanDateTime } = obj;
   try {
     let latestOtp;
-    const queryObj = { $or: [{ tracking_id: awb }, { courier_tracking_id: awb }] };
     const eventScanTime = moment(scanDateTime).subtract(330, "m").toDate();
-    const projectionObj = { track_arr: 1 };
-    const { track_arr: trackArr } = await findOneDocumentFromMongo({ queryObj, projectionObj });
+    const { track_arr: trackArr } = doc;
     for (let i = 0; i < trackArr.length; i += 1) {
       const { scan_type: dbScanType, scan_datetime: dbScanTime } = trackArr[i];
       const isSame = moment(eventScanTime).isSame(moment(dbScanTime));
@@ -63,21 +58,67 @@ const putBackOtpDataInTrackEvent = async (obj) => {
         break;
       }
     }
-    const col = await commonTrackingInfoCol();
     const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr);
-    const response = await col.findOneAndUpdate(
-      queryObj,
-      {
-        $set: { track_arr: trackArr, latest_otp: latestOtp, is_otp_delivered: isOtpDelivered },
-      },
-      {
-        returnNewDocument: true,
-        returnDocument: "after",
-      }
-    );
-    await updateStatusOnReport(response, logger);
+    return { track_arr: trackArr, latest_otp: latestOtp, is_otp_delivered: isOtpDelivered };
   } catch (error) {
     logger.error("Failed Backfilling Otp Data", error);
+    return {};
+  }
+};
+
+/**
+ *
+ * @param {obj to be updated} updatedObj
+ * @param {trackingId} awb
+ * @param {commonTrackingInfo Col Instance} colInstance
+ */
+const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance) => {
+  try {
+    if (!awb || !updatedObj) {
+      return {};
+    }
+    const updatedTrackDocument = colInstance.findOneAndUpdate(
+      { tracking_id: awb },
+      { $set: updatedObj }
+    );
+    await updateStatusOnReport(updatedTrackDocument);
+  } catch (error) {
+    logger.error("failed Updating Data");
+    return {};
+  }
+};
+
+/**
+ *
+ * @param {prepared Data from courier} obj
+ * @param {col Instance} col
+ * @param {is Pulled Event} isFromPulled
+ */
+const updateEDD = (obj, trackDocument, colInstance, isFromPulled) => {
+  try {
+    if (!trackDocument) {
+      return {};
+    }
+    const updatedData = prepareTrackDataToUpdateInPullDb(obj, isFromPulled);
+    const latestCourierEDD = updatedData?.eddStamp;
+    const { pickup_datetime: pickupDateTime, edd_stamp: eddStampInDb, zone } = trackDocument;
+    const statusType = trackDocument?.status?.current_status_type;
+    const eddInstance = new EddPrepareHelper({
+      latestCourierEDD,
+      pickupDateTime,
+      eddStampInDb,
+    });
+    const updatedEDD = eddInstance.callPickrrEDDEventFunc({
+      zone,
+      latestCourierEDD,
+      pickupDateTime,
+      eddStampInDb,
+      statusType,
+    });
+    return { edd_stamp: updatedEDD };
+  } catch (error) {
+    logger.error("Failed Updating EDD for Duplicate Events");
+    return {};
   }
 };
 
@@ -152,13 +193,22 @@ class KafkaMessageHandler {
       await updateTrackingProcessingCount({ awb: res.awb });
 
       const trackData = await redisCheckAndReturnTrackData(res, isFromPulled);
+      const colInstance = await commonTrackingInfoCol();
 
       if (!trackData) {
+        const trackDocument = await getTrackDocumentfromMongo(res.awb);
+        let otpObj = {};
         if (!courierName.includes("pull")) {
           if (res.otp || res.otp_remarks) {
-            await putBackOtpDataInTrackEvent(res);
+            otpObj = await putBackOtpDataInTrackEvent(res, trackDocument, colInstance);
           }
         }
+        const eddObj = await updateEDD(res, trackDocument, colInstance, isFromPulled);
+        const updatedObj = { ...eddObj, ...otpObj };
+        updateDataInPullDBAndReports(updatedObj, res.awb, colInstance);
+
+        // All Updates happening here in single go
+
         logger.info(`data already exists or not found in DB! ${res.awb}`);
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return {};
