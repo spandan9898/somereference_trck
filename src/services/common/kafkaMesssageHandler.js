@@ -194,8 +194,16 @@ class KafkaMessageHandler {
 
       const trackData = await redisCheckAndReturnTrackData(res, isFromPulled);
       if (!trackData) {
+        logger.info(`data already exists or not found in DB! ${res.awb}`);
+        updateTrackingProcessingCount({ awb: res.awb }, "remove");
+
         const colInstance = await commonTrackingInfoCol();
         const trackDocument = await getTrackDocumentfromMongo(res.awb);
+
+        if (!trackDocument) {
+          return {};
+        }
+
         let otpObj = {};
         if (!courierName.includes("pull")) {
           if (res.otp || res.otp_remarks) {
@@ -208,8 +216,6 @@ class KafkaMessageHandler {
 
         // All Updates happening here in single go
 
-        logger.info(`data already exists or not found in DB! ${res.awb}`);
-        updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return {};
       }
       let qcDetails = null;
