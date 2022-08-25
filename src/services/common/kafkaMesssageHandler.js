@@ -65,9 +65,17 @@ const putBackOtpDataInTrackEvent = async (obj) => {
     }
     const col = await commonTrackingInfoCol();
     const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr);
-    await col.findOneAndUpdate(queryObj, {
-      $set: { track_arr: trackArr, latest_otp: latestOtp, is_otp_delivered: isOtpDelivered },
-    });
+    const response = await col.findOneAndUpdate(
+      queryObj,
+      {
+        $set: { track_arr: trackArr, latest_otp: latestOtp, is_otp_delivered: isOtpDelivered },
+      },
+      {
+        returnNewDocument: true,
+        returnDocument: "after",
+      }
+    );
+    await updateStatusOnReport(response, logger);
   } catch (error) {
     logger.error("Failed Backfilling Otp Data", error);
   }
@@ -148,7 +156,7 @@ class KafkaMessageHandler {
       if (!trackData) {
         if (!courierName.includes("pull")) {
           if (res.otp || res.otp_remarks) {
-            putBackOtpDataInTrackEvent(res);
+            await putBackOtpDataInTrackEvent(res);
           }
         }
         logger.info(`data already exists or not found in DB! ${res.awb}`);
