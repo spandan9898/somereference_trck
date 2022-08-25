@@ -203,7 +203,13 @@ const updateTrackDataToPullMongo = async ({
       firstTrackObjOfTrackArr.scan_status =
         PICKRR_STATUS_CODE_MAPPING[firstTrackObjOfTrackArr.scan_type];
     }
-
+    // lat-long marking and storing in trackDB
+    if(firstTrackObjOfTrackArr?.latitude ){
+      updatedObj.latitude = firstTrackObjOfTrackArr.latitude;
+    }
+    if(firstTrackObjOfTrackArr?.longitude){
+      updatedObj.longitude = firstTrackObjOfTrackArr.longitude;
+    }
     // Otp Delivered Shipments marking
 
     if (firstTrackObjOfTrackArr?.scan_type === "DL") {
@@ -251,6 +257,7 @@ const updateTrackDataToPullMongo = async ({
         updatedObj.qc_details = qcDetails;
       }
     }
+
     const pullInstance =
       process.env.NODE_ENV === "staging"
         ? pullStagingCollectionInstance
