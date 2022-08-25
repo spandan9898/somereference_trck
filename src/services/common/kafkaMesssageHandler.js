@@ -82,42 +82,9 @@ const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance) => {
       { $set: updatedObj }
     );
     await updateStatusOnReport(updatedTrackDocument);
+    return {};
   } catch (error) {
     logger.error("failed Updating Data");
-    return {};
-  }
-};
-
-/**
- *
- * @param {prepared Data from courier} obj
- * @param {col Instance} col
- * @param {is Pulled Event} isFromPulled
- */
-const updateEDD = (obj, trackDocument, colInstance, isFromPulled) => {
-  try {
-    if (!trackDocument) {
-      return {};
-    }
-    const updatedData = prepareTrackDataToUpdateInPullDb(obj, isFromPulled);
-    const latestCourierEDD = updatedData?.eddStamp;
-    const { pickup_datetime: pickupDateTime, edd_stamp: eddStampInDb, zone } = trackDocument;
-    const statusType = trackDocument?.status?.current_status_type;
-    const eddInstance = new EddPrepareHelper({
-      latestCourierEDD,
-      pickupDateTime,
-      eddStampInDb,
-    });
-    const updatedEDD = eddInstance.callPickrrEDDEventFunc({
-      zone,
-      latestCourierEDD,
-      pickupDateTime,
-      eddStampInDb,
-      statusType,
-    });
-    return { edd_stamp: updatedEDD };
-  } catch (error) {
-    logger.error("Failed Updating EDD for Duplicate Events");
     return {};
   }
 };
@@ -213,9 +180,7 @@ class KafkaMessageHandler {
             otpObj = await putBackOtpDataInTrackEvent(res, trackDocument, colInstance);
           }
         }
-        const eddObj = await updateEDD(res, trackDocument, colInstance, isFromPulled);
-        const updatedObj = { ...eddObj, ...otpObj };
-        updateDataInPullDBAndReports(updatedObj, res.awb, colInstance);
+        updateDataInPullDBAndReports(otpObj, res.awb, colInstance);
 
         // All Updates happening here in single go
 
