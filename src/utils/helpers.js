@@ -415,7 +415,7 @@ const parseReasonDescription = (s) => {
     let arr = [];
     let flag = 0;
     let specialFlagforReasonDescription = false;
-    for(let i = 0; i < s.length; i++) {
+    for(let i = 0; i < s.length; i=i+1) {
         if(s[i] === '=' || s[i] === ':'){
             tmp = tmp.toLowerCase();
             if(tmp === 'reasondescription'){
@@ -428,25 +428,25 @@ const parseReasonDescription = (s) => {
             
             i++;
             while(specialFlagforReasonDescription === false){
-                if(s[i] === ',' || s[i] == '}'){
+                if(s[i] === ',' || s[i] === '}'){
                     break;
                 }
                 p+=s[i];
-                i++;
+                i=i+1;
             }
             let count  = 0;
             while(specialFlagforReasonDescription === true){
                 if(s[i] === ','){
                     count++;
                 }
-                if(count == 2){
+                if(count === 2){
                     break;
                 }
                 if(s[i] === '}'){
                     break;
                 }
                 p+=s[i];
-                i++;
+                i=i+1;
             }
             let pair = [];
             pair.push(tmp);
@@ -463,7 +463,7 @@ const parseReasonDescription = (s) => {
     let result = {};
 
     //converting 2D array to JSON OBJECT
-    for(let i =0 ;i<arr.length;i++){
+    for(let i =0 ;i<arr.length;i=i+1){
         result[arr[i][0]] = arr[i][1];
     }
     // console.log(result);
