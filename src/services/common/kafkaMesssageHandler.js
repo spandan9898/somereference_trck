@@ -43,30 +43,34 @@ const putBackOtpDataInTrackEvent = async (obj) => {
     otp_remarks: otpRemarks,
     scan_datetime: scanDateTime,
   } = obj;
-  let latestOtp;
-  const queryObj = { $or: [{ tracking_id: awb }, { courier_tracking_id: awb }] };
-  const eventScanTime = moment(scanDateTime).subtract(330, "m").toDate();
-  const projectionObj = { track_arr: 1 };
-  const { track_arr: trackArr } = await findOneDocumentFromMongo({ queryObj, projectionObj });
-  for (let i = 0; i < trackArr.length; i += 1) {
-    const { scan_type: dbScanType, scan_datetime: dbScanTime } = trackArr[i];
-    const isSame = moment(eventScanTime).isSame(moment(dbScanTime));
-    if (dbScanType === scanType && isSame) {
-      if (otpRemarks) {
-        trackArr[i].otp_remarks = otpRemarks;
+  try {
+    let latestOtp;
+    const queryObj = { $or: [{ tracking_id: awb }, { courier_tracking_id: awb }] };
+    const eventScanTime = moment(scanDateTime).subtract(330, "m").toDate();
+    const projectionObj = { track_arr: 1 };
+    const { track_arr: trackArr } = await findOneDocumentFromMongo({ queryObj, projectionObj });
+    for (let i = 0; i < trackArr.length; i += 1) {
+      const { scan_type: dbScanType, scan_datetime: dbScanTime } = trackArr[i];
+      const isSame = moment(eventScanTime).isSame(moment(dbScanTime));
+      if (dbScanType === scanType && isSame) {
+        if (otpRemarks) {
+          trackArr[i].otp_remarks = otpRemarks;
+        }
+        if (otp) {
+          trackArr[i].otp = otp;
+          latestOtp = otp;
+        }
+        break;
       }
-      if (otp) {
-        trackArr[i].otp = otp;
-        latestOtp = otp;
-      }
-      break;
     }
+    const col = await commonTrackingInfoCol();
+    const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr);
+    await col.findOneAndUpdate(queryObj, {
+      $set: { track_arr: trackArr, latest_otp: latestOtp, is_otp_delivered: isOtpDelivered },
+    });
+  } catch (error) {
+    logger.error("Failed Backfilling Otp Data", error);
   }
-  const col = await commonTrackingInfoCol();
-  const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr);
-  await col.findOneAndUpdate(queryObj, {
-    $set: { track_arr: trackArr, latest_otp: latestOtp, is_otp_delivered: isOtpDelivered },
-  });
 };
 
 /**
