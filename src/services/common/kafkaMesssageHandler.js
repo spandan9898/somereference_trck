@@ -207,6 +207,9 @@ class KafkaMessageHandler {
         let otpObj = {};
         if (!courierName.includes("pull")) {
           if (res.otp || res.otp_remarks) {
+            // Otp Data Backfilling when kafka_pull is updating first
+            // Otp Data is only recieved in kafka_Push events
+
             otpObj = await putBackOtpDataInTrackEvent(res, trackDocument, colInstance);
           }
         }
