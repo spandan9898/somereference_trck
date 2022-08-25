@@ -2,7 +2,7 @@ const Redis = require("ioredis");
 const logger = require("../../logger");
 const { REDIS_CONFIG } = require("./constants");
 
-let redisConf = null;
+let redisConf = { host: "127.0.0.1", port: 6379 };
 if (process.env.NODE_ENV === "production") {
   redisConf = REDIS_CONFIG;
 }

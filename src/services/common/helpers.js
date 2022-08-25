@@ -1,7 +1,10 @@
 const { orderBy, isEmpty, get, cloneDeep } = require("lodash");
 
 const { prepareAmazeData } = require("../../apps/amaze/services");
-const { preparePickrrBluedartDict } = require("../../apps/bluedart/services");
+const {
+  preparePickrrBluedartDict,
+  preparePickrrBluedartPulledData,
+} = require("../../apps/bluedart/services");
 const {
   prepareDelhiveryData,
   prepareDelhiveryPulledData,
@@ -14,10 +17,16 @@ const {
   preparePulledShadowfaxData,
 } = require("../../apps/shadowfax/services");
 const { prepareUdaanData } = require("../../apps/udaan/services");
-const { prepareXbsData } = require("../../apps/xpressbees/services");
+const { prepareXbsData, preparePulledXBSData } = require("../../apps/xpressbees/services");
 const { preparePidgeData, preparePidgePulledData } = require("../../apps/pidge/services");
 const { prepareDtdcData, prepareDtdcPulledData } = require("../../apps/dtdc/services");
-const { prepareLoadshareData } = require("../../apps/loadshare/services");
+const {
+  prepareLoadshareData,
+  prepareLoadsharePulledData,
+} = require("../../apps/loadshare/services");
+const { prepareKerryIndevPulledData } = require("../../apps/kerryindev/services");
+const { preparePulledHolisolData } = require("../../apps/holisol/services");
+const { prepareSmartrData, preparePulledSmartrData } = require("../../apps/smartr/services");
 
 const logger = require("../../../logger");
 const { DELHIVERY_REVERSE_MAPPER } = require("../../apps/delhivery/constant");
@@ -141,6 +150,7 @@ const getPrepareFunction = (courierName) => {
   const courierPrepareMapFunctions = {
     amaze: prepareAmazeData,
     bluedart: preparePickrrBluedartDict,
+    bluedart_pull: preparePickrrBluedartPulledData,
     delhivery: prepareDelhiveryData,
     delhivery_pull: prepareDelhiveryPulledData,
     ecomm: prepareEcommData,
@@ -156,8 +166,14 @@ const getPrepareFunction = (courierName) => {
     dtdc: prepareDtdcData,
     dtdc_pull: prepareDtdcPulledData,
     loadshare: prepareLoadshareData,
+    smartr_pull: preparePulledSmartrData,
     pikndel: preparePikNDelData,
+    kerryindev_pull: prepareKerryIndevPulledData,
+    smartr: prepareSmartrData,
     pikndel_pull: preparePulledPikndelData,
+    xpressbees_pull: preparePulledXBSData,
+    holisol_pull: preparePulledHolisolData,
+    loadshare_pull: prepareLoadsharePulledData,
   };
   return courierPrepareMapFunctions[courierName];
 };

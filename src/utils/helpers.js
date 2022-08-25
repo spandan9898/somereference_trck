@@ -88,6 +88,50 @@ const compareScanUnixTimeAndCheckIfExists = (newScanTime, newScanType, cachedDat
 
 /**
  *
+ * @param {*} trackingObj -> latest document to be send on common topic
+ * @desc check if latest event sent on common kafka topic is same as
+ * current status
+ * @returns true/false
+ */
+const isLatestEventSentOnCommonTopic = async (trackingObj) => {
+  try {
+    const currentStatusTime = trackingObj?.status?.current_status_time;
+    const currentStatusType = trackingObj?.status?.current_status_type;
+    const awb = trackingObj?.courier_tracking_id;
+    if (!currentStatusTime || !currentStatusType || !awb) {
+      return false;
+    }
+    const cacheData = (await getObject(awb)) || {};
+    const latestEventSent = cacheData?.latest_event_sent_on_common_topic;
+    const newScanTime = moment(currentStatusTime).unix();
+    let keys = null;
+    if (latestEventSent) {
+      keys = latestEventSent.split("_");
+    }
+    if (keys && keys[0] === currentStatusType) {
+      const oldScanTime = keys[1];
+      const diff = (newScanTime - oldScanTime) / 60;
+      if (diff >= -1 && diff <= 1) {
+        logger.info(
+          `Event discarded on tracking_topic for awb: ${awb}, status: ${currentStatusType}, scan_time: ${currentStatusTime}`
+        );
+        return true;
+      }
+    }
+    cacheData.latest_event_sent_on_common_topic = `${currentStatusType}_${newScanTime}`;
+    await storeInCache(awb, cacheData);
+    logger.info(
+      `Event sent on tracking_topic for awb: ${awb}, status: ${currentStatusType}, scan_time: ${currentStatusTime}`
+    );
+    return false;
+  } catch (error) {
+    logger.error("Error in checking isLatestEventSentOnCommonTopic", error);
+    return false;
+  }
+};
+
+/**
+ *
  * @param {*} trackObj
  * @param {*} cachedData
  * @returns
@@ -389,6 +433,90 @@ const sendEmail = async ({
   }
 };
 
+
+/**
+ * 
+ * @param {*} s -> accept a string 
+ * @desc convert a special string realted to Reason DEscription object
+ * @returns Its return the JSON Object
+ * result body (input string)
+ * "{id=101165.0, reasonId=101165.0, reasonCode=291, reasonDescription=Pickup not ready (Packaging * not ready, manifest not ready)}"
+
+ * return body type of result
+ * {
+ *   id: '101165.0',
+ *   reasonId: '101165.0',
+ *   reasonCode: '291',
+ *   reasonDescription: 'Pickup not ready (Packaging not ready, manifest not ready)'
+ * }
+
+ * example function call : 
+ * stringToJSON("{id=101165.0, reasonId=101165.0, reasonCode=291 reasonDescription=Pickup not ready (Packaging not ready, manifest not ready)}");
+ */
+
+const parseReasonDescription = (s) => {
+    let tmp = '';
+    let arr = [];
+    let flag = 0;
+    let specialFlagforReasonDescription = false;
+    for(let i = 0; i < s.length; i++) {
+        if(s[i] === '=' || s[i] === ':'){
+            tmp = tmp.toLowerCase();
+            if(tmp === 'reasondescription'){
+                specialFlagforReasonDescription = true;
+            }
+            else{
+                specialFlagforReasonDescription = false;
+            }
+            let p = '';
+            
+            i++;
+            while(specialFlagforReasonDescription === false){
+                if(s[i] === ',' || s[i] == '}'){
+                    break;
+                }
+                p+=s[i];
+                i++;
+            }
+            let count  = 0;
+            while(specialFlagforReasonDescription === true){
+                if(s[i] === ','){
+                    count++;
+                }
+                if(count == 2){
+                    break;
+                }
+                if(s[i] === '}'){
+                    break;
+                }
+                p+=s[i];
+                i++;
+            }
+            let pair = [];
+            pair.push(tmp);
+            pair.push(p);
+            arr.push(pair);
+            tmp = '';
+        }
+        else if((s[i]>='a' && s[i]<='z') || (s[i]>='A' && s[i]<='Z')  ) {
+            tmp+=s[i];
+        }
+
+    }
+    
+    let result = {};
+
+    //converting 2D array to JSON OBJECT
+    for(let i =0 ;i<arr.length;i++){
+        result[arr[i][0]] = arr[i][1];
+    }
+    // console.log(result);
+    return result;
+}
+
+ 
+
+
 module.exports = {
   checkAwbInCache,
   convertDatetimeFormat,
@@ -399,5 +527,7 @@ module.exports = {
   getMaxDate,
   getElkClients,
   ofdCount,
+  parseReasonDescription,
   sendEmail,
+  isLatestEventSentOnCommonTopic,
 };

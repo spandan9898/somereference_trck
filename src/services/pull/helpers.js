@@ -5,6 +5,9 @@ const _ = require("lodash");
 
 const logger = require("../../../logger");
 const { TRACKING_PAGE_OTP_MESSAGE } = require("../common/constants");
+const { PRE_PICKUP_STATUS } = require("./constants");
+const commonTrackingInfoCol = require("./model");
+const { HOST_NAMES } = require("../../utils/constants");
 
 /**
  *
@@ -70,6 +73,24 @@ const checkCancelStatusInTrackArr = (trackArr) => {
     logger.error("checkCancelStatusInTrackArr", error);
     return false;
   }
+};
+
+/**
+ *
+ * @param {Event's TrackArr} trackArr
+ * returns the last PrePickupTime
+ */
+const findLastPrePickupTime = (trackArr) => {
+  let lastPrePickupTime;
+  const n = trackArr.length;
+  for (let i = n - 1; i >= 0; i -= 1) {
+    if (PRE_PICKUP_STATUS.includes(trackArr[i]?.scan_type)) {
+      lastPrePickupTime = moment(trackArr[i]?.scan_datetime).isValid()
+        ? trackArr[i]?.scan_datetime
+        : null;
+    }
+  }
+  return lastPrePickupTime;
 };
 
 /**
@@ -145,22 +166,65 @@ const updateFlagForOtpDeliveredShipments = (trackArr) => {
 /**
  *
  * @param {iterable event statusDate} statusDate
- * @param {order_created_date} placedDate
+ * @param {reference Date} refDate
  * @returns is Valid Event
  */
-const checkIsAfter = (statusDate, placedDate) => {
+const checkIsAfter = (statusDate, refDate) => {
   try {
-    if (!moment(placedDate).isValid()) {
+    if (!moment(refDate).isValid()) {
       return true;
     }
     const isValid = moment(statusDate).isValid()
-      ? moment(statusDate).isAfter(moment(placedDate))
+      ? moment(statusDate).isAfter(moment(refDate))
       : false;
     return isValid;
   } catch (error) {
     return false;
   }
 };
+
+/**
+ *
+ * @desc update freshdesk webhook data in pull mongodb
+ * @returns null
+ */
+const updateFreshdeskWebhookToMongo = async ({ courierTrackingId, statusType }) => {
+  try {
+    let freshdeskWebhookColInstance;
+    if (process.env.NODE_ENV === "staging") {
+      freshdeskWebhookColInstance = await commonTrackingInfoCol({
+        hostName: HOST_NAMES.PULL_STATING_DB,
+        collectionName: process.env.FRESHDESK_WEBHOOK_TRACKING_COLLECTION_NAME,
+      });
+    } else {
+      freshdeskWebhookColInstance = await commonTrackingInfoCol({
+        collectionName: process.env.FRESHDESK_WEBHOOK_TRACKING_COLLECTION_NAME,
+      });
+    }
+
+    const queryObj = {
+      $and: [{ tracking_id: courierTrackingId }, { is_updated: false }],
+    };
+    const response = await freshdeskWebhookColInstance.findOneAndUpdate(
+      queryObj,
+      {
+        $set: {
+          is_updated: statusType === "Delivered" || statusType === "RTD",
+          status_sent: statusType,
+          updated_at: moment().toDate(),
+        },
+      },
+      { upsert: false }
+    );
+    return response?.value?.ticket_id;
+  } catch (error) {
+    logger.error(
+      `Updating Freshdesk Webhook Mongo Operation Failed for trackingId  --> ${courierTrackingId} for status ${statusType}`
+    );
+    return null;
+  }
+};
+
 module.exports = {
   mapStatusToEvent,
   checkIsAfter,
@@ -170,4 +234,6 @@ module.exports = {
   updateTrackModel,
   checkTriggerForPulledEvent,
   updateFlagForOtpDeliveredShipments,
+  findLastPrePickupTime,
+  updateFreshdeskWebhookToMongo,
 };

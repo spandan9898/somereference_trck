@@ -3,14 +3,14 @@ const moment = require("moment");
 
 const logger = require("../../../logger");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("../../apps/webhookClients/common/constants");
-const { getObject, setObject } = require("../../utils");
+const { getObject, setObject, isLatestEventSentOnCommonTopic } = require("../../utils");
 const { MakeAPICall } = require("../../utils");
 const { elkDataUpdate } = require("./elk");
 const producerConnection = require("../../utils/producerConnection");
 const { KAFKA_INSTANCE_CONFIG } = require("../../utils/constants");
 const { produceData } = require("../../utils/kafka");
 const { COMMON_TRACKING_TOPIC_NAME } = require("./constants");
-const { updateFreshdeskWebhookToMongo } = require("../pull");
+const { updateFreshdeskWebhookToMongo } = require("../pull/helpers");
 
 /**
  * @param trackingDoc -> tracking document(same as DB document)
@@ -77,6 +77,12 @@ const updateTrackingProcessingCount = async ({ awb }, type = "add") => {
  * @param {*} trackingObj -> DB Tracking Document
  */
 const commonTrackingDataProducer = async (trackingObj) => {
+  if (process.env.AVOID_DUPLICATES_ON_COMMON_TRACKING_TOPIC === "true") {
+    const duplicateEvent = await isLatestEventSentOnCommonTopic(trackingObj);
+    if (duplicateEvent) {
+      return null;
+    }
+  }
   try {
     const trackingItemList = [
       "is_cod",
@@ -160,6 +166,7 @@ const commonTrackingDataProducer = async (trackingObj) => {
   } catch (error) {
     logger.error("commonProducer", error);
   }
+  return null;
 };
 
 /**
@@ -168,6 +175,9 @@ const commonTrackingDataProducer = async (trackingObj) => {
  */
 const updateFreshdeskTrackingTicket = async (trackData) => {
   try {
+    if (process.env.UPDATE_FRESHDESK_TICKET === "false") {
+      return null;
+    }
     let statusType = trackData?.status?.current_status_type;
     const courierTrackingId = trackData?.tracking_id;
     if (statusType === "DL") {
@@ -182,9 +192,9 @@ const updateFreshdeskTrackingTicket = async (trackData) => {
     const ticketId = await updateFreshdeskWebhookToMongo({
       courierTrackingId,
       statusType,
-      logger,
     });
     if (!ticketId) {
+      logger.info(`freshdesk ticket not found for tracking id! ${courierTrackingId}`);
       return null;
     }
     const URL = `https://pickrrsupport.freshdesk.com/api/v2/tickets/${ticketId}`;
@@ -204,6 +214,7 @@ const updateFreshdeskTrackingTicket = async (trackData) => {
       if (response.statusCode !== 200) {
         response = await makeApiCall.put();
       }
+      logger.info(`freshdesk ticket updated for tracking id! ${courierTrackingId}`);
       return response;
     } catch (error) {
       logger.error(`Updating Freshdesk Ticket API Failed for document  --> ${trackData}`);

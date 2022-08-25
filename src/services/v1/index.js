@@ -32,6 +32,7 @@ const sendTrackDataToV1 = async (trackData) => {
       "64a61f6d3c302d2c478adc888aa20d58791587",
       "c5a2a4af9f55b744473879737f6cf81a442",
       "8c56657e0eb47d78dec2acdb49e7ea80135854",
+      "2935e096720ec493fe45d22cd4a75dc3811011",
     ];
 
     const shopPlatforms = ["shopify"];
@@ -63,7 +64,9 @@ const sendTrackDataToV1 = async (trackData) => {
 
     if (
       !(
-        authTokens.includes(trackData.auth_token) || shopPlatforms.includes(trackData.shop_platform)
+        authTokens.includes(trackData.auth_token) ||
+        shopPlatforms.includes(trackData.shop_platform) ||
+        trackData?.woocom_platform_obj
       )
     ) {
       return false;

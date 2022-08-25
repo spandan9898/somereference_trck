@@ -13,6 +13,7 @@ const {
   updateFlagForOtpDeliveredShipments,
   updateScanStatus,
   checkIsAfter,
+  findLastPrePickupTime,
 } = require("./helpers");
 const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
@@ -52,16 +53,27 @@ const fetchAndUpdateAuditLogsData = async ({
       scantime: updatedObj["status.current_status_time"],
       pulled_at: moment().toDate(),
     };
+    const eddAuditObj = {
+      from: isFromPulled ? "kafka_consumer_pull" : "kafka_consumer",
+      scan_type: updatedObj["status.current_status_type"],
+      courier_edd: updatedObj?.courier_edd,
+      edd_stamp: updatedObj?.edd_stamp,
+      pickup_datetime: updatedObj?.pickup_datetime,
+    };
     await auditInstance.findOneAndUpdate(
       queryObj,
       {
         $set: { [`audit.${auditObjKey}`]: auditObjValue },
+        $push: {
+          edd_audit: eddAuditObj,
+        },
       },
       { upsert: true }
     );
   } catch (error) {
     logger.error(
-      `Updating Audit Logs Failed for trackingId  --> ${courierTrackingId} for status ${updatedObj["status.current_status_type"]} at scanTime ${updatedObj["status.current_status_time"]}`
+      `Updating Audit Logs Failed for trackingId  --> ${courierTrackingId} for status ${updatedObj["status.current_status_type"]} at scanTime ${updatedObj["status.current_status_time"]}`,
+      error
     );
   }
 };
@@ -125,6 +137,9 @@ const updateTrackDataToPullMongo = async ({
     if (isFromPulled) {
       const isAllow = checkTriggerForPulledEvent(trackObj, res);
       if (!isAllow) {
+        logger.info(
+          `trigger returned false for - ${result.awb} and status - ${updatedObj["status.current_status_type"]}`
+        );
         return false;
       }
     }
@@ -140,7 +155,13 @@ const updateTrackDataToPullMongo = async ({
             moment(updatedObj["status.current_status_time"]),
             "seconds"
           );
+
+          // const absoluteTimeCheck = Math.abs(scanTimeCheck);
+
           if (isSameScanType && scanTimeCheck <= 60) {
+            logger.info(
+              `event discarded for tracking id --> ${result.awb}, status --> ${trackItem?.scan_type}`
+            );
             return false;
           }
         }
@@ -154,12 +175,12 @@ const updateTrackDataToPullMongo = async ({
     updatedObj.courier_edd = latestCourierEDD;
 
     let pickupDateTime = null;
-    const placedData = res?.order_created_at;
     if (res?.pickup_datetime && statusType !== "PP") {
       pickupDateTime = res?.pickup_datetime;
     } else {
+      const lastPrePickupTime = findLastPrePickupTime(sortedTrackArray);
       sortedTrackArray.forEach((trackEvent) => {
-        const isAfter = checkIsAfter(trackEvent?.scan_datetime, placedData);
+        const isAfter = checkIsAfter(trackEvent?.scan_datetime, lastPrePickupTime);
         if (PP_PROXY_LIST.includes(trackEvent?.scan_type) && isAfter) {
           pickupDateTime = trackEvent?.scan_datetime;
         }
@@ -204,7 +225,7 @@ const updateTrackDataToPullMongo = async ({
         latestCourierEDD,
         pickupDateTime,
         eddStampInDb,
-        statusType,
+        statusType: firstTrackObjOfTrackArr.scan_type,
       });
 
       // in case of QCF, edd_stamp will be what was calculated before QC Failure
@@ -249,7 +270,12 @@ const updateTrackDataToPullMongo = async ({
 
     // audit Logs is Updated Over here
 
-    await fetchAndUpdateAuditLogsData({ courierTrackingId: trackObj.awb, updatedObj });
+    await fetchAndUpdateAuditLogsData({
+      courierTrackingId: trackObj.awb,
+      updatedObj,
+      isFromPulled,
+      logger,
+    });
     await storeDataInCache(result);
     await updateTrackingProcessingCount(trackObj, "remove");
     updateCacheTrackArray({
@@ -265,49 +291,6 @@ const updateTrackDataToPullMongo = async ({
   }
 };
 
-/**
- *
- * @desc update freshdesk webhook data in pull mongodb
- * @returns null
- */
-const updateFreshdeskWebhookToMongo = async ({ courierTrackingId, statusType, logger }) => {
-  try {
-    let freshdeskWebhookColInstance;
-    if (process.env.NODE_ENV === "staging") {
-      freshdeskWebhookColInstance = await commonTrackingInfoCol({
-        hostName: HOST_NAMES.PULL_STATING_DB,
-        collectionName: process.env.FRESHDESK_WEBHOOK_TRACKING_COLLECTION_NAME,
-      });
-    } else {
-      freshdeskWebhookColInstance = await commonTrackingInfoCol({
-        collectionName: process.env.FRESHDESK_WEBHOOK_TRACKING_COLLECTION_NAME,
-      });
-    }
-
-    const queryObj = {
-      $and: [{ tracking_id: courierTrackingId }, { is_updated: false }],
-    };
-    const response = await freshdeskWebhookColInstance.findOneAndUpdate(
-      queryObj,
-      {
-        $set: {
-          is_updated: statusType === "Delivered" || statusType === "RTD",
-          status_sent: statusType,
-          updated_at: moment().toDate(),
-        },
-      },
-      { upsert: false }
-    );
-    return response?.value?.ticket_id;
-  } catch (error) {
-    logger.error(
-      `Updating Freshdesk Webhook Mongo Operation Failed for trackingId  --> ${courierTrackingId} for status ${statusType}`
-    );
-    return null;
-  }
-};
-
 module.exports = {
   updateTrackDataToPullMongo,
-  updateFreshdeskWebhookToMongo,
 };
