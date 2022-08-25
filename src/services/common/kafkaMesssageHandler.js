@@ -193,9 +193,8 @@ class KafkaMessageHandler {
       await updateTrackingProcessingCount({ awb: res.awb });
 
       const trackData = await redisCheckAndReturnTrackData(res, isFromPulled);
-      const colInstance = await commonTrackingInfoCol();
-
       if (!trackData) {
+        const colInstance = await commonTrackingInfoCol();
         const trackDocument = await getTrackDocumentfromMongo(res.awb);
         let otpObj = {};
         if (!courierName.includes("pull")) {
