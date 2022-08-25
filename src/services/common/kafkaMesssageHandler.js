@@ -28,8 +28,6 @@ const { TrackingLogger } = require("../../../logger");
 const { sendDataToElk } = require("./elk");
 const commonTrackingInfoCol = require("../pull/model");
 const { updateFlagForOtpDeliveredShipments } = require("../pull/helpers");
-const { prepareTrackDataToUpdateInPullDb } = require("../pull/preparator");
-const { EddPrepareHelper } = require("./eddHelpers");
 const { getTrackDocumentfromMongo } = require("./trackServices");
 
 const trackingLogger = TrackingLogger("tracking/payloads");
