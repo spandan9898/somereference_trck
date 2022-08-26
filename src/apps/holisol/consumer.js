@@ -28,7 +28,7 @@ const listener = async (consumer, partitionsCount) => {
       autoCommitInterval: 60000,
       partitionsConsumedConcurrently: partitionsCount,
       eachMessage: (consumedPayload) => {
-        const courierName = consumedPayload.topic === "ekart_pull" ? "ekart_pull" : "ekart";
+        const courierName = consumedPayload.topic === "holisol_pull" ? "holisol_pull" : "holisol";
         KafkaMessageHandler.init(consumedPayload, courierName);
       },
     });

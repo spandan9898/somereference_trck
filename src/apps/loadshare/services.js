@@ -2,7 +2,7 @@ const _ = require("lodash");
 const moment = require("moment");
 const { CODE_MAPPER } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const {parseReasonDescription} = require('../../utils/helpers.js');
+const { parseReasonDescription } = require("../../utils/helpers");
 const logger = require("../../../logger");
 
 /**
@@ -62,14 +62,18 @@ const prepareLoadshareData = (loadshareDict) => {
     if (!scanType) {
       return { err: "Unknown status code" };
     }
-    //return an JSON object from a string
+
+    // return an JSON object from a string
+
     let reasonDes = parseReasonDescription(loadshareDict?.reasonBO?.reasonDescription);
+
     // if reasonDes gives undefined
-    if((typeof (reasonDes.reasondescription)) === 'undefined'){
+
+    if (typeof reasonDes.reasondescription === "undefined") {
       reasonDes = loadshareDict?.reasonBO?.reasonDescription;
-    }
-    // reasonDes has a proper JSON object
-    else{
+    } else {
+      // reasonDes has a proper JSON object
+
       reasonDes = reasonDes?.reasondescription;
     }
     let statusDate = moment(loadshareDict?.eventTime, "YYYY-MM-DD HH:mm:ss");
@@ -82,14 +86,12 @@ const prepareLoadshareData = (loadshareDict) => {
     pickrrLoadshareDict.scan_datetime = statusDate;
     pickrrLoadshareDict.courier_status_code = mapperString;
     pickrrLoadshareDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
-    pickrrLoadshareDict.track_info = reasonDes
-    if(scanType.scan_type === "DL"){
+    pickrrLoadshareDict.track_info = reasonDes;
+    if (scanType.scan_type === "DL") {
       pickrrLoadshareDict.otp = loadshareDict?.reasonBO?.otp;
     }
     pickrrLoadshareDict.track_info = loadshareDict?.reasonBO?.reasonDescription
-      ? `${PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type]}_${
-          reasonDes
-        }`
+      ? `${PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type]}_${reasonDes}`
       : PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrLoadshareDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrLoadshareDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;

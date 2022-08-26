@@ -172,7 +172,7 @@ const preparePickrrObjData = (trackObj) => {
   pickrrBluedartDict.scan_type =
     scanMappingItem.scan_type === "UD" ? "NDR" : scanMappingItem.scan_type;
   pickrrBluedartDict.scan_datetime = scanDatetime;
-  if(scanMappingItem.scan_type === "DL"){
+  if (scanMappingItem.scan_type === "DL") {
     pickrrBluedartDict.longitude = trackObj?.longitude;
     pickrrBluedartDict.latitude = trackObj?.latitude;
   }
@@ -224,8 +224,8 @@ const getBluedartTrackingList = (trackObj) => {
       trackDict.scan_grp_type = scanDetails?.ScanGroupType;
       trackDict.track_info = scanDetails?.Scan;
       trackDict.scan_location = scanDetails?.ScannedLocation;
-      
-      if(trackDict.scan_type === 'DL'){
+
+      if (trackDict.scan_type === "DL") {
         trackDict.longitude = scanDetails?.StatusLongitude;
         trackDict.latitude = scanDetails?.StatusLatitude;
       }
@@ -237,7 +237,7 @@ const getBluedartTrackingList = (trackObj) => {
         pickupDate = moment(pickupDate, "DD-MM-YYYY hmm").format("YYYY-MM-DD HH:mm:ss");
         trackDict.pickup_datetime = pickupDate;
       }
-      
+
       if (shipmentData.Scans?.DeliveryDetails) {
         trackDict.Receivedby = _.get(shipmentData, "Scans.DeliveryDetails.ReceivedBy");
         const singatureData = _.get(shipmentData, "Scans.DeliveryDetails.ReceivedBy.Signature", []);
@@ -414,4 +414,3 @@ module.exports = {
   preparePickrrBluedartDict,
   preparePickrrBluedartPulledData,
 };
-

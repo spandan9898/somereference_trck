@@ -120,10 +120,9 @@ const prepareDelhiveryData = (delhiveryDict) => {
     if (pickrrDelhiveryDict.track_info.toLowerCase().includes("otp verified delivery")) {
       pickrrDelhiveryDict.otp_remarks = Instructions;
     }
-    if(statusType === "DL"){
+    if (statusType === "DL") {
       pickrrDelhiveryDict.latitude = trackData?.Latitude || "";
       pickrrDelhiveryDict.longitude = trackData?.Longitude || "";
-
     }
     pickrrDelhiveryDict.otp = trackData?.DeliveryOTP || "";
     return pickrrDelhiveryDict;
