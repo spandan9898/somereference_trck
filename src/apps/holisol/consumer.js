@@ -15,9 +15,7 @@ const initialize = async () => {
 
   await pullConsumer.connect();
   await pullConsumer.subscribe({ topic: PULL_TOPIC_NAME, fromBeginning: false });
-  return {
-    pullConsumer,
-  };
+  return pullConsumer;
 };
 
 /**
