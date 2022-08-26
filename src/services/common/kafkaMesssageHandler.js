@@ -1,7 +1,5 @@
 /* eslint-disable no-promise-executor-return */
 const _ = require("lodash");
-const logger = require("../../../logger")
-const moment = require("moment");
 
 const { getPrepareFunction } = require("./helpers");
 
@@ -27,73 +25,8 @@ const { getElkClients } = require("../../utils");
 const logger = require("../../../logger");
 const { TrackingLogger } = require("../../../logger");
 const { sendDataToElk } = require("./elk");
-const commonTrackingInfoCol = require("../pull/model");
-const { updateFlagForOtpDeliveredShipments } = require("../pull/helpers");
-const { getTrackDocumentfromMongo } = require("./trackServices");
 
 const trackingLogger = TrackingLogger("tracking/payloads");
-
-/**
- *
- * puts back otp data in trackEvent
- */
-const putBackOtpDataInTrackEvent = async (obj, doc) => {
-  const { scan_type: scanType, otp, otp_remarks: otpRemarks, scan_datetime: scanDateTime } = obj;
-  try {
-    let latestOtp;
-    const eventScanTime = moment(scanDateTime).subtract(330, "m").toDate();
-    const { track_arr: trackArr } = doc;
-    for (let i = 0; i < trackArr.length; i += 1) {
-      const { scan_type: dbScanType, scan_datetime: dbScanTime } = trackArr[i];
-      const isSame = moment(eventScanTime).isSame(moment(dbScanTime));
-      if (dbScanType === scanType && isSame) {
-        if (otpRemarks) {
-          trackArr[i].otp_remarks = otpRemarks;
-        }
-        if (otp) {
-          trackArr[i].otp = otp;
-          latestOtp = otp;
-        }
-        break;
-      }
-    }
-    const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr);
-    return { track_arr: trackArr, latest_otp: latestOtp, is_otp_delivered: isOtpDelivered };
-  } catch (error) {
-    logger.error("Failed Backfilling Otp Data", error);
-    return {};
-  }
-};
-
-/**
- *
- * @param {obj to be updated} updatedObj
- * @param {trackingId} awb
- * @param {commonTrackingInfo Col Instance} colInstance
- */
-const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance) => {
-  try {
-    if (!awb || !updatedObj) {
-      return {};
-    }
-    const updatedTrackDocument = await colInstance.findOneAndUpdate(
-      { tracking_id: awb },
-      { $set: updatedObj },
-      {
-        returnNewDocument: true,
-        returnDocument: "after",
-        upsert: process.env.NODE_ENV === "staging",
-      }
-    );
-
-    await updateStatusOnReport(updatedTrackDocument,logger,null,null,null);
-
-    return {};
-  } catch (error) {
-    logger.error("failed Updating Data");
-    return {};
-  }
-};
 
 /**
  * @desc get prepare data function and call others tasks like, send data to pull, ndr, v1
@@ -166,31 +99,10 @@ class KafkaMessageHandler {
       await updateTrackingProcessingCount({ awb: res.awb });
 
       const trackData = await redisCheckAndReturnTrackData(res, isFromPulled);
+
       if (!trackData) {
         logger.info(`data already exists or not found in DB! ${res.awb}`);
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
-
-        const colInstance = await commonTrackingInfoCol();
-
-        if (!trackDocument) {
-          return {};
-        }
-
-        let otpObj = {};
-        if (!courierName.includes("pull")) {
-          if (res.otp || res.otp_remarks) {
-            const trackDocument = await getTrackDocumentfromMongo(res.awb);
-            // Otp Data Backfilling when kafka_pull is updating first
-            // Otp Data is only recieved in kafka_Push events
-
-            otpObj = await putBackOtpDataInTrackEvent(res, trackDocument, colInstance);
-            await updateDataInPullDBAndReports(otpObj, res.awb, colInstance);
-          }
-        }
-       
-
-        // All Updates happening here in single go
-
         return {};
       }
       let qcDetails = null;
