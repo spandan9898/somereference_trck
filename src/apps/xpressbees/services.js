@@ -89,9 +89,9 @@ const prepareXbsData = (xbsDict) => {
         ? xbsNdrMapper[reasonDict?.pickrr_sub_status_code]
         : PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrXbsDict.awb = trackData.AWBNO;
-    if(statusType === "DL"){
-      pickrrXbsDict.longitude = xbsDict?.Longitude
-      pickrrXbsDict.latitude = xbsDict?.Latitude
+    if (statusType === "DL") {
+      pickrrXbsDict.longitude = xbsDict?.Longitude;
+      pickrrXbsDict.latitude = xbsDict?.Latitude;
     }
     pickrrXbsDict.track_location = trackData.CurrentLocation;
     pickrrXbsDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
