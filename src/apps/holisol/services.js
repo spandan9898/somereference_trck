@@ -77,28 +77,13 @@ const preparePulledHolisolData = (holisolDict) => {
     pickrrHolisolDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[pickrrHolisolDict?.scan_type];
     pickrrHolisolDict.track_location = holisolDict?.city;
     pickrrHolisolDict.track_info = holisolDict?.message || pickrrHolisolDict?.pickrr_status;
+    pickrrHolisolDict.awb = holisolDict?.trackingId;
     return pickrrHolisolDict;
   } catch (error) {
     pickrrHolisolDict.err = error.message;
     return pickrrHolisolDict;
   }
 };
-
-const payload = {
-  trackingId: "HL6474312806",
-  event: "pull",
-  isReverse: false,
-  isRto: true,
-  expectedDOD: "8/1/2022 10:30:59 AM",
-  awb: "HL5103093123",
-  message: "Return order received",
-  createdAt: "7/22/2022 10:45:06 PM",
-  city: "NA",
-  serialNo: "413",
-  ndrCode: "",
-};
-
-console.log(preparePulledHolisolData(payload));
 
 module.exports = {
   preparePulledHolisolData,
