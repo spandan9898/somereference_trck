@@ -172,9 +172,7 @@ class KafkaMessageHandler {
 
         const colInstance = await commonTrackingInfoCol();
 
-        if (!trackDocument) {
-          return {};
-        }
+        
 
         let otpObj = {};
         if (!courierName.includes("pull")) {
@@ -182,8 +180,11 @@ class KafkaMessageHandler {
             const trackDocument = await getTrackDocumentfromMongo(res.awb);
             // Otp Data Backfilling when kafka_pull is updating first
             // Otp Data is only recieved in kafka_Push events
+            if (!trackDocument){
+              return {}
+            }
 
-            otpObj = await putBackOtpDataInTrackEvent(res, trackDocument, colInstance);
+            otpObj = await putBackOtpDataInTrackEvent(res, trackDocument);
             await updateDataInPullDBAndReports(otpObj, res.awb, colInstance);
           }
         }
