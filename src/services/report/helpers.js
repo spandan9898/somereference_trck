@@ -31,17 +31,17 @@ const findLatestTrackingInfo = (trackDict) => {
  */
 const findTotalAttemptCount = (trackArr) => {
   let totalAttempCount = 0;
-  let dlCount = 0;
+  let isDelivered = false;
   try {
     trackArr.foreach((trackEvent) => {
       if (CUSTOMER_DRIVEN_NDR_REASON.includes(trackEvent?.pickrr_sub_status_code)) {
         totalAttempCount += 1;
       }
       if (trackEvent?.scan_type === "DL") {
-        dlCount += 1;
+        isDelivered = true;
       }
     });
-    if (dlCount) {
+    if (isDelivered) {
       return min(totalAttempCount, 1);
     }
     return totalAttempCount;
