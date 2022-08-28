@@ -28,7 +28,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
   const NDRObject = findLatestNDRDetails(trackData?.track_arr || {});
   const ndrTrackInfos = findNDRTrackInfos(trackData?.track_arr || []);
   const ndrDataSize = ndrTrackInfos.length;
-  const totalAttempCount = findTotalAttemptCount(trackData);
+  const totalAttempCount = findTotalAttemptCount(trackData?.track_arr || []);
 
   let pickupDate = findPickupDate(trackData);
   if (pickupDate) {
