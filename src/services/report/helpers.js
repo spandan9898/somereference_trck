@@ -3,7 +3,11 @@ const _ = require("lodash");
 const logger = require("../../../logger");
 const { NDR_STATUS_CODE_TO_REASON_MAPPER } = require("../../utils/constants");
 const { sendDataToElk } = require("../common/elk");
-const { NEW_STATUS_TO_OLD_MAPPING, VALID_FAD_NDR_SUBSTATUS_CODE } = require("./constants");
+const {
+  NEW_STATUS_TO_OLD_MAPPING,
+  VALID_FAD_NDR_SUBSTATUS_CODE,
+  CUSTOMER_DRIVEN_NDR_REASON,
+} = require("./constants");
 const { REPORT_STATUS_CODE_MAPPING, REPORT_STATUS_TYPE_MAPPING } = require("./constants");
 
 /**
@@ -28,7 +32,7 @@ const findTotalAttemptCount = (trackArr) => {
   let totalAttempCount = 0;
   try {
     trackArr.foreach((trackEvent) => {
-      if (VALID_FAD_NDR_SUBSTATUS_CODE.includes(trackEvent?.pickrr_sub_status_code)) {
+      if (CUSTOMER_DRIVEN_NDR_REASON.includes(trackEvent?.pickrr_sub_status_code)) {
         totalAttempCount += 1;
       }
     });
