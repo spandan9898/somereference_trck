@@ -16,6 +16,7 @@ const {
   findQCFailureReason,
   findNDRTrackInfos,
   findLatestRtdDate,
+  findTotalAttemptCount,
 } = require("./helpers");
 
 /**
@@ -27,6 +28,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
   const NDRObject = findLatestNDRDetails(trackData?.track_arr || {});
   const ndrTrackInfos = findNDRTrackInfos(trackData?.track_arr || []);
   const ndrDataSize = ndrTrackInfos.length;
+  const totalAttempCount = findTotalAttemptCount(trackData);
 
   let pickupDate = findPickupDate(trackData);
   if (pickupDate) {
@@ -90,6 +92,7 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     pickrr_tracking_id: trackData.tracking_id,
     qc_rejection_reason: findQCFailureReason(trackData?.track_arr || {}),
     rtdDate: findLatestRtdDate(trackData?.trackArr || []),
+    total_attempt_count: totalAttempCount,
   };
 
   if (trackData.promise_edd) {

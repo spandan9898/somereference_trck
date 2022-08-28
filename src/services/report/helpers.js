@@ -21,6 +21,25 @@ const findLatestTrackingInfo = (trackDict) => {
 
 /**
  *
+ * @param {trackArr} trackArr
+ * @returns total customer driven ndr reason
+ */
+const findTotalAttemptCount = (trackArr) => {
+  let totalAttempCount = 0;
+  try {
+    trackArr.foreach((trackEvent) => {
+      if (VALID_FAD_NDR_SUBSTATUS_CODE.includes(trackEvent?.pickrr_sub_status_code)) {
+        totalAttempCount += 1;
+      }
+    });
+    return totalAttempCount;
+  } catch (error) {
+    return null;
+  }
+};
+
+/**
+ *
  * @param {track_arr} trackDict
  * @param {*} n
  * @returns
@@ -271,4 +290,5 @@ module.exports = {
   findNDRTrackInfos,
   findLatestRtdDate,
   findQCFailureReason,
+  findTotalAttemptCount,
 };
