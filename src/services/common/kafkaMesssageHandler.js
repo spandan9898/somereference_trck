@@ -119,22 +119,6 @@ class KafkaMessageHandler {
     try {
       let res;
       let isFromPulled = false;
-      //handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
-      if(courierName === "ekart" && res.track_info === "delivery_attempt_metadata"){
-        if(res.latitude !== "" && res.longitude !== ""){
-          try{
-            updateEkartLatLong(res);
-          }
-          catch(error){
-            logger.error("updateEkartLatLong failed", error);
-          }
-        }
-        else{
-          logger.error(`Empty Lat-Long Filed, TrackingID: ${res.awb}`);
-        }
-        
-        return {};
-      }
 
       const { prodElkClient, trackingElkClient } = getElkClients();
 
@@ -172,6 +156,22 @@ class KafkaMessageHandler {
       } catch (error) {
         res = prepareFunc(consumedPayload);
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
+      }
+      //handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
+      if(courierName === "ekart" && res.track_info === "delivery_attempt_metadata"){
+        if(res.latitude !== "" && res.longitude !== ""){
+          try{
+            updateEkartLatLong(res);
+          }
+          catch(error){
+            logger.error("updateEkartLatLong failed", error);
+          }
+        }
+        else{
+          logger.error(`Empty Lat-Long Filed, TrackingID: ${res.awb}`);
+        }
+        
+        return {};
       }
 
       if (!res.awb) return {};
