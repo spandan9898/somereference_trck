@@ -1,4 +1,3 @@
-const { min } = require("lodash");
 const _ = require("lodash");
 
 const logger = require("../../../logger");
@@ -33,7 +32,7 @@ const findTotalAttemptCount = (trackArr) => {
   let totalAttempCount = 0;
   let isDelivered = false;
   try {
-    trackArr.foreach((trackEvent) => {
+    trackArr.forEach((trackEvent) => {
       if (CUSTOMER_DRIVEN_NDR_REASON.includes(trackEvent?.pickrr_sub_status_code)) {
         totalAttempCount += 1;
       }
@@ -42,7 +41,7 @@ const findTotalAttemptCount = (trackArr) => {
       }
     });
     if (isDelivered) {
-      return min(totalAttempCount, 1);
+      return Math.min(totalAttempCount, 1);
     }
     return totalAttempCount;
   } catch (error) {
