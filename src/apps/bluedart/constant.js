@@ -82,7 +82,7 @@ const BLUEDART_CODE_MAPPER_V2 = {
   "044-t": { scan_type: "UD", pickrr_sub_status_code: "CNR" },
   "062-t": { scan_type: "UD", pickrr_sub_status_code: "CNR" },
   "066-t": { scan_type: "UD", pickrr_sub_status_code: "SD" },
-  "076-t": { scan_type: "UD", pickrr_sub_status_code: "CR" },
+  "076-t": { scan_type: "UD", pickrr_sub_status_code: "OTPF" },
   "137-t": { scan_type: "UD", pickrr_sub_status_code: "ODA" },
   "139-t": { scan_type: "UD", pickrr_sub_status_code: "AI" },
   "175-t": { scan_type: "UD", pickrr_sub_status_code: "AI" },
