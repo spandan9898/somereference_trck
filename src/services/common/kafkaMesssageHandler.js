@@ -7,6 +7,7 @@ const { getPrepareFunction } = require("./helpers");
 
 const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
+const { updateEkartLatLong } = require("../pull/index");
 
 const sendDataToNdr = require("../ndr");
 const sendTrackDataToV1 = require("../v1");
@@ -118,6 +119,22 @@ class KafkaMessageHandler {
     try {
       let res;
       let isFromPulled = false;
+      //handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
+      if(courierName === "ekart" && res.track_info === "delivery_attempt_metadata"){
+        if(res.latitude !== "" && res.longitude !== ""){
+          try{
+            updateEkartLatLong(res);
+          }
+          catch(error){
+            logger.error("updateEkartLatLong failed", error);
+          }
+        }
+        else{
+          logger.error(`Empty Lat-Long Filed, TrackingID: ${res.awb}`);
+        }
+        
+        return {};
+      }
 
       const { prodElkClient, trackingElkClient } = getElkClients();
 
