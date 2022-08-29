@@ -159,6 +159,8 @@ class KafkaMessageHandler {
 
       // handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
 
+      // handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
+
       if (courierName === "ekart" && res.track_info === "delivery_attempt_metadata") {
         if (res.latitude !== "" && res.longitude !== "") {
           try {
@@ -172,7 +174,6 @@ class KafkaMessageHandler {
 
         return {};
       }
-
       if (!res.awb) return {};
 
       const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
