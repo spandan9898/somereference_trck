@@ -24,6 +24,7 @@ const {
   updateFreshdeskTrackingTicket,
 } = require("./services");
 const { getElkClients } = require("../../utils");
+const logger = require("../../../logger");
 const { TrackingLogger } = require("../../../logger");
 const { sendDataToElk } = require("./elk");
 const commonTrackingInfoCol = require("../pull/model");
