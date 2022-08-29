@@ -1,7 +1,6 @@
 /* eslint-disable no-promise-executor-return */
 const _ = require("lodash");
 const moment = require("moment");
-const logger = require("../../../logger");
 
 const { getPrepareFunction } = require("./helpers");
 
