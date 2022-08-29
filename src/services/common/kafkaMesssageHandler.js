@@ -1,7 +1,7 @@
 /* eslint-disable no-promise-executor-return */
 const _ = require("lodash");
-const logger = require("../../../logger")
 const moment = require("moment");
+const logger = require("../../../logger");
 
 const { getPrepareFunction } = require("./helpers");
 
@@ -25,7 +25,6 @@ const {
   updateFreshdeskTrackingTicket,
 } = require("./services");
 const { getElkClients } = require("../../utils");
-const logger = require("../../../logger");
 const { TrackingLogger } = require("../../../logger");
 const { sendDataToElk } = require("./elk");
 const commonTrackingInfoCol = require("../pull/model");
@@ -87,7 +86,7 @@ const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance) => {
       }
     );
 
-    await updateStatusOnReport(updatedTrackDocument,logger,null,null,null);
+    await updateStatusOnReport(updatedTrackDocument, logger, null, null, null);
 
     return {};
   } catch (error) {
@@ -157,20 +156,20 @@ class KafkaMessageHandler {
         res = prepareFunc(consumedPayload);
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
-      //handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
-      if(courierName === "ekart" && res.track_info === "delivery_attempt_metadata"){
-        if(res.latitude !== "" && res.longitude !== ""){
-          try{
+
+      // handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
+
+      if (courierName === "ekart" && res.track_info === "delivery_attempt_metadata") {
+        if (res.latitude !== "" && res.longitude !== "") {
+          try {
             updateEkartLatLong(res);
-          }
-          catch(error){
+          } catch (error) {
             logger.error("updateEkartLatLong failed", error);
           }
-        }
-        else{
+        } else {
           logger.error(`Empty Lat-Long Filed, TrackingID: ${res.awb}`);
         }
-        
+
         return {};
       }
 
@@ -193,16 +192,17 @@ class KafkaMessageHandler {
         if (!courierName.includes("pull")) {
           if (res.otp || res.otp_remarks) {
             const trackDocument = await getTrackDocumentfromMongo(res.awb);
+
             // Otp Data Backfilling when kafka_pull is updating first
             // Otp Data is only recieved in kafka_Push events
+
             if (!trackDocument) {
-              return {}
+              return {};
             }
             otpObj = await putBackOtpDataInTrackEvent(res, trackDocument, colInstance);
             await updateDataInPullDBAndReports(otpObj, res.awb, colInstance);
           }
         }
-       
 
         // All Updates happening here in single go
 
