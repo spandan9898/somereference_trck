@@ -15,9 +15,7 @@ const initialize = async () => {
 
   await pullConsumer.connect();
   await pullConsumer.subscribe({ topic: PULL_TOPIC_NAME, fromBeginning: false });
-  return {
-    pullConsumer,
-  };
+  return pullConsumer;
 };
 
 /**
@@ -30,7 +28,7 @@ const listener = async (consumer, partitionsCount) => {
       autoCommitInterval: 60000,
       partitionsConsumedConcurrently: partitionsCount,
       eachMessage: (consumedPayload) => {
-        const courierName = consumedPayload.topic === "ekart_pull" ? "ekart_pull" : "ekart";
+        const courierName = consumedPayload.topic === "holisol_pull" ? "holisol_pull" : "holisol";
         KafkaMessageHandler.init(consumedPayload, courierName);
       },
     });

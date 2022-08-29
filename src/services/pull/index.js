@@ -203,13 +203,16 @@ const updateTrackDataToPullMongo = async ({
       firstTrackObjOfTrackArr.scan_status =
         PICKRR_STATUS_CODE_MAPPING[firstTrackObjOfTrackArr.scan_type];
     }
+
     // lat-long marking and storing in trackDB
-    if(firstTrackObjOfTrackArr?.latitude ){
+
+    if (firstTrackObjOfTrackArr?.latitude) {
       updatedObj.latitude = firstTrackObjOfTrackArr.latitude;
     }
-    if(firstTrackObjOfTrackArr?.longitude){
+    if (firstTrackObjOfTrackArr?.longitude) {
       updatedObj.longitude = firstTrackObjOfTrackArr.longitude;
     }
+
     // Otp Delivered Shipments marking
 
     if (firstTrackObjOfTrackArr?.scan_type === "DL") {
@@ -274,7 +277,7 @@ const updateTrackDataToPullMongo = async ({
         upsert: process.env.NODE_ENV === "staging",
       }
     );
-
+  
     // audit Logs is Updated Over here
 
     await fetchAndUpdateAuditLogsData({
@@ -297,7 +300,26 @@ const updateTrackDataToPullMongo = async ({
     return false;
   }
 };
-
+//Handel special case for Ekart Lat-Long
+  const updateEkartLatLong = async (res) => {
+      const pullProdCollectionInstance = await commonTrackingInfoCol();
+      const pickrrEkartDict = {
+        latitude:"",
+        longitude:""
+      }
+      const {awb, longitude, latitude} = res;
+      pickrrEkartDict.latitude = latitude;
+      pickrrEkartDict.longitude = longitude;
+      pickrrEkartDict.updated_at = moment().toDate();
+      pickrrEkartDict.last_update_from = "kafka";
+      const response = await pullProdCollectionInstance.findOneAndUpdate(
+        { tracking_id: awb },
+        {
+          $set: pickrrEkartDict,
+        }
+      )
+  }
 module.exports = {
   updateTrackDataToPullMongo,
+  updateEkartLatLong,
 };

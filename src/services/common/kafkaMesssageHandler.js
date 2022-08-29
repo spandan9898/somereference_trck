@@ -178,7 +178,7 @@ class KafkaMessageHandler {
             const trackDocument = await getTrackDocumentfromMongo(res.awb);
             // Otp Data Backfilling when kafka_pull is updating first
             // Otp Data is only recieved in kafka_Push events
-            if (!trackDocument){
+            if (!trackDocument) {
               return {}
             }
             otpObj = await putBackOtpDataInTrackEvent(res, trackDocument, colInstance);
