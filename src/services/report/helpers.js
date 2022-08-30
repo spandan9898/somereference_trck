@@ -3,7 +3,11 @@ const _ = require("lodash");
 const logger = require("../../../logger");
 const { NDR_STATUS_CODE_TO_REASON_MAPPER } = require("../../utils/constants");
 const { sendDataToElk } = require("../common/elk");
-const { NEW_STATUS_TO_OLD_MAPPING, VALID_FAD_NDR_SUBSTATUS_CODE } = require("./constants");
+const {
+  NEW_STATUS_TO_OLD_MAPPING,
+  VALID_FAD_NDR_SUBSTATUS_CODE,
+  CUSTOMER_DRIVEN_NDR_REASON,
+} = require("./constants");
 const { REPORT_STATUS_CODE_MAPPING, REPORT_STATUS_TYPE_MAPPING } = require("./constants");
 
 /**
@@ -17,6 +21,29 @@ const findLatestTrackingInfo = (trackDict) => {
   }
   const latestTrackingInfo = _.get(trackDict, "track_arr[0].scan_status", "");
   return latestTrackingInfo;
+};
+
+/**
+ *
+ * @param {trackArr} trackArr
+ * @returns total customer driven ndr reason
+ */
+const findTotalAttemptCount = (trackArr) => {
+  let totalAttempCount = 0;
+  try {
+    const isDelivered = trackArr[0]?.scan_type === "DL";
+    trackArr.forEach((trackEvent) => {
+      if (CUSTOMER_DRIVEN_NDR_REASON.includes(trackEvent?.pickrr_sub_status_code)) {
+        totalAttempCount += 1;
+      }
+    });
+    if (isDelivered) {
+      return Math.min(totalAttempCount, 1);
+    }
+    return totalAttempCount;
+  } catch (error) {
+    return null;
+  }
 };
 
 /**
@@ -271,4 +298,5 @@ module.exports = {
   findNDRTrackInfos,
   findLatestRtdDate,
   findQCFailureReason,
+  findTotalAttemptCount,
 };
