@@ -31,7 +31,7 @@ const findLatestTrackingInfo = (trackDict) => {
 const findTotalAttemptCount = (trackArr) => {
   let totalAttempCount = 0;
   try {
-    const isDelivered = trackArr[0].scan_type === "DL";
+    const isDelivered = trackArr[0]?.scan_type === "DL";
     trackArr.forEach((trackEvent) => {
       if (CUSTOMER_DRIVEN_NDR_REASON.includes(trackEvent?.pickrr_sub_status_code)) {
         totalAttempCount += 1;
