@@ -38,7 +38,7 @@ const trackingLogger = TrackingLogger("tracking/payloads");
  * puts back otp data in trackEvent
  */
 const updateFieldsForDuplicateEvent = async (obj) => {
-  const { scan_type: scanType, otp, otp_remarks: otpRemarks, scan_datetime: scanDateTime,  } = obj;
+  const { scan_type: scanType, otp, otp_remarks: otpRemarks, scan_datetime: scanDateTime  } = obj;
   try {
     let latestOtp;
     let lat;
