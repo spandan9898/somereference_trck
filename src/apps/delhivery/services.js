@@ -224,9 +224,10 @@ const prepareDelhiveryPulledData = (delhiveryDict) => {
   pickrrDelhiveryDict.received_by = receivedBy || "";
   pickrrDelhiveryDict.EDD = edd ? moment(edd).toDate() : "";
   pickrrDelhiveryDict.awb = trackingId;
+  pickrrDelhiveryDict.latitude = delhiveryDict?.geo_location?.lat;
+  pickrrDelhiveryDict.longitude = delhiveryDict?.geo_location?.long;
   pickrrDelhiveryDict.courier_status_code = mapperString;
   pickrrDelhiveryDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];
-
   return pickrrDelhiveryDict;
 };
 module.exports = { prepareDelhiveryData, prepareDelhiveryPulledData };
