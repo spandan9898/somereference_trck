@@ -38,7 +38,7 @@ const trackingLogger = TrackingLogger("tracking/payloads");
  * puts back otp data in trackEvent
  */
 const updateFieldsForDuplicateEvent = async (obj) => {
-  const { scan_type: scanType, otp, otp_remarks: otpRemarks, scan_datetime: scanDateTime  } = obj;
+  const { scan_type: scanType, otp, otp_remarks: otpRemarks, scan_datetime: scanDateTime,latitude, longitude} = obj;
   try {
     let latestOtp;
     let lat;
@@ -47,7 +47,6 @@ const updateFieldsForDuplicateEvent = async (obj) => {
     // Otp Data Backfilling when kafka_pull is updating first
     // Otp Data is only recieved in kafka_Push events
 
-    const {latitude, longitude} = obj;
     const eventScanTime = moment(scanDateTime).subtract(330, "m").toDate();
     const { track_arr: trackArr } = doc;
     for (let i = 0; i < trackArr.length; i += 1) {
