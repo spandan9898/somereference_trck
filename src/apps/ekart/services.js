@@ -72,6 +72,13 @@ const prepareEkartData = (ekartDict) => {
     } else {
       statusScanType = subReasons.length ? `${event}_${subReasons[0]}` : event;
     }
+    if(event === "delivery_attempt_metadata"){
+      pickrrEkartDict.awb = trackData?.vendor_tracking_id;
+      pickrrEkartDict.track_info = event;
+      pickrrEkartDict.longitude = metaData?.attempt_location?.longitude;
+      pickrrEkartDict.latitude = metaData?.attempt_location?.latitude;
+      return pickrrEkartDict;
+    }
     let statusType = statusScanType;
     const statusDateTime = trackData?.event_date;
     const statusDate = statusDateTime

@@ -120,8 +120,11 @@ const prepareDelhiveryData = (delhiveryDict) => {
     if (pickrrDelhiveryDict.track_info.toLowerCase().includes("otp verified delivery")) {
       pickrrDelhiveryDict.otp_remarks = Instructions;
     }
+    if (statusType === "DL") {
+      pickrrDelhiveryDict.latitude = trackData?.Latitude || "";
+      pickrrDelhiveryDict.longitude = trackData?.Longitude || "";
+    }
     pickrrDelhiveryDict.otp = trackData?.DeliveryOTP || "";
-
     return pickrrDelhiveryDict;
   } catch (error) {
     pickrrDelhiveryDict.err = error.message;
@@ -221,9 +224,10 @@ const prepareDelhiveryPulledData = (delhiveryDict) => {
   pickrrDelhiveryDict.received_by = receivedBy || "";
   pickrrDelhiveryDict.EDD = edd ? moment(edd).toDate() : "";
   pickrrDelhiveryDict.awb = trackingId;
+  pickrrDelhiveryDict.latitude = delhiveryDict?.geo_location?.lat;
+  pickrrDelhiveryDict.longitude = delhiveryDict?.geo_location?.long;
   pickrrDelhiveryDict.courier_status_code = mapperString;
   pickrrDelhiveryDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType];
-
   return pickrrDelhiveryDict;
 };
 module.exports = { prepareDelhiveryData, prepareDelhiveryPulledData };

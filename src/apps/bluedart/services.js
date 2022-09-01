@@ -172,6 +172,10 @@ const preparePickrrObjData = (trackObj) => {
   pickrrBluedartDict.scan_type =
     scanMappingItem.scan_type === "UD" ? "NDR" : scanMappingItem.scan_type;
   pickrrBluedartDict.scan_datetime = scanDatetime;
+  if (scanMappingItem.scan_type === "DL") {
+    pickrrBluedartDict.longitude = trackObj?.longitude;
+    pickrrBluedartDict.latitude = trackObj?.latitude;
+  }
   pickrrBluedartDict.track_info = trackInfo;
   pickrrBluedartDict.awb = awb;
   pickrrBluedartDict.track_location = scanLocation;
@@ -183,7 +187,6 @@ const preparePickrrObjData = (trackObj) => {
   if (trackObj.EDD) pickrrBluedartDict.EDD = trackObj.EDD;
   if (trackObj.Receivedby) pickrrBluedartDict.received_by = trackObj.Receivedby;
   if (trackObj.pickup_datetime) pickrrBluedartDict.pickup_datetime = trackObj.pickup_datetime;
-
   return pickrrBluedartDict;
 };
 
@@ -221,6 +224,11 @@ const getBluedartTrackingList = (trackObj) => {
       trackDict.scan_grp_type = scanDetails?.ScanGroupType;
       trackDict.track_info = scanDetails?.Scan;
       trackDict.scan_location = scanDetails?.ScannedLocation;
+
+      if (trackDict.scan_type === "DL") {
+        trackDict.longitude = scanDetails?.StatusLongitude;
+        trackDict.latitude = scanDetails?.StatusLatitude;
+      }
       trackDict.awb = trackingId;
       trackDict.scan_code_id = `${scanDetails?.ScanCode || ""}-${scanDetails?.ScanGroupType || ""}`;
 
@@ -282,11 +290,9 @@ const getBluedartTrackingList = (trackObj) => {
  */
 const preparePickrrBluedartDict = (requestedTrackData) => {
   const result = getBluedartTrackingList(requestedTrackData);
-
   if (result.err) {
     return result.err;
   }
-
   const { trackingList } = result;
   if (_.isEmpty(trackingList)) {
     return {};
