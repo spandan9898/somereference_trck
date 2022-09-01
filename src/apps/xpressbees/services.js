@@ -97,6 +97,10 @@ const prepareXbsData = (xbsDict) => {
     pickrrXbsDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrXbsDict.pickrr_sub_status_code = reasonDict?.pickrr_sub_status_code || "";
     pickrrXbsDict.courier_status_code = statusScanType;
+    if (xbsDict?.ofdotp) {
+      pickrrXbsDict.otp = xbsDict.ofdotp;
+    }
+
     return pickrrXbsDict;
   } catch (error) {
     pickrrXbsDict.err = error.message;
