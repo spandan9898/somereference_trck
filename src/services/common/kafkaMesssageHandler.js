@@ -47,9 +47,6 @@ const updateFieldsForDuplicateEvent = async (obj) => {
     // Otp Data Backfilling when kafka_pull is updating first
     // Otp Data is only recieved in kafka_Push events
 
-    if (!trackDocument) {
-      return {};
-    }
     const {latitude, longitude} = obj;
     const eventScanTime = moment(scanDateTime).subtract(330, "m").toDate();
     const { track_arr: trackArr } = doc;
@@ -174,7 +171,6 @@ class KafkaMessageHandler {
         res = prepareFunc(consumedPayload);
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
-
       // handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
 
       // handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
@@ -223,7 +219,8 @@ class KafkaMessageHandler {
             trackArrObj = await updateFieldsForDuplicateEvent(res);
           }
         }
-
+        const updatedObj = { ...otpObj, ...trackArrObj };
+        await updateDataInPullDBAndReports(updatedObj, res.awb, colInstance);
         // All Updates happening here in single go
 
         return {};
