@@ -202,26 +202,30 @@ class KafkaMessageHandler {
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
 
         const colInstance = await commonTrackingInfoCol();
-
-        let otpObj = {};
-        if (!courierName.includes("pull")) {
-          if (res.otp || res.otp_remarks) {
-            // Otp Data Backfilling when kafka_pull is updating first
-            // Otp Data is only recieved in kafka_Push events
-            otpObj = await updateFieldsForDuplicateEvent(res);
-          }
+        try{
+            let otpObj = {};
+            if (!courierName.includes("pull")) {
+              if (res.otp || res.otp_remarks) {
+                // Otp Data Backfilling when kafka_pull is updating first
+                // Otp Data is only recieved in kafka_Push events
+                otpObj = await updateFieldsForDuplicateEvent(res);
+              }
+            }
+            let trackArrObj = {};
+            if(courierName.includes("pull") && res.scan_type === "DL"){
+              const {latitude, longtitude} = res;
+              if(latitude || longtitude){
+                //backfilling  lat and long from pull and updating the trackarray
+                trackArrObj = await updateFieldsForDuplicateEvent(res);
+              }
+            }
+            const updatedObj = { ...otpObj, ...trackArrObj };
+            await updateDataInPullDBAndReports(updatedObj, res.awb, colInstance);
         }
-        let trackArrObj = {};
-        if(courierName.includes("pull")){
-          const {latitude, longtitude} = res;
-          if(latitude || longtitude){
-            //backfilling  lat and long from pull and updating the trackarray
-            trackArrObj = await updateFieldsForDuplicateEvent(res);
-          }
+        catch(error){
+          return {};
         }
-        const updatedObj = { ...otpObj, ...trackArrObj };
-        await updateDataInPullDBAndReports(updatedObj, res.awb, colInstance);
-        // All Updates happening here in single go
+                // All Updates happening here in single go
 
         return {};
       }
