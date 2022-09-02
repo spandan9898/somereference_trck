@@ -1,7 +1,12 @@
 const moment = require("moment");
 
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { EKART_STATUS_MAPPER, EKART_PULL_MAPPER } = require("./constant");
+const {
+  EKART_STATUS_MAPPER,
+  EKART_PULL_MAPPER,
+  EKART_UD_REASON,
+  UD_TO_OT_HUB_NOTES,
+} = require("./constant");
 const logger = require("../../../logger");
 
 /*
@@ -98,10 +103,18 @@ const prepareEkartData = (ekartDict) => {
       };
     }
     statusType = reasonDict.scan_type;
-
+    let scanStatus = statusScanType;
+    if (!scanStatus && ["UD", "NDR"].includes(statusType)) {
+      const pickrrSubStatus = reasonDict?.pickrr_sub_status_code || "";
+      if (pickrrSubStatus && pickrrSubStatus in EKART_UD_REASON) {
+        scanStatus = EKART_UD_REASON[pickrrSubStatus];
+      } else {
+        scanStatus = "Undelivered";
+      }
+    }
     pickrrEkartDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrEkartDict.scan_datetime = statusDate;
-    pickrrEkartDict.track_info = statusScanType;
+    pickrrEkartDict.track_info = scanStatus;
     pickrrEkartDict.awb = trackData.vendor_tracking_id.toString();
     pickrrEkartDict.track_location = trackData.location.toString();
     pickrrEkartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
@@ -153,7 +166,10 @@ const preparePulledEkartData = (ekartDict) => {
         err: "Unknown status code",
       };
     }
-
+    const hubNotes = ekartDict?.hub_notes ? ekartDict.hub_notes.toString().toLowerCase() : "";
+    if (UD_TO_OT_HUB_NOTES.includes(hubNotes) && ["UD", "NDR"].includes(scanType.pickrr_code)) {
+      scanType.pickrr_code = "OT";
+    }
     pickrrEkartDict.scan_type = scanType.pickrr_code === "UD" ? "NDR" : scanType.pickrr_code;
     pickrrEkartDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
 
