@@ -226,7 +226,7 @@ const updateTrackDataToPullMongo = async ({
     }
 
     // Pickrr EDD is fetch over here
-
+    const courierParentName = res?.courier_parent_name;
     try {
       const instance = new EddPrepareHelper({ latestCourierEDD, pickupDateTime, eddStampInDb });
       const pickrrEDD = await instance.callPickrrEDDEventFunc({
@@ -235,6 +235,7 @@ const updateTrackDataToPullMongo = async ({
         pickupDateTime,
         eddStampInDb,
         statusType: firstTrackObjOfTrackArr.scan_type,
+        courierParentName,
       });
 
       // in case of QCF, edd_stamp will be what was calculated before QC Failure

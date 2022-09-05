@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
 const moment = require("moment");
-const { PICKRR_EDD_MATRIX, ZONE_REQUIRED_STATUS_SET } = require("./constants");
+const { PICKRR_EDD_MATRIX, PICKRR_EDD_MATRIX_FOR_EKART, ZONE_REQUIRED_STATUS_SET } = require("./constants");
 const { validateDateField, getMaxDate } = require("../../utils/helpers");
 
 /**
@@ -15,9 +15,9 @@ class EddPrepareHelper {
     this.tomorrow = moment().add(1, "days").set({ hour: 13, minute: 0, second: 0 }).toDate();
   }
 
-  getMinMaxTat({ zone }) {
-    const minTat = PICKRR_EDD_MATRIX[zone].min_tat;
-    const maxTat = PICKRR_EDD_MATRIX[zone].max_tat;
+  getMinMaxTat({ zone, courierParentName }) {
+    const minTat = courierParentName === "Ekart" ? PICKRR_EDD_MATRIX_FOR_EKART[zone].min_tat : PICKRR_EDD_MATRIX[zone].min_tat;
+    const maxTat = courierParentName === "Ekart" ? PICKRR_EDD_MATRIX_FOR_EKART[zone].max_tat : PICKRR_EDD_MATRIX[zone].max_tat;
     return { minTat, maxTat };
   }
 
@@ -26,10 +26,10 @@ class EddPrepareHelper {
    * @prepared EDD for OrderPlaced
    * @returns EDD
    */
-  getPickrrEDDforOrderPlaced({ zone, latestCourierEDD }) {
+  getPickrrEDDforOrderPlaced({ zone, latestCourierEDD, courierParentName }) {
     let minPickrrEDD;
     let maxPickrrEDD;
-    const { minTat, maxTat } = this.getMinMaxTat({ zone });
+    const { minTat, maxTat } = this.getMinMaxTat({ zone, courierParentName });
     if (this.validatedCourierEdd) {
       // change today + timedelta
 
@@ -46,9 +46,9 @@ class EddPrepareHelper {
     return moment(this.tomorrow).add(minTat, "days").toDate();
   }
 
-  getPickrrEDDforOrderLive({ zone, latestCourierEDD, pickupDateTime, eddStampInDb }) {
+  getPickrrEDDforOrderLive({ zone, latestCourierEDD, pickupDateTime, eddStampInDb, courierParentName }) {
     let pickrrEDD;
-    const { minTat, maxTat } = this.getMinMaxTat({ zone });
+    const { minTat, maxTat } = this.getMinMaxTat({ zone, courierParentName });
     if (this.validatedPickupDate) {
       const pickupAndMinTat = moment(pickupDateTime).add(minTat, "days").toDate();
       const pickupAndMaxTat = moment(pickupDateTime).add(maxTat, "days").toDate();
@@ -107,6 +107,7 @@ class EddPrepareHelper {
     pickupDateTime,
     eddStampInDb,
     statusType,
+    courierParentName,
   }) {
     let pickrrEDD;
     if (!PICKRR_EDD_MATRIX[zone] && ZONE_REQUIRED_STATUS_SET.includes(statusType)) {
@@ -116,6 +117,7 @@ class EddPrepareHelper {
       pickrrEDD = this.getPickrrEDDforOrderPlaced({
         zone,
         latestCourierEDD,
+        courierParentName,
       });
     } else if (["PP", "SHP", "OT", "RAD"].includes(statusType)) {
       pickrrEDD = this.getPickrrEDDforOrderLive({
@@ -123,6 +125,7 @@ class EddPrepareHelper {
         latestCourierEDD,
         pickupDateTime,
         eddStampInDb,
+        courierParentName,
       });
     } else if (statusType === "OO") {
       pickrrEDD = this.getPickrrEDDforOFD();
