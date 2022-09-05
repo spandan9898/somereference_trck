@@ -29,18 +29,18 @@ const findLatestTrackingInfo = (trackDict) => {
  * @returns total customer driven ndr reason
  */
 const findTotalAttemptCount = (trackArr) => {
-  let totalAttempCount = 0;
+  let totalAttemptCount = 0;
   try {
     const isDelivered = trackArr[0]?.scan_type === "DL";
     trackArr.forEach((trackEvent) => {
       if (CUSTOMER_DRIVEN_NDR_REASON.includes(trackEvent?.pickrr_sub_status_code)) {
-        totalAttempCount += 1;
+        totalAttemptCount += 1;
       }
     });
     if (isDelivered) {
-      return Math.min(totalAttempCount, 1);
+      return totalAttemptCount + 1;
     }
-    return totalAttempCount;
+    return totalAttemptCount;
   } catch (error) {
     return null;
   }
