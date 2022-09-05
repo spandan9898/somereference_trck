@@ -279,8 +279,8 @@ const updateTrackDataToPullMongo = async ({
       }
     );
   
-    // audit Logs is Updated Over here
-
+    // audit Logs is Updated Over here 
+    updatedObj.pickup_datetime = pickupDateTime;
     await fetchAndUpdateAuditLogsData({
       courierTrackingId: trackObj.awb,
       updatedObj,
