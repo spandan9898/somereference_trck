@@ -148,22 +148,20 @@ const updateTrackDataToPullMongo = async ({
     } else {
       // Handle duplicate Entry
 
-      if (isFromPulled) {
-        for (const trackItem of res.track_arr) {
-          const isSameScanType = updatedObj["status.current_status_type"] === trackItem.scan_type;
-          const scanTimeCheck = moment(trackItem.scan_datetime).diff(
-            moment(updatedObj["status.current_status_time"]),
-            "seconds"
+      for (const trackItem of res.track_arr) {
+        const isSameScanType = updatedObj["status.current_status_type"] === trackItem.scan_type;
+        const scanTimeCheck = moment(trackItem.scan_datetime).diff(
+          moment(updatedObj["status.current_status_time"]),
+          "seconds"
+        );
+
+        // const absoluteTimeCheck = Math.abs(scanTimeCheck);
+
+        if (isSameScanType && scanTimeCheck <= 60) {
+          logger.info(
+            `event discarded for tracking id --> ${result.awb}, status --> ${trackItem?.scan_type}`
           );
-
-          // const absoluteTimeCheck = Math.abs(scanTimeCheck);
-
-          if (isSameScanType && scanTimeCheck <= 60) {
-            logger.info(
-              `event discarded for tracking id --> ${result.awb}, status --> ${trackItem?.scan_type}`
-            );
-            return false;
-          }
+          return false;
         }
       }
 
