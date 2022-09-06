@@ -119,7 +119,7 @@ const DTDC_CODE_MAPPER = {
   },
   "nondlv_receiver not available-(cir)": {
     scan_type: "UD",
-    pickrr_sub_status_code: "CI",
+    pickrr_sub_status_code: "CNA",
   },
   "nondlv_receiver refused delivery(cir)": {
     scan_type: "UD",
