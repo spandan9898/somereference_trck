@@ -6,6 +6,7 @@ const {
   EKART_PULL_MAPPER,
   EKART_UD_REASON,
   UD_TO_OT_HUB_NOTES,
+  UD_TO_DM_HUB_NOTES,
 } = require("./constant");
 const logger = require("../../../logger");
 
@@ -72,7 +73,7 @@ const prepareEkartData = (ekartDict) => {
     } else {
       statusScanType = subReasons.length ? `${event}_${subReasons[0]}` : event;
     }
-    if(event === "delivery_attempt_metadata"){
+    if (event === "delivery_attempt_metadata") {
       pickrrEkartDict.awb = trackData?.vendor_tracking_id;
       pickrrEkartDict.track_info = event;
       pickrrEkartDict.longitude = metaData?.attempt_location?.longitude;
@@ -167,9 +168,15 @@ const preparePulledEkartData = (ekartDict) => {
       };
     }
     const hubNotes = ekartDict?.hub_notes ? ekartDict.hub_notes.toString().toLowerCase() : "";
-    if (UD_TO_OT_HUB_NOTES.includes(hubNotes) && ["UD", "NDR"].includes(scanType.pickrr_code)) {
-      scanType.pickrr_code = "OT";
+    if (["UD", "NDR"].includes(scanType.pickrr_code)) {
+      if (UD_TO_OT_HUB_NOTES.includes(hubNotes)) {
+        scanType.pickrr_code = "OT";
+      }
+      if (UD_TO_DM_HUB_NOTES.includes(hubNotes)) {
+        scanType.pickrr_code = "DM";
+      }
     }
+
     pickrrEkartDict.scan_type = scanType.pickrr_code === "UD" ? "NDR" : scanType.pickrr_code;
     pickrrEkartDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
 
