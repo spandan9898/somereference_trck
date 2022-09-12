@@ -38,12 +38,20 @@ const trackingLogger = TrackingLogger("tracking/payloads");
  * puts back otp data in trackEvent
  */
 const updateFieldsForDuplicateEvent = async (obj) => {
-  const { scan_type: scanType, otp, otp_remarks: otpRemarks, scan_datetime: scanDateTime,latitude, longitude} = obj;
+  const {
+    scan_type: scanType,
+    otp,
+    otp_remarks: otpRemarks,
+    scan_datetime: scanDateTime,
+    latitude,
+    longitude,
+  } = obj;
   try {
     let latestOtp;
     let lat;
     let long;
     const doc = await getTrackDocumentfromMongo(obj.awb);
+
     // Otp Data Backfilling when kafka_pull is updating first
     // Otp Data is only recieved in kafka_Push events
 
@@ -60,19 +68,25 @@ const updateFieldsForDuplicateEvent = async (obj) => {
           trackArr[i].otp = otp;
           latestOtp = otp;
         }
-        if(latitude){
+        if (latitude) {
           trackArr[i].latitude = latitude;
           lat = latitude;
         }
-        if(longitude){
-          trackArr[i].longitude = longitude
+        if (longitude) {
+          trackArr[i].longitude = longitude;
           long = longitude;
         }
         break;
       }
     }
     const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr);
-    return { track_arr: trackArr, latest_otp: latestOtp, is_otp_delivered: isOtpDelivered, longitude: long, latitude:lat };
+    return {
+      track_arr: trackArr,
+      latest_otp: latestOtp,
+      is_otp_delivered: isOtpDelivered,
+      longitude: long,
+      latitude: lat,
+    };
   } catch (error) {
     logger.error("Failed Backfilling Otp Data", error);
     return {};
@@ -170,6 +184,7 @@ class KafkaMessageHandler {
         res = prepareFunc(consumedPayload);
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
+
       // handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
 
       // handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
@@ -201,30 +216,32 @@ class KafkaMessageHandler {
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
 
         const colInstance = await commonTrackingInfoCol();
-        try{
-            let otpObj = {};
-            if (!courierName.includes("pull")) {
-              if (res.otp || res.otp_remarks) {
-                // Otp Data Backfilling when kafka_pull is updating first
-                // Otp Data is only recieved in kafka_Push events
-                otpObj = await updateFieldsForDuplicateEvent(res);
-              }
+        try {
+          let otpObj = {};
+          if (!courierName.includes("pull")) {
+            if (res.otp || res.otp_remarks) {
+              // Otp Data Backfilling when kafka_pull is updating first
+              // Otp Data is only recieved in kafka_Push events
+
+              otpObj = await updateFieldsForDuplicateEvent(res);
             }
-            let trackArrObj = {};
-            if(courierName.includes("pull") && res.scan_type === "DL"){
-              const {latitude, longtitude} = res;
-              if(latitude || longtitude){
-                //backfilling  lat and long from pull and updating the trackarray
-                trackArrObj = await updateFieldsForDuplicateEvent(res);
-              }
+          }
+          let trackArrObj = {};
+          if (courierName.includes("pull") && res.scan_type === "DL") {
+            const { latitude, longtitude } = res;
+            if (latitude || longtitude) {
+              // backfilling  lat and long from pull and updating the trackarray
+
+              trackArrObj = await updateFieldsForDuplicateEvent(res);
             }
-            const updatedObj = { ...otpObj, ...trackArrObj };
-            await updateDataInPullDBAndReports(updatedObj, res.awb, colInstance);
-        }
-        catch(error){
+          }
+          const updatedObj = { ...otpObj, ...trackArrObj };
+          await updateDataInPullDBAndReports(updatedObj, res.awb, colInstance);
+        } catch (error) {
           return {};
         }
-                // All Updates happening here in single go
+
+        // All Updates happening here in single go
 
         return {};
       }
