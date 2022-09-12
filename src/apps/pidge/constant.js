@@ -22,7 +22,7 @@ const PIDGE_CODE_MAPPER = {
   "12_blockade/unable to attempt": { scan_type: "UD", pickrr_sub_status_code: "SD" },
   "12_cod dispute - dtro": { scan_type: "UD", pickrr_sub_status_code: "CNR" },
   "12_customer not available": { scan_type: "UD", pickrr_sub_status_code: "CNA" },
-  "12_customer reject order - drto": { scan_type: "UD", pickrr_sub_status_code: "CR" },
+  "12_customer reject order - drto": { scan_type: "UD", pickrr_sub_status_code: "CR-OTP" },
   "12_customer reschedule order": { scan_type: "UD", pickrr_sub_status_code: "CD" },
   "12_customer unreachable": { scan_type: "UD", pickrr_sub_status_code: "CNA" },
   "12_failed delivery": { scan_type: "UD", pickrr_sub_status_code: "OTH" },
