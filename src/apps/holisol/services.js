@@ -86,22 +86,6 @@ const preparePulledHolisolData = (holisolDict) => {
   }
 };
 
-const payload = {
-  trackingId: "HL5474332019",
-  event: "pull",
-  isReverse: false,
-  isRto: false,
-  expectedDOD: "9/3/2022 1:00:37 PM",
-  awb: "HL5474332019",
-  message: "Shipment delivered  ",
-  createdAt: "8/25/2022 2:24:00 PM",
-  city: "BANGALORE",
-  serialNo: "6",
-  ndrCode: "",
-};
-
-console.log(preparePulledHolisolData(payload));
-
 module.exports = {
   preparePulledHolisolData,
 };
