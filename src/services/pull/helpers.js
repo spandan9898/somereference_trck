@@ -119,11 +119,18 @@ const updateTrackModel = (cacheTrakModel, trackingDocument) => {
  * @desc https://drive.google.com/file/d/1U-Kh18Yfj1-iJDD9Rd8d887PxM7hZ8AK/view?usp=sharing
  */
 const checkTriggerForPulledEvent = (preparedDict, dbResponse) => {
-  const latestCurrentStatusTimeInDB = _.get(dbResponse, "track_arr[0].current_status_time");
+  const currentStatus = dbResponse?.status;
+  const latestCurrentStatusTimeInDB = currentStatus?.current_status_time;
+
+  // const latestCurrentStatusTimeInDB = _.get(dbResponse, ".current_status_time");
+
+  logger.info(`Check Trigger For Pulled Event -> ${latestCurrentStatusTimeInDB}`);
   const pulledCurrentStatusTime = _.get(preparedDict, "scan_datetime");
 
   const currentStatusTypeInDB = _.get(dbResponse, "track_arr[0].scan_type");
   const pulledCurrentStatusType = _.get(preparedDict, "scan_type");
+
+  // need confirmation if we have to remove if block from #133
 
   if (!["DL", "RTO", "RTD", "PP"].includes(preparedDict.scan_type)) {
     if (moment(latestCurrentStatusTimeInDB).isAfter(moment(pulledCurrentStatusTime))) {
@@ -133,9 +140,13 @@ const checkTriggerForPulledEvent = (preparedDict, dbResponse) => {
       currentStatusTypeInDB === "DL" &&
       !["RTO", "RTO-OO", "RTO-OT", "RTD"].includes(pulledCurrentStatusType)
     ) {
-      return false;
+      if (moment(pulledCurrentStatusType).isAfter(moment(latestCurrentStatusTimeInDB)))
+        return false;
     }
   }
+
+  // this condition is when -->
+  // current obj time is after latest in DB and latest_scan_type_db = DL and current obj scan --> PP
 
   if (
     moment(pulledCurrentStatusTime).isAfter(moment(latestCurrentStatusTimeInDB)) &&
