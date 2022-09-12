@@ -428,11 +428,8 @@ const EKART_UD_REASON = {
   OTPF: "Undelivered - OTP Validation Failed",
 };
 
-const UD_TO_OT_HUB_NOTES = [
-  "marked_as_same_state_misroute",
-  "marked_as_received_damaged",
-  "marked_as_other_state_misroute",
-];
+const UD_TO_OT_HUB_NOTES = ["marked_as_same_state_misroute", "marked_as_other_state_misroute"];
+const UD_TO_DM_HUB_NOTES = ["marked_as_received_damaged"];
 
 const PUSH_PARTITION_COUNT = 10;
 const PUSH_GROUP_NAME = "ekart-push-group";
@@ -446,6 +443,7 @@ module.exports = {
   EKART_PULL_MAPPER,
   EKART_UD_REASON,
   UD_TO_OT_HUB_NOTES,
+  UD_TO_DM_HUB_NOTES,
   PUSH_PARTITION_COUNT,
   PUSH_GROUP_NAME,
   PUSH_TOPIC_NAME,
