@@ -1,13 +1,13 @@
 const Redis = require("ioredis");
 const logger = require("../../logger");
 
-// const { REDIS_CONFIG } = require("./constants");
+const { REDIS_CONFIG } = require("./constants");
 
-const redisConf = null;
+let redisConf = null;
 
-// if (process.env.NODE_ENV === "production") {
-//   redisConf = REDIS_CONFIG;
-// }
+if (process.env.NODE_ENV === "production") {
+  redisConf = REDIS_CONFIG;
+}
 
 const redisClient = new Redis(redisConf);
 
