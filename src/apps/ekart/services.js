@@ -1,7 +1,13 @@
 const moment = require("moment");
 
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { EKART_STATUS_MAPPER, EKART_PULL_MAPPER } = require("./constant");
+const {
+  EKART_STATUS_MAPPER,
+  EKART_PULL_MAPPER,
+  EKART_UD_REASON,
+  UD_TO_OT_HUB_NOTES,
+  UD_TO_DM_HUB_NOTES,
+} = require("./constant");
 const logger = require("../../../logger");
 
 /*
@@ -67,6 +73,13 @@ const prepareEkartData = (ekartDict) => {
     } else {
       statusScanType = subReasons.length ? `${event}_${subReasons[0]}` : event;
     }
+    if (event === "delivery_attempt_metadata") {
+      pickrrEkartDict.awb = trackData?.vendor_tracking_id;
+      pickrrEkartDict.track_info = event;
+      pickrrEkartDict.longitude = metaData?.attempt_location?.longitude;
+      pickrrEkartDict.latitude = metaData?.attempt_location?.latitude;
+      return pickrrEkartDict;
+    }
     let statusType = statusScanType;
     const statusDateTime = trackData?.event_date;
     const statusDate = statusDateTime
@@ -91,10 +104,18 @@ const prepareEkartData = (ekartDict) => {
       };
     }
     statusType = reasonDict.scan_type;
-
+    let scanStatus = statusScanType;
+    if (!scanStatus && ["UD", "NDR"].includes(statusType)) {
+      const pickrrSubStatus = reasonDict?.pickrr_sub_status_code || "";
+      if (pickrrSubStatus && pickrrSubStatus in EKART_UD_REASON) {
+        scanStatus = EKART_UD_REASON[pickrrSubStatus];
+      } else {
+        scanStatus = "Undelivered";
+      }
+    }
     pickrrEkartDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrEkartDict.scan_datetime = statusDate;
-    pickrrEkartDict.track_info = statusScanType;
+    pickrrEkartDict.track_info = scanStatus;
     pickrrEkartDict.awb = trackData.vendor_tracking_id.toString();
     pickrrEkartDict.track_location = trackData.location.toString();
     pickrrEkartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
@@ -145,6 +166,15 @@ const preparePulledEkartData = (ekartDict) => {
       return {
         err: "Unknown status code",
       };
+    }
+    const hubNotes = ekartDict?.hub_notes ? ekartDict.hub_notes.toString().toLowerCase() : "";
+    if (["UD", "NDR"].includes(scanType.pickrr_code)) {
+      if (UD_TO_OT_HUB_NOTES.includes(hubNotes)) {
+        scanType.pickrr_code = "OT";
+      }
+      if (UD_TO_DM_HUB_NOTES.includes(hubNotes)) {
+        scanType.pickrr_code = "DM";
+      }
     }
 
     pickrrEkartDict.scan_type = scanType.pickrr_code === "UD" ? "NDR" : scanType.pickrr_code;

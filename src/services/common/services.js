@@ -18,6 +18,9 @@ const { updateFreshdeskWebhookToMongo } = require("../pull/helpers");
  */
 const updateStatusELK = async (trackingDoc, elkClient) => {
   try {
+    if(true) {
+      return null;
+    }
     const trackingId = trackingDoc.tracking_id;
     const currentStatusTime = get(trackingDoc, "status.current_status_time") || "NA";
     const currentStatusType = get(trackingDoc, "status.current_status_type") || "NA";

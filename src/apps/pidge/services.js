@@ -47,7 +47,7 @@ const preparePidgeData = (pidgeDict) => {
   try {
     pickrrPidgeDict.awb = _.get(pidgeDict, "PBID", "").toString();
     let statusString = null;
-    if (pidgeDict.status) {
+    if (pidgeDict?.status) {
       if ([13, 12, 21].includes(pidgeDict.status)) {
         statusString = pidgeDict?.remarks
           ? `${pidgeDict.status}_${pidgeDict.remarks}`
@@ -69,7 +69,9 @@ const preparePidgeData = (pidgeDict) => {
     pickrrPidgeDict.scan_datetime = scanDatetime;
     pickrrPidgeDict.courier_status_code = statusString;
     pickrrPidgeDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
-    pickrrPidgeDict.track_info = PICKRR_STATUS_CODE_MAPPING[pickrrPidgeDict.scan_type];
+    pickrrPidgeDict.track_info = pidgeDict?.remarks
+      ? `${PICKRR_STATUS_CODE_MAPPING[pickrrPidgeDict.scan_type]} - ${pidgeDict?.remarks}`
+      : PICKRR_STATUS_CODE_MAPPING[pickrrPidgeDict.scan_type];
     pickrrPidgeDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrPidgeDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
 
@@ -141,7 +143,9 @@ const preparePidgePulledData = (pidgeDict) => {
     pickrrPidgeDict.scan_datetime = scanDatetime;
     pickrrPidgeDict.courier_status_code = statusString;
     pickrrPidgeDict.scan_type = scanType.scan_type === "UD" ? "NDR" : scanType.scan_type;
-    pickrrPidgeDict.track_info = remarks || PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
+    pickrrPidgeDict.track_info = remarks
+      ? `${PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type]} - ${remarks}`
+      : PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrPidgeDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type] || "";
     pickrrPidgeDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
     if (pickrrPidgeDict?.scan_type === "PP") {

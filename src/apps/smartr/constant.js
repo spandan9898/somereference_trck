@@ -68,6 +68,10 @@ const PULL_MAPPER = {
     scan_type: "PPF",
     pickrr_sub_status_code: "OTH",
   },
+  "found cargo": {
+    scan_type: "OT",
+    pickrr_sub_status_code: "",
+  },
   "delivery attempt_residence or office closed": {
     scan_type: "NDR",
     pickrr_sub_status_code: "CNA",
@@ -464,6 +468,10 @@ const CODE_MAPPER = {
   },
   dsd: {
     scan_type: "LT",
+    pickrr_sub_status_code: "",
+  },
+  "found cargo": {
+    scan_type: "OT",
     pickrr_sub_status_code: "",
   },
 };

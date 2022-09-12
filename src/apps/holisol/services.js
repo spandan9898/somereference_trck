@@ -78,6 +78,7 @@ const preparePulledHolisolData = (holisolDict) => {
     pickrrHolisolDict.track_location = holisolDict?.city;
     pickrrHolisolDict.track_info = holisolDict?.message || pickrrHolisolDict?.pickrr_status;
     pickrrHolisolDict.awb = holisolDict?.trackingId;
+    pickrrHolisolDict.courier_status_code = mapperString.toLowerCase();
     return pickrrHolisolDict;
   } catch (error) {
     pickrrHolisolDict.err = error.message;

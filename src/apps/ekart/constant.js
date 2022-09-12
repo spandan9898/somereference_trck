@@ -412,6 +412,25 @@ const EKART_PULL_MAPPER = {
   },
 };
 
+const EKART_UD_REASON = {
+  CR: "Undelivered - Customer Refused Shipment",
+  CNA: "Undelivered - Customer Not Available",
+  AI: "Undelivered - Address Issue",
+  CD: "Undelivered - Customer Delay",
+  REST: "Undelivered - Restricted Area",
+  "CR-OTP": "Undelivered - Customer Refused Shipment- OTP Verified",
+  ODA: "Undelivered - Out of Delivery area",
+  CNR: "Undelivered - Cash Not Ready",
+  OPDEL: "Undelivered - Consignee wants open delivery",
+  OTH: "Undelivered",
+  CI: "Undelivered - Customer Issue",
+  SD: "Undelivered - Shipper Delay",
+  OTPF: "Undelivered - OTP Validation Failed",
+};
+
+const UD_TO_OT_HUB_NOTES = ["marked_as_same_state_misroute", "marked_as_other_state_misroute"];
+const UD_TO_DM_HUB_NOTES = ["marked_as_received_damaged"];
+
 const PUSH_PARTITION_COUNT = 10;
 const PUSH_GROUP_NAME = "ekart-push-group";
 const PUSH_TOPIC_NAME = "ekart_push";
@@ -422,6 +441,9 @@ const PULL_PARTITION_COUNT = 10;
 module.exports = {
   EKART_STATUS_MAPPER,
   EKART_PULL_MAPPER,
+  EKART_UD_REASON,
+  UD_TO_OT_HUB_NOTES,
+  UD_TO_DM_HUB_NOTES,
   PUSH_PARTITION_COUNT,
   PUSH_GROUP_NAME,
   PUSH_TOPIC_NAME,

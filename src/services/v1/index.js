@@ -53,24 +53,26 @@ const sendTrackDataToV1 = async (trackData) => {
     ) {
       return false;
     }
-    if (!authTokens.includes(trackData.auth_token)) {
-      sendDataToEventBridge({
-        source: V1_EVENT_BRIDGE_SOURCE,
-        detailType: V1_EVENT_BRIDGE_DETAIL_TYPE,
-        data: trackDict,
-        eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
-      });
-    }
+    // Avoid sending data to eb and send to track_v1 topic
+    // if (!authTokens.includes(trackData.auth_token)) {
+    //   sendDataToEventBridge({
+    //     source: V1_EVENT_BRIDGE_SOURCE,
+    //     detailType: V1_EVENT_BRIDGE_DETAIL_TYPE,
+    //     data: trackDict,
+    //     eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
+    //   });
+    // }
 
-    if (
-      !(
-        authTokens.includes(trackData.auth_token) ||
-        shopPlatforms.includes(trackData.shop_platform) ||
-        trackData?.woocom_platform_obj
-      )
-    ) {
-      return false;
-    }
+    
+    // if (
+    //   !(
+    //     authTokens.includes(trackData.auth_token) ||
+    //     shopPlatforms.includes(trackData.shop_platform) ||
+    //     trackData?.woocom_platform_obj
+    //   )
+    // ) {
+    //   return false;
+    // }
     const producerInstance = await producerConnection.connect(KAFKA_INSTANCE_CONFIG.PROD.name);
     const messages = [
       {

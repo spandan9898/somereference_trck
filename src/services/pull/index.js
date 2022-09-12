@@ -138,7 +138,7 @@ const updateTrackDataToPullMongo = async ({
       const isAllow = checkTriggerForPulledEvent(trackObj, res);
       if (!isAllow) {
         logger.info(
-          `trigger returned false for - ${result.awb} and status - ${updatedObj["status.current_status_type"]}`
+          `trigger returned false for - ${result.awb} and status - ${updatedObj["status.current_status_type"]} and scan datetime - ${updatedObj["status.current_status_time"]}`
         );
         return false;
       }
@@ -225,6 +225,7 @@ const updateTrackDataToPullMongo = async ({
 
     // Pickrr EDD is fetch over here
 
+    const courierParentName = res?.courier_parent_name;
     try {
       const instance = new EddPrepareHelper({ latestCourierEDD, pickupDateTime, eddStampInDb });
       const pickrrEDD = await instance.callPickrrEDDEventFunc({
@@ -233,6 +234,7 @@ const updateTrackDataToPullMongo = async ({
         pickupDateTime,
         eddStampInDb,
         statusType: firstTrackObjOfTrackArr.scan_type,
+        courierParentName,
       });
 
       // in case of QCF, edd_stamp will be what was calculated before QC Failure
@@ -278,6 +280,8 @@ const updateTrackDataToPullMongo = async ({
 
     // audit Logs is Updated Over here
 
+    updatedObj.pickup_datetime = pickupDateTime;
+
     await fetchAndUpdateAuditLogsData({
       courierTrackingId: trackObj.awb,
       updatedObj,
@@ -299,6 +303,30 @@ const updateTrackDataToPullMongo = async ({
   }
 };
 
+/**
+ *
+ * @param {*} res
+ * @description Handle lat long for ekart push events
+ */
+const updateEkartLatLong = async (res) => {
+  const pullProdCollectionInstance = await commonTrackingInfoCol();
+  const pickrrEkartDict = {
+    latitude: "",
+    longitude: "",
+  };
+  const { awb, longitude, latitude } = res;
+  pickrrEkartDict.latitude = latitude;
+  pickrrEkartDict.longitude = longitude;
+  pickrrEkartDict.updated_at = moment().toDate();
+  pickrrEkartDict.last_update_from = "kafka";
+  const response = await pullProdCollectionInstance.findOneAndUpdate(
+    { tracking_id: awb },
+    {
+      $set: pickrrEkartDict,
+    }
+  );
+};
 module.exports = {
   updateTrackDataToPullMongo,
+  updateEkartLatLong,
 };

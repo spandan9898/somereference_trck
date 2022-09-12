@@ -186,6 +186,9 @@ const prepareTrackingRes = async (trackingObj) => {
             responseList[i].info.to_phone_number = "";
             responseList[i].info.to_email = "";
             responseList[i].info.to_name = "";
+            responseList[i].info.to_address = "";
+            responseList[i].info.to_pincode = "";
+            responseList[i].info.to_address_id = "";
           } catch {
             // pass
           }
