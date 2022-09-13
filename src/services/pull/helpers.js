@@ -164,10 +164,10 @@ const checkTriggerForPulledEvent = (preparedDict, dbResponse) => {
  *Finds Otp Flag in Track Arrays for Delivered Shipment
  *
  */
-const updateFlagForOtpDeliveredShipments = (trackArr) => {
+const updateFlagForOtpDeliveredShipments = (trackArr, latestOtp) => {
   let isOtpDelivered = false;
   trackArr.forEach((eachTrackObj) => {
-    if (eachTrackObj?.otp_remarks || eachTrackObj?.otp) {
+    if (eachTrackObj?.otp_remarks || eachTrackObj?.otp || latestOtp) {
       isOtpDelivered = true;
     }
   });
