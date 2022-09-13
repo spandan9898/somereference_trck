@@ -277,6 +277,10 @@ const PIKNDEL_STATUS_MAPPER = {
     scan_type: "PPF",
     pickrr_sub_status_code: "NSL",
   },
+  pcn_ccbc: {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "canc",
+  },
   can_cpnm: {
     scan_type: "PPF",
     pickrr_sub_status_code: "SU",
