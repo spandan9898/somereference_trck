@@ -79,7 +79,7 @@ const updateFieldsForDuplicateEvent = async (obj) => {
         break;
       }
     }
-    const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr);
+    const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr, latestOtp);
     return {
       track_arr: trackArr,
       latest_otp: latestOtp,
