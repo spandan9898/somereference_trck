@@ -14,7 +14,7 @@ const { PUSH_PARTITION_COUNT, PULL_PARTITION_COUNT } = require("./constant");
     }
 
     if (process.env.CONSUME_PULL_EVENTS.toLowerCase() === "true") {
-      listener(pullConsumer, PULL_PARTITION_COUNT);
+      await listener(pullConsumer, PULL_PARTITION_COUNT);
     }
   } catch (error) {
     logger.error("Pidge Consumer Error", error);
