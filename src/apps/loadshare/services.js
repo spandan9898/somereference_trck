@@ -43,13 +43,21 @@ const prepareLoadshareData = (loadshareDict) => {
   try {
     pickrrLoadshareDict.awb = _.get(loadshareDict, "waybillNo", "").toString();
     let mapperString = "";
+
     if (loadshareDict.eventType) {
       mapperString = loadshareDict.eventType.toString();
+      let mappedReasonCode = "";
+
+      if (!loadshareDict?.reasonBO?.reasonCode) {
+        mappedReasonCode = loadshareDict?.reasonBO?.reasonDescription?.reasonCode || "";
+      } else {
+        mappedReasonCode = loadshareDict?.reasonBO?.reasonCode;
+      }
       if (
         ["PICKUP_CANCELLED", "UNDELIVERED", "RTO_UNDELIVERED"].includes(loadshareDict.eventType) &&
-        loadshareDict?.reasonBO?.reasonCode
+        mappedReasonCode
       ) {
-        mapperString += `_${loadshareDict?.reasonBO?.reasonCode}`;
+        mapperString += `_${mappedReasonCode}`;
       }
     }
     if (loadshareDict?.reasonBO?.isOtpVerified && mapperString === "UNDELIVERED_132") {
@@ -76,6 +84,7 @@ const prepareLoadshareData = (loadshareDict) => {
 
       reasonDes = reasonDes?.reasondescription;
     }
+
     let statusDate = moment(loadshareDict?.eventTime, "YYYY-MM-DD HH:mm:ss");
     statusDate = statusDate.isValid()
       ? statusDate.format("YYYY-MM-DD HH:mm:ss.SSS")
