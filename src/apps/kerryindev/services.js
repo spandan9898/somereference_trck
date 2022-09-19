@@ -47,7 +47,7 @@ const prepareKerryIndevPulledData = (kerryindevDict) => {
     }
 
     let statusString = Statuscode;
-    if (statusString === "PNA" || statusString === "ICA") {
+    if (statusString === "PNA") {
       statusString += `_${Remarks.toLowerCase()}`;
     }
     let scanType = "";
