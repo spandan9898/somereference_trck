@@ -28,7 +28,7 @@ const callSendReportDataForPulledEvent = (trackingObj) => {
   const { trackingElkClient, prodElkClient } = getElkClients();
   const statusChangedFromPull = true;
   sendTrackDataToV1(trackingObj);
-  updateStatusOnReport(trackingObj, logger, trackingElkClient, statusChangedFromPull);
+  updateStatusOnReport(trackingObj, logger, trackingElkClient, false, statusChangedFromPull);
   updateStatusELK(trackingObj, prodElkClient);
   commonTrackingDataProducer(trackingObj);
   updateFreshdeskTrackingTicket(trackingObj);
