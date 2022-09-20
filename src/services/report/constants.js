@@ -63,10 +63,30 @@ const CUSTOMER_DRIVEN_NDR_REASON = [
   "CI",
   "OTPF",
 ];
+
+const PPF_REPORT_STATUS_CODE_MAPPINGS = {
+  SC: "Shop closed",
+  SU: "Seller Uncontactable",
+  SNR: "Shipment not ready/ Future Pickup date by seller",
+  NA: "No attempt by courier",
+  VC: "Vehicle constraint",
+  NSL: "Non serviceable location/ Entry Restricted area",
+  HO: "Shipment handover to other courier",
+  REJ: "AWB Rejected/ Barcode Issue/ Prohibited Item",
+  AI: "Address issue",
+  AE: "Attempts exhausted",
+  OTH: "Others",
+  CANC: "Pickup canceled by seller",
+  REGU: "Paperwork issue",
+  BCUT: "Pickup attempt beyond cutoff",
+  DUP: "Duplicate Pickup",
+};
+
 module.exports = {
   REPORT_STATUS_CODE_MAPPING,
   REPORT_STATUS_TYPE_MAPPING,
   NEW_STATUS_TO_OLD_MAPPING,
   VALID_FAD_NDR_SUBSTATUS_CODE,
   CUSTOMER_DRIVEN_NDR_REASON,
+  PPF_REPORT_STATUS_CODE_MAPPINGS,
 };

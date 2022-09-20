@@ -132,6 +132,7 @@ const commonTrackingDataProducer = async (trackingObj) => {
       "qc_bill",
       "qcf_bill",
       "order_pk",
+      "status_pk",
     ];
 
     const defaultValue = {
@@ -142,6 +143,8 @@ const commonTrackingDataProducer = async (trackingObj) => {
     trackingItemList.forEach((item) => {
       if (item === "order_pk") {
         payload[item] = trackingObj?.order_pk || null;
+      } else if (item === "status_pk"){
+        payload[item] = trackingObj?.status_pk || null;
       } else {
         payload[item] = trackingObj[item];
       }

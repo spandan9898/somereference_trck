@@ -213,8 +213,12 @@ const updateTrackDataToPullMongo = async ({
 
     // Otp Delivered Shipments marking
 
+    let latestOtp = updatedObj?.latest_otp;
+    if (!latestOtp) {
+      latestOtp = res?.latest_otp;
+    }
     if (firstTrackObjOfTrackArr?.scan_type === "DL") {
-      const isOtpDelivered = updateFlagForOtpDeliveredShipments(sortedTrackArray);
+      const isOtpDelivered = updateFlagForOtpDeliveredShipments(sortedTrackArray, latestOtp);
       updatedObj.is_otp_delivered = isOtpDelivered;
       updateScanStatus(res, sortedTrackArray, isOtpDelivered);
     }

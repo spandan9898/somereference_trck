@@ -94,7 +94,7 @@ const PULL_MAPPER = {
   },
   "delivery attempt_shippers or consignee request to hold at location": {
     scan_type: "NDR",
-    pickrr_sub_status_code: "CI",
+    pickrr_sub_status_code: "CD",
   },
   "delivery attempt_address incomplete or incorrect can not deliver": {
     scan_type: "NDR",
