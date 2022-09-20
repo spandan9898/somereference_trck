@@ -180,6 +180,10 @@ const PULL_MAPPER = {
     scan_type: "NDR",
     pickrr_sub_status_code: "CNR",
   },
+  "delivery attempt_otp not received by consignee": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "OTPF",
+  },
   booked: { scan_type: "OP", pickrr_sub_status_code: "" },
   "picked up": { scan_type: "PP", pickrr_sub_status_code: "" },
   accepted: { scan_type: "SHP", pickrr_sub_status_code: "" },
