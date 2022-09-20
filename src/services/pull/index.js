@@ -288,7 +288,19 @@ const updateTrackDataToPullMongo = async ({
       isFromPulled,
       logger,
     });
-    await storeDataInCache(result);
+    try {
+      const updatedStatusObject = _.get(response?.value, "track_arr[0]", null);
+      const storeInCacheObject = {
+        eventObj: updatedStatusObject,
+        awb: response?.value?.tracking_id,
+      };
+      if (storeInCacheObject) {
+        await storeDataInCache(storeInCacheObject);
+      }
+    } catch (error) {
+      logger.info(`Redis Status Key Set Failed for ${res?.tracking_id} error -> ${error}`);
+    }
+
     await updateTrackingProcessingCount(trackObj, "remove");
     updateCacheTrackArray({
       currentTrackObj: trackArr[0],
@@ -319,7 +331,7 @@ const updateEkartLatLong = async (res) => {
   pickrrEkartDict.longitude = longitude;
   pickrrEkartDict.updated_at = moment().toDate();
   pickrrEkartDict.last_update_from = "kafka";
-  const response = await pullProdCollectionInstance.findOneAndUpdate(
+  await pullProdCollectionInstance.findOneAndUpdate(
     { tracking_id: awb },
     {
       $set: pickrrEkartDict,
