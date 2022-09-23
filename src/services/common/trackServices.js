@@ -1,7 +1,7 @@
 const { isEmpty, omit, get, last } = require("lodash");
 const moment = require("moment");
 
-const { findOneDocumentFromMongo, getObject, storeInCache } = require("../../utils");
+const { findOneDocumentFromMongo, findMultipleDocumentsFromMongo, getObject, storeInCache } = require("../../utils");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { sortStatusArray } = require("./helpers");
 const { IS_FETCH_FROM_DB } = require("../../utils/constants");
@@ -110,6 +110,19 @@ const getTrackDocumentfromMongo = async (trackingAwb, couriers=[]) => {
   return trackModelDocument;
 };
 
+const getMultipleTrackDocumentfromMongo = async (trackingAwb) => {
+  try {
+    const { query, projection } = await PrepareTrackModelFilters(trackingAwb);
+    return await findMultipleDocumentsFromMongo({
+      queryObj: query,
+      projectionObj: projection,
+      collectionName: process.env.MONGO_DB_PROD_SERVER_COLLECTION_NAME,
+    });
+  } catch (error) {
+    throw new Error(`failed to fetch documents | AWB: ${trackingAwb} | message: ${error.message}`);
+  }
+};
+
 /**
  *
  * b∫ @param {fetches tracking Model from Mongo} trackingAwbs
@@ -177,8 +190,36 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, couriers = [], from
   }
 };
 
+const fetchTrackingModelAndUpdateCacheForTracking = async (trackingAwb) => {
+  try {
+    let trackingObjList = [];
+    const docList = await getMultipleTrackDocumentfromMongo(trackingAwb);
+    if (isEmpty(docList)) {
+      throw new Error(`failed to fetch documents - ${trackingAwb}`);
+    }
+    let trackingObj;
+    for(let idx=0; idx< docList.length; idx++){
+      trackingObj = {};
+      const doc = docList[idx];
+      const trackArr = doc?.track_arr || [];
+      const modifiedTrackArr = prepareTrackDataForTracking(trackArr);
+      if (isEmpty(modifiedTrackArr)) {
+        throw new Error("track array is empty");
+      }
+      doc.track_arr = modifiedTrackArr;
+      trackingObj.track_model = doc;
+      trackingObjList.push(trackingObj);
+    }
+    return trackingObjList;
+  } catch (error) {
+    logger.error(`fetchTrackingModelAndUpdateCache: ${error.message}`);
+    return [];
+  }
+};
+
 module.exports = {
   fetchTrackingModelAndUpdateCache,
+  fetchTrackingModelAndUpdateCacheForTracking,
   prepareTrackDataForTracking,
   getTrackDocumentfromMongo,
 };
