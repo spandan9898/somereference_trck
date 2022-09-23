@@ -77,9 +77,9 @@ const redisCheckAndReturnTrackData = async (preparedTrackData, isFromPulled) => 
   // preparedTrackData contains fields couriers and redis_key
   const trackObj = { ...preparedTrackData };
 
-  // if (isFromPulled) {
-  // return trackObj;
-  // }
+  if (isFromPulled) {
+    return trackObj;
+  }
 
   const isExists = await checkAwbInCache({ trackObj, updateCacheTrackArray, isFromPulled });
   if (isExists) {
@@ -94,18 +94,18 @@ const redisCheckAndReturnTrackData = async (preparedTrackData, isFromPulled) => 
  * @desc store data in cache with expected format
  */
 const storeDataInCache = async (result) => {
-  const { eventObj, key } = result;
+  const { eventObj, redis_key } = result;
   const { scan_datetime: scanDatetime } = eventObj || {};
   const redisKey = `${eventObj.scan_type}_${moment(scanDatetime).unix()}`;
   const newRedisPayload = {
     [redisKey]: true,
   };
   if (["NDR", "UD"].includes(eventObj.scan_type)) {
-    await updateIsNDRinCache(key);
+    await updateIsNDRinCache(redis_key);
   }
-  const dt = (await getObject(key)) || {};
+  const dt = (await getObject(redis_key)) || {};
   const oldData = { ...dt, ...newRedisPayload };
-  await setObject(key, oldData);
+  await setObject(redis_key, oldData);
 };
 
 /**

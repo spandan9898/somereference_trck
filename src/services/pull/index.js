@@ -310,14 +310,19 @@ const updateTrackDataToPullMongo = async ({
       logger,
     });
     try {
-      const updatedStatusObject = _.get(response?.value, "track_arr[0]", null);
-      const storeInCacheObject = {
-        eventObj: updatedStatusObject,
-        key: trackObj?.redis_key,
-      };
-      if (storeInCacheObject) {
-        await storeDataInCache(storeInCacheObject);
+      if (response?.value) {
+        result.redis_key = trackObj?.redis_key;
+        await storeDataInCache(result);
       }
+
+      // const updatedStatusObject = _.get(response?.value, "track_arr[0]", null);
+      // const storeInCacheObject = {
+      //   eventObj: updatedStatusObject,
+      //   redis_key: trackObj?.redis_key,
+      // };
+      // if (storeInCacheObject) {
+      //   await storeDataInCache(storeInCacheObject);
+      // }
     } catch (error) {
       logger.info(`Redis Status Key Set Failed for ${trackObj?.redis_key} error -> ${error}`);
     }
