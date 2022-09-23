@@ -54,7 +54,25 @@ const findOneDocumentFromMongo = async ({ queryObj, projectionObj, collectionNam
   return response;
 };
 
+const findMultipleDocumentsFromMongo = async ({ queryObj, projectionObj, collectionName }) => {
+  try {
+    const collection = await getDbCollectionInstance({ collectionName });
+    let response;
+    if (isEmpty(queryObj)) {
+      throw new Error("Query object cannot be empty ");
+    }
+    if (isEmpty(projectionObj)) {
+      projectionObj._id = 0;
+    }
+    return await collection.find(queryObj, { projection: projectionObj }).toArray();
+  } catch (error) {
+    logger.error("findMultipleDocment error -->", error);
+    return [];
+  }
+};
+
 module.exports = {
   findOneDocumentFromMongo,
   getDbCollectionInstance,
+  findMultipleDocumentsFromMongo,
 };
