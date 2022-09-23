@@ -65,7 +65,7 @@ const findMultipleDocumentsFromMongo = async ({ queryObj, projectionObj, collect
     if (isEmpty(projectionObj)) {
       projectionObj._id = 0;
     }
-    return await collection.find(queryObj, { projection: projectionObj }).toArray() || [];
+    return await collection.find(queryObj, { projection: projectionObj }).toArray();
   } catch (error) {
     logger.error("findMultipleDocment error -->", error);
     return [];
@@ -75,4 +75,5 @@ const findMultipleDocumentsFromMongo = async ({ queryObj, projectionObj, collect
 module.exports = {
   findOneDocumentFromMongo,
   getDbCollectionInstance,
+  findMultipleDocumentsFromMongo,
 };
