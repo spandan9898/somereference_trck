@@ -17,6 +17,7 @@ const updateStatusOnReport = async (
   isManualUpdate = false,
   statusChangedFromPull = false
 ) => {
+  // trackObj contains order_pk
   const latestScanType = _.get(trackObj, "track_arr[0].scan_type", null);
   const latestScanStatus = _.get(trackObj, "track_arr[0].scan_status", "") || "";
   if (
@@ -68,8 +69,12 @@ const updateStatusOnReport = async (
 
   const opsReportColInstance = await reportMongoCol();
   try {
+    let filter = { pickrr_tracking_id: trackObj.tracking_id, courier_used: { $nin: ["", null] } };
+    if (trackObj.order_pk) {
+      filter.order_pk = trackObj.order_pk;
+    }
     const response = await opsReportColInstance.findOneAndUpdate(
-      { pickrr_tracking_id: trackObj.tracking_id, courier_used: { $nin: ["", null] } },
+      filter,
       {
         $set: result,
       },
