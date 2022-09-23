@@ -18,6 +18,9 @@ const { COMPULSORY_EVENTS } = require("./constants");
  */
 const triggerWebhook = async (trackingData, elkClient) => {
   try {
+    if (process.env.CALL_WEBHOOK_LAMBDA === "false") {
+      return false;
+    }
     const webhookUserData = await getWebhookUserDataFromCache(trackingData.auth_token);
 
     if (_.isEmpty(webhookUserData)) {

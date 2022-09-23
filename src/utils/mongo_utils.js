@@ -38,11 +38,15 @@ const findOneDocumentFromMongo = async ({ queryObj, projectionObj, collectionNam
   if (isEmpty(queryObj)) {
     throw new Error("Query object cannot be empty ");
   }
+  let docs;
   try {
     if (isEmpty(projectionObj)) {
-      return await collection.findOne(queryObj);
+      docs = await collection.find(queryObj).sort({ _id: -1 }).limit(1).toArray();
     }
-    return await collection.findOne(queryObj, { projection: projectionObj });
+    docs = await collection.find(queryObj, { projection: projectionObj }).sort({ _id: -1 }).limit(1).toArray();
+    if (docs.length > 0) {
+      return docs[0];
+    }
   } catch (error) {
     logger.error("findOneDocment error -->", error);
   }
