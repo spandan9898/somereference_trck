@@ -41,7 +41,7 @@ const findOneDocumentFromMongo = async ({ queryObj, projectionObj, collectionNam
   let docs;
   try {
     if (isEmpty(projectionObj)) {
-      docs = await collection.find(queryObj).sort({ _id: -1 }).limit(1).toArray();
+      docs = await collection.find(queryObj).sort({ _id: -1 }).limit(1).toArray() || [];
     }
     docs = await collection.find(queryObj, { projection: projectionObj }).sort({ _id: -1 }).limit(1).toArray() || [];
     if (docs.length > 0) {
