@@ -11,10 +11,11 @@ const { getElkClients } = require("../../utils");
  * }
  */
 const pickrrConnectKafkaMessageHandler = (consumedPayload) => {
+  // consumedPayload contains courier field
   try {
     const { message } = consumedPayload;
     const data = JSON.parse(message.value.toString());
-    const { tracking_id: trackingId, is_from_pull: isFromPull } = data || {};
+    const { tracking_id: trackingId, courier: courier, is_from_pull: isFromPull } = data || {};
     if (!trackingId || !isFromPull) {
       return false;
     }
@@ -23,6 +24,7 @@ const pickrrConnectKafkaMessageHandler = (consumedPayload) => {
       preparePickrrConnectLambdaPayloadAndCall({
         trackingId,
         isFromPull,
+        courier,
         elkClient: trackingElkClient,
       });
     }

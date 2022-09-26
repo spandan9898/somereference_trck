@@ -38,11 +38,15 @@ const findOneDocumentFromMongo = async ({ queryObj, projectionObj, collectionNam
   if (isEmpty(queryObj)) {
     throw new Error("Query object cannot be empty ");
   }
+  let docs;
   try {
     if (isEmpty(projectionObj)) {
-      return await collection.findOne(queryObj);
+      docs = await collection.find(queryObj).sort({ _id: -1 }).limit(1).toArray();
     }
-    return await collection.findOne(queryObj, { projection: projectionObj });
+    docs = await collection.find(queryObj, { projection: projectionObj }).sort({ _id: -1 }).limit(1).toArray();
+    if (docs.length > 0) {
+      return docs[0];
+    }
   } catch (error) {
     logger.error("findOneDocment error -->", error);
   }
@@ -50,7 +54,25 @@ const findOneDocumentFromMongo = async ({ queryObj, projectionObj, collectionNam
   return response;
 };
 
+const findMultipleDocumentsFromMongo = async ({ queryObj, projectionObj, collectionName }) => {
+  try {
+    const collection = await getDbCollectionInstance({ collectionName });
+    let response;
+    if (isEmpty(queryObj)) {
+      throw new Error("Query object cannot be empty ");
+    }
+    if (isEmpty(projectionObj)) {
+      projectionObj._id = 0;
+    }
+    return await collection.find(queryObj, { projection: projectionObj }).toArray();
+  } catch (error) {
+    logger.error("findMultipleDocment error -->", error);
+    return [];
+  }
+};
+
 module.exports = {
   findOneDocumentFromMongo,
   getDbCollectionInstance,
+  findMultipleDocumentsFromMongo,
 };
