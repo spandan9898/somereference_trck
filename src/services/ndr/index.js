@@ -11,6 +11,7 @@ const { NDR_EVENT_BRIDGE_SOURCE, NDR_EVENT_BRIDGE_DETAIL_TYPE, NDR_EVENT_BRIDGE_
  * @desc sending track data to ndr event bridge
  */
 const sendDataToNdr = async (trackData) => {
+  // deprecated
   const currentStatusType = trackData?.status?.current_status_type;
   const awb = trackData?.tracking_id;
 
@@ -30,7 +31,7 @@ const sendDataToNdr = async (trackData) => {
     data: payload,
     eventBusName: NDR_EVENT_BRIDGE_BUS_NAME,
   });
-  updateIsNDRinCache(awb);
+  updateIsNDRinCache(trackData.redis_key);
   return true;
 };
 module.exports = sendDataToNdr;

@@ -47,11 +47,11 @@ const checkIfTriggerNDREb = async (currentStatusType, awb) => {
  * @param {*} awb
  * @desc update isNDR to true when NDR/UD status type found in track_arr or in current status
  */
-const updateIsNDRinCache = async (awb) => {
+const updateIsNDRinCache = async (key) => {
   try {
-    const cacheData = (await getObject(awb)) || {};
+    const cacheData = (await getObject(key)) || {};
     cacheData.is_ndr = true;
-    await storeInCache(awb, cacheData);
+    await storeInCache(key, cacheData);
   } catch (error) {
     logger.error("updateIsNDRinCache", error);
   }
