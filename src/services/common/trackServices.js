@@ -204,7 +204,7 @@ const fetchTrackingModelAndUpdateCacheForTracking = async (trackingAwb) => {
       const trackArr = doc?.track_arr || [];
       const modifiedTrackArr = prepareTrackDataForTracking(trackArr);
       if (isEmpty(modifiedTrackArr)) {
-        throw new Error("track array is empty");
+        throw new Error(`track array is empty - ${trackingAwb}`);
       }
       doc.track_arr = modifiedTrackArr;
       trackingObj.track_model = doc;
@@ -212,7 +212,7 @@ const fetchTrackingModelAndUpdateCacheForTracking = async (trackingAwb) => {
     }
     return trackingObjList;
   } catch (error) {
-    logger.error(`fetchTrackingModelAndUpdateCache: ${error.message}`);
+    logger.info(`fetchTrackingModelAndUpdateCacheForTracking for ${trackingAwb}: ${error.message}`);
     return [];
   }
 };

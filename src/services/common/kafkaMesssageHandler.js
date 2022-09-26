@@ -124,7 +124,7 @@ const updateDataInPullDBAndReports = async (updatedObj, awb, courier, colInstanc
 
     return {};
   } catch (error) {
-    logger.error("failed Updating Data");
+    logger.error("failed Updating Data", error);
     return {};
   }
 };
