@@ -36,9 +36,17 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
     const response = await pullCollection.findOne(
       { tracking_id: awb },
       { projection: { track_arr: 1 } }
-    );
+      ).sort({ _id: -1 }).limit(1).toArray() || [];
+    let response = {};
+    if(responseList.length>0){
+      response = responseList[0];
+    }
 
     if (!response) {
+      return "NA";
+    }
+    if (!response.track_arr) {
+      logger.info(`response.track_arr is empty in fetchTrackingDataAndStoreInCache for awb: ${awb}`, error);
       return "NA";
     }
 
@@ -61,7 +69,7 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
     }
     return trackMap;
   } catch (error) {
-    logger.error("fetchTrackingDataAndStoreInCache", error);
+    logger.error(`fetchTrackingDataAndStoreInCache for awb: ${awb}`, error);
     return false;
   }
 };

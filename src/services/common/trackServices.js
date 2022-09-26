@@ -167,6 +167,33 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, fromTrackingApi = f
   }
 };
 
+const fetchTrackingModelAndUpdateCacheForTracking = async (trackingAwb) => {
+  try {
+    let trackingObjList = [];
+    const docList = await getMultipleTrackDocumentfromMongo(trackingAwb);
+    if (isEmpty(docList)) {
+      throw new Error(`failed to fetch documents - ${trackingAwb}`);
+    }
+    let trackingObj;
+    for(let idx=0; idx< docList.length; idx++){
+      trackingObj = {};
+      const doc = docList[idx];
+      const trackArr = doc?.track_arr || [];
+      const modifiedTrackArr = prepareTrackDataForTracking(trackArr);
+      if (isEmpty(modifiedTrackArr)) {
+        throw new Error(`track array is empty - ${trackingAwb}`);
+      }
+      doc.track_arr = modifiedTrackArr;
+      trackingObj.track_model = doc;
+      trackingObjList.push(trackingObj);
+    }
+    return trackingObjList;
+  } catch (error) {
+    logger.info(`fetchTrackingModelAndUpdateCacheForTracking for ${trackingAwb}: ${error.message}`);
+    return [];
+  }
+};
+
 module.exports = {
   fetchTrackingModelAndUpdateCache,
   prepareTrackDataForTracking,

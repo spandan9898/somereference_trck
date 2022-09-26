@@ -127,8 +127,22 @@ const updateTrackDataToPullMongo = async ({
 
     let sortedTrackArray;
 
-    const res = await pullProdCollectionInstance.findOne({ tracking_id: result.awb });
-
+    const couriers = trackObj.couriers instanceof Array ? trackObj.couriers : [];
+    let query = { tracking_id: result.awb };
+    if (couriers.length>0) {
+      query.courier_parent_name = { "$in": couriers };
+    }
+    const pullCollection = await commonTrackingInfoCol();
+    const responseList = await pullCollection.find(query).sort({ _id: -1 }).limit(1).toArray() || [];
+    let res = {};
+    if (responseList.length > 0) {
+      res = responseList[0];
+    }
+    if(!res){
+      logger.info(
+        `empty res in updateTrackDataToPullMongo for awb --> ${result.awb}`
+      );
+    }
     if (res.is_manual_update) {
       return false;
     }
@@ -147,7 +161,9 @@ const updateTrackDataToPullMongo = async ({
       sortedTrackArray = [...trackArr];
     } else {
       // Handle duplicate Entry
-
+      if(!res.track_arr){
+        res.track_arr = [];
+      }
       for (const trackItem of res.track_arr) {
         const isSameScanType = updatedObj["status.current_status_type"] === trackItem.scan_type;
         const scanTimeCheck = moment(trackItem.scan_datetime).diff(
