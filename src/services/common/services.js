@@ -43,9 +43,9 @@ const updateStatusELK = async (trackingDoc, elkClient) => {
  * @param {*} preparedDict
  * @desc fetching processCount, default value is 0
  */
-const getTrackingIdProcessingCount = async ({ key }) => {
+const getTrackingIdProcessingCount = async ({ awb }) => {
   try {
-    const cacheData = (await getObject(key)) || {};
+    const cacheData = (await getObject(awb)) || {};
     const { processCount = 0 } = cacheData;
     return processCount;
   } catch (error) {
@@ -59,9 +59,9 @@ const getTrackingIdProcessingCount = async ({ key }) => {
  * @param {*} preparedDict
  * @desc update processCount based on provided type, default type is "add". i.e increase value by 1
  */
-const updateTrackingProcessingCount = async ({ key }, type = "add") => {
+const updateTrackingProcessingCount = async ({ awb }, type = "add") => {
   try {
-    const cacheData = (await getObject(key)) || {};
+    const cacheData = (await getObject(awb)) || {};
     let { processCount = 0 } = cacheData;
     if (type === "add") {
       processCount += 1;
@@ -69,7 +69,7 @@ const updateTrackingProcessingCount = async ({ key }, type = "add") => {
       processCount = !processCount ? 0 : processCount - 1;
     }
     cacheData.processCount = processCount;
-    await setObject(key, cacheData);
+    await setObject(awb, cacheData);
   } catch (error) {
     logger.error("updateTrackingProcessingCount", error);
   }
