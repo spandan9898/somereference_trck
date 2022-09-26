@@ -19,24 +19,18 @@ const { checkCancelStatusInTrackArr, updateTrackModel } = require("./helpers");
  * and update cache's track_arr
  * @returns bool
  */
-const updateCacheTrackArray = async ({ trackArray, awb, couriers = [], trackingDocument }) => {
+const updateCacheTrackArray = async ({ trackArray, awb, trackingDocument }) => {
   try {
-    couriers = couriers instanceof Array ? couriers : [];
-    let courier = "";
-    if(couriers.length > 0){
-      courier = couriers[0];
-    }
-    const redisKey = `${awb}_${courier}`;
-    const cacheData = await getObject(redisKey);
+    const cacheData = await getObject(awb);
 
     if (_.isEmpty(cacheData)) {
-      await fetchTrackingModelAndUpdateCache(awb, couriers);
+      await fetchTrackingModelAndUpdateCache(awb);
       return true;
     }
     const trackModel = cacheData.track_model;
 
     if (_.isEmpty(trackModel)) {
-      await fetchTrackingModelAndUpdateCache(awb, couriers);
+      await fetchTrackingModelAndUpdateCache(awb);
       return true;
     }
 
@@ -46,7 +40,7 @@ const updateCacheTrackArray = async ({ trackArray, awb, couriers = [], trackingD
       const updatedTrackModel = updateTrackModel(cacheData.track_model, trackingDocument);
       cacheData.track_model = updatedTrackModel;
     }
-    await storeInCache(redisKey, cacheData);
+    await storeInCache(awb, cacheData);
     return true;
   } catch (error) {
     logger.error("updateCacheTrackArray", error);
@@ -74,7 +68,6 @@ const updateCacheTrackArray = async ({ trackArray, awb, couriers = [], trackingD
  * @returns {string}
  */
 const redisCheckAndReturnTrackData = async (preparedTrackData, isFromPulled) => {
-  // preparedTrackData contains fields couriers and redis_key
   const trackObj = { ...preparedTrackData };
 
   if (isFromPulled) {
@@ -94,18 +87,18 @@ const redisCheckAndReturnTrackData = async (preparedTrackData, isFromPulled) => 
  * @desc store data in cache with expected format
  */
 const storeDataInCache = async (result) => {
-  const { eventObj, redis_key } = result;
+  const { eventObj, awb } = result;
   const { scan_datetime: scanDatetime } = eventObj || {};
   const redisKey = `${eventObj.scan_type}_${moment(scanDatetime).unix()}`;
   const newRedisPayload = {
     [redisKey]: true,
   };
   if (["NDR", "UD"].includes(eventObj.scan_type)) {
-    await updateIsNDRinCache(redis_key);
+    await updateIsNDRinCache(awb);
   }
-  const dt = (await getObject(redis_key)) || {};
+  const dt = (await getObject(awb)) || {};
   const oldData = { ...dt, ...newRedisPayload };
-  await setObject(redis_key, oldData);
+  await setObject(awb, oldData);
 };
 
 /**

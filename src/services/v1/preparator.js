@@ -40,7 +40,6 @@ const prepareTrackDictForV1 = (trackData) => {
     courier_status_code: _.get(trackData, "track_arr[0].courier_status_code", ""),
     ofd_count: trackData?.track_arr ? ofdCount(trackData?.track_arr || []) : 0,
     source: "node-kafka",
-    order_pk: trackData?.order_pk,
   };
   return trackDict;
 };

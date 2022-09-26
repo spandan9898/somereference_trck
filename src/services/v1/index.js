@@ -18,7 +18,6 @@ const {
  * @desc sending track data to v1 event bridge
  */
 const sendTrackDataToV1 = async (trackData) => {
-  // track data contains order_pk
   try {
     const authTokens = [
       "5a5e8b5ff28c89a0ebb352e5370e60e9805975",

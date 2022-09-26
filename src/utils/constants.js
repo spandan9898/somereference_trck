@@ -106,35 +106,6 @@ const NDR_STATUS_CODE_TO_REASON_MAPPER = {
   OTPF: "OTP Validation Failed",
 };
 
-const TOPIC_NAME_TO_COURIER_NAME_MAPPER = {
-  amaze: ["Amaze"],
-  bluedart: ["BLUEDART"],
-  bluedart_pull: ["BLUEDART"],
-  delhivery: ["Delhivery"],
-  delhivery_pull: ["Delhivery"],
-  ecomm: ["Ecom Express"],
-  ekart: ["Ekart"],
-  ekart_pull: ["Ekart"],
-  parceldo: ["ParcelDo"],
-  shadowfax: ["ShadowFax", "ShadowFax SDD"],
-  shadowfax_pull: ["ShadowFax", "ShadowFax SDD"],
-  udaan: ["Udaan Express"],
-  xpressbees: ["Xpressbees"],
-  xpressbees_pull: ["Xpressbees"],
-  pidge: ["Pidge"],
-  pidge_pull: ["Pidge"],
-  dtdc: ["DTDC"],
-  dtdc_pull: ["DTDC"],
-  loadshare: ["Loadshare"],
-  pikndel: ["Pickndel"],
-  pikndel_pull: ["Pickndel"],
-  smartr: ["Smartr Logistics"],
-  smartr_pull: ["Smartr Logistics"],
-  kerryindev_pull: ["Kerry Ndd", "KerryIndev"],
-  holisol_pull: ["Holisol"],
-  loadshare_pull: ["Loadshare"],
-}
-
 const WEBHOOK_USER_CACHE_KEY_NAME = "webhookUser";
 
 const DEFAULT_REQUESTS_TIMEOUT = 10;
@@ -151,5 +122,4 @@ module.exports = {
   KAFKA_INSTANCE_CONFIG,
   REDIS_CONFIG,
   NDR_STATUS_CODE_TO_REASON_MAPPER,
-  TOPIC_NAME_TO_COURIER_NAME_MAPPER,
 };
