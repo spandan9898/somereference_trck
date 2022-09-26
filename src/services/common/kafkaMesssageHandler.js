@@ -99,8 +99,9 @@ const updateFieldsForDuplicateEvent = async (obj) => {
  * @param {trackingId} awb
  * @param {commonTrackingInfo Col Instance} colInstance
  */
-const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance) => {
+const updateDataInPullDBAndReports = async (updatedObj, colInstance, auditInstance, res) => {
   try {
+    const { scanType, awb } = res;
     if (!awb || !updatedObj) {
       return {};
     }
@@ -113,7 +114,18 @@ const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance) => {
         upsert: process.env.NODE_ENV === "staging",
       }
     );
-
+    const auditKeyTime = moment().format("YYYY-MM-DD HH:mm:ss");
+    const auditObjKey = `${scanType}_${auditKeyTime}`;
+    const auditObjValue = {
+      is_duplicate: true,
+      preparedObj: res,
+    };
+    await auditInstance.findOneAndUpdate(
+      { courier_tracking_id: awb },
+      {
+        $set: { [`audit.${auditObjKey}`]: auditObjValue },
+      }
+    );
     await updateStatusOnReport(updatedTrackDocument, logger, null, null, null);
 
     return {};
@@ -216,6 +228,7 @@ class KafkaMessageHandler {
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
 
         const colInstance = await commonTrackingInfoCol();
+        const auditInstance = await commonTrackingDataProducer({ collection: "track_audit" });
         try {
           let otpObj = {};
           if (!courierName.includes("pull")) {
@@ -236,7 +249,7 @@ class KafkaMessageHandler {
             }
           }
           const updatedObj = { ...otpObj, ...trackArrObj };
-          await updateDataInPullDBAndReports(updatedObj, res.awb, colInstance);
+          await updateDataInPullDBAndReports(updatedObj, res.awb, colInstance, auditInstance, res);
         } catch (error) {
           return {};
         }
