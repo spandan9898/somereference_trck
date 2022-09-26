@@ -100,7 +100,7 @@ const updateFieldsForDuplicateEvent = async (obj) => {
  * @param {trackingId} awb
  * @param {commonTrackingInfo Col Instance} colInstance
  */
-const updateDataInPullDBAndReports = async (updatedObj, awb, courier, colInstance) => {
+const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance, courier) => {
   try {
     if (!awb || !updatedObj) {
       return {};
@@ -247,7 +247,7 @@ class KafkaMessageHandler {
             }
           }
           const updatedObj = { ...otpObj, ...trackArrObj };
-          await updateDataInPullDBAndReports(updatedObj, res.awb, colInstance);
+          await updateDataInPullDBAndReports(updatedObj, res.awb, colInstance, couriers[0]);
         } catch (error) {
           return {};
         }
