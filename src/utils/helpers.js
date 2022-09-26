@@ -41,7 +41,7 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
     const responseList = await pullCollection.find(
       query,
       { projection: { track_arr: 1 } }
-      ).sort({ _id: -1 }).limit(1).toArray();
+      ).sort({ _id: -1 }).limit(1).toArray() || [];
     let response = {};
     if(responseList.length>0){
       response = responseList[0];

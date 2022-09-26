@@ -43,7 +43,7 @@ const findOneDocumentFromMongo = async ({ queryObj, projectionObj, collectionNam
     if (isEmpty(projectionObj)) {
       docs = await collection.find(queryObj).sort({ _id: -1 }).limit(1).toArray();
     }
-    docs = await collection.find(queryObj, { projection: projectionObj }).sort({ _id: -1 }).limit(1).toArray();
+    docs = await collection.find(queryObj, { projection: projectionObj }).sort({ _id: -1 }).limit(1).toArray() || [];
     if (docs.length > 0) {
       return docs[0];
     }
@@ -64,7 +64,7 @@ const findMultipleDocumentsFromMongo = async ({ queryObj, projectionObj, collect
     if (isEmpty(projectionObj)) {
       projectionObj._id = 0;
     }
-    return await collection.find(queryObj, { projection: projectionObj }).toArray();
+    return await collection.find(queryObj, { projection: projectionObj }).toArray() || [];
   } catch (error) {
     logger.error("findMultipleDocment error -->", error);
     return [];
