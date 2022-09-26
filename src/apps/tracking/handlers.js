@@ -9,7 +9,6 @@ const {
 } = require("./preparator");
 const {
   fetchTrackingService,
-  fetchTrackingServiceV2,
   TrackingAuthenticationService,
   getTrackingIdFromClientOrderIdClientTrackingService,
   getTrackingIdFromClientOrderIdPublicTrackingService,
@@ -39,7 +38,7 @@ module.exports.publicTracking = async (req, reply) => {
     return reply.code(200).send({ response_list: [] });
   }
 
-  let tracking = await fetchTrackingServiceV2({
+  let tracking = await fetchTrackingService({
     trackingIdsList,
     authToken,
     IP,

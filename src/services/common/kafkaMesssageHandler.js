@@ -24,7 +24,6 @@ const {
   updateFreshdeskTrackingTicket,
 } = require("./services");
 const { getElkClients } = require("../../utils");
-const { TOPIC_NAME_TO_COURIER_NAME_MAPPER } = require("../../utils/constants");
 const logger = require("../../../logger");
 const { TrackingLogger } = require("../../../logger");
 const { sendDataToElk } = require("./elk");
@@ -51,7 +50,7 @@ const updateFieldsForDuplicateEvent = async (obj) => {
     let latestOtp;
     let lat;
     let long;
-    const doc = await getTrackDocumentfromMongo(obj.awb, obj.couriers);
+    const doc = await getTrackDocumentfromMongo(obj.awb);
 
     // Otp Data Backfilling when kafka_pull is updating first
     // Otp Data is only recieved in kafka_Push events
@@ -100,23 +99,18 @@ const updateFieldsForDuplicateEvent = async (obj) => {
  * @param {trackingId} awb
  * @param {commonTrackingInfo Col Instance} colInstance
  */
-const updateDataInPullDBAndReports = async (updatedObj, awb, courier, colInstance) => {
+const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance) => {
   try {
     if (!awb || !updatedObj) {
       return {};
     }
-    let filter = { tracking_id: awb };
-    if(courier){
-      filter.courier_parent_name = courier;
-    }
     const updatedTrackDocument = await colInstance.findOneAndUpdate(
-      filter,
+      { tracking_id: awb },
       { $set: updatedObj },
       {
         returnNewDocument: true,
         returnDocument: "after",
         upsert: process.env.NODE_ENV === "staging",
-        sort: { _id: -1 },
       }
     );
 
@@ -191,11 +185,6 @@ class KafkaMessageHandler {
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
 
-      const couriers = TOPIC_NAME_TO_COURIER_NAME_MAPPER[courierName];
-      const redisKey = `${res.awb}_${couriers[0]}`;
-      res.couriers = couriers;
-      res.redis_key = redisKey;
-
       // handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
 
       // handel special case for Ekart to store Lat-Long and also checking if the data comming from push flow only
@@ -215,11 +204,11 @@ class KafkaMessageHandler {
       }
       if (!res.awb) return {};
 
-      const processCount = await getTrackingIdProcessingCount({ key: redisKey });
+      const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
 
-      await new Promise((done) => setTimeout(() => done(), processCount * 1000));
+      //await new Promise((done) => setTimeout(() => done(), processCount * 1000));
 
-      await updateTrackingProcessingCount({ key: redisKey });
+      await updateTrackingProcessingCount({ awb: res.awb });
 
       const trackData = await redisCheckAndReturnTrackData(res, isFromPulled);
       if (!trackData) {
@@ -263,7 +252,7 @@ class KafkaMessageHandler {
       const updatedTrackData = await updatePrepareDict(trackData);
       if (_.isEmpty(updatedTrackData)) {
         logger.error("Xpresbees reverse map not found", trackData);
-        updateTrackingProcessingCount({ key: redisKey }, "remove");
+        updateTrackingProcessingCount({ awb: res.awb }, "remove");
         return {};
       }
 
@@ -280,7 +269,6 @@ class KafkaMessageHandler {
       if (process.env.IS_OTHERS_CALL === "false") {
         return {};
       }
-      result.redis_key = redisKey;
       await commonTrackingDataProducer(result);
       await updateStatusOnReport(result, logger, trackingElkClient);
       sendDataToNdr(result);

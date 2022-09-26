@@ -1,7 +1,7 @@
 const { isEmpty, omit, get, last } = require("lodash");
 const moment = require("moment");
 
-const { findOneDocumentFromMongo, findMultipleDocumentsFromMongo, getObject, storeInCache } = require("../../utils");
+const { findOneDocumentFromMongo, getObject, storeInCache } = require("../../utils");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { sortStatusArray } = require("./helpers");
 const { IS_FETCH_FROM_DB } = require("../../utils/constants");
@@ -69,13 +69,10 @@ const prepareTrackDataForTracking = (trackArr) => {
  *
  * @param {prepares Filter for tracking and returns to tracking/services} trackingAwb
  */
-const PrepareTrackModelFilters = async (trackingAwb, couriers = []) => {
-  let query = {
+const PrepareTrackModelFilters = async (trackingAwb) => {
+  const query = {
     tracking_id: trackingAwb,
   };
-  if (couriers.length>0){
-    query.courier_parent_name = {"$in": couriers};
-  }
 
   const projection = {
     _id: 0,
@@ -94,54 +91,34 @@ const PrepareTrackModelFilters = async (trackingAwb, couriers = []) => {
  *
  * @param {gets called by fetchTrackingModelAndUpdateCache and returns a document} trackingAwb
  */
-const getTrackDocumentfromMongo = async (trackingAwb, couriers=[]) => {
+const getTrackDocumentfromMongo = async (trackingAwb) => {
   let trackModelDocument;
   try {
-    couriers = couriers instanceof Array ? couriers : [];
-    const { query, projection } = await PrepareTrackModelFilters(trackingAwb, couriers);
+    const { query, projection } = await PrepareTrackModelFilters(trackingAwb);
     trackModelDocument = await findOneDocumentFromMongo({
       queryObj: query,
       projectionObj: projection,
       collectionName: process.env.MONGO_DB_PROD_SERVER_COLLECTION_NAME,
     });
   } catch (error) {
-    throw new Error(`failed to fetch document | AWB: ${trackingAwb} | couriers: ${couriers.toString()} | message: ${error.message}`);
+    throw new Error(`failed to fetch document | AWB: ${trackingAwb} | message: ${error.message}`);
   }
   return trackModelDocument;
-};
-
-const getMultipleTrackDocumentfromMongo = async (trackingAwb) => {
-  try {
-    const { query, projection } = await PrepareTrackModelFilters(trackingAwb);
-    return await findMultipleDocumentsFromMongo({
-      queryObj: query,
-      projectionObj: projection,
-      collectionName: process.env.MONGO_DB_PROD_SERVER_COLLECTION_NAME,
-    });
-  } catch (error) {
-    throw new Error(`failed to fetch documents | AWB: ${trackingAwb} | message: ${error.message}`);
-  }
 };
 
 /**
  *
  * b∫ @param {fetches tracking Model from Mongo} trackingAwbs
  */
-const fetchTrackingModelAndUpdateCache = async (trackingAwb, couriers = [], fromTrackingApi = false) => {
+const fetchTrackingModelAndUpdateCache = async (trackingAwb, fromTrackingApi = false) => {
   try {
-    couriers = couriers instanceof Array ? couriers : [];
-    let courier = "";
-    if (couriers.length > 0) {
-      courier = couriers[0];
-    }
-    const redisKey = `${trackingAwb}_${courier}`;
     let trackingObj = {};
     if (fromTrackingApi){
       if (process.env.USE_REDIS_FOR_TRACKING === "true"){
-        trackingObj = (await getObject(redisKey)) || {};
+        trackingObj = (await getObject(trackingAwb)) || {};
       }
     }else{
-      trackingObj = (await getObject(redisKey)) || {};
+      trackingObj = (await getObject(trackingAwb)) || {};
     }
     let isFetchFromDB = fromTrackingApi;
     if (fromTrackingApi) {
@@ -155,7 +132,7 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, couriers = [], from
       isEmpty(trackingObj?.track_model) ||
       isFetchFromDB
     ) {
-      const trackDocument = await getTrackDocumentfromMongo(trackingAwb, couriers);
+      const trackDocument = await getTrackDocumentfromMongo(trackingAwb);
 
       if (isEmpty(trackDocument)) {
         throw new Error(`failed to fetch document - ${trackingAwb}`);
@@ -175,10 +152,10 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, couriers = [], from
       const expiryTime = fromTrackingApi ? 2 * 60 * 60 : undefined;
       if (fromTrackingApi) {
         if (process.env.USE_REDIS_FOR_TRACKING === "true") {
-          await storeInCache(redisKey, trackingObj, expiryTime);
+          await storeInCache(trackingAwb, trackingObj, expiryTime);
         }
       }else{
-        await storeInCache(redisKey, trackingObj, expiryTime);
+        await storeInCache(trackingAwb, trackingObj, expiryTime);
       }
       return trackingObj;
     }
@@ -219,7 +196,6 @@ const fetchTrackingModelAndUpdateCacheForTracking = async (trackingAwb) => {
 
 module.exports = {
   fetchTrackingModelAndUpdateCache,
-  fetchTrackingModelAndUpdateCacheForTracking,
   prepareTrackDataForTracking,
   getTrackDocumentfromMongo,
 };
