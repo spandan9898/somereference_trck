@@ -249,7 +249,7 @@ class KafkaMessageHandler {
             }
           }
           const updatedObj = { ...otpObj, ...trackArrObj };
-          await updateDataInPullDBAndReports(updatedObj, res.awb, colInstance, auditInstance, res);
+          await updateDataInPullDBAndReports(updatedObj, colInstance, auditInstance, res);
         } catch (error) {
           return {};
         }
