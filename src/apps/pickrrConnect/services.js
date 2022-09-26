@@ -41,30 +41,23 @@ const callSendReportDataForPulledEvent = (trackingObj) => {
  * @desc get update tracking object
  *    if isFromPull true then fetch data from DB and prepare data, otherwise fetch data from cache
  */
-const getTrackingObj = async ({ trackingId, isFromPull, result, courier, fetchFromCache = false }) => {
+const getTrackingObj = async ({ trackingId, isFromPull, result, fetchFromCache = false }) => {
   if (result) {
     return result;
   }
-  let couriers = [];
-  if(courier){
-    couriers.push(courier);
-  }else{
-    courier = "";
-  }
-  const redisKey = `${trackingId}_${courier}`;
   let trackObj;
   if (isFromPull) {
-    const response = await getTrackDocumentfromMongo(trackingId, couriers);
+    const response = await getTrackDocumentfromMongo(trackingId);
     if (!response) {
       return false;
     }
     trackObj = response;
   } else if (fetchFromCache) {
-    const cacheData = await getObject(redisKey);
+    const cacheData = await getObject(trackingId);
     if (cacheData) {
       trackObj = cacheData.track_model;
     } else {
-      trackObj = await fetchTrackingModelAndUpdateCache(trackingId, couriers=couriers);
+      trackObj = await fetchTrackingModelAndUpdateCache(trackingId);
     }
   }
   return trackObj;
@@ -79,16 +72,13 @@ const preparePickrrConnectLambdaPayloadAndCall = async ({
   trackingId,
   isFromPull = false,
   result,
-  courier,
   fetchFromCache = false,
 }) => {
   try {
-    fetchFromCache = false;
-    let trackObj = await getTrackingObj({ trackingId, isFromPull, courier: null, result, fetchFromCache });
+    let trackObj = await getTrackingObj({ trackingId, isFromPull, result, fetchFromCache });
 
     if (isFromPull) {
       process.nextTick(() => {
-        // trackObj contains order_pk
         callSendReportDataForPulledEvent(trackObj);
       });
     }

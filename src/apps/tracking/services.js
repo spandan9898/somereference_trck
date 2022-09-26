@@ -8,7 +8,7 @@ const { getString, setString } = require("../../utils/redis");
 const logger = require("../../../logger");
 const { VALIDATE_VIA_AUTH_TOKEN, ALLOWED_IPS, BLOCKED_IPS } = require("../../utils/constants");
 const { filterTrackingObj, prepareConcatenatedTrackingIdList } = require("./preparator");
-const { fetchTrackingModelAndUpdateCache, fetchTrackingModelAndUpdateCacheForTracking } = require("../../services/common/trackServices");
+const { fetchTrackingModelAndUpdateCache } = require("../../services/common/trackServices");
 const { fetchTrackingIdFromClientOrderId } = require("./models");
 
 /**
@@ -46,7 +46,7 @@ const fetchTrackingService = async ({ trackingIdsList, authToken = null, IP = nu
           responseDict.response_list = responseList;
           return responseDict;
         }
-        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0], couriers = [], true);
+        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0], true);
         const cacheAuthToken = trackingObj?.track_model?.auth_token || "";
         if (cacheAuthToken !== authToken) {
           if (IP && ALLOWED_IPS.includes(IP)) {
@@ -62,7 +62,7 @@ const fetchTrackingService = async ({ trackingIdsList, authToken = null, IP = nu
         responseDict.err = " Tracking ID not found";
       }
       if ((IP && ALLOWED_IPS.includes(IP)) || allowFetchFromDB) {
-        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0], couriers = [], true);
+        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingIdsList[0], true);
         const trackModel = await filterTrackingObj(trackingObj?.track_model);
         responseDict = trackModel;
         return responseDict;
@@ -86,7 +86,7 @@ const fetchTrackingService = async ({ trackingIdsList, authToken = null, IP = nu
         continue;
       }
       try {
-        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingId, couriers = [], true);
+        const trackingObj = await fetchTrackingModelAndUpdateCache(trackingId, true);
         if (!trackingObj) {
           throw new Error();
         }
@@ -107,69 +107,6 @@ const fetchTrackingService = async ({ trackingIdsList, authToken = null, IP = nu
         singleResponseDict.tracking_id = trackingId;
         responseList.push(singleResponseDict);
       }
-    }
-    responseDict.response_list = responseList;
-    return responseDict;
-  } catch (error) {
-    if (error.message.includes("failed")) {
-      responseDict.err = "Tracking ID not found";
-    } else {
-      logger.error(error.message);
-    }
-    return responseDict;
-  }
-};
-
-
-
-const fetchTrackingServiceV2 = async ({ trackingIdsList}) => {
-  let responseDict = {};
-  const responseList = [];
-  try {
-    if (_.isEmpty(trackingIdsList)) return responseDict;
-    if (trackingIdsList.length > 30) {
-      responseDict.err = "cannot track more than 30 waybills at once";
-      return responseDict;
-    }
-  
-    for(let idx = 0; idx<trackingIdsList.length; idx+=1){
-
-      if (!trackingIdsList[idx]) {
-        continue;
-      }
-      if (trackingIdsList[idx] === "err") {
-        // client order id not found
-        responseList.push({ err: "Order ID not found" });
-        continue;
-      }
-      if (trackingIdsList[idx] === "err_auth") {
-        responseList.push({ err: "authentication error" });
-        continue;
-      }
-
-      const documentList = await fetchTrackingModelAndUpdateCacheForTracking(trackingIdsList[idx]);
-      for (let j = 0; j < documentList.length; j++){
-        try {
-          const trackingObj = documentList[j];
-          if (!trackingObj) {
-            throw new Error();
-          }
-          responseList.push(trackingObj?.track_model || {});
-        } catch (error) {
-          responseDict = {};
-          responseDict.err = "Tracking ID Not Found";
-          responseDict.tracking_id = trackingId;
-          responseList.push(responseDict);
-        }
-      }
-    }
-    if(responseList.length === 0){
-      responseDict.err = "Tracking ID not found";
-      return responseDict;
-    }
-    if(responseList.length === 1){
-      responseDict = responseList[0];
-      return responseDict;
     }
     responseDict.response_list = responseList;
     return responseDict;
@@ -426,7 +363,6 @@ const updateClientOrderIdPatternInCacheService = async ({
 };
 module.exports = {
   fetchTrackingService,
-  fetchTrackingServiceV2,
   TrackingAuthenticationService,
   getTrackingIdFromClientOrderIdClientTrackingService,
   getTrackingIdFromClientOrderIdPublicTrackingService,
