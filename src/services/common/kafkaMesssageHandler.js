@@ -118,7 +118,7 @@ const updateDataInPullDBAndReports = async (updatedObj, colInstance, auditInstan
     const auditObjKey = `${scanType}_${auditKeyTime}`;
     const auditObjValue = {
       is_duplicate: true,
-      preparedObj: res,
+      prepared_obj: res,
     };
     await auditInstance.findOneAndUpdate(
       { courier_tracking_id: awb },
