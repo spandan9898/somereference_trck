@@ -191,6 +191,7 @@ class KafkaMessageHandler {
         isFromPulled = (_.get(consumedPayload, "event") || "").includes("pull");
       }
 
+      if (!res.awb) return {};
       const couriers = TOPIC_NAME_TO_COURIER_NAME_MAPPER[courierName];
       const redisKey = `${res.awb}_${couriers[0]}`;
       res.couriers = couriers;
@@ -213,7 +214,6 @@ class KafkaMessageHandler {
 
         return {};
       }
-      if (!res.awb) return {};
 
       const processCount = await getTrackingIdProcessingCount({ key: redisKey });
 
