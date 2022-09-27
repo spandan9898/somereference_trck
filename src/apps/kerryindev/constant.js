@@ -42,7 +42,7 @@ const KERRYINDEV_CODE_MAPPER = {
   "pna_vendor not available": { scan_type: "PPF", pickrr_sub_status_code: "SU" },
   "pna_vendor requested late pickup": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
   "pna_vendor requested next day pickup": { scan_type: "PPF", pickrr_sub_status_code: "SNR" },
-  odd: { scan_type: "UD", pickrr_sub_status_code: "FD" },
+  odd: { scan_type: "UD", pickrr_sub_status_code: "CD" },
 };
 const PULL_GROUP_NAME = "kerryindev_pull_group";
 const PULL_TOPIC_NAME = "kerryindev_pull";
