@@ -99,9 +99,8 @@ const updateFieldsForDuplicateEvent = async (obj) => {
  * @param {trackingId} awb
  * @param {commonTrackingInfo Col Instance} colInstance
  */
-const updateDataInPullDBAndReports = async (updatedObj, colInstance, auditInstance, res) => {
+const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance) => {
   try {
-    const { scanType, awb } = res;
     if (!awb || !updatedObj) {
       return {};
     }
@@ -114,18 +113,7 @@ const updateDataInPullDBAndReports = async (updatedObj, colInstance, auditInstan
         upsert: process.env.NODE_ENV === "staging",
       }
     );
-    const auditKeyTime = moment().format("YYYY-MM-DD HH:mm:ss");
-    const auditObjKey = `${scanType}_${auditKeyTime}`;
-    const auditObjValue = {
-      is_duplicate: true,
-      prepared_obj: res,
-    };
-    await auditInstance.findOneAndUpdate(
-      { courier_tracking_id: awb },
-      {
-        $set: { [`audit.${auditObjKey}`]: auditObjValue },
-      }
-    );
+
     await updateStatusOnReport(updatedTrackDocument, logger, null, null, null);
 
     return {};
@@ -218,7 +206,7 @@ class KafkaMessageHandler {
 
       const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
 
-      //await new Promise((done) => setTimeout(() => done(), processCount * 1000));
+      await new Promise((done) => setTimeout(() => done(), processCount * 1000));
 
       await updateTrackingProcessingCount({ awb: res.awb });
 
@@ -228,7 +216,6 @@ class KafkaMessageHandler {
         updateTrackingProcessingCount({ awb: res.awb }, "remove");
 
         const colInstance = await commonTrackingInfoCol();
-        const auditInstance = await commonTrackingDataProducer({ collection: "track_audit" });
         try {
           let otpObj = {};
           if (!courierName.includes("pull")) {
@@ -249,7 +236,7 @@ class KafkaMessageHandler {
             }
           }
           const updatedObj = { ...otpObj, ...trackArrObj };
-          await updateDataInPullDBAndReports(updatedObj, colInstance, auditInstance, res);
+          await updateDataInPullDBAndReports(updatedObj, res.awb, colInstance);
         } catch (error) {
           return {};
         }
