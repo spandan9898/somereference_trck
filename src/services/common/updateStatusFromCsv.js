@@ -9,6 +9,7 @@ const initELK = require("../../connector/elkConnection");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { ELK_INSTANCE_NAMES } = require("../../utils/constants");
 const logger = require("../../../logger");
+const { convertDate } = require("../../../scripts/helper");
 
 /**
  * 
@@ -131,11 +132,15 @@ const updateStatusFromCSV = async (csvData, platformNames) => {
   }
   const trackData = filteredCsvData.map(prepareStatusObj);
 
+  const manualUpdateCreatedAtThreshold = convertDate("2022-06-10", "start");
   const response = await pullDbInstance.bulkWrite(
     trackData.map(
       (trackItem) => ({
         updateOne: {
-          filter: { tracking_id: trackItem.trackingId },
+          filter: {
+            tracking_id: trackItem.trackingId,
+            order_created_at: { $gt: manualUpdateCreatedAtThreshold },
+          },
           update: {
             $set: {
               status: trackItem.statusObj,

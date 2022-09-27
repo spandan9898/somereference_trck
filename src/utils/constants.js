@@ -39,6 +39,7 @@ const REDIS_CONFIG = {
   password: process.env.REDIS_PASSWORD,
   sentinelPassword: process.env.SENTINEL_PASSWORD,
   db: process.env.DB_NUMBER,
+  maxRetriesPerRequest: 1,
 };
 
 const ELK_INSTANCE_NAMES = {

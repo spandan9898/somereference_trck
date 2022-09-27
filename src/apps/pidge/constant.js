@@ -38,7 +38,7 @@ const PIDGE_CODE_MAPPER = {
   "21_rto closed": { scan_type: "RTO UD", pickrr_sub_status_code: "" },
   40: { scan_type: "OT", pickrr_sub_status_code: "" },
   41: { scan_type: "OT", pickrr_sub_status_code: "" },
-  "19_order returned back": { scan_type: "RTO", pickrr_sub_status_code: "" },
+  19: { scan_type: "RTO", pickrr_sub_status_code: "" },
 };
 
 module.exports = {

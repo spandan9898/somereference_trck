@@ -218,7 +218,7 @@ class KafkaMessageHandler {
 
       const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
 
-      await new Promise((done) => setTimeout(() => done(), processCount * 1000));
+      //await new Promise((done) => setTimeout(() => done(), processCount * 1000));
 
       await updateTrackingProcessingCount({ awb: res.awb });
 

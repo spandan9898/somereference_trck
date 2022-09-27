@@ -82,7 +82,6 @@ const PrepareTrackModelFilters = async (trackingAwb) => {
     kam: 0,
     sales_poc: 0,
     wh_id: 0,
-    status_pk: 0,
   };
 
   return { query, projection };
@@ -113,7 +112,14 @@ const getTrackDocumentfromMongo = async (trackingAwb) => {
  */
 const fetchTrackingModelAndUpdateCache = async (trackingAwb, fromTrackingApi = false) => {
   try {
-    const trackingObj = (await getObject(trackingAwb)) || {};
+    let trackingObj = {};
+    if (fromTrackingApi){
+      if (process.env.USE_REDIS_FOR_TRACKING === "true"){
+        trackingObj = (await getObject(trackingAwb)) || {};
+      }
+    }else{
+      trackingObj = (await getObject(trackingAwb)) || {};
+    }
     let isFetchFromDB = fromTrackingApi;
     if (fromTrackingApi) {
       const updatedAt = trackingObj?.track_model?.updated_at;
@@ -144,8 +150,13 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, fromTrackingApi = f
       trackingObj.track_model = trackDocument;
 
       const expiryTime = fromTrackingApi ? 2 * 60 * 60 : undefined;
-      await storeInCache(trackingAwb, trackingObj, expiryTime);
-
+      if (fromTrackingApi) {
+        if (process.env.USE_REDIS_FOR_TRACKING === "true") {
+          await storeInCache(trackingAwb, trackingObj, expiryTime);
+        }
+      }else{
+        await storeInCache(trackingAwb, trackingObj, expiryTime);
+      }
       return trackingObj;
     }
     return trackingObj;

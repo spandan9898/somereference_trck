@@ -41,8 +41,12 @@ const setString = async (key, value) => {
  * @returns {object}
  */
 const getObject = async (key) => {
-  const res = await redisClient.get(key);
-  return JSON.parse(res);
+  try {
+    const res = await redisClient.get(key);
+    return JSON.parse(res);
+  } catch (error) {
+    return {};
+  }
 };
 
 /** *
