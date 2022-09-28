@@ -8,20 +8,23 @@ const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
 const { updateEkartLatLong } = require("../pull/index");
 
-const sendDataToNdr = require("../ndr");
-const sendTrackDataToV1 = require("../v1");
-const triggerWebhook = require("../webhook");
+// const sendDataToNdr = require("../ndr");
+// const sendTrackDataToV1 = require("../v1");
+// const triggerWebhook = require("../webhook");
+
 const updateStatusOnReport = require("../report");
 
 // const { preparePickrrConnectLambdaPayloadAndCall } = require("../../apps/pickrrConnect/services");
 
 const { updatePrepareDict } = require("./helpers");
 const {
-  updateStatusELK,
+  // updateStatusELK,
+
   getTrackingIdProcessingCount,
   updateTrackingProcessingCount,
-  commonTrackingDataProducer,
-  updateFreshdeskTrackingTicket,
+
+  // commonTrackingDataProducer,
+  // updateFreshdeskTrackingTicket,
 } = require("./services");
 const { getElkClients } = require("../../utils");
 const logger = require("../../../logger");
@@ -47,7 +50,6 @@ const updateFieldsForDuplicateEvent = async (obj) => {
     longitude,
   } = obj;
   try {
-    let latestOtp;
     let lat;
     let long;
     const doc = await getTrackDocumentfromMongo(obj.awb);
@@ -66,7 +68,6 @@ const updateFieldsForDuplicateEvent = async (obj) => {
         }
         if (otp) {
           trackArr[i].otp = otp;
-          latestOtp = otp;
         }
         if (latitude) {
           trackArr[i].latitude = latitude;
@@ -79,10 +80,10 @@ const updateFieldsForDuplicateEvent = async (obj) => {
         break;
       }
     }
-    const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr, latestOtp);
+    const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr, otp);
     return {
       track_arr: trackArr,
-      latest_otp: latestOtp,
+      latest_otp: otp,
       is_otp_delivered: isOtpDelivered,
       longitude: long,
       latitude: lat,
@@ -206,7 +207,7 @@ class KafkaMessageHandler {
 
       const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
 
-      //await new Promise((done) => setTimeout(() => done(), processCount * 1000));
+      // await new Promise((done) => setTimeout(() => done(), processCount * 1000));
 
       await updateTrackingProcessingCount({ awb: res.awb });
 
@@ -269,13 +270,14 @@ class KafkaMessageHandler {
       if (process.env.IS_OTHERS_CALL === "false") {
         return {};
       }
-      await commonTrackingDataProducer(result);
-      await updateStatusOnReport(result, logger, trackingElkClient);
-      sendDataToNdr(result);
-      sendTrackDataToV1(result);
-      updateStatusELK(result, prodElkClient);
-      triggerWebhook(result, trackingElkClient);
-      updateFreshdeskTrackingTicket(result);
+
+      // await commonTrackingDataProducer(result);
+      // await updateStatusOnReport(result, logger, trackingElkClient);
+      // sendDataToNdr(result);
+      // sendTrackDataToV1(result);
+      // updateStatusELK(result, prodElkClient);
+      // triggerWebhook(result, trackingElkClient);
+      // updateFreshdeskTrackingTicket(result);
 
       // blocking events to lambda (new pickrr connect service)
 
