@@ -8,9 +8,9 @@ const { updateTrackDataToPullMongo } = require("../pull");
 const { redisCheckAndReturnTrackData } = require("../pull/services");
 const { updateEkartLatLong } = require("../pull/index");
 
-// const sendDataToNdr = require("../ndr");
-// const sendTrackDataToV1 = require("../v1");
-// const triggerWebhook = require("../webhook");
+const sendDataToNdr = require("../ndr");
+const sendTrackDataToV1 = require("../v1");
+const triggerWebhook = require("../webhook");
 
 const updateStatusOnReport = require("../report");
 
@@ -18,13 +18,11 @@ const updateStatusOnReport = require("../report");
 
 const { updatePrepareDict } = require("./helpers");
 const {
-  // updateStatusELK,
-
+  updateStatusELK,
   getTrackingIdProcessingCount,
   updateTrackingProcessingCount,
-
-  // commonTrackingDataProducer,
-  // updateFreshdeskTrackingTicket,
+  commonTrackingDataProducer,
+  updateFreshdeskTrackingTicket,
 } = require("./services");
 const { getElkClients } = require("../../utils");
 const logger = require("../../../logger");
@@ -271,13 +269,13 @@ class KafkaMessageHandler {
         return {};
       }
 
-      // await commonTrackingDataProducer(result);
-      // await updateStatusOnReport(result, logger, trackingElkClient);
-      // sendDataToNdr(result);
-      // sendTrackDataToV1(result);
-      // updateStatusELK(result, prodElkClient);
-      // triggerWebhook(result, trackingElkClient);
-      // updateFreshdeskTrackingTicket(result);
+      await commonTrackingDataProducer(result);
+      await updateStatusOnReport(result, logger, trackingElkClient);
+      sendDataToNdr(result);
+      sendTrackDataToV1(result);
+      updateStatusELK(result, prodElkClient);
+      triggerWebhook(result, trackingElkClient);
+      updateFreshdeskTrackingTicket(result);
 
       // blocking events to lambda (new pickrr connect service)
 
