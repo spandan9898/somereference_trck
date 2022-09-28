@@ -78,13 +78,17 @@ const updateFieldsForDuplicateEvent = async (obj) => {
       }
     }
     const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr, otp);
-    return {
+    const response = {
       track_arr: trackArr,
       latest_otp: otp,
       is_otp_delivered: isOtpDelivered,
       longitude: long,
       latitude: lat,
     };
+    if (otp) {
+      response.latest_otp = otp;
+    }
+    return response;
   } catch (error) {
     logger.error("Failed Backfilling Otp Data", error);
     return {};
