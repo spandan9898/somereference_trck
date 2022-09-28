@@ -124,7 +124,7 @@ const checkTriggerForPulledEvent = (preparedDict, dbResponse) => {
 
   // const latestCurrentStatusTimeInDB = _.get(dbResponse, ".current_status_time");
 
-  logger.info(`Check Trigger For Pulled Event -> ${latestCurrentStatusTimeInDB}`);
+  logger.info(`Check Trigger For Pulled Event t_id: ${preparedDict?.awb}-> ${latestCurrentStatusTimeInDB}`);
   const pulledCurrentStatusTime = _.get(preparedDict, "scan_datetime");
 
   const currentStatusTypeInDB = _.get(dbResponse, "track_arr[0].scan_type");
