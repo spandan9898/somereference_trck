@@ -86,26 +86,6 @@ const preparePidgeData = (pidgeDict) => {
     return pickrrPidgeDict;
   }
 };
-
-const pidgeDict = {
-  trip_id:"4927943", 
-  reference_id:"74787344", 
-  trip_status:"190", 
-  PBID:2057598, 
-  remark:null, 
-  vendor_order_id:2057598, 
-  trip_type:3, 
-  flow_type:{name:"hyperlocal regular", code:1}, 
-  rider_name:"shiva ZB(CHD)", 
-  attempt_type:10, 
-  pbid:2057598, 
-  brand:{name:"FIRKI WHOLESALE PRIVATE LIMITED" , code:"FIRKI WHOLESALE PRIVATE LIMITED" , location_code:null}, 
-  // timestamp:"2022-09-26 17:51:41", 
-  status:11
-}
-
-console.log(preparePidgeData(pidgeDict));
-
 /**
  *
  * @param {*} pidgeDict
