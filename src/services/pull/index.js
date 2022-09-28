@@ -343,7 +343,7 @@ const updateTrackDataToPullMongo = async ({
     });
     return response.value;
   } catch (error) {
-    logger.error(`updateTrackDataToPullMongo Error ${error.stack} ${error}`);
+    logger.error(`updateTrackDataToPullMongo Error ${error.stack} ${error} trackObj: ${JSON.stringify(trackObj || {})}`);
     return false;
   }
 };
@@ -360,7 +360,7 @@ const updateEkartLatLong = async (res) => {
     latitude: "",
     longitude: "",
   };
-  const { awb, couriers, longitude, latitude } = res;
+  let { awb, couriers, longitude, latitude } = res;
   pickrrEkartDict.latitude = latitude;
   pickrrEkartDict.longitude = longitude;
   pickrrEkartDict.updated_at = moment().toDate();
