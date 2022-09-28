@@ -49,7 +49,7 @@ const getTrackingIdProcessingCount = async ({ key }) => {
     const { processCount = 0 } = cacheData;
     return processCount;
   } catch (error) {
-    logger.error("getTrackingIdProcessingCount", error);
+    logger.error(`getTrackingIdProcessingCount ${error.stack} ${error}`);
     return 0;
   }
 };
@@ -71,7 +71,7 @@ const updateTrackingProcessingCount = async ({ key }, type = "add") => {
     cacheData.processCount = processCount;
     await setObject(key, cacheData);
   } catch (error) {
-    logger.error("updateTrackingProcessingCount", error);
+    logger.error(`updateTrackingProcessingCount ${error.stack} ${error}`);
   }
 };
 
@@ -170,7 +170,7 @@ const commonTrackingDataProducer = async (trackingObj) => {
       messages,
     });
   } catch (error) {
-    logger.error("commonProducer", error);
+    logger.error(`commonProducer ${error.stack} ${error}`);
   }
   return null;
 };

@@ -30,8 +30,8 @@ const axiosInstance = axios.create();
  */
 const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray) => {
   // trackObj contains fields couriers and redis_key
+  const { awb } = trackObj || {};
   try {
-    const { awb } = trackObj || {};
     let couriers = trackObj.couriers instanceof Array ? trackObj.couriers : [];
     let query = { tracking_id: awb };
     if (couriers.length > 0){
@@ -51,7 +51,7 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
       return "NA";
     }
     if (!response.track_arr) {
-      logger.info(`response.track_arr is empty in fetchTrackingDataAndStoreInCache for awb: ${awb}`, error);
+      logger.info(`response.track_arr is empty in fetchTrackingDataAndStoreInCache for awb: ${awb}`);
       return "NA";
     }
 
@@ -75,7 +75,7 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
     }
     return trackMap;
   } catch (error) {
-    logger.error(`fetchTrackingDataAndStoreInCache for awb: ${awb}`, error);
+    logger.error(`fetchTrackingDataAndStoreInCache for ${awb} error: ${error.stack} ${error}`);
     return false;
   }
 };

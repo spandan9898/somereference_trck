@@ -106,7 +106,7 @@ const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance, courie
       return {};
     }
     let filter = { tracking_id: awb };
-    if(courier){
+    if (courier) {
       filter.courier_parent_name = courier;
     }
     const updatedTrackDocument = await colInstance.findOneAndUpdate(
@@ -124,7 +124,7 @@ const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance, courie
 
     return {};
   } catch (error) {
-    logger.error("failed Updating Data", error);
+    logger.error(`failed Updating Data error: ${ error.stack } ${ error }`);
     return {};
   }
 };
@@ -206,7 +206,7 @@ class KafkaMessageHandler {
           try {
             updateEkartLatLong(res);
           } catch (error) {
-            logger.error("updateEkartLatLong failed", error);
+            logger.error(`updateEkartLatLong failed error: ${ error.stack } ${ error }`);
           }
         } else {
           logger.error(`Empty Lat-Long Filed, TrackingID: ${res.awb}`);
@@ -273,6 +273,7 @@ class KafkaMessageHandler {
         isFromPulled,
         qcDetails,
       });
+      logger.info(`updateTrackDataToPullMongo result val: , ${JSON.stringify(result)}`);
       if (!result) {
         return {};
       }
@@ -299,7 +300,7 @@ class KafkaMessageHandler {
 
       return {};
     } catch (error) {
-      logger.error("KafkaMessageHandler", error);
+      logger.error(`KafkaMessageHandler ${error.stack} ${error}`);
       return {};
     }
   }

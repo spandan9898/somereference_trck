@@ -268,7 +268,7 @@ const updateTrackDataToPullMongo = async ({
         updatedObj.edd_stamp = pickrrEDD;
       }
     } catch (error) {
-      logger.error(error.message);
+      logger.error(`${ error.stack } ${ error }`);
     }
     updatedObj["status.current_status_type"] = firstTrackObjOfTrackArr.scan_type;
     updatedObj["status.courier_status_code"] = firstTrackObjOfTrackArr.courier_status_code;
@@ -343,7 +343,7 @@ const updateTrackDataToPullMongo = async ({
     });
     return response.value;
   } catch (error) {
-    logger.error("updateTrackDataToPullMongo Error", error);
+    logger.error(`updateTrackDataToPullMongo Error ${error.stack} ${error}`);
     return false;
   }
 };

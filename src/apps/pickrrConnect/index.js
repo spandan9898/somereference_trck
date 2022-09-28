@@ -8,6 +8,6 @@ const { listener, initialize } = require("./consumer");
       listener(pickrrConnectConsumers);
     }
   } catch (error) {
-    logger.error("Pickrr Connect Consumer Error ", error);
+    logger.error(`Pickrr Connect Consumer Error ${error.stack} ${error}`);
   }
 })();

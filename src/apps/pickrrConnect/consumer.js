@@ -39,7 +39,7 @@ const listener = async (consumer) => {
       },
     });
   } catch (error) {
-    logger.error("Pickrr Connect Listener Error", error);
+    logger.error(`Pickrr Connect Listener Error ${error.stack} ${error}`);
   }
 };
 

@@ -53,7 +53,7 @@ const updateIsNDRinCache = async (key) => {
     cacheData.is_ndr = true;
     await storeInCache(key, cacheData);
   } catch (error) {
-    logger.error("updateIsNDRinCache", error);
+    logger.error(`updateIsNDRinCache ${error.stack} ${error}`);
   }
 };
 

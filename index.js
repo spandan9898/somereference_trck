@@ -56,7 +56,7 @@ const { MONGO_DB_PROD_SERVER_HOST, MONGO_DB_REPORT_SERVER_HOST, MONGO_DB_STAGING
 
     return true;
   } catch (error) {
-    logger.error("DB Connection Error", error);
+    logger.error(`DB Connection Error ${error.stack} ${error}`);
     return false;
   }
 })();

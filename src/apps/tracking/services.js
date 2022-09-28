@@ -114,7 +114,7 @@ const fetchTrackingService = async ({ trackingIdsList, authToken = null, IP = nu
     if (error.message.includes("failed")) {
       responseDict.err = "Tracking ID not found";
     } else {
-      logger.error(error.message);
+      logger.error(`fetchTrackingService error: ${ error.stack } ${ error }`);
     }
     return responseDict;
   }
@@ -177,7 +177,7 @@ const fetchTrackingServiceV2 = async ({ trackingIdsList}) => {
     if (error.message.includes("failed")) {
       responseDict.err = "Tracking ID not found";
     } else {
-      logger.error(error.message);
+      logger.error(`fetchTrackingServiceV2 error: ${error.stack} ${error}`);
     }
     return responseDict;
   }

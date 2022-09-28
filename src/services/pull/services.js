@@ -49,7 +49,7 @@ const updateCacheTrackArray = async ({ trackArray, awb, couriers = [], trackingD
     await storeInCache(redisKey, cacheData);
     return true;
   } catch (error) {
-    logger.error("updateCacheTrackArray", error);
+    logger.error(`updateCacheTrackArray ${error.stack} ${error}`);
     return false;
   }
 };

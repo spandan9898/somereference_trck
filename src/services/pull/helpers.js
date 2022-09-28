@@ -107,7 +107,7 @@ const updateTrackModel = (cacheTrakModel, trackingDocument) => {
       return obj;
     }, {});
   } catch (error) {
-    logger.error("updateTrackModel", error);
+    logger.error(`updateTrackModel ${error.stack} ${error}`);
     return cacheTrakModel;
   }
 };

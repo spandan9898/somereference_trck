@@ -30,7 +30,7 @@ const pickrrConnectKafkaMessageHandler = (consumedPayload) => {
     }
     return true;
   } catch (error) {
-    logger.error("pickrrConnectKafkaMessageHandler", error.message);
+    logger.error(`pickrrConnectKafkaMessageHandler ${error.stack} ${error}`);
     return false;
   }
 };

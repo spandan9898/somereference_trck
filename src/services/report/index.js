@@ -86,7 +86,7 @@ const updateStatusOnReport = async (
     );
     return response.value;
   } catch (error) {
-    logger.error("updateStatusonReport Error", error);
+    logger.error(`updateStatusonReport Error ${error.stack} ${error}`);
 
     return false;
   }
