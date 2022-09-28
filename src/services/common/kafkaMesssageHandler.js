@@ -80,7 +80,6 @@ const updateFieldsForDuplicateEvent = async (obj) => {
     const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr, otp);
     const response = {
       track_arr: trackArr,
-      latest_otp: otp,
       is_otp_delivered: isOtpDelivered,
       longitude: long,
       latitude: lat,
