@@ -131,7 +131,7 @@ const readCsvData = ({
       },
     });
   } catch (error) {
-    logger.error("v1BackFilling", error);
+    logger.error(`v1BackFilling ${error.stack} ${error}`);
   }
 };
 
