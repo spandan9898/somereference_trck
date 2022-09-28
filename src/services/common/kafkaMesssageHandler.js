@@ -273,7 +273,6 @@ class KafkaMessageHandler {
         isFromPulled,
         qcDetails,
       });
-      logger.info(`updateTrackDataToPullMongo result val: , ${JSON.stringify(result)}`);
       if (!result) {
         return {};
       }
