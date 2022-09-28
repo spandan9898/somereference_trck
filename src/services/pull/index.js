@@ -316,19 +316,15 @@ const updateTrackDataToPullMongo = async ({
       logger,
     });
     try {
-      const updatedStatusObject = _.get(response?.value, "track_arr[0]", null);
-      const storeInCacheObject = {
-        eventObj: updatedStatusObject,
-        key: trackObj?.redis_key,
-      };
-      if (storeInCacheObject) {
-        await storeDataInCache(storeInCacheObject);
+      if (response?.value) {
+        result.key = trackObj?.redis_key;
+        await storeDataInCache(result);
       }
 
       // const updatedStatusObject = _.get(response?.value, "track_arr[0]", null);
       // const storeInCacheObject = {
       //   eventObj: updatedStatusObject,
-      //   awb: response?.value?.tracking_id,
+      //   key: trackObj?.redis_key,
       // };
       // if (storeInCacheObject) {
       //   await storeDataInCache(storeInCacheObject);
