@@ -107,7 +107,7 @@ const NDR_STATUS_CODE_TO_REASON_MAPPER = {
 };
 
 const TOPIC_NAME_TO_COURIER_NAME_MAPPER = {
-  amaze: ["Amaze"],
+  amaze: ["Amaze", "Amaze Docs"],
   bluedart: ["BLUEDART"],
   bluedart_pull: ["BLUEDART"],
   delhivery: ["Delhivery"],
@@ -118,21 +118,21 @@ const TOPIC_NAME_TO_COURIER_NAME_MAPPER = {
   parceldo: ["ParcelDo"],
   shadowfax: ["ShadowFax", "ShadowFax SDD", "ShadowFax NDD"],
   shadowfax_pull: ["ShadowFax", "ShadowFax SDD", "ShadowFax NDD"],
-  udaan: ["Udaan Express", "UDAAN"],
+  udaan: ["Udaan Express"],
   xpressbees: ["Xpressbees"],
   xpressbees_pull: ["Xpressbees"],
   pidge: ["Pidge", "Pidge Ndd", "Pidge External"],
   pidge_pull: ["Pidge", "Pidge Ndd", "Pidge External"],
   dtdc: ["DTDC"],
   dtdc_pull: ["DTDC"],
-  loadshare: ["Loadshare"],
+  loadshare: ["Loadshare", "Loadshare SDD"],
+  loadshare_pull: ["Loadshare", "Loadshare SDD"],
   pikndel: ["Pickndel"],
   pikndel_pull: ["Pickndel"],
-  smartr: ["Smartr Logistics", "SMARTR"],
-  smartr_pull: ["Smartr Logistics", "SMARTR"],
+  smartr: ["Smartr Logistics"],
+  smartr_pull: ["Smartr Logistics"],
   kerryindev_pull: ["Kerry Ndd", "KerryIndev", "Kerry Sdd"],
   holisol_pull: ["Holisol"],
-  loadshare_pull: ["Loadshare"],
 }
 
 const WEBHOOK_USER_CACHE_KEY_NAME = "webhookUser";
