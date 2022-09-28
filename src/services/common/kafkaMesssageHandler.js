@@ -47,7 +47,6 @@ const updateFieldsForDuplicateEvent = async (obj) => {
     longitude,
   } = obj;
   try {
-    let latestOtp;
     let lat;
     let long;
     const doc = await getTrackDocumentfromMongo(obj.awb);
@@ -66,7 +65,6 @@ const updateFieldsForDuplicateEvent = async (obj) => {
         }
         if (otp) {
           trackArr[i].otp = otp;
-          latestOtp = otp;
         }
         if (latitude) {
           trackArr[i].latitude = latitude;
@@ -79,14 +77,17 @@ const updateFieldsForDuplicateEvent = async (obj) => {
         break;
       }
     }
-    const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr, latestOtp);
-    return {
+    const isOtpDelivered = updateFlagForOtpDeliveredShipments(trackArr, otp);
+    const response = {
       track_arr: trackArr,
-      latest_otp: latestOtp,
       is_otp_delivered: isOtpDelivered,
       longitude: long,
       latitude: lat,
     };
+    if (otp) {
+      response.latest_otp = otp;
+    }
+    return response;
   } catch (error) {
     logger.error("Failed Backfilling Otp Data", error);
     return {};
@@ -206,7 +207,7 @@ class KafkaMessageHandler {
 
       const processCount = await getTrackingIdProcessingCount({ awb: res.awb });
 
-      //await new Promise((done) => setTimeout(() => done(), processCount * 1000));
+      // await new Promise((done) => setTimeout(() => done(), processCount * 1000));
 
       await updateTrackingProcessingCount({ awb: res.awb });
 
@@ -269,6 +270,7 @@ class KafkaMessageHandler {
       if (process.env.IS_OTHERS_CALL === "false") {
         return {};
       }
+
       await commonTrackingDataProducer(result);
       await updateStatusOnReport(result, logger, trackingElkClient);
       sendDataToNdr(result);
