@@ -113,11 +113,11 @@ const getTrackDocumentfromMongo = async (trackingAwb) => {
 const fetchTrackingModelAndUpdateCache = async (trackingAwb, fromTrackingApi = false) => {
   try {
     let trackingObj = {};
-    if (fromTrackingApi){
-      if (process.env.USE_REDIS_FOR_TRACKING === "true"){
+    if (fromTrackingApi) {
+      if (process.env.USE_REDIS_FOR_TRACKING === "true") {
         trackingObj = (await getObject(trackingAwb)) || {};
       }
-    }else{
+    } else {
       trackingObj = (await getObject(trackingAwb)) || {};
     }
     let isFetchFromDB = fromTrackingApi;
@@ -154,7 +154,7 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, fromTrackingApi = f
         if (process.env.USE_REDIS_FOR_TRACKING === "true") {
           await storeInCache(trackingAwb, trackingObj, expiryTime);
         }
-      }else{
+      } else {
         await storeInCache(trackingAwb, trackingObj, expiryTime);
       }
       return trackingObj;

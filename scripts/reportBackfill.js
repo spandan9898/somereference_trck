@@ -19,7 +19,11 @@ const sendTrackDataToV1 = require("../src/services/v1");
 const { getDbCollectionInstance } = require("../src/utils");
 const { HOST_NAMES, ELK_INSTANCE_NAMES, KAFKA_INSTANCE_CONFIG } = require("../src/utils/constants");
 const { convertDate } = require("./helper");
-const { updateStatusELK, commonTrackingDataProducer , updateFreshdeskTrackingTicket} = require("../src/services/common/services");
+const {
+  updateStatusELK,
+  commonTrackingDataProducer,
+  updateFreshdeskTrackingTicket,
+} = require("../src/services/common/services");
 const triggerWebhook = require("../src/services/webhook");
 
 // const sendDataToNdr = require("../src/services/ndr");
@@ -52,7 +56,7 @@ const processBackfilling = async (
 
   for (const response of responses) {
     if (type.includes("v1")) {
-      sendTrackDataToV1(response);
+      sendTrackDataToV1(response, isManualUpdate);
     }
     if (type.includes("report")) {
       if (!["OP", "OM", "OFP", "PPF"].includes(response?.status?.current_status_type)) {
@@ -70,6 +74,7 @@ const processBackfilling = async (
       commonTrackingDataProducer(response);
     }
     updateFreshdeskTrackingTicket(response);
+
     // if (type.includes("ndr")) {
     //   sendDataToNdr(response);
     // }
@@ -203,7 +208,7 @@ const processForDbData = async ({ batchData: trackingData, type, elkClient, prod
     for (const chunkData of chunkedData) {
       for (const trackingItem of chunkData) {
         if (type.includes("v1")) {
-          sendTrackDataToV1(trackingItem);
+          sendTrackDataToV1(trackingItem, true);
         }
         if (type.includes("report")) {
           if (!["OP", "OM", "OFP", "PPF"].includes(trackingItem?.status?.current_status_type)) {
