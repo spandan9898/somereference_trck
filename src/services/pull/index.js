@@ -30,6 +30,7 @@ const fetchAndUpdateAuditLogsData = async ({
   isFromPulled,
   logger,
 }) => {
+  //updatedObj contains order_pk
   try {
     let auditStagingColInstance;
     if (process.env.NODE_ENV === "staging") {
@@ -46,6 +47,9 @@ const fetchAndUpdateAuditLogsData = async ({
       process.env.NODE_ENV === "staging" ? auditStagingColInstance : auditProdColInstance;
 
     const queryObj = { courier_tracking_id: courierTrackingId };
+    if (updatedObj?.order_pk){
+      queryObj.order_pk = updatedObj.order_pk;
+    }
     const auditKeyTime = moment().format("YYYY-MM-DD HH:mm:ss");
     const auditObjKey = `${updatedObj["status.current_status_type"]}_${auditKeyTime}`;
     const auditObjValue = {
@@ -90,6 +94,7 @@ const updateTrackDataToPullMongo = async ({
   isFromPulled = false,
   qcDetails = null,
 }) => {
+  // trackObj contains fields couriers and redis_key
   const result = prepareTrackDataToUpdateInPullDb(trackObj, isFromPulled);
   if (!result.success) {
     throw new Error(result.err);
@@ -127,8 +132,22 @@ const updateTrackDataToPullMongo = async ({
 
     let sortedTrackArray;
 
-    const res = await pullProdCollectionInstance.findOne({ tracking_id: result.awb });
-
+    const couriers = trackObj.couriers instanceof Array ? trackObj.couriers : [];
+    let query = { tracking_id: result.awb };
+    if (couriers.length>0) {
+      query.courier_parent_name = { "$in": couriers };
+    }
+    const pullCollection = await commonTrackingInfoCol();
+    const responseList = await pullCollection.find(query).sort({ _id: -1 }).limit(1).toArray() || [];
+    let res = {};
+    if (responseList.length > 0) {
+      res = responseList[0];
+    }
+    if(!res){
+      logger.info(
+        `empty res in updateTrackDataToPullMongo for awb --> ${result.awb}`
+      );
+    }
     if (res.is_manual_update) {
       return false;
     }
@@ -147,7 +166,9 @@ const updateTrackDataToPullMongo = async ({
       sortedTrackArray = [...trackArr];
     } else {
       // Handle duplicate Entry
-
+      if(!res.track_arr){
+        res.track_arr = [];
+      }
       for (const trackItem of res.track_arr) {
         const isSameScanType = updatedObj["status.current_status_type"] === trackItem.scan_type;
         const scanTimeCheck = moment(trackItem.scan_datetime).diff(
@@ -247,7 +268,7 @@ const updateTrackDataToPullMongo = async ({
         updatedObj.edd_stamp = pickrrEDD;
       }
     } catch (error) {
-      logger.error(error.message);
+      logger.error(`${ error.stack } ${ error }`);
     }
     updatedObj["status.current_status_type"] = firstTrackObjOfTrackArr.scan_type;
     updatedObj["status.courier_status_code"] = firstTrackObjOfTrackArr.courier_status_code;
@@ -271,7 +292,7 @@ const updateTrackDataToPullMongo = async ({
         : pullProdCollectionInstance;
 
     const response = await pullInstance.findOneAndUpdate(
-      { tracking_id: trackObj.awb },
+      query,
       {
         $set: updatedObj,
       },
@@ -279,12 +300,14 @@ const updateTrackDataToPullMongo = async ({
         returnNewDocument: true,
         returnDocument: "after",
         upsert: process.env.NODE_ENV === "staging",
+        sort: { _id: -1 },
       }
     );
 
     // audit Logs is Updated Over here
 
     updatedObj.pickup_datetime = pickupDateTime;
+    updatedObj.order_pk = response?.value?.order_pk;
 
     await fetchAndUpdateAuditLogsData({
       courierTrackingId: trackObj.awb,
@@ -294,31 +317,33 @@ const updateTrackDataToPullMongo = async ({
     });
     try {
       if (response?.value) {
+        result.key = trackObj?.redis_key;
         await storeDataInCache(result);
       }
 
       // const updatedStatusObject = _.get(response?.value, "track_arr[0]", null);
       // const storeInCacheObject = {
       //   eventObj: updatedStatusObject,
-      //   awb: response?.value?.tracking_id,
+      //   key: trackObj?.redis_key,
       // };
       // if (storeInCacheObject) {
       //   await storeDataInCache(storeInCacheObject);
       // }
     } catch (error) {
-      logger.info(`Redis Status Key Set Failed for ${res?.tracking_id} error -> ${error}`);
+      logger.info(`Redis Status Key Set Failed for ${trackObj?.redis_key} error -> ${error}`);
     }
-
-    await updateTrackingProcessingCount(trackObj, "remove");
+    await updateTrackingProcessingCount({ key: trackObj?.redis_key }, "remove");
+    // TODO: send couriers
     updateCacheTrackArray({
       currentTrackObj: trackArr[0],
       trackArray: response.value.track_arr,
       awb: result.awb,
+      couriers: trackObj.couriers,
       trackingDocument: response.value,
     });
     return response.value;
   } catch (error) {
-    logger.error("updateTrackDataToPullMongo Error", error);
+    logger.error(`updateTrackDataToPullMongo Error ${error.stack} ${error}`);
     return false;
   }
 };
@@ -329,20 +354,29 @@ const updateTrackDataToPullMongo = async ({
  * @description Handle lat long for ekart push events
  */
 const updateEkartLatLong = async (res) => {
+  // res contains fields couriers and redis_key
   const pullProdCollectionInstance = await commonTrackingInfoCol();
   const pickrrEkartDict = {
     latitude: "",
     longitude: "",
   };
-  const { awb, longitude, latitude } = res;
+  const { awb, couriers, longitude, latitude } = res;
   pickrrEkartDict.latitude = latitude;
   pickrrEkartDict.longitude = longitude;
   pickrrEkartDict.updated_at = moment().toDate();
   pickrrEkartDict.last_update_from = "kafka";
+  let query = { tracking_id: awb };
+  couriers = couriers instanceof Array ? couriers : [];
+  if (couriers.length > 0) {
+    query.courier_parent_name = { "$in": couriers };
+  }
   await pullProdCollectionInstance.findOneAndUpdate(
-    { tracking_id: awb },
+    query,
     {
       $set: pickrrEkartDict,
+    },
+    {
+      sort: { _id: -1 },
     }
   );
 };
