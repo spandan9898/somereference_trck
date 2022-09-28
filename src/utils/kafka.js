@@ -13,7 +13,7 @@ const sendErrorData = async ({ topic, messages }) => {
     const apiCall = new MakeAPICall(URL, { body: messages });
     await apiCall.post();
   } catch (error) {
-    logger.error("sendErrorData", error.message);
+    logger.error(`sendErrorData error: ${error.stack} ${error}`);
   }
 };
 
@@ -31,7 +31,7 @@ const produceData = async ({ topic, producer, messages }) => {
 
     return true;
   } catch (error) {
-    logger.error("produceData error", error.message);
+    logger.error(`produceData error  ${error.stack} ${error}`);
     sendErrorData({ topic, messages });
     return false;
   }
