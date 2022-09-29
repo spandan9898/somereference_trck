@@ -67,6 +67,7 @@ const getTrackingObj = async ({ trackingId, isFromPull, result, courier, fetchFr
       trackObj = await fetchTrackingModelAndUpdateCache(trackingId, couriers=couriers);
     }
   }
+  trackObj.redis_key = redisKey;
   return trackObj;
 };
 

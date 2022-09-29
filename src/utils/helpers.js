@@ -110,13 +110,15 @@ const compareScanUnixTimeAndCheckIfExists = (newScanTime, newScanType, cachedDat
  */
 const isLatestEventSentOnCommonTopic = async (trackingObj) => {
   try {
+    // trackingObj contains redis_key
     const currentStatusTime = trackingObj?.status?.current_status_time;
     const currentStatusType = trackingObj?.status?.current_status_type;
     const awb = trackingObj?.courier_tracking_id;
     if (!currentStatusTime || !currentStatusType || !awb) {
       return false;
     }
-    const cacheData = (await getObject(awb)) || {};
+    const redisKey = trackingObj?.redis_key || awb;
+    const cacheData = (await getObject(redisKey)) || {};
     const latestEventSent = cacheData?.latest_event_sent_on_common_topic;
     const newScanTime = moment(currentStatusTime).unix();
     let keys = null;
