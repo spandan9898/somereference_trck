@@ -2,6 +2,7 @@ const _ = require("lodash");
 const moment = require("moment");
 const { PIDGE_CODE_MAPPER } = require("./constant");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
+const logger = require("../../../logger");
 
 /**
  *
@@ -47,6 +48,10 @@ const preparePidgeData = (pidgeDict) => {
   try {
     pickrrPidgeDict.awb = _.get(pidgeDict, "PBID", "").toString();
     let statusString = null;
+    if(!pidgeDict?.timestamp){
+      logger.info(`Timestamp not found on ${pickrrPidgeDict.awb} waybill`);
+      return { err: `Timestamp not found on ${pickrrPidgeDict.awb} waybill` };
+    }
     if (pidgeDict?.status) {
       if ([13, 12, 21].includes(pidgeDict.status)) {
         statusString = pidgeDict?.remarks
@@ -81,7 +86,6 @@ const preparePidgeData = (pidgeDict) => {
     return pickrrPidgeDict;
   }
 };
-
 /**
  *
  * @param {*} pidgeDict
