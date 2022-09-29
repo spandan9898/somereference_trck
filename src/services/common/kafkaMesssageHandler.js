@@ -261,6 +261,7 @@ class KafkaMessageHandler {
       if (courierName === "shadowfax_pull" && isFromPulled) {
         qcDetails = res?.qc_details;
       }
+      trackData.redis_key = redisKey;
       const updatedTrackData = await updatePrepareDict(trackData);
       if (_.isEmpty(updatedTrackData)) {
         logger.error("Xpresbees reverse map not found", trackData);

@@ -13,9 +13,9 @@ const { NDR_EVENT_BRIDGE_SOURCE, NDR_EVENT_BRIDGE_DETAIL_TYPE, NDR_EVENT_BRIDGE_
 const sendDataToNdr = async (trackData) => {
   // deprecated
   const currentStatusType = trackData?.status?.current_status_type;
-  const awb = trackData?.tracking_id;
+  const redisKey = trackData?.redis_key;
 
-  if (!(await checkIfTriggerNDREb(currentStatusType, awb))) {
+  if (!(await checkIfTriggerNDREb(currentStatusType, redisKey))) {
     return false;
   }
 

@@ -62,9 +62,9 @@ const getCourierReverseStatusMap = (courierUsed) => {
  * @param {*} trackData
  */
 const isRervseCheck = async (preparedDict) => {
-  const { awb } = preparedDict;
+  const { redis_key: redisKey } = preparedDict;
 
-  const cacheData = await getObject(awb);
+  const cacheData = await getObject(redisKey);
   const { track_model: trackModel } = cacheData || {};
   const isRversed = get(trackModel, "is_reverse");
   const courierUsed = get(trackModel, "courier_used");
@@ -109,7 +109,7 @@ const updatePrepareDict = async (preparedDict) => {
 
     return clonedPreparedDict;
   } catch (error) {
-    logger.error("updatePrepareDict", error);
+    logger.error(`updatePrepareDict ${error.stack} ${error}`);
     return preparedDict;
   }
 };
