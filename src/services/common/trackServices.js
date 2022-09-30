@@ -1,7 +1,14 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable prefer-destructuring */
 const { isEmpty, omit, get, last } = require("lodash");
 const moment = require("moment");
 
-const { findOneDocumentFromMongo, findMultipleDocumentsFromMongo, getObject, storeInCache } = require("../../utils");
+const {
+  findOneDocumentFromMongo,
+  findMultipleDocumentsFromMongo,
+  getObject,
+  storeInCache,
+} = require("../../utils");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
 const { sortStatusArray } = require("./helpers");
 const { IS_FETCH_FROM_DB } = require("../../utils/constants");
@@ -70,11 +77,11 @@ const prepareTrackDataForTracking = (trackArr) => {
  * @param {prepares Filter for tracking and returns to tracking/services} trackingAwb
  */
 const PrepareTrackModelFilters = async (trackingAwb, couriers = []) => {
-  let query = {
+  const query = {
     tracking_id: trackingAwb,
   };
-  if (couriers.length>0){
-    query.courier_parent_name = {"$in": couriers};
+  if (couriers.length > 0) {
+    query.courier_parent_name = { $in: couriers };
   }
 
   const projection = {
@@ -94,7 +101,7 @@ const PrepareTrackModelFilters = async (trackingAwb, couriers = []) => {
  *
  * @param {gets called by fetchTrackingModelAndUpdateCache and returns a document} trackingAwb
  */
-const getTrackDocumentfromMongo = async (trackingAwb, couriers=[]) => {
+const getTrackDocumentfromMongo = async (trackingAwb, couriers = []) => {
   let trackModelDocument;
   try {
     couriers = couriers instanceof Array ? couriers : [];
@@ -105,11 +112,20 @@ const getTrackDocumentfromMongo = async (trackingAwb, couriers=[]) => {
       collectionName: process.env.MONGO_DB_PROD_SERVER_COLLECTION_NAME,
     });
   } catch (error) {
-    throw new Error(`failed to fetch document | AWB: ${trackingAwb} | couriers: ${couriers.toString()} | message: ${error.message}`);
+    throw new Error(
+      `failed to fetch document | AWB: ${trackingAwb} | couriers: ${couriers.toString()} | message: ${
+        error.message
+      }`
+    );
   }
   return trackModelDocument;
 };
 
+/**
+ *
+ * @param {*} trackingAwb
+ * @returns
+ */
 const getMultipleTrackDocumentfromMongo = async (trackingAwb) => {
   try {
     const { query, projection } = await PrepareTrackModelFilters(trackingAwb);
@@ -127,7 +143,11 @@ const getMultipleTrackDocumentfromMongo = async (trackingAwb) => {
  *
  * b∫ @param {fetches tracking Model from Mongo} trackingAwbs
  */
-const fetchTrackingModelAndUpdateCache = async (trackingAwb, couriers = [], fromTrackingApi = false) => {
+const fetchTrackingModelAndUpdateCache = async (
+  trackingAwb,
+  couriers = [],
+  fromTrackingApi = false
+) => {
   try {
     couriers = couriers instanceof Array ? couriers : [];
     let courier = "";
@@ -136,11 +156,11 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, couriers = [], from
     }
     const redisKey = `${trackingAwb}_${courier}`;
     let trackingObj = {};
-    if (fromTrackingApi){
-      if (process.env.USE_REDIS_FOR_TRACKING === "true"){
+    if (fromTrackingApi) {
+      if (process.env.USE_REDIS_FOR_TRACKING === "true") {
         trackingObj = (await getObject(redisKey)) || {};
       }
-    }else{
+    } else {
       trackingObj = (await getObject(redisKey)) || {};
     }
     let isFetchFromDB = fromTrackingApi;
@@ -177,7 +197,7 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, couriers = [], from
         if (process.env.USE_REDIS_FOR_TRACKING === "true") {
           await storeInCache(redisKey, trackingObj, expiryTime);
         }
-      }else{
+      } else {
         await storeInCache(redisKey, trackingObj, expiryTime);
       }
       return trackingObj;
@@ -190,15 +210,20 @@ const fetchTrackingModelAndUpdateCache = async (trackingAwb, couriers = [], from
   }
 };
 
+/**
+ *
+ * @param {*} trackingAwb
+ * @returns
+ */
 const fetchTrackingModelAndUpdateCacheForTracking = async (trackingAwb) => {
   try {
-    let trackingObjList = [];
+    const trackingObjList = [];
     const docList = await getMultipleTrackDocumentfromMongo(trackingAwb);
     if (isEmpty(docList)) {
       throw new Error(`failed to fetch documents - ${trackingAwb}`);
     }
     let trackingObj;
-    for(let idx=0; idx< docList.length; idx++){
+    for (let idx = 0; idx < docList.length; idx += 1) {
       trackingObj = {};
       const doc = docList[idx];
       const trackArr = doc?.track_arr || [];
