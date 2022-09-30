@@ -52,7 +52,8 @@ const sendTrackDataToV1 = async (trackData, isManualUpdate = false) => {
 
     trackDict.is_manual_update = isManualUpdate;
     if (
-      ["OFP", "PPF", "OP", "OM", "OC"].includes(trackData?.status?.current_status_type) ||
+      (["OFP", "PPF", "OP", "OM", "OC"].includes(trackData?.status?.current_status_type) &&
+        !isManualUpdate) ||
       ((trackData?.status?.current_status_body || "").toLowerCase() === "pickup_cancelled" &&
         !isManualUpdate)
     ) {
