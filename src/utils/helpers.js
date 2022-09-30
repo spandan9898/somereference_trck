@@ -29,20 +29,33 @@ const axiosInstance = axios.create();
  * PS: it'll call only if cache data not found
  */
 const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray) => {
+  // trackObj contains fields couriers and redis_key
+  const { awb } = trackObj || {};
   try {
-    const { awb } = trackObj || {};
-
+    let couriers = trackObj.couriers instanceof Array ? trackObj.couriers : [];
+    let query = { tracking_id: awb };
+    if (couriers.length > 0){
+      query.courier_parent_name = {"$in": couriers};
+    }
     const pullCollection = await commonTrackingInfoCol();
-    const response = await pullCollection.findOne(
-      { tracking_id: awb },
+    const responseList = await pullCollection.find(
+      query,
       { projection: { track_arr: 1 } }
-    );
+      ).sort({ _id: -1 }).limit(1).toArray() || [];
+    let response = {};
+    if(responseList.length>0){
+      response = responseList[0];
+    }
 
     if (!response) {
       return "NA";
     }
+    if (!response.track_arr) {
+      logger.info(`response.track_arr is empty in fetchTrackingDataAndStoreInCache for awb: ${awb}`);
+      return "NA";
+    }
 
-    const cacheData = (await getObject(awb)) || {};
+    const cacheData = (await getObject(trackObj.redis_key)) || {};
     const { trackMap, isNdr } = prepareTrackArrCacheData(response.track_arr);
     let { is_ndr: isNDR } = response;
 
@@ -50,18 +63,19 @@ const fetchTrackingDataAndStoreInCache = async (trackObj, updateCacheTrackArray)
 
     const updatedCacheData = { ...trackMap };
     updatedCacheData.track_model = cacheData.track_model || {};
-    await storeInCache(awb, updatedCacheData);
+    await storeInCache(trackObj.redis_key, updatedCacheData);
     await updateCacheTrackArray({
       trackArray: response.track_arr,
       currentTrackObj: trackObj,
+      couriers: couriers,
       awb,
     });
     if (isNDR) {
-      await updateIsNDRinCache(awb);
+      await updateIsNDRinCache(trackObj.redis_key);
     }
     return trackMap;
   } catch (error) {
-    logger.error("fetchTrackingDataAndStoreInCache", error);
+    logger.error(`fetchTrackingDataAndStoreInCache for ${awb} error: ${error.stack} ${error}`);
     return false;
   }
 };
@@ -96,13 +110,15 @@ const compareScanUnixTimeAndCheckIfExists = (newScanTime, newScanType, cachedDat
  */
 const isLatestEventSentOnCommonTopic = async (trackingObj) => {
   try {
+    // trackingObj contains redis_key
     const currentStatusTime = trackingObj?.status?.current_status_time;
     const currentStatusType = trackingObj?.status?.current_status_type;
     const awb = trackingObj?.courier_tracking_id;
     if (!currentStatusTime || !currentStatusType || !awb) {
       return false;
     }
-    const cacheData = (await getObject(awb)) || {};
+    const redisKey = trackingObj?.redis_key || awb;
+    const cacheData = (await getObject(redisKey)) || {};
     const latestEventSent = cacheData?.latest_event_sent_on_common_topic;
     const newScanTime = moment(currentStatusTime).unix();
     let keys = null;
@@ -168,7 +184,8 @@ const checkCurrentStatusAWBInCache = (trackObj, cachedData) => {
  * @returns true or false
  */
 const checkAwbInCache = async ({ trackObj, updateCacheTrackArray, isFromPulled }) => {
-  const cachedData = await getObject(trackObj.awb);
+  // trackObj contains fields couriers and redis_key
+  const cachedData = await getObject(trackObj.redis_key);
   const newScanTime = moment(trackObj.scan_datetime).unix();
 
   if (!cachedData || !(size(cachedData) >= 2) || !cachedData?.track_model) {

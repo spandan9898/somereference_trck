@@ -25,12 +25,12 @@ const findPickupDate = (trackData) => {
  * @desc if current status is in UD & NDR then trigger
  *    if not then check isNDR true from cache. if it is true we need to send all status to NDR
  */
-const checkIfTriggerNDREb = async (currentStatusType, awb) => {
+const checkIfTriggerNDREb = async (currentStatusType, redisKey) => {
   try {
-    if (!awb) {
+    if (!redisKey) {
       return false;
     }
-    const { is_ndr: isNDR = false } = (await getObject(awb)) || {};
+    const { is_ndr: isNDR = false } = (await getObject(redisKey)) || {};
 
     if (["NDR", "UD"].includes(currentStatusType) || isNDR) {
       return true;
@@ -47,13 +47,13 @@ const checkIfTriggerNDREb = async (currentStatusType, awb) => {
  * @param {*} awb
  * @desc update isNDR to true when NDR/UD status type found in track_arr or in current status
  */
-const updateIsNDRinCache = async (awb) => {
+const updateIsNDRinCache = async (key) => {
   try {
-    const cacheData = (await getObject(awb)) || {};
+    const cacheData = (await getObject(key)) || {};
     cacheData.is_ndr = true;
-    await storeInCache(awb, cacheData);
+    await storeInCache(key, cacheData);
   } catch (error) {
-    logger.error("updateIsNDRinCache", error);
+    logger.error(`updateIsNDRinCache ${error.stack} ${error}`);
   }
 };
 

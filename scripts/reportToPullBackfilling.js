@@ -251,7 +251,7 @@ const fetchDataFromReportDB = async ({ startDate, endDate, limit }) => {
       } while (isDataAvailable);
     }
   } catch (error) {
-    logger.error("fetchDataFromReportDB", error);
+    logger.error(`fetchDataFromReportDB ${error.stack} ${error}`);
   }
 };
 

@@ -55,6 +55,8 @@ const processBackfilling = async (
     .toArray();
 
   for (const response of responses) {
+    const redisKey = `${response?.courier_tracking_id}_${response?.courier_parent_name}`;
+    response.redis_key = redisKey;
     if (type.includes("v1")) {
       sendTrackDataToV1(response, isManualUpdate);
     }
@@ -136,7 +138,7 @@ const readCsvData = ({
       },
     });
   } catch (error) {
-    logger.error("v1BackFilling", error);
+    logger.error(`v1BackFilling ${error.stack} ${error}`);
   }
 };
 

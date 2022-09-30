@@ -50,9 +50,7 @@ const sendTrackDataToV1 = async (trackData, isManualUpdate = false) => {
       eventBusName: V1_EVENT_BRIDGE_BUS_NAME,
     });
 
-    if (isManualUpdate) {
-      trackDict.is_manual_update = isManualUpdate;
-    }
+    trackDict.is_manual_update = isManualUpdate;
     if (
       ["OFP", "PPF", "OP", "OM", "OC"].includes(trackData?.status?.current_status_type) ||
       ((trackData?.status?.current_status_body || "").toLowerCase() === "pickup_cancelled" &&
