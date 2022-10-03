@@ -256,6 +256,8 @@ const prepareTrackingRes = async (trackingObj) => {
         tracking.info.to_address = "";
         tracking.info.to_pincode = "";
         tracking.info.to_address_id = "";
+        tracking.shop_platform_obj = "";
+        tracking.woocom_platform_obj = "";
       } catch {
         // pass
       }
