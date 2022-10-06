@@ -77,7 +77,9 @@ const prepareLoadshareData = (loadshareDict) => {
 
     // if reasonDes gives undefined
 
-    if (typeof reasonDes.reasondescription === "undefined") {
+    if (!reasonDes?.reasondescription) {
+      reasonDes = loadshareDict?.reasonBO?.reasonDescription;
+    } else if (typeof reasonDes.reasondescription === "undefined") {
       reasonDes = loadshareDict?.reasonBO?.reasonDescription?.reasonDescription;
     } else {
       // reasonDes has a proper JSON object
@@ -100,7 +102,7 @@ const prepareLoadshareData = (loadshareDict) => {
       pickrrLoadshareDict.otp = loadshareDict?.reasonBO?.otp;
     }
     pickrrLoadshareDict.track_info = reasonDes
-      ? `${PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type]}_${reasonDes}`
+      ? `${PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type]} - ${reasonDes}`
       : PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrLoadshareDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrLoadshareDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
