@@ -124,6 +124,10 @@ const PULL_MAPPER = {
     scan_type: "NDR",
     pickrr_sub_status_code: "SD",
   },
+  "delivery attempt_shipment destroyed": {
+    scan_type: "NDR",
+    pickrr_sub_status_code: "SD",
+  },
   "delivery attempt_shipment redirected to alternate address": {
     scan_type: "NDR",
     pickrr_sub_status_code: "SD",
