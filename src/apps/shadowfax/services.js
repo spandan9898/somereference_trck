@@ -5,6 +5,7 @@ const {
   SHADOWFAX_PULL_CODE_MAPPER_1,
   SHADOWFAX_PULL_CODE_MAPPER_2,
 } = require("./constant");
+const { TRACKING_PAGE_OTP_MESSAGE } = require("../../services/common/constants");
 const { NEW_STATUS_TO_OLD_MAPPING } = require("../../services/v1/constants");
 
 /**
@@ -125,6 +126,9 @@ const prepareShadowfaxData = (shadowfaxDict) => {
     pickrrShadowfaxDict.pickrr_sub_status_code = pickrrSubStatusCode;
     if ((Remarks || "").toLowerCase().includes("otp verified item delivered")) {
       pickrrShadowfaxDict.otp_remarks = Remarks;
+    }
+    if ((Remarks || "").toLowerCase().includes("otp verified cancelled")) {
+      pickrrShadowfaxDict.track_info += `${TRACKING_PAGE_OTP_MESSAGE}`;
     }
     return pickrrShadowfaxDict;
   } catch (error) {
