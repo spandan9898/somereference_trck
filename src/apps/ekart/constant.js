@@ -78,6 +78,12 @@ const EKART_STATUS_MAPPER = {
     scan_type: "RTO",
     pickrr_sub_status_code: "",
   },
+  pickup_not_picked_attempted_productmismatch: { scan_type: "QCF", pickrr_sub_status_code: "" },
+  pickup_not_picked_attempted_customerhappywithproduct: {
+    scan_type: "QCF",
+    pickrr_sub_status_code: "",
+  },
+  pickup_not_picked_unattempted: { scan_type: "QCF", pickrr_sub_status_code: "" },
   shipment_rto_created_order_cancelled: { scan_type: "RTO", pickrr_sub_status_code: "" },
   shipment_rto_created_incomplete_address: { scan_type: "RTO", pickrr_sub_status_code: "" },
   shipment_rto_created_rfrpromisebreached: { scan_type: "RTO", pickrr_sub_status_code: "" },
