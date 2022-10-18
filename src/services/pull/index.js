@@ -127,9 +127,6 @@ const updateTrackDataToPullMongo = async ({
   const latestCourierEDD = result?.eddStamp;
 
   const statusType = result?.statusMap["status.current_status_type"];
-  if (moment(result?.statusMap["status.current_status_time"]).isAfter(moment.toDate())) {
-    return;
-  }
 
   const updatedObj = {
     ...result.statusMap,
