@@ -144,6 +144,10 @@ const CODE_MAPPER = {
     scan_type: "UD",
     pickrr_sub_status_code: "CNR",
   },
+  undelivered_095: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "CNR",
+  },
   undelivered_900: {
     scan_type: "UD",
     pickrr_sub_status_code: "CD",
@@ -165,6 +169,10 @@ const CODE_MAPPER = {
     pickrr_sub_status_code: "ODA",
   },
   undelivered_29: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "AI",
+  },
+  undelivered_029: {
     scan_type: "UD",
     pickrr_sub_status_code: "AI",
   },
