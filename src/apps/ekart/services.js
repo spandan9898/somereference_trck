@@ -126,7 +126,6 @@ const prepareEkartData = (ekartDict) => {
         scanStatus = "Undelivered";
       }
     }
-    pickrrEkartDict.mapper_string = statusType;
     pickrrEkartDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrEkartDict.scan_datetime = statusDate;
     pickrrEkartDict.track_info = scanStatus;
