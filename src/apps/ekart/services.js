@@ -72,7 +72,7 @@ const prepareEkartData = (ekartDict) => {
     if (event === "shipment_rto_created") {
       statusScanType = event;
     } else if (event === "pickup_not_picked_attempted") {
-      statusScanType = event + subReasons[0] + reason;
+      statusScanType = `${event}_${subReasons[0]}_${reason}`;
     } else {
       statusScanType = subReasons.length ? `${event}_${subReasons[0]}` : event;
     }
