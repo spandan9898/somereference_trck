@@ -61,15 +61,18 @@ const prepareEkartData = (ekartDict) => {
     pickrr_status: "",
     pickrr_sub_status_code: "",
     courier_status_code: "",
+    mapper_string: "",
   };
 
   try {
     const trackData = { ...ekartDict };
     const { meta_data: metaData } = trackData;
-    const { sub_reasons: subReasons = [], event = "" } = trackData;
+    const { sub_reasons: subReasons = [], event = "", reason = "" } = trackData;
     let statusScanType = "";
     if (event === "shipment_rto_created") {
       statusScanType = event;
+    } else if (event === "pickup_not_picked_unattempted") {
+      statusScanType = event + subReasons[0] + reason;
     } else {
       statusScanType = subReasons.length ? `${event}_${subReasons[0]}` : event;
     }
@@ -104,6 +107,16 @@ const prepareEkartData = (ekartDict) => {
       };
     }
     statusType = reasonDict.scan_type;
+
+    // if statusType is not seen fall , asssume it to be non qc and follow
+
+    if (!statusType) {
+      statusType = (reasonDict.non_qc || {})?.scan_type;
+    }
+
+    if (!statusType) {
+      return { err: "Unknown Status from courier" };
+    }
     let scanStatus = statusScanType;
     if (!scanStatus && ["UD", "NDR"].includes(statusType)) {
       const pickrrSubStatus = reasonDict?.pickrr_sub_status_code || "";
@@ -113,6 +126,7 @@ const prepareEkartData = (ekartDict) => {
         scanStatus = "Undelivered";
       }
     }
+    pickrrEkartDict.mapper_string = statusType;
     pickrrEkartDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrEkartDict.scan_datetime = statusDate;
     pickrrEkartDict.track_info = scanStatus;
@@ -121,8 +135,8 @@ const prepareEkartData = (ekartDict) => {
     pickrrEkartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrEkartDict.pickrr_sub_status_code = reasonDict?.pickrr_sub_status_code || "";
     pickrrEkartDict.courier_status_code = statusScanType;
+    pickrrEkartDict.mapper_string = reasonDict;
     pickrrEkartDict.otp = metaData?.attempt_details?.otp || "";
-
     return pickrrEkartDict;
   } catch (error) {
     pickrrEkartDict.err = error.message;
