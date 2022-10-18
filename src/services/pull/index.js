@@ -20,7 +20,6 @@ const { EddPrepareHelper } = require("../common/eddHelpers");
 const { PP_PROXY_LIST } = require("../v1/constants");
 const { HOST_NAMES } = require("../../utils/constants");
 const { PICKRR_STATUS_CODE_MAPPING } = require("../../utils/statusMapping");
-const { EKART_STATUS_MAPPER } = require("../../apps/ekart/constant");
 
 /**
  *
@@ -92,7 +91,7 @@ const fetchAndUpdateAuditLogsData = async ({
  * @returns eventObj
  */
 const transformTrackStatusForRevQc = async (eventObj, statusMap, mapperString) => {
-  const mappedData = (EKART_STATUS_MAPPER[mapperString] || {})?.qc;
+  const mappedData = (mapperString || {})?.qc;
   if (!mappedData) {
     return { modifiedEventObj: null, modifiedStatusMap: null };
   }
