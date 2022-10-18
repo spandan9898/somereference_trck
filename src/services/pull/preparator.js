@@ -21,6 +21,7 @@ const prepareTrackDataToUpdateInPullDb = (trackObj, isFromPulled) => {
     courier_status_code: courierStatusCode = "",
     received_by: receivedBy = "",
     pickup_datetime: pickupDatetime = "",
+    mapper_string: mapperString,
   } = trackData;
 
   if (scanType === "CC") {
@@ -90,6 +91,7 @@ const prepareTrackDataToUpdateInPullDb = (trackObj, isFromPulled) => {
     eventObj,
     statusMap,
     awb: trackData.awb,
+    mapperString,
   };
 };
 
