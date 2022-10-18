@@ -204,7 +204,7 @@ const EKART_STATUS_MAPPER = {
   },
   "pickup_not_picked_attempted_customerhappywithproduct_customer related": {
     qc: {
-      scan_type: "qcf",
+      scan_type: "QCF",
       pickrr_sub_status_code: "OCC",
     },
     non_qc: {
