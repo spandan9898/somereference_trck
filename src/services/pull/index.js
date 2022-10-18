@@ -99,8 +99,8 @@ const transformTrackStatusForRevQc = async (eventObj, statusMap, mapperString) =
   const { scan_type: scanType, pickrr_sub_status_code: subStatusCode } = mappedData;
   eventObj.scan_type = scanType;
   eventObj.pickrr_sub_status_code = subStatusCode;
-  statusMap.current_status_type = scanType;
-  statusMap.pickrr_sub_status_code = subStatusCode;
+  statusMap["status.current_status_type"] = scanType;
+  statusMap["status.pickrr_sub_status_code"] = subStatusCode;
   return { modifiedEventObj: eventObj, modifiedStatusMap: statusMap };
 };
 
@@ -127,7 +127,7 @@ const updateTrackDataToPullMongo = async ({
 
   const statusType = result?.statusMap["status.current_status_type"];
 
-  const updatedObj = {
+  let updatedObj = {
     ...result.statusMap,
     track_arr: [result.eventObj],
     last_update_from: isFromPulled ? "kafka_pull" : "kafka",
@@ -150,7 +150,7 @@ const updateTrackDataToPullMongo = async ({
         hostName: HOST_NAMES.PULL_STATING_DB,
       });
     }
-    const trackArr = updatedObj.track_arr;
+    let trackArr = updatedObj.track_arr;
 
     delete updatedObj.track_arr;
 
@@ -175,16 +175,17 @@ const updateTrackDataToPullMongo = async ({
     // update reverse qc
 
     if (res?.is_reverse_qc && (res?.courier_used || "").includes("ekart")) {
-      const { modifiedEventObj, modifiedStatusMap } = transformTrackStatusForRevQc(
+      const data = await transformTrackStatusForRevQc(
         result.eventObj,
         result?.statusMap,
         result?.mapperString
       );
+      const { modifiedEventObj, modifiedStatusMap } = data;
       if (!modifiedEventObj) {
         return;
       }
-      updatedObj.status = modifiedStatusMap;
-      updatedObj.track_obj = [modifiedEventObj];
+      updatedObj = { ...updatedObj, ...modifiedStatusMap };
+      trackArr = [modifiedEventObj];
     }
 
     if (res.is_manual_update) {
