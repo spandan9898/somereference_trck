@@ -213,7 +213,7 @@ const EKART_STATUS_MAPPER = {
     },
   },
   pickup_not_picked_unattempted_customernotavailable: {
-    scan_type: "QCF",
+    scan_type: "PPF",
     pickrr_sub_status_code: "",
   },
 };
