@@ -213,8 +213,14 @@ const EKART_STATUS_MAPPER = {
     },
   },
   pickup_not_picked_unattempted_customernotavailable: {
-    scan_type: "PPF",
-    pickrr_sub_status_code: "CNA",
+    qc: {
+      scan_type: "PPF",
+      pickrr_sub_status_code: "CNA",
+    },
+    non_qc: {
+      scan_type: "PPF",
+      pickrr_sub_status_code: "CNA",
+    },
   },
 };
 const EKART_PULL_MAPPER = {
