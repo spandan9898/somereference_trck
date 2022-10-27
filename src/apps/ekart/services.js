@@ -135,7 +135,7 @@ const prepareEkartData = (ekartDict) => {
     pickrrEkartDict.track_location = trackData.location.toString();
     pickrrEkartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
     pickrrEkartDict.pickrr_sub_status_code =
-      reasonDict?.pickrr_sub_status_code || pickrrSubStatusCode || "";
+      reasonDict?.pickrr_sub_status_code || pickrrSubStatusCode;
     pickrrEkartDict.courier_status_code = statusScanType;
     pickrrEkartDict.mapper_string = reasonDict;
     pickrrEkartDict.otp = metaData?.attempt_details?.otp || "";
