@@ -65,6 +65,7 @@ const prepareEkartData = (ekartDict) => {
   };
 
   try {
+    let pickrrSubStatusCode = "";
     const trackData = { ...ekartDict };
     const { meta_data: metaData } = trackData;
     const { sub_reasons: subReasons = [], event = "", reason = "" } = trackData;
@@ -112,6 +113,7 @@ const prepareEkartData = (ekartDict) => {
 
     if (!statusType) {
       statusType = (reasonDict.non_qc || {})?.scan_type;
+      pickrrSubStatusCode = (reasonDict.non_qc || {})?.pickrr_sub_status_code;
     }
 
     if (!statusType) {
@@ -132,7 +134,8 @@ const prepareEkartData = (ekartDict) => {
     pickrrEkartDict.awb = trackData.vendor_tracking_id.toString();
     pickrrEkartDict.track_location = trackData.location.toString();
     pickrrEkartDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[statusType];
-    pickrrEkartDict.pickrr_sub_status_code = reasonDict?.pickrr_sub_status_code || "";
+    pickrrEkartDict.pickrr_sub_status_code =
+      reasonDict?.pickrr_sub_status_code || pickrrSubStatusCode || "";
     pickrrEkartDict.courier_status_code = statusScanType;
     pickrrEkartDict.mapper_string = reasonDict;
     pickrrEkartDict.otp = metaData?.attempt_details?.otp || "";
