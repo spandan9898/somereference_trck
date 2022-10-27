@@ -108,7 +108,7 @@ const prepareEkartData = (ekartDict) => {
     }
     statusType = reasonDict.scan_type;
 
-    // if statusType is not seen fall , asssume it to be non qc and follow
+    // if statusType is not seen , asssume it to be non qc and follow
 
     if (!statusType) {
       statusType = (reasonDict.non_qc || {})?.scan_type;
