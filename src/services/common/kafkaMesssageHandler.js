@@ -106,7 +106,7 @@ const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance, courie
     if (!awb || !updatedObj) {
       return {};
     }
-    let filter = { tracking_id: awb };
+    const filter = { tracking_id: awb };
     if (courier) {
       filter.courier_parent_name = courier;
     }
@@ -125,7 +125,7 @@ const updateDataInPullDBAndReports = async (updatedObj, awb, colInstance, courie
 
     return {};
   } catch (error) {
-    logger.error(`failed Updating Data error: ${ error.stack } ${ error }`);
+    logger.error(`failed Updating Data error: ${error.stack} ${error}`);
     return {};
   }
 };
@@ -207,7 +207,7 @@ class KafkaMessageHandler {
           try {
             updateEkartLatLong(res);
           } catch (error) {
-            logger.error(`updateEkartLatLong failed error: ${ error.stack } ${ error }`);
+            logger.error(`updateEkartLatLong failed error: ${error.stack} ${error}`);
           }
         } else {
           logger.error(`Empty Lat-Long Filed, TrackingID: ${res.awb}`);

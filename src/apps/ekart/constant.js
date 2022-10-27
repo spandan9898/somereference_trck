@@ -185,6 +185,43 @@ const EKART_STATUS_MAPPER = {
     scan_type: "LT",
     pickrr_sub_status_code: "",
   },
+
+  // matching event_subreason_reason
+
+  "pickup_not_picked_unattempted_customernotavailable_ekl related": {
+    scan_type: "PPF",
+    pickrr_sub_status_code: "CNA",
+  },
+  "pickup_not_picked_attempted_productmismatch_customer related": {
+    qc: {
+      scan_type: "QCF",
+      pickrr_sub_status_code: ":PMM",
+    },
+    non_qc: {
+      scan_type: "PPF",
+      pickrr_sub_status_code: "R-PMM",
+    },
+  },
+  "pickup_not_picked_attempted_customerhappywithproduct_customer related": {
+    qc: {
+      scan_type: "QCF",
+      pickrr_sub_status_code: "OCC",
+    },
+    non_qc: {
+      scan_type: "PPF",
+      pickrr_sub_status_code: "R-CANC",
+    },
+  },
+  pickup_not_picked_unattempted_customernotavailable: {
+    qc: {
+      scan_type: "PPF",
+      pickrr_sub_status_code: "CNA",
+    },
+    non_qc: {
+      scan_type: "PPF",
+      pickrr_sub_status_code: "CNA",
+    },
+  },
 };
 const EKART_PULL_MAPPER = {
   shipment_created: {
