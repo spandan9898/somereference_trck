@@ -90,7 +90,10 @@ const prepareDataForReportMongo = (trackData, isManualUpdate) => {
     delivery_date: findDeliveryDate(trackData?.track_arr || {}),
     rto_date: findRTODate(trackData?.track_arr || {}),
     pickrr_tracking_id: trackData.tracking_id,
-    qc_rejection_reason: findQCFailureReason(trackData?.track_arr || {}),
+    qc_rejection_reason: findQCFailureReason(
+      trackData?.track_arr || {},
+      trackData?.courier_parent_name || ""
+    ),
     rtdDate: findLatestRtdDate(trackData?.trackArr || []),
     total_attempt_count: totalAttemptCount,
   };

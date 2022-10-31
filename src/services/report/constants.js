@@ -12,6 +12,11 @@ const REPORT_STATUS_CODE_MAPPING = {
   QCF: "QC FAILED",
 };
 
+const QCF_FAILURE_REASON_MAPPING = {
+  OCC: "Order Cancelled by Customer",
+  PMM: "Product Mismatched",
+};
+
 const REPORT_STATUS_TYPE_MAPPING = {
   RTD: "RTD",
   RTO: "RTO",
@@ -89,4 +94,5 @@ module.exports = {
   VALID_FAD_NDR_SUBSTATUS_CODE,
   CUSTOMER_DRIVEN_NDR_REASON,
   PPF_REPORT_STATUS_CODE_MAPPINGS,
+  QCF_FAILURE_REASON_MAPPING,
 };
