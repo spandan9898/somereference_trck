@@ -136,7 +136,7 @@ const isLatestEventSentOnCommonTopic = async (trackingObj) => {
       }
     }
     cacheData.latest_event_sent_on_common_topic = `${currentStatusType}_${newScanTime}`;
-    await storeInCache(awb, cacheData);
+    await storeInCache(redisKey, cacheData);
     logger.info(
       `Event sent on tracking_topic for awb: ${awb}, status: ${currentStatusType}, scan_time: ${currentStatusTime}`
     );
