@@ -45,7 +45,7 @@ const PICKRR_EDD_MATRIX_FOR_EKART = {
 };
 
 const ZONE_REQUIRED_STATUS_SET = ["OP", "OM", "PPF", "OFP", "PP", "SHP", "OT", "RAD"];
-const COMMON_TRACKING_TOPIC_NAME = "tracking_internal";
+const COMMON_TRACKING_TOPIC_NAME = "tracking_data";
 const TRACKING_PAGE_OTP_MESSAGE = " OTP VERIFIED";
 
 module.exports = {
