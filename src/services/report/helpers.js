@@ -7,6 +7,7 @@ const {
   NEW_STATUS_TO_OLD_MAPPING,
   VALID_FAD_NDR_SUBSTATUS_CODE,
   CUSTOMER_DRIVEN_NDR_REASON,
+  QCF_FAILURE_REASON_MAPPING,
 } = require("./constants");
 const { REPORT_STATUS_CODE_MAPPING, REPORT_STATUS_TYPE_MAPPING } = require("./constants");
 
@@ -162,9 +163,12 @@ const findLostDate = (trackArr, latestStatus) => {
  * @param {*} trackArr
  * @returns
  */
-const findQCFailureReason = (trackArr) => {
+const findQCFailureReason = (trackArr, courierParentName) => {
   for (let i = 0; i < trackArr.length; i += 1) {
     if (trackArr[i].scan_type === "QCF") {
+      if (courierParentName === "Ekart") {
+        return QCF_FAILURE_REASON_MAPPING[trackArr[i]?.pickrr_sub_status_code] || "Others";
+      }
       return trackArr[i].scan_status;
     }
   }
