@@ -195,7 +195,7 @@ const EKART_STATUS_MAPPER = {
   "pickup_not_picked_attempted_productmismatch_customer related": {
     qc: {
       scan_type: "QCF",
-      pickrr_sub_status_code: ":PMM",
+      pickrr_sub_status_code: "PMM",
     },
     non_qc: {
       scan_type: "PPF",
