@@ -14,7 +14,15 @@ const REPORT_STATUS_CODE_MAPPING = {
 
 const QCF_FAILURE_REASON_MAPPING = {
   OCC: "Order Cancelled by Customer",
+  QDM: "Damged/Used Product",
   PMM: "Product Mismatched",
+  CM: "Color Mismatch",
+  PSM: "Size Mismatch",
+  PTM: "Product Tag Missing",
+  PBM: "Product Box Missing",
+  BM: "Brand Mismatch",
+  PCM: "Product Count Mismatch",
+  PDM: "Product Description Mismatch",
 };
 
 const REPORT_STATUS_TYPE_MAPPING = {
