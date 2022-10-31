@@ -172,6 +172,15 @@ const commonTrackingDataProducer = async (trackingObj) => {
       producer: producerInstance,
       messages,
     });
+    try{
+      await produceData({
+        topic: "tracking_internal",
+        producer: producerInstance,
+        messages,
+      });
+    }catch(error){
+      logger.error(`tracking_internal ${error.stack} ${error}`);
+    }
   } catch (error) {
     logger.error(`commonProducer ${error.stack} ${error}`);
   }
