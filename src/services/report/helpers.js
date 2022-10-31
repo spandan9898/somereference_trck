@@ -163,13 +163,10 @@ const findLostDate = (trackArr, latestStatus) => {
  * @param {*} trackArr
  * @returns
  */
-const findQCFailureReason = (trackArr, courierParentName) => {
+const findQCFailureReason = (trackArr) => {
   for (let i = 0; i < trackArr.length; i += 1) {
     if (trackArr[i].scan_type === "QCF") {
-      if (courierParentName === "Ekart") {
-        return QCF_FAILURE_REASON_MAPPING[trackArr[i]?.pickrr_sub_status_code] || "Others";
-      }
-      return trackArr[i].scan_status;
+      return QCF_FAILURE_REASON_MAPPING[trackArr[i]?.pickrr_sub_status_code] || "Others";
     }
   }
 
