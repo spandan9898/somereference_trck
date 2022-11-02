@@ -225,7 +225,7 @@ class KafkaMessageHandler {
       const trackData = await redisCheckAndReturnTrackData(res, isFromPulled);
       if (!trackData) {
         logger.info(`data already exists or not found in DB! ${res.awb}`);
-        updateTrackingProcessingCount({ awb: res.awb }, "remove");
+        updateTrackingProcessingCount({ key: redisKey }, "remove");
 
         const colInstance = await commonTrackingInfoCol();
         try {
