@@ -193,7 +193,7 @@ const updateTrackDataToPullMongo = async ({
     }
 
     if (res.is_manual_update) {
-      return;
+      return false;
     }
     const zone = res?.billing_zone;
     const eddStampInDb = res?.edd_stamp;
@@ -203,7 +203,7 @@ const updateTrackDataToPullMongo = async ({
         logger.info(
           `trigger returned false for - ${result.awb} and status - ${updatedObj["status.current_status_type"]} and scan datetime - ${updatedObj["status.current_status_time"]}`
         );
-        return;
+        return false;
       }
     }
     if (!res) {
