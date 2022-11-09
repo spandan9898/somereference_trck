@@ -1,3 +1,5 @@
+/* eslint-disable consistent-return */
+/* eslint-disable prefer-destructuring */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-restricted-syntax */
 const moment = require("moment");
@@ -174,6 +176,8 @@ const updateTrackDataToPullMongo = async ({
 
     // update reverse qc
 
+    const childCourier = res?.courier_used;
+
     if (res?.is_reverse_qc && (res?.courier_used || "").includes("ekart")) {
       const data = await transformTrackStatusForRevQc(
         result.eventObj,
@@ -228,9 +232,35 @@ const updateTrackDataToPullMongo = async ({
       }
 
       let updatedTrackArray = [...trackArr, ...res.track_arr];
+
       updatedTrackArray = _.orderBy(updatedTrackArray, ["scan_datetime"], ["desc"]);
       sortedTrackArray = updatedTrackArray;
     }
+
+    // logic to handle logic for sfx sdd ndd
+
+    let SFX_SDD_NDD_FLAG = false;
+    if (childCourier === "shadowfax_sdd" || childCourier === "shadowfax_ndd") {
+      for (let i = sortedTrackArray.length - 1; i >= 0; i -= 1) {
+        const currentScanType = sortedTrackArray[i]?.scan_type;
+        if (currentScanType === "RTO") {
+          SFX_SDD_NDD_FLAG = true;
+        }
+        if (SFX_SDD_NDD_FLAG && !["RTO", "RTO-OT", "RTO-OO", "RTD"].includes(currentScanType)) {
+          if (currentScanType === "DL") {
+            sortedTrackArray[i].scan_type = "RTD";
+          }
+          if (currentScanType === "OO") {
+            sortedTrackArray[i].scan_type = "RTO-OO";
+          } else {
+            sortedTrackArray[i].scan_type = "RTO-OT";
+          }
+        }
+      }
+    }
+
+    // print the track array -->
+
     updatedObj.track_arr = sortedTrackArray;
     updatedObj.courier_edd = latestCourierEDD;
 
