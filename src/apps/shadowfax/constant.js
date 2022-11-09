@@ -122,6 +122,10 @@ const SHADOWFAX_PULL_CODE_MAPPER_1 = {
     scan_type: "UD",
     pickrr_sub_status_code: "CR",
   },
+  received_from_client_warehouse: {
+    scan_type: "PP",
+    pickrr_sub_status_code: "",
+  },
 };
 
 const SHADOWFAX_PULL_CODE_MAPPER_2 = {
@@ -152,8 +156,16 @@ const SHADOWFAX_PULL_CODE_MAPPER_2 = {
   item_manifested: { scan_type: "OT", pickrr_sub_status_code: "" },
   bag_in_transit: { scan_type: "OT", pickrr_sub_status_code: "" },
   bag_received_at_via: { scan_type: "OT", pickrr_sub_status_code: "" },
+  bag_received: { scan_type: "OT", pickrr_sub_status_code: "" },
   assigned_for_seller_pickup: { scan_type: "OM", pickrr_sub_status_code: "" },
   cancelled_by_seller: { scan_type: "PPF", pickrr_sub_status_code: "CANC" },
+  received_from_client_warehouse: { scan_type: "PP", pickrr_sub_status_code: "" },
+  received_at_dc: { scan_type: "OT", pickrr_sub_status_code: "" },
+  received_at_hub: { scan_type: "OT", pickrr_sub_status_code: "" },
+  assigned: { scan_type: "OT", pickrr_sub_status_code: "" },
+  rto: { scan_type: "RTO", pickrr_sub_status_code: "" },
+  rto_nd: { scan_type: "RTO UD", pickrr_sub_status_code: "" },
+  rto_d: { scan_type: "RTD", pickrr_sub_status_code: "" },
 };
 
 const SHADOWFAX_REVERSE_MAPPER = {
