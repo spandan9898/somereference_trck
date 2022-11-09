@@ -349,6 +349,10 @@ const DTDC_CODE_MAPPER = {
     scan_type: "RTO",
     pickrr_sub_status_code: "",
   },
+  nondlv: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
 };
 
 module.exports = {
