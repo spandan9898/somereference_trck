@@ -129,8 +129,10 @@ const prepareEkartData = (ekartDict) => {
       }
     }
     if (ekartDict?.courier_name === "flipkartlogistics-reverse") {
-      pickrrEkartDict.scan_type = statusType === "RTO-OT" ? "OT" : statusType;
-      pickrrEkartDict.scan_type = statusType === "RTD" ? "DL" : statusType;
+      statusType = statusType === "RTO-OT" ? "OT" : statusType;
+      statusType = statusType === "RTO-OO" ? "OO" : statusType;
+      statusType = statusType === "RTD" ? "DL" : statusType;
+      statusType = statusType === "RTO-NDR" ? "NDR" : statusType;
     }
     pickrrEkartDict.scan_type = statusType === "UD" ? "NDR" : statusType;
     pickrrEkartDict.scan_datetime = statusDate;
