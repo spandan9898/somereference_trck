@@ -52,6 +52,8 @@ const preparePikNDelData = (payload) => {
       ExpectedDeliveryDate,
       ReasonCode: reasonCode,
       Reason: reason,
+      ReportingLat,
+      ReportingLng,
     } = payload;
     pickrrDict.awb = AWB;
     let mapperString = null;
@@ -87,7 +89,8 @@ const preparePikNDelData = (payload) => {
     if (scanType.scan_type === "PP") {
       pickrrDict.pickup_datetime = pickrrDict.scan_datetime;
     }
-
+    pickrrDict.latitude = ReportingLat;
+    pickrrDict.longitude = ReportingLng;
     return pickrrDict;
   } catch (error) {
     pickrrDict.err = error.message;
