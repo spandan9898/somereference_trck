@@ -79,7 +79,7 @@ const preparePidgeData = (pidgeDict) => {
       : PICKRR_STATUS_CODE_MAPPING[pickrrPidgeDict.scan_type];
     pickrrPidgeDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrPidgeDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
-    pickrrPidgeDict.rider_name = _.get(pidgeDict, "rider_name", "").toString();
+    pickrrPidgeDict.rider_name = pidgeDict?.rider_name || "";
 
     return pickrrPidgeDict;
   } catch (error) {
