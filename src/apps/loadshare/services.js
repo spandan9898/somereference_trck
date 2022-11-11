@@ -107,6 +107,9 @@ const prepareLoadshareData = (loadshareDict) => {
     pickrrLoadshareDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrLoadshareDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
     pickrrLoadshareDict.track_location = loadshareDict?.locationCity?.toString();
+    pickrrLoadshareDict.rider_name = loadshareDict?.userName || "";
+    pickrrLoadshareDict.latitude = loadshareDict?.latitude || "";
+    pickrrLoadshareDict.longitude = loadshareDict?.longitude || "";
     return pickrrLoadshareDict;
   } catch (error) {
     pickrrLoadshareDict.err = error;
@@ -190,7 +193,6 @@ const prepareLoadsharePulledData = (loadshareDict) => {
     pickrrLoadshareDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrLoadshareDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
     pickrrLoadshareDict.track_location = loadshareDict?.locationAddressPincodeCityName?.toString();
-    return pickrrLoadshareDict;
   } catch (error) {
     pickrrLoadshareDict.err = error;
     logger.error("Loadshare Pull Preparator Error ->", error);

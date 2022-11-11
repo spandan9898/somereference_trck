@@ -59,6 +59,10 @@ const prepareTrackDataToUpdateInPullDb = (trackObj, isFromPulled) => {
     eventObj.longitude = trackData?.longitude;
     eventObj.latitude = trackData?.latitude;
   }
+
+  eventObj.rider_name = trackData?.rider_name;
+  eventObj.rider_phone_number = trackData?.rider_phone_number;
+
   if (trackData?.otp) {
     eventObj.otp = trackData.otp;
   }

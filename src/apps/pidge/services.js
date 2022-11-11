@@ -48,7 +48,7 @@ const preparePidgeData = (pidgeDict) => {
   try {
     pickrrPidgeDict.awb = _.get(pidgeDict, "PBID", "").toString();
     let statusString = null;
-    if(!pidgeDict?.timestamp){
+    if (!pidgeDict?.timestamp) {
       logger.info(`Timestamp not found on ${pickrrPidgeDict.awb} waybill`);
       return { err: `Timestamp not found on ${pickrrPidgeDict.awb} waybill` };
     }
@@ -79,6 +79,7 @@ const preparePidgeData = (pidgeDict) => {
       : PICKRR_STATUS_CODE_MAPPING[pickrrPidgeDict.scan_type];
     pickrrPidgeDict.pickrr_status = PICKRR_STATUS_CODE_MAPPING[scanType?.scan_type];
     pickrrPidgeDict.pickrr_sub_status_code = scanType?.pickrr_sub_status_code;
+    pickrrPidgeDict.rider_name = _.get(pidgeDict, "rider_name", "").toString();
 
     return pickrrPidgeDict;
   } catch (error) {
@@ -86,6 +87,7 @@ const preparePidgeData = (pidgeDict) => {
     return pickrrPidgeDict;
   }
 };
+
 /**
  *
  * @param {*} pidgeDict
