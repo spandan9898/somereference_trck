@@ -103,6 +103,8 @@ const prepareShadowfaxData = (shadowfaxDict) => {
       event_timestamp: eventTimeStamp,
       event_location: eventLocation,
       remarks: Remarks,
+      rider_name: riderName,
+      rider_contact: riderContact,
     } = shadowfaxDict || {};
 
     pickrrShadowfaxDict.awb = awb;
@@ -130,6 +132,8 @@ const prepareShadowfaxData = (shadowfaxDict) => {
     if ((Remarks || "").toLowerCase().includes("otp verified cancelled")) {
       pickrrShadowfaxDict.track_info += `${TRACKING_PAGE_OTP_MESSAGE}`;
     }
+    pickrrShadowfaxDict.rider_name = riderName || "";
+    pickrrShadowfaxDict.rider_phone_number = riderContact || "";
     return pickrrShadowfaxDict;
   } catch (error) {
     pickrrShadowfaxDict.err = error.message;
