@@ -1514,6 +1514,16 @@ const DELHIVERY_NSL_CODE_TO_STATUS_TYPE_MAPPER = {
     scan_type: "UD",
     pickrr_sub_status_code: "CR",
   },
+  "dlydg-RT_119": {
+    courier_remark: "Shipment Damaged",
+    scan_type: "DM",
+    pickrr_sub_status_code: "",
+  },
+  "dlydg-UD_119": {
+    courier_remark: "Shipment Damaged",
+    scan_type: "DM",
+    pickrr_sub_status_code: "",
+  },
 };
 
 const DELHIVERY_REVERSE_MAPPER = {
