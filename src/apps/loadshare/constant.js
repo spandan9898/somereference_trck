@@ -176,6 +176,10 @@ const CODE_MAPPER = {
     scan_type: "UD",
     pickrr_sub_status_code: "AI",
   },
+  undelivered_9221: {
+    scan_type: "UD",
+    pickrr_sub_status_code: "SD",
+  },
 };
 
 const PULL_PARTITION_COUNT = 6;
