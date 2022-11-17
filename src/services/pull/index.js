@@ -108,6 +108,7 @@ const transformTrackStatusForRevQc = async (eventObj, statusMap, mapperString) =
       mappedData.scan_type = "NDR";
     }
   }
+
   if (!mappedData) {
     return { modifiedEventObj: null, modifiedStatusMap: null };
   }
