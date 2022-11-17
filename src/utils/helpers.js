@@ -117,7 +117,7 @@ const isLatestEventSentOnCommonTopic = async (trackingObj) => {
     if (!currentStatusTime || !currentStatusType || !awb) {
       return false;
     }
-    const redisKey = trackingObj?.redis_key || awb;
+    const redisKey = `${trackingObj?.redis_key || awb}_last_event_sent`;
     const cacheData = (await getObject(redisKey)) || {};
     const latestEventSent = cacheData?.latest_event_sent_on_common_topic;
     const newScanTime = moment(currentStatusTime).unix();
@@ -136,7 +136,7 @@ const isLatestEventSentOnCommonTopic = async (trackingObj) => {
       }
     }
     cacheData.latest_event_sent_on_common_topic = `${currentStatusType}_${newScanTime}`;
-    await storeInCache(redisKey, cacheData);
+    await storeInCache(redisKey, cacheData, 10 * 24 * 60 * 60);
     logger.info(
       `Event sent on tracking_topic for awb: ${awb}, status: ${currentStatusType}, scan_time: ${currentStatusTime}`
     );
