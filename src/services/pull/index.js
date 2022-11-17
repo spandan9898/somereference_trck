@@ -93,12 +93,7 @@ const fetchAndUpdateAuditLogsData = async ({
  * @returns eventObj
  */
 const transformTrackStatusForRevQc = async (eventObj, statusMap, mapperString) => {
-  let mappedData = (mapperString || {})?.qc;
-  if (!mappedData) {
-    // mapped Data is null
-
-    mappedData = mapperString;
-  }
+  const mappedData = (mapperString || {})?.qc;
   if (!mappedData) {
     return { modifiedEventObj: null, modifiedStatusMap: null };
   }
