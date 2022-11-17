@@ -98,6 +98,15 @@ const transformTrackStatusForRevQc = async (eventObj, statusMap, mapperString) =
     // mapped Data is null
 
     mappedData = mapperString;
+    if (mappedData?.scan_type === "RTO-OT") {
+      mappedData.scan_type = "OT";
+    } else if (mappedData?.scan_type === "RTO-OO") {
+      mappedData.scan_type = "OO";
+    } else if (mappedData?.scan_type === "RTD") {
+      mappedData.scan_type = "DL";
+    } else if (mappedData?.scan_type === "RTO-NDR") {
+      mappedData.scan_type = "NDR";
+    }
   }
   if (!mappedData) {
     return { modifiedEventObj: null, modifiedStatusMap: null };
