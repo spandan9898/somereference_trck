@@ -3,6 +3,7 @@
 const RequestIp = require("@supercharge/request-ip");
 const moment = require("moment");
 const PapaParse = require("papaparse");
+const { deleteKey } = require("../../../utils/redis");
 
 const { startProcess } = require("../../../../scripts/reportBackfill");
 const { sendDataToElk } = require("../../../services/common/elk");
@@ -35,6 +36,21 @@ module.exports.reportBackfilling = async (req, reply) => {
     dateFilter,
   });
   return reply.code(200).send(body);
+};
+
+module.exports.emptyRedisKey = async function emptyRedisKey(req, reply) {
+  try {
+    const { awb, courier_parent_name: courierParentName } = req.query || {};
+    const key = `${awb}_${courierParentName}`;
+    await deleteKey(key);
+    return reply.code(200).send({
+      success: true,
+    });
+  } catch (error) {
+    return reply.code(400).send({
+      message: error.message,
+    });
+  }
 };
 
 module.exports.updateStatus = async function updateStatus(req, reply) {
